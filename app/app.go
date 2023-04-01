@@ -124,6 +124,10 @@ import (
 
 	evmupgrade "github.com/0xknstntn/quadrate/app/upgrades/evm"
 
+	convertermodule "github.com/0xknstntn/x/converter"
+	convertermodulekeeper "github.com/0xknstntn/x/converter/keeper"
+	convertermoduletypes "github.com/0xknstntn/x/converter/types"
+
 	// unnamed import of statik for swagger UI support
 	_ "github.com/cosmos/cosmos-sdk/client/docs/statik"
 )
@@ -210,20 +214,22 @@ var (
 		wasm.AppModuleBasic{},
 		evm.AppModuleBasic{},
 		feemarket.AppModuleBasic{},
+		convertermodule.AppModuleBasic{},
 	)
 
 	// module account permissions
 	maccPerms = map[string][]string{
-		authtypes.FeeCollectorName:     nil,
-		distrtypes.ModuleName:          nil,
-		icatypes.ModuleName:            nil,
-		minttypes.ModuleName:           {authtypes.Minter},
-		stakingtypes.BondedPoolName:    {authtypes.Burner, authtypes.Staking},
-		stakingtypes.NotBondedPoolName: {authtypes.Burner, authtypes.Staking},
-		govtypes.ModuleName:            {authtypes.Burner},
-		ibctransfertypes.ModuleName:    {authtypes.Minter, authtypes.Burner},
-		wasm.ModuleName:                {authtypes.Burner},
-		evmtypes.ModuleName:            {authtypes.Minter, authtypes.Burner}, // used for secure addition and subtraction of balance using module account
+		authtypes.FeeCollectorName:      nil,
+		distrtypes.ModuleName:           nil,
+		icatypes.ModuleName:             nil,
+		minttypes.ModuleName:            {authtypes.Minter},
+		stakingtypes.BondedPoolName:     {authtypes.Burner, authtypes.Staking},
+		stakingtypes.NotBondedPoolName:  {authtypes.Burner, authtypes.Staking},
+		govtypes.ModuleName:             {authtypes.Burner},
+		ibctransfertypes.ModuleName:     {authtypes.Minter, authtypes.Burner},
+		wasm.ModuleName:                 {authtypes.Burner},
+		evmtypes.ModuleName:             {authtypes.Minter, authtypes.Burner}, // used for secure addition and subtraction of balance using module account
+		convertermoduletypes.ModuleName: {authtypes.Minter, authtypes.Burner, authtypes.Staking},
 	}
 )
 
@@ -270,6 +276,8 @@ type QuadrateApp struct { // nolint: golint
 	FeeGrantKeeper feegrantkeeper.Keeper
 	AuthzKeeper    authzkeeper.Keeper
 	RouterKeeper   routerkeeper.Keeper
+
+	ConverterKeeper convertermodulekeeper.Keeper
 
 	// make scoped keepers public for test purposes
 	ScopedIBCKeeper      capabilitykeeper.ScopedKeeper
@@ -327,7 +335,7 @@ func NewQuadrateApp(
 		govtypes.StoreKey, paramstypes.StoreKey, ibchost.StoreKey, upgradetypes.StoreKey,
 		evidencetypes.StoreKey, ibctransfertypes.StoreKey, capabilitytypes.StoreKey,
 		feegrant.StoreKey, authzkeeper.StoreKey, routertypes.StoreKey, icahosttypes.StoreKey,
-		wasm.StoreKey, evmtypes.StoreKey, feemarkettypes.StoreKey,
+		wasm.StoreKey, evmtypes.StoreKey, feemarkettypes.StoreKey, convertermoduletypes.StoreKey,
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey, evmtypes.TransientKey, feemarkettypes.TransientKey)
 	memKeys := sdk.NewMemoryStoreKeys(capabilitytypes.MemStoreKey)
@@ -433,6 +441,16 @@ func NewQuadrateApp(
 		homePath,
 		nil,
 	)
+
+	app.ConverterKeeper = *convertermodulekeeper.NewKeeper(
+		appCodec,
+		keys[convertermoduletypes.StoreKey],
+		keys[convertermoduletypes.MemStoreKey],
+		app.GetSubspace(convertermoduletypes.ModuleName),
+
+		app.BankKeeper,
+	)
+	converterModule := convertermodule.NewAppModule(appCodec, app.ConverterKeeper, app.AccountKeeper, app.BankKeeper)
 
 	// register the staking hooks
 	// NOTE: stakingKeeper above is passed by reference, so that it will contain these hooks
@@ -602,6 +620,7 @@ func NewQuadrateApp(
 		wasm.NewAppModule(appCodec, &app.wasmKeeper, app.StakingKeeper, app.AccountKeeper, app.BankKeeper),
 		evm.NewAppModule(app.EvmKeeper, app.AccountKeeper),
 		feemarket.NewAppModule(app.FeeMarketKeeper),
+		converterModule,
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
@@ -634,6 +653,7 @@ func NewQuadrateApp(
 		wasm.ModuleName,
 		feemarkettypes.ModuleName,
 		evmtypes.ModuleName,
+		convertermoduletypes.ModuleName,
 	)
 	app.mm.SetOrderEndBlockers(
 		crisistypes.ModuleName,
@@ -659,6 +679,7 @@ func NewQuadrateApp(
 		wasm.ModuleName,
 		evmtypes.ModuleName,
 		feemarkettypes.ModuleName,
+		convertermoduletypes.ModuleName,
 	)
 
 	// NOTE: The genutils module must occur after staking so that pools are
@@ -694,6 +715,7 @@ func NewQuadrateApp(
 		upgradetypes.ModuleName,
 		vestingtypes.ModuleName,
 		wasm.ModuleName,
+		convertermoduletypes.ModuleName,
 	)
 
 	app.mm.RegisterInvariants(&app.CrisisKeeper)
@@ -905,6 +927,7 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(wasm.ModuleName)
 	paramsKeeper.Subspace(feemarkettypes.ModuleName)
 	paramsKeeper.Subspace(evmtypes.ModuleName)
+	paramsKeeper.Subspace(convertermoduletypes.ModuleName)
 
 	return paramsKeeper
 }
