@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package example.converter;
+
+option go_package = "example/x/converter/types";
+
+// Msg defines the Msg service.
+service Msg {
+  rpc Cw20Erc20 (MsgCw20Erc20) returns (MsgCw20Erc20Response);
+  rpc Erc20Cw20 (MsgErc20Cw20) returns (MsgErc20Cw20Response);
+}
+message MsgCw20Erc20 {
+  string creator = 1;
+  string amount  = 2;
+  string token   = 3;
+}
+
+message MsgCw20Erc20Response {}
+
+message MsgErc20Cw20 {
+  string creator = 1;
+  string amount  = 2;
+  string token   = 3;
+}
+
+message MsgErc20Cw20Response {}
+

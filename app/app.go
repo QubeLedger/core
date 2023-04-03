@@ -124,9 +124,9 @@ import (
 
 	evmupgrade "github.com/0xknstntn/quadrate/app/upgrades/evm"
 
-	convertermodule "github.com/0xknstntn/x/converter"
-	convertermodulekeeper "github.com/0xknstntn/x/converter/keeper"
-	convertermoduletypes "github.com/0xknstntn/x/converter/types"
+	"github.com/0xknstntn/quadrate/x/converter"
+	convertermodulekeeper "github.com/0xknstntn/quadrate/x/converter/keeper"
+	convertermoduletypes "github.com/0xknstntn/quadrate/x/converter/types"
 
 	// unnamed import of statik for swagger UI support
 	_ "github.com/cosmos/cosmos-sdk/client/docs/statik"
@@ -214,7 +214,7 @@ var (
 		wasm.AppModuleBasic{},
 		evm.AppModuleBasic{},
 		feemarket.AppModuleBasic{},
-		convertermodule.AppModuleBasic{},
+		converter.AppModuleBasic{},
 	)
 
 	// module account permissions
@@ -277,8 +277,6 @@ type QuadrateApp struct { // nolint: golint
 	AuthzKeeper    authzkeeper.Keeper
 	RouterKeeper   routerkeeper.Keeper
 
-	ConverterKeeper convertermodulekeeper.Keeper
-
 	// make scoped keepers public for test purposes
 	ScopedIBCKeeper      capabilitykeeper.ScopedKeeper
 	ScopedTransferKeeper capabilitykeeper.ScopedKeeper
@@ -289,6 +287,7 @@ type QuadrateApp struct { // nolint: golint
 
 	EvmKeeper       *evmkeeper.Keeper
 	FeeMarketKeeper feemarketkeeper.Keeper
+	ConverterKeeper convertermodulekeeper.Keeper
 
 	// the module manager
 	mm *module.Manager
@@ -447,10 +446,12 @@ func NewQuadrateApp(
 		keys[convertermoduletypes.StoreKey],
 		keys[convertermoduletypes.MemStoreKey],
 		app.GetSubspace(convertermoduletypes.ModuleName),
-
 		app.BankKeeper,
+		app.EvmKeeper,
+		app.wasmKeeper,
+		app.AccountKeeper,
 	)
-	converterModule := convertermodule.NewAppModule(appCodec, app.ConverterKeeper, app.AccountKeeper, app.BankKeeper)
+	//converterModule := converter.NewAppModule(appCodec, app.ConverterKeeper, app.AccountKeeper, app.BankKeeper, app.EvmKeeper, app.wasmKeeper)
 
 	// register the staking hooks
 	// NOTE: stakingKeeper above is passed by reference, so that it will contain these hooks
@@ -620,7 +621,7 @@ func NewQuadrateApp(
 		wasm.NewAppModule(appCodec, &app.wasmKeeper, app.StakingKeeper, app.AccountKeeper, app.BankKeeper),
 		evm.NewAppModule(app.EvmKeeper, app.AccountKeeper),
 		feemarket.NewAppModule(app.FeeMarketKeeper),
-		converterModule,
+		converter.NewAppModule(appCodec, app.ConverterKeeper, app.AccountKeeper, app.BankKeeper, app.EvmKeeper, app.wasmKeeper),
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
@@ -878,7 +879,6 @@ func (app *QuadrateApp) RegisterAPIRoutes(apiSvr *api.Server, apiConfig config.A
 
 	// Register legacy and grpc-gateway routes for all modules.
 	evmrest.RegisterTxRoutes(clientCtx, apiSvr.Router)
-	ModuleBasics.RegisterRESTRoutes(clientCtx, apiSvr.Router)
 	ModuleBasics.RegisterGRPCGatewayRoutes(clientCtx, apiSvr.GRPCGatewayRouter)
 
 	// register swagger API from root so that other applications can override easily
