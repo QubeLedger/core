@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="assets/banner.png" width="1600" height="533"/>
+  <img src="assets/banner.png"/>
   <br/>
   <h1> Quadrate </h1>
   <p> Cosmos SDK L1 blockchain, built for decentralized, trust-free, stable economy </p>
