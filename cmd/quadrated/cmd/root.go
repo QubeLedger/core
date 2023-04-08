@@ -36,9 +36,9 @@ import (
 	ethermintserver "github.com/evmos/ethermint/server"
 	evmcfg "github.com/evmos/ethermint/server/config"
 
-	quadrate "github.com/0xknstntn/quadrate/app"
-	"github.com/0xknstntn/quadrate/app/params"
-	quadratetypes "github.com/0xknstntn/quadrate/types"
+	quadrate "github.com/QuadrateOrg/core/app"
+	"github.com/QuadrateOrg/core/app/params"
+	quadratetypes "github.com/QuadrateOrg/core/types"
 	"github.com/evmos/ethermint/client/debug"
 )
 

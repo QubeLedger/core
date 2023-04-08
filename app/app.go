@@ -119,11 +119,18 @@ import (
 	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
 	"github.com/prometheus/client_golang/prometheus"
 
-	quadrateante "github.com/0xknstntn/quadrate/ante"
-	quadrateappparams "github.com/0xknstntn/quadrate/app/params"
+	quadrateante "github.com/QuadrateOrg/core/ante"
+	quadrateappparams "github.com/QuadrateOrg/core/app/params"
 
-	evmupgrade "github.com/0xknstntn/quadrate/app/upgrades/evm"
+	evmupgrade "github.com/QuadrateOrg/core/app/upgrades/evm"
 
+<<<<<<< Updated upstream
+=======
+	"github.com/QuadrateOrg/core/x/printer"
+	printermodulekeeper "github.com/QuadrateOrg/core/x/printer/keeper"
+	printermoduletypes "github.com/QuadrateOrg/core/x/printer/types"
+
+>>>>>>> Stashed changes
 	// unnamed import of statik for swagger UI support
 	_ "github.com/cosmos/cosmos-sdk/client/docs/statik"
 )
@@ -210,6 +217,10 @@ var (
 		wasm.AppModuleBasic{},
 		evm.AppModuleBasic{},
 		feemarket.AppModuleBasic{},
+<<<<<<< Updated upstream
+=======
+		printer.AppModuleBasic{},
+>>>>>>> Stashed changes
 	)
 
 	// module account permissions
@@ -224,6 +235,10 @@ var (
 		ibctransfertypes.ModuleName:    {authtypes.Minter, authtypes.Burner},
 		wasm.ModuleName:                {authtypes.Burner},
 		evmtypes.ModuleName:            {authtypes.Minter, authtypes.Burner}, // used for secure addition and subtraction of balance using module account
+<<<<<<< Updated upstream
+=======
+		printermoduletypes.ModuleName:  {authtypes.Minter, authtypes.Burner, authtypes.Staking},
+>>>>>>> Stashed changes
 	}
 )
 
@@ -279,8 +294,15 @@ type QuadrateApp struct { // nolint: golint
 	wasmKeeper       wasm.Keeper
 	scopedWasmKeeper capabilitykeeper.ScopedKeeper
 
+<<<<<<< Updated upstream
 	EvmKeeper       *evmkeeper.Keeper
 	FeeMarketKeeper feemarketkeeper.Keeper
+=======
+	EvmKeeper           *evmkeeper.Keeper
+	FeeMarketKeeper     feemarketkeeper.Keeper
+	ScopedPrinterKeeper capabilitykeeper.ScopedKeeper
+	printerKeeper       printermodulekeeper.Keeper
+>>>>>>> Stashed changes
 
 	// the module manager
 	mm *module.Manager
@@ -327,7 +349,11 @@ func NewQuadrateApp(
 		govtypes.StoreKey, paramstypes.StoreKey, ibchost.StoreKey, upgradetypes.StoreKey,
 		evidencetypes.StoreKey, ibctransfertypes.StoreKey, capabilitytypes.StoreKey,
 		feegrant.StoreKey, authzkeeper.StoreKey, routertypes.StoreKey, icahosttypes.StoreKey,
+<<<<<<< Updated upstream
 		wasm.StoreKey, evmtypes.StoreKey, feemarkettypes.StoreKey,
+=======
+		wasm.StoreKey, evmtypes.StoreKey, feemarkettypes.StoreKey, printermoduletypes.StoreKey,
+>>>>>>> Stashed changes
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey, evmtypes.TransientKey, feemarkettypes.TransientKey)
 	memKeys := sdk.NewMemoryStoreKeys(capabilitytypes.MemStoreKey)
@@ -549,6 +575,24 @@ func NewQuadrateApp(
 	icaModule := ica.NewAppModule(nil, &app.ICAHostKeeper)
 	icaHostIBCModule := icahost.NewIBCModule(app.ICAHostKeeper)
 
+	scopedPrinterKeeper := app.CapabilityKeeper.ScopeToModule(printermoduletypes.ModuleName)
+	app.ScopedPrinterKeeper = scopedPrinterKeeper
+
+	app.printerKeeper = *printermodulekeeper.NewKeeper(
+		appCodec,
+		keys[printermoduletypes.StoreKey],
+		keys[printermoduletypes.MemStoreKey],
+		app.GetSubspace(printermoduletypes.ModuleName),
+		app.IBCKeeper.ChannelKeeper,
+		&app.IBCKeeper.PortKeeper,
+		scopedPrinterKeeper,
+		app.BankKeeper,
+		app.AccountKeeper,
+		app.StakingKeeper,
+	)
+	printerModule := printer.NewAppModule(appCodec, app.printerKeeper, app.AccountKeeper, app.BankKeeper, app.StakingKeeper)
+	printerIBCModule := printer.NewIBCModule(app.printerKeeper)
+
 	app.RouterKeeper = routerkeeper.NewKeeper(appCodec, keys[routertypes.StoreKey], app.GetSubspace(routertypes.ModuleName), app.TransferKeeper, app.DistrKeeper)
 
 	routerModule := router.NewAppModule(app.RouterKeeper, transferIBCModule)
@@ -556,7 +600,7 @@ func NewQuadrateApp(
 	ibcRouter := porttypes.NewRouter()
 	ibcRouter.AddRoute(icahosttypes.SubModuleName, icaHostIBCModule).
 		AddRoute(wasm.ModuleName, wasm.NewIBCHandler(app.wasmKeeper, app.IBCKeeper.ChannelKeeper)).
-		AddRoute(ibctransfertypes.ModuleName, transferIBCModule)
+		AddRoute(ibctransfertypes.ModuleName, transferIBCModule).AddRoute(printermoduletypes.ModuleName, printerIBCModule)
 
 	app.IBCKeeper.SetRouter(ibcRouter)
 
@@ -602,6 +646,10 @@ func NewQuadrateApp(
 		wasm.NewAppModule(appCodec, &app.wasmKeeper, app.StakingKeeper, app.AccountKeeper, app.BankKeeper),
 		evm.NewAppModule(app.EvmKeeper, app.AccountKeeper),
 		feemarket.NewAppModule(app.FeeMarketKeeper),
+<<<<<<< Updated upstream
+=======
+		printerModule,
+>>>>>>> Stashed changes
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
@@ -634,6 +682,10 @@ func NewQuadrateApp(
 		wasm.ModuleName,
 		feemarkettypes.ModuleName,
 		evmtypes.ModuleName,
+<<<<<<< Updated upstream
+=======
+		printermoduletypes.ModuleName,
+>>>>>>> Stashed changes
 	)
 	app.mm.SetOrderEndBlockers(
 		crisistypes.ModuleName,
@@ -659,6 +711,10 @@ func NewQuadrateApp(
 		wasm.ModuleName,
 		evmtypes.ModuleName,
 		feemarkettypes.ModuleName,
+<<<<<<< Updated upstream
+=======
+		printermoduletypes.ModuleName,
+>>>>>>> Stashed changes
 	)
 
 	// NOTE: The genutils module must occur after staking so that pools are
@@ -694,6 +750,10 @@ func NewQuadrateApp(
 		upgradetypes.ModuleName,
 		vestingtypes.ModuleName,
 		wasm.ModuleName,
+<<<<<<< Updated upstream
+=======
+		printermoduletypes.ModuleName,
+>>>>>>> Stashed changes
 	)
 
 	app.mm.RegisterInvariants(&app.CrisisKeeper)
@@ -905,6 +965,10 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(wasm.ModuleName)
 	paramsKeeper.Subspace(feemarkettypes.ModuleName)
 	paramsKeeper.Subspace(evmtypes.ModuleName)
+<<<<<<< Updated upstream
+=======
+	paramsKeeper.Subspace(printermoduletypes.ModuleName)
+>>>>>>> Stashed changes
 
 	return paramsKeeper
 }

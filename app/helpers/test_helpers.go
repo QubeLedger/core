@@ -12,7 +12,7 @@ import (
 	tmtypes "github.com/tendermint/tendermint/types"
 	dbm "github.com/tendermint/tm-db"
 
-	quadrateapp "github.com/0xknstntn/quadrate/app"
+	quadrateapp "github.com/QuadrateOrg/core/app"
 )
 
 // SimAppChainID hardcoded chainID for simulation

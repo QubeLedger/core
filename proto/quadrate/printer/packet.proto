@@ -1,0 +1,13 @@
+syntax = "proto3";
+package _QuadrateOrg.core.printer;
+
+option go_package = "github.com/QuadrateOrg/core/x/printer/types";
+
+message MakerPacketData {
+    oneof packet {
+        NoData noData = 1;
+    }
+}
+
+message NoData {
+}
