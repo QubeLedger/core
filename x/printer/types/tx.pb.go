@@ -118,6 +118,7 @@ var xxx_messageInfo_MsgMintResponse proto.InternalMessageInfo
 type MsgBurn struct {
 	Creator string `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
 	Amount  string `protobuf:"bytes,2,opt,name=amount,proto3" json:"amount,omitempty"`
+	Validator  string `protobuf:"bytes,3,opt,name=validator,proto3" json:"validator,omitempty"`
 }
 
 func (m *MsgBurn) Reset()         { *m = MsgBurn{} }
