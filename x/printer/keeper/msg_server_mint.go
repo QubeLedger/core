@@ -25,16 +25,13 @@ func (k msgServer) Mint(goCtx context.Context, msg *types.MsgMint) (*types.MsgMi
 		panic(sdkerrors.Wrapf(types.ErrInvalidVersion, "got %s, expected qube", amount.GetDenomByIndex(0)))
 	}
 
-	err = k.bankKeeper.SendCoinsFromAccountToModule(ctx, creator, types.ModuleName, amount)
-	if err != nil {
-		return nil, err
-	}
-
 	//TODO: get price from oracle
-	price := sdk.NewInt(2 * 1000000)
+
+	//QUBE=$2
+	price := sdk.NewInt(2 * 1000000 / 1000000)
 
 	qubeAmount := amount.AmountOfNoDenomValidation("qube")
-	usqAmount := qubeAmount.Mul(price.Sub(sdk.NewInt(1000000)))
+	usqAmount := qubeAmount.Mul(price)
 
 	usq := sdk.NewCoin("usq", usqAmount)
 	err = k.bankKeeper.MintCoins(ctx, types.ModuleName, sdk.NewCoins(usq))
@@ -42,14 +39,10 @@ func (k msgServer) Mint(goCtx context.Context, msg *types.MsgMint) (*types.MsgMi
 		return nil, err
 	}
 
-	validatorAddress, err := sdk.ValAddressFromBech32(types.ModuleName)
-	validator, err1 := k.stakingKeeper.GetValidator(ctx, validatorAddress)
-	if err1 != true {
-		return nil, sdkerrors.Wrapf(types.ErrValNotFound, "validator not found")
-	}
-
 	//TODO: delegate to random validator
-	_, err = k.stakingKeeper.Delegate(ctx, sdk.AccAddress(types.ModuleName), qubeAmount, stakingtypes.Unbonded, validator, true)
+
+	validator := k.stakingKeeper.GetAllValidators(ctx)[0]
+	_, err = k.stakingKeeper.Delegate(ctx, creator, qubeAmount, stakingtypes.Bonded, validator, false)
 	if err != nil {
 		panic(err)
 	}
