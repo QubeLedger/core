@@ -5,11 +5,11 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
-const TypeMsgMint = "cw_20_erc_20"
+const TypeMsgMint = "mint"
 
 var _ sdk.Msg = &MsgMint{}
 
-func NewMsgMint(creator string, amount string, token string) *MsgMint {
+func NewMsgMint(creator string, amount string) *MsgMint {
 	return &MsgMint{
 		Creator: creator,
 		Amount:  amount,

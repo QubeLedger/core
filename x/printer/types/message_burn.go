@@ -5,14 +5,15 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
-const TypeMsgBurn = "erc_20_cw_20"
+const TypeMsgBurn = "burn"
 
 var _ sdk.Msg = &MsgBurn{}
 
-func NewMsgBurn(creator string, amount string, token string) *MsgBurn {
+func NewMsgBurn(creator string, amount string, validator string) *MsgBurn {
 	return &MsgBurn{
-		Creator: creator,
-		Amount:  amount,
+		Creator:   creator,
+		Amount:    amount,
+		Validator: validator,
 	}
 }
 

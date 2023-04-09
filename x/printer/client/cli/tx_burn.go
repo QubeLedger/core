@@ -15,10 +15,10 @@ var _ = strconv.Itoa(0)
 
 func CmdBurn() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "burn [amount]",
+		Use:   "burn [amount, validator]",
 		Short: "USQ combustion to obtain Qube",
 		Args:  cobra.ExactArgs(1),
-		Long:  strings.TrimSpace(`$ quadrated printer burn 10000usq`),
+		Long:  strings.TrimSpace(`$ quadrated printer burn 10000usq qubevaloperkgb366x4hqa4d3457cjjizwsnhp9m4hhw7fby72`),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			//argAmount := args[0]
 

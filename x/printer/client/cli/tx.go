@@ -6,9 +6,8 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/cosmos/cosmos-sdk/client"
-	// "github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/QuadrateOrg/core/x/printer/types"
+	"github.com/cosmos/cosmos-sdk/client"
 )
 
 var (
