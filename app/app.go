@@ -338,9 +338,6 @@ func NewQuadrateApp(
 		govtypes.StoreKey, paramstypes.StoreKey, ibchost.StoreKey, upgradetypes.StoreKey,
 		evidencetypes.StoreKey, ibctransfertypes.StoreKey, capabilitytypes.StoreKey,
 		feegrant.StoreKey, authzkeeper.StoreKey, routertypes.StoreKey, icahosttypes.StoreKey,
-
-		wasm.StoreKey, evmtypes.StoreKey, feemarkettypes.StoreKey,
-
 		wasm.StoreKey, evmtypes.StoreKey, feemarkettypes.StoreKey, printermoduletypes.StoreKey,
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey, evmtypes.TransientKey, feemarkettypes.TransientKey)
