@@ -114,11 +114,11 @@ func (m *QueryParamsResponse) GetParams() Params {
 }
 
 func init() {
-	proto.RegisterType((*QueryParamsRequest)(nil), "example.printer.QueryParamsRequest")
-	proto.RegisterType((*QueryParamsResponse)(nil), "example.printer.QueryParamsResponse")
+	proto.RegisterType((*QueryParamsRequest)(nil), "core.printer.QueryParamsRequest")
+	proto.RegisterType((*QueryParamsResponse)(nil), "core.printer.QueryParamsResponse")
 }
 
-func init() { proto.RegisterFile("example/printer/query.proto", fileDescriptor_5bb347080937311b) }
+func init() { proto.RegisterFile("core/printer/query.proto", fileDescriptor_5bb347080937311b) }
 
 var fileDescriptor_5bb347080937311b = []byte{
 	// 287 bytes of a gzipped FileDescriptorProto
@@ -168,7 +168,7 @@ func NewQueryClient(cc grpc1.ClientConn) QueryClient {
 
 func (c *queryClient) Params(ctx context.Context, in *QueryParamsRequest, opts ...grpc.CallOption) (*QueryParamsResponse, error) {
 	out := new(QueryParamsResponse)
-	err := c.cc.Invoke(ctx, "/example.printer.Query/Params", in, out, opts...)
+	err := c.cc.Invoke(ctx, "core.printer.Query/Params", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -203,7 +203,7 @@ func _Query_Params_Handler(srv interface{}, ctx context.Context, dec func(interf
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/example.printer.Query/Params",
+		FullMethod: "core.printer.Query/Params",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(QueryServer).Params(ctx, req.(*QueryParamsRequest))
@@ -212,7 +212,7 @@ func _Query_Params_Handler(srv interface{}, ctx context.Context, dec func(interf
 }
 
 var _Query_serviceDesc = grpc.ServiceDesc{
-	ServiceName: "example.printer.Query",
+	ServiceName: "core.printer.Query",
 	HandlerType: (*QueryServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
@@ -221,7 +221,7 @@ var _Query_serviceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "example/printer/query.proto",
+	Metadata: "core/printer/query.proto",
 }
 
 func (m *QueryParamsRequest) Marshal() (dAtA []byte, err error) {

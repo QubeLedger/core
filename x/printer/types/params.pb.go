@@ -60,10 +60,10 @@ func (m *Params) XXX_DiscardUnknown() {
 var xxx_messageInfo_Params proto.InternalMessageInfo
 
 func init() {
-	proto.RegisterType((*Params)(nil), "example.printer.Params")
+	proto.RegisterType((*Params)(nil), "core.printer.Params")
 }
 
-func init() { proto.RegisterFile("example/printer/params.proto", fileDescriptor_28573084a4a2fce7) }
+func init() { proto.RegisterFile("core/printer/params.proto", fileDescriptor_28573084a4a2fce7) }
 
 var fileDescriptor_28573084a4a2fce7 = []byte{
 	// 134 bytes of a gzipped FileDescriptorProto

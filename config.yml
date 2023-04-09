@@ -1,0 +1,21 @@
+version: 1
+accounts:
+- name: alice
+  coins:
+  - 20000qube
+  - 200000000stake
+- name: validator1
+  coins:
+  - 20000qube
+  - 200000000stake
+- name: bob
+  coins:
+  - 10000qube
+  - 100000000stake
+client:
+  openapi:
+    path: docs/static/openapi.yml
+validators:
+- name: validator1
+  bonded: 100000000stake
+

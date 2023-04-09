@@ -205,13 +205,13 @@ func (m *MsgBurnResponse) XXX_DiscardUnknown() {
 var xxx_messageInfo_MsgBurnResponse proto.InternalMessageInfo
 
 func init() {
-	proto.RegisterType((*MsgMint)(nil), "example.printer.MsgMint")
-	proto.RegisterType((*MsgMintResponse)(nil), "example.printer.MsgMintResponse")
-	proto.RegisterType((*MsgBurn)(nil), "example.printer.MsgBurn")
-	proto.RegisterType((*MsgBurnResponse)(nil), "example.printer.MsgBurnResponse")
+	proto.RegisterType((*MsgMint)(nil), "core.printer.MsgMint")
+	proto.RegisterType((*MsgMintResponse)(nil), "core.printer.MsgMintResponse")
+	proto.RegisterType((*MsgBurn)(nil), "core.printer.MsgBurn")
+	proto.RegisterType((*MsgBurnResponse)(nil), "core.printer.MsgBurnResponse")
 }
 
-func init() { proto.RegisterFile("example/printer/tx.proto", fileDescriptor_894056d651e55cb0) }
+func init() { proto.RegisterFile("core/printer/tx.proto", fileDescriptor_894056d651e55cb0) }
 
 var fileDescriptor_894056d651e55cb0 = []byte{
 	// 224 bytes of a gzipped FileDescriptorProto
@@ -257,7 +257,7 @@ func NewMsgClient(cc grpc1.ClientConn) MsgClient {
 
 func (c *msgClient) Mint(ctx context.Context, in *MsgMint, opts ...grpc.CallOption) (*MsgMintResponse, error) {
 	out := new(MsgMintResponse)
-	err := c.cc.Invoke(ctx, "/example.printer.Msg/Mint", in, out, opts...)
+	err := c.cc.Invoke(ctx, "core.printer.Msg/Mint", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -266,7 +266,7 @@ func (c *msgClient) Mint(ctx context.Context, in *MsgMint, opts ...grpc.CallOpti
 
 func (c *msgClient) Burn(ctx context.Context, in *MsgBurn, opts ...grpc.CallOption) (*MsgBurnResponse, error) {
 	out := new(MsgBurnResponse)
-	err := c.cc.Invoke(ctx, "/example.printer.Msg/Burn", in, out, opts...)
+	err := c.cc.Invoke(ctx, "core.printer.Msg/Burn", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -304,7 +304,7 @@ func _Msg_Mint_Handler(srv interface{}, ctx context.Context, dec func(interface{
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/example.printer.Msg/Mint",
+		FullMethod: "core.printer.Msg/Mint",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(MsgServer).Mint(ctx, req.(*MsgMint))
@@ -322,7 +322,7 @@ func _Msg_Burn_Handler(srv interface{}, ctx context.Context, dec func(interface{
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/example.printer.Msg/Burn",
+		FullMethod: "core.printer.Msg/Burn",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(MsgServer).Burn(ctx, req.(*MsgBurn))
@@ -331,7 +331,7 @@ func _Msg_Burn_Handler(srv interface{}, ctx context.Context, dec func(interface{
 }
 
 var _Msg_serviceDesc = grpc.ServiceDesc{
-	ServiceName: "example.printer.Msg",
+	ServiceName: "core.printer.Msg",
 	HandlerType: (*MsgServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
@@ -344,7 +344,7 @@ var _Msg_serviceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "example/printer/tx.proto",
+	Metadata: "core/printer/tx.proto",
 }
 
 func (m *MsgMint) Marshal() (dAtA []byte, err error) {
