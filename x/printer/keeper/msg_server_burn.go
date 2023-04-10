@@ -19,16 +19,14 @@ func (k msgServer) Burn(goCtx context.Context, msg *types.MsgBurn) (*types.MsgBu
 	if err != nil {
 		panic(err)
 	}
+
 	if amount.GetDenomByIndex(0) != "usq" {
 		panic(sdkerrors.Wrapf(types.ErrInvalidVersion, "got %s, expected usq", amount.GetDenomByIndex(0)))
 	}
 
 	/* Check delegation */
-	validatorAddress, err := sdk.ValAddressFromBech32(msg.Validator)
-	del, found := k.stakingKeeper.GetDelegation(ctx, creator, validatorAddress)
-	if found != true {
-		panic(sdkerrors.Wrapf(types.ErrValNotFound, "validator not found"))
-	}
+	validator := k.stakingKeeper.GetAllValidators(ctx)[0]
+	validatorAddress := validator.GetOperator()
 
 	//TODO: get price from oracle
 	//QUBE=$2
@@ -36,15 +34,7 @@ func (k msgServer) Burn(goCtx context.Context, msg *types.MsgBurn) (*types.MsgBu
 
 	usqAmount := (amount.AmountOfNoDenomValidation("usq")).Int64()
 
-	qubeAmountAfterPriceCalculation := sdk.NewDec(usqAmount / price)
-
-	if del.Shares.Sub(qubeAmountAfterPriceCalculation).IsZero() != true || del.Shares.Sub(qubeAmountAfterPriceCalculation).IsNegative() != true {
-		qubeTemp := sdk.NewCoin("qube", sdk.Int(qubeAmountAfterPriceCalculation.Sub(del.Shares)))
-		err = k.bankKeeper.MintCoins(ctx, types.ModuleName, sdk.NewCoins(qubeTemp))
-		if err != nil {
-			return nil, err
-		}
-	}
+	qubeAmountAfterPriceCalculation := usqAmount / price
 
 	err = k.bankKeeper.SendCoinsFromAccountToModule(ctx, creator, types.ModuleName, amount)
 	if err != nil {
@@ -56,16 +46,35 @@ func (k msgServer) Burn(goCtx context.Context, msg *types.MsgBurn) (*types.MsgBu
 		return nil, err
 	}
 
-	_, err = k.stakingKeeper.Unbond(ctx, creator, validatorAddress, del.Shares)
+	del, found := k.stakingKeeper.GetDelegation(ctx, creator, validatorAddress)
+	if found == false {
+		qubeTemp := sdk.NewCoin("qube", sdk.NewInt(qubeAmountAfterPriceCalculation))
+		err = k.bankKeeper.MintCoins(ctx, types.ModuleName, sdk.NewCoins(qubeTemp))
+		if err != nil {
+			return nil, err
+		}
+		err = k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, creator, sdk.NewCoins(qubeTemp))
+		if err != nil {
+			return nil, err
+		}
+		return &types.MsgBurnResponse{}, nil
+	}
+
+	if (sdk.NewInt(qubeAmountAfterPriceCalculation).Sub(sdk.Int(del.Shares))).IsPositive() {
+		qubeTemp := sdk.NewCoin("qube", sdk.NewInt(qubeAmountAfterPriceCalculation).Sub(sdk.Int(del.Shares)))
+		err = k.bankKeeper.MintCoins(ctx, types.ModuleName, sdk.NewCoins(qubeTemp))
+		if err != nil {
+			return nil, err
+		}
+		err = k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, creator, sdk.NewCoins(qubeTemp))
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	_, err = k.stakingKeeper.Unbond(ctx, creator, validatorAddress, sdk.NewDec(qubeAmountAfterPriceCalculation))
 	if err != nil {
 		return nil, err
 	}
-
-	qube := sdk.NewCoin("qube", sdk.Int(qubeAmountAfterPriceCalculation))
-	err = k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, creator, sdk.NewCoins(qube))
-	if err != nil {
-		return nil, err
-	}
-
 	return &types.MsgBurnResponse{}, nil
 }
