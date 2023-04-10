@@ -31,10 +31,13 @@ func (k msgServer) Burn(goCtx context.Context, msg *types.MsgBurn) (*types.MsgBu
 	}
 
 	//TODO: get price from oracle
-	price := int64(2 * 1000000)
+	//QUBE=$2
+	price := int64(2 * 1000000 / 1000000)
 
 	usqAmount := (amount.AmountOfNoDenomValidation("usq")).Int64()
-	qubeAmountAfterPriceCalculation := sdk.NewDec(usqAmount / (price / 1000000))
+
+	qubeAmountAfterPriceCalculation := sdk.NewDec(usqAmount / price)
+
 	if del.Shares.Sub(qubeAmountAfterPriceCalculation).IsZero() != true || del.Shares.Sub(qubeAmountAfterPriceCalculation).IsNegative() != true {
 		qubeTemp := sdk.NewCoin("qube", sdk.Int(qubeAmountAfterPriceCalculation.Sub(del.Shares)))
 		err = k.bankKeeper.MintCoins(ctx, types.ModuleName, sdk.NewCoins(qubeTemp))
