@@ -25,13 +25,10 @@ func (k msgServer) Mint(goCtx context.Context, msg *types.MsgMint) (*types.MsgMi
 		panic(sdkerrors.Wrapf(types.ErrInvalidVersion, "got %s, expected qube", amount.GetDenomByIndex(0)))
 	}
 
-	//TODO: get price from oracle
-
-	//QUBE=$2
-	price := sdk.NewInt(2 * 1000000 / 1000000)
+	price := sdk.NewInt(k.oracleKeeper.GetPrice(ctx) / 100000)
 
 	qubeAmount := amount.AmountOfNoDenomValidation("qube")
-	usqAmount := qubeAmount.Mul(price)
+	usqAmount := (qubeAmount.Mul(price)).Quo(sdk.NewInt(10))
 
 	usq := sdk.NewCoin("usq", usqAmount)
 	err = k.bankKeeper.MintCoins(ctx, types.ModuleName, sdk.NewCoins(usq))

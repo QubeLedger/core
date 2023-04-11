@@ -28,13 +28,10 @@ func (k msgServer) Burn(goCtx context.Context, msg *types.MsgBurn) (*types.MsgBu
 	validator := k.stakingKeeper.GetAllValidators(ctx)[0]
 	validatorAddress := validator.GetOperator()
 
-	//TODO: get price from oracle
-	//QUBE=$2
-	price := int64(2 * 1000000 / 1000000)
+	price := sdk.NewInt(k.oracleKeeper.GetPrice(ctx) / 100000)
 
-	usqAmount := (amount.AmountOfNoDenomValidation("usq")).Int64()
-
-	qubeAmountAfterPriceCalculation := usqAmount / price
+	usqAmount := (amount.AmountOfNoDenomValidation("usq")).Mul(sdk.NewInt(10))
+	qubeAmountAfterPriceCalculation := usqAmount.Quo(price)
 
 	err = k.bankKeeper.SendCoinsFromAccountToModule(ctx, creator, types.ModuleName, amount)
 	if err != nil {
@@ -48,7 +45,7 @@ func (k msgServer) Burn(goCtx context.Context, msg *types.MsgBurn) (*types.MsgBu
 
 	del, found := k.stakingKeeper.GetDelegation(ctx, creator, validatorAddress)
 	if found == false {
-		qubeTemp := sdk.NewCoin("qube", sdk.NewInt(qubeAmountAfterPriceCalculation))
+		qubeTemp := sdk.NewCoin("qube", qubeAmountAfterPriceCalculation)
 		err = k.bankKeeper.MintCoins(ctx, types.ModuleName, sdk.NewCoins(qubeTemp))
 		if err != nil {
 			return nil, err
@@ -60,8 +57,8 @@ func (k msgServer) Burn(goCtx context.Context, msg *types.MsgBurn) (*types.MsgBu
 		return &types.MsgBurnResponse{}, nil
 	}
 
-	if (sdk.NewInt(qubeAmountAfterPriceCalculation).Sub(sdk.Int(del.Shares))).IsPositive() {
-		qubeTemp := sdk.NewCoin("qube", sdk.NewInt(qubeAmountAfterPriceCalculation).Sub(sdk.Int(del.Shares)))
+	if (qubeAmountAfterPriceCalculation.Sub(sdk.Int(del.Shares))).IsPositive() {
+		qubeTemp := sdk.NewCoin("qube", (qubeAmountAfterPriceCalculation).Sub(sdk.Int(del.Shares)))
 		err = k.bankKeeper.MintCoins(ctx, types.ModuleName, sdk.NewCoins(qubeTemp))
 		if err != nil {
 			return nil, err
@@ -71,8 +68,7 @@ func (k msgServer) Burn(goCtx context.Context, msg *types.MsgBurn) (*types.MsgBu
 			return nil, err
 		}
 	}
-
-	_, err = k.stakingKeeper.Unbond(ctx, creator, validatorAddress, sdk.NewDec(qubeAmountAfterPriceCalculation))
+	_, err = k.stakingKeeper.Unbond(ctx, creator, validatorAddress, sdk.NewDecFromInt(qubeAmountAfterPriceCalculation))
 	if err != nil {
 		return nil, err
 	}

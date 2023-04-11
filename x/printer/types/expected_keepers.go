@@ -55,3 +55,7 @@ type StakingKeeper interface {
 	IterateDelegatorDelegations(ctx sdk.Context, delegator sdk.AccAddress, cb func(delegation stakingtypes.Delegation) (stop bool))
 	GetAllValidators(ctx sdk.Context) (validators []stakingtypes.Validator)
 }
+
+type OracleKeeper interface {
+	GetPrice(ctx sdk.Context) int64
+}
