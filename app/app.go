@@ -124,6 +124,10 @@ import (
 
 	evmupgrade "github.com/QuadrateOrg/core/app/upgrades/evm"
 
+	oraclemodule "github.com/QuadrateOrg/core/x/oracle"
+	oraclemodulekeeper "github.com/QuadrateOrg/core/x/oracle/keeper"
+	oraclemoduletypes "github.com/QuadrateOrg/core/x/oracle/types"
+
 	"github.com/QuadrateOrg/core/x/printer"
 	printermodulekeeper "github.com/QuadrateOrg/core/x/printer/keeper"
 	printermoduletypes "github.com/QuadrateOrg/core/x/printer/types"
@@ -214,7 +218,7 @@ var (
 		wasm.AppModuleBasic{},
 		evm.AppModuleBasic{},
 		feemarket.AppModuleBasic{},
-
+		oraclemodule.AppModuleBasic{},
 		printer.AppModuleBasic{},
 	)
 
@@ -293,6 +297,8 @@ type QuadrateApp struct { // nolint: golint
 	ScopedPrinterKeeper capabilitykeeper.ScopedKeeper
 	printerKeeper       printermodulekeeper.Keeper
 
+	OracleKeeper oraclemodulekeeper.Keeper
+
 	// the module manager
 	mm *module.Manager
 
@@ -339,6 +345,7 @@ func NewQuadrateApp(
 		evidencetypes.StoreKey, ibctransfertypes.StoreKey, capabilitytypes.StoreKey,
 		feegrant.StoreKey, authzkeeper.StoreKey, routertypes.StoreKey, icahosttypes.StoreKey,
 		wasm.StoreKey, evmtypes.StoreKey, feemarkettypes.StoreKey, printermoduletypes.StoreKey,
+		oraclemoduletypes.StoreKey,
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey, evmtypes.TransientKey, feemarkettypes.TransientKey)
 	memKeys := sdk.NewMemoryStoreKeys(capabilitytypes.MemStoreKey)
@@ -560,6 +567,15 @@ func NewQuadrateApp(
 	icaModule := ica.NewAppModule(nil, &app.ICAHostKeeper)
 	icaHostIBCModule := icahost.NewIBCModule(app.ICAHostKeeper)
 
+	app.OracleKeeper = *oraclemodulekeeper.NewKeeper(
+		appCodec,
+		keys[oraclemoduletypes.StoreKey],
+		keys[oraclemoduletypes.MemStoreKey],
+		app.GetSubspace(oraclemoduletypes.ModuleName),
+		app.StakingKeeper,
+	)
+	oracleModule := oraclemodule.NewAppModule(appCodec, app.OracleKeeper, app.AccountKeeper, app.BankKeeper)
+
 	scopedPrinterKeeper := app.CapabilityKeeper.ScopeToModule(printermoduletypes.ModuleName)
 	app.ScopedPrinterKeeper = scopedPrinterKeeper
 
@@ -574,6 +590,7 @@ func NewQuadrateApp(
 		app.BankKeeper,
 		app.AccountKeeper,
 		app.StakingKeeper,
+		app.OracleKeeper,
 	)
 	printerModule := printer.NewAppModule(appCodec, app.printerKeeper, app.AccountKeeper, app.BankKeeper, app.StakingKeeper)
 	printerIBCModule := printer.NewIBCModule(app.printerKeeper)
@@ -631,7 +648,7 @@ func NewQuadrateApp(
 		wasm.NewAppModule(appCodec, &app.wasmKeeper, app.StakingKeeper, app.AccountKeeper, app.BankKeeper),
 		evm.NewAppModule(app.EvmKeeper, app.AccountKeeper),
 		feemarket.NewAppModule(app.FeeMarketKeeper),
-
+		oracleModule,
 		printerModule,
 	)
 
@@ -665,7 +682,7 @@ func NewQuadrateApp(
 		wasm.ModuleName,
 		feemarkettypes.ModuleName,
 		evmtypes.ModuleName,
-
+		oraclemoduletypes.ModuleName,
 		printermoduletypes.ModuleName,
 	)
 	app.mm.SetOrderEndBlockers(
@@ -692,7 +709,7 @@ func NewQuadrateApp(
 		wasm.ModuleName,
 		evmtypes.ModuleName,
 		feemarkettypes.ModuleName,
-
+		oraclemoduletypes.ModuleName,
 		printermoduletypes.ModuleName,
 	)
 
@@ -718,10 +735,7 @@ func NewQuadrateApp(
 		evidencetypes.ModuleName,
 		feegrant.ModuleName,
 		authz.ModuleName,
-		// evm module denomination is used by the fees module, in AnteHandle
 		evmtypes.ModuleName,
-		// feemarket module needs to be initialized before genutil module,
-		// gentx transactions use MinGasPriceDecorator.AnteHandle
 		feemarkettypes.ModuleName,
 		genutiltypes.ModuleName,
 		routertypes.ModuleName,
@@ -729,7 +743,7 @@ func NewQuadrateApp(
 		upgradetypes.ModuleName,
 		vestingtypes.ModuleName,
 		wasm.ModuleName,
-
+		oraclemoduletypes.ModuleName,
 		printermoduletypes.ModuleName,
 	)
 
@@ -942,7 +956,7 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(wasm.ModuleName)
 	paramsKeeper.Subspace(feemarkettypes.ModuleName)
 	paramsKeeper.Subspace(evmtypes.ModuleName)
-
+	paramsKeeper.Subspace(oraclemoduletypes.ModuleName)
 	paramsKeeper.Subspace(printermoduletypes.ModuleName)
 
 	return paramsKeeper
