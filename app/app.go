@@ -122,15 +122,10 @@ import (
 	quadrateante "github.com/QuadrateOrg/core/ante"
 	quadrateappparams "github.com/QuadrateOrg/core/app/params"
 
+	contractmanagermodulekeeper "github.com/QuadrateOrg/core/x/contractmanager/keeper"
+	contractmanagermoduletypes "github.com/QuadrateOrg/core/x/contractmanager/types"
+
 	evmupgrade "github.com/QuadrateOrg/core/app/upgrades/evm"
-
-	oraclemodule "github.com/QuadrateOrg/core/x/oracle"
-	oraclemodulekeeper "github.com/QuadrateOrg/core/x/oracle/keeper"
-	oraclemoduletypes "github.com/QuadrateOrg/core/x/oracle/types"
-
-	"github.com/QuadrateOrg/core/x/printer"
-	printermodulekeeper "github.com/QuadrateOrg/core/x/printer/keeper"
-	printermoduletypes "github.com/QuadrateOrg/core/x/printer/types"
 
 	// unnamed import of statik for swagger UI support
 	_ "github.com/cosmos/cosmos-sdk/client/docs/statik"
@@ -218,8 +213,6 @@ var (
 		wasm.AppModuleBasic{},
 		evm.AppModuleBasic{},
 		feemarket.AppModuleBasic{},
-		oraclemodule.AppModuleBasic{},
-		printer.AppModuleBasic{},
 	)
 
 	// module account permissions
@@ -234,8 +227,6 @@ var (
 		ibctransfertypes.ModuleName:    {authtypes.Minter, authtypes.Burner},
 		wasm.ModuleName:                {authtypes.Burner},
 		evmtypes.ModuleName:            {authtypes.Minter, authtypes.Burner}, // used for secure addition and subtraction of balance using module account
-
-		printermoduletypes.ModuleName: {authtypes.Minter, authtypes.Burner, authtypes.Staking},
 	}
 )
 
@@ -288,16 +279,13 @@ type QuadrateApp struct { // nolint: golint
 	ScopedTransferKeeper capabilitykeeper.ScopedKeeper
 	ScopedICAHostKeeper  capabilitykeeper.ScopedKeeper
 
+	ContractManagerKeeper contractmanagermodulekeeper.Keeper
+
 	wasmKeeper       wasm.Keeper
 	scopedWasmKeeper capabilitykeeper.ScopedKeeper
 
 	EvmKeeper       *evmkeeper.Keeper
 	FeeMarketKeeper feemarketkeeper.Keeper
-
-	ScopedPrinterKeeper capabilitykeeper.ScopedKeeper
-	printerKeeper       printermodulekeeper.Keeper
-
-	OracleKeeper oraclemodulekeeper.Keeper
 
 	// the module manager
 	mm *module.Manager
@@ -344,8 +332,7 @@ func NewQuadrateApp(
 		govtypes.StoreKey, paramstypes.StoreKey, ibchost.StoreKey, upgradetypes.StoreKey,
 		evidencetypes.StoreKey, ibctransfertypes.StoreKey, capabilitytypes.StoreKey,
 		feegrant.StoreKey, authzkeeper.StoreKey, routertypes.StoreKey, icahosttypes.StoreKey,
-		wasm.StoreKey, evmtypes.StoreKey, feemarkettypes.StoreKey, printermoduletypes.StoreKey,
-		oraclemoduletypes.StoreKey,
+		wasm.StoreKey, evmtypes.StoreKey, feemarkettypes.StoreKey,
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey, evmtypes.TransientKey, feemarkettypes.TransientKey)
 	memKeys := sdk.NewMemoryStoreKeys(capabilitytypes.MemStoreKey)
@@ -567,33 +554,13 @@ func NewQuadrateApp(
 	icaModule := ica.NewAppModule(nil, &app.ICAHostKeeper)
 	icaHostIBCModule := icahost.NewIBCModule(app.ICAHostKeeper)
 
-	app.OracleKeeper = *oraclemodulekeeper.NewKeeper(
+	app.ContractManagerKeeper = *contractmanagermodulekeeper.NewKeeper(
 		appCodec,
-		keys[oraclemoduletypes.StoreKey],
-		keys[oraclemoduletypes.MemStoreKey],
-		app.GetSubspace(oraclemoduletypes.ModuleName),
-		app.StakingKeeper,
+		keys[contractmanagermoduletypes.StoreKey],
+		keys[contractmanagermoduletypes.MemStoreKey],
+		app.GetSubspace(contractmanagermoduletypes.ModuleName),
+		&app.wasmKeeper,
 	)
-	oracleModule := oraclemodule.NewAppModule(appCodec, app.OracleKeeper, app.AccountKeeper, app.BankKeeper)
-
-	scopedPrinterKeeper := app.CapabilityKeeper.ScopeToModule(printermoduletypes.ModuleName)
-	app.ScopedPrinterKeeper = scopedPrinterKeeper
-
-	app.printerKeeper = *printermodulekeeper.NewKeeper(
-		appCodec,
-		keys[printermoduletypes.StoreKey],
-		keys[printermoduletypes.MemStoreKey],
-		app.GetSubspace(printermoduletypes.ModuleName),
-		app.IBCKeeper.ChannelKeeper,
-		&app.IBCKeeper.PortKeeper,
-		scopedPrinterKeeper,
-		app.BankKeeper,
-		app.AccountKeeper,
-		app.StakingKeeper,
-		app.OracleKeeper,
-	)
-	printerModule := printer.NewAppModule(appCodec, app.printerKeeper, app.AccountKeeper, app.BankKeeper, app.StakingKeeper)
-	printerIBCModule := printer.NewIBCModule(app.printerKeeper)
 
 	app.RouterKeeper = routerkeeper.NewKeeper(appCodec, keys[routertypes.StoreKey], app.GetSubspace(routertypes.ModuleName), app.TransferKeeper, app.DistrKeeper)
 
@@ -601,9 +568,7 @@ func NewQuadrateApp(
 	// create static IBC router, add transfer route, then set and seal it
 	ibcRouter := porttypes.NewRouter()
 	ibcRouter.AddRoute(icahosttypes.SubModuleName, icaHostIBCModule).
-		AddRoute(wasm.ModuleName, wasm.NewIBCHandler(app.wasmKeeper, app.IBCKeeper.ChannelKeeper)).
-		AddRoute(ibctransfertypes.ModuleName, transferIBCModule).AddRoute(printermoduletypes.ModuleName, printerIBCModule)
-
+		AddRoute(wasm.ModuleName, wasm.NewIBCHandler(app.wasmKeeper, app.IBCKeeper.ChannelKeeper))
 	app.IBCKeeper.SetRouter(ibcRouter)
 
 	// create evidence keeper with router
@@ -648,8 +613,6 @@ func NewQuadrateApp(
 		wasm.NewAppModule(appCodec, &app.wasmKeeper, app.StakingKeeper, app.AccountKeeper, app.BankKeeper),
 		evm.NewAppModule(app.EvmKeeper, app.AccountKeeper),
 		feemarket.NewAppModule(app.FeeMarketKeeper),
-		oracleModule,
-		printerModule,
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
@@ -682,8 +645,6 @@ func NewQuadrateApp(
 		wasm.ModuleName,
 		feemarkettypes.ModuleName,
 		evmtypes.ModuleName,
-		oraclemoduletypes.ModuleName,
-		printermoduletypes.ModuleName,
 	)
 	app.mm.SetOrderEndBlockers(
 		crisistypes.ModuleName,
@@ -709,8 +670,6 @@ func NewQuadrateApp(
 		wasm.ModuleName,
 		evmtypes.ModuleName,
 		feemarkettypes.ModuleName,
-		oraclemoduletypes.ModuleName,
-		printermoduletypes.ModuleName,
 	)
 
 	// NOTE: The genutils module must occur after staking so that pools are
@@ -743,8 +702,6 @@ func NewQuadrateApp(
 		upgradetypes.ModuleName,
 		vestingtypes.ModuleName,
 		wasm.ModuleName,
-		oraclemoduletypes.ModuleName,
-		printermoduletypes.ModuleName,
 	)
 
 	app.mm.RegisterInvariants(&app.CrisisKeeper)
@@ -956,8 +913,6 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(wasm.ModuleName)
 	paramsKeeper.Subspace(feemarkettypes.ModuleName)
 	paramsKeeper.Subspace(evmtypes.ModuleName)
-	paramsKeeper.Subspace(oraclemoduletypes.ModuleName)
-	paramsKeeper.Subspace(printermoduletypes.ModuleName)
 
 	return paramsKeeper
 }
