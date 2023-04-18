@@ -81,13 +81,12 @@ import (
 	icahostkeeper "github.com/cosmos/ibc-go/v3/modules/apps/27-interchain-accounts/host/keeper"
 	icahosttypes "github.com/cosmos/ibc-go/v3/modules/apps/27-interchain-accounts/host/types"
 	icatypes "github.com/cosmos/ibc-go/v3/modules/apps/27-interchain-accounts/types"
-	"github.com/cosmos/ibc-go/v3/modules/apps/transfer"
-	ibctransferkeeper "github.com/cosmos/ibc-go/v3/modules/apps/transfer/keeper"
 	ibctransfertypes "github.com/cosmos/ibc-go/v3/modules/apps/transfer/types"
 	ibc "github.com/cosmos/ibc-go/v3/modules/core"
 	ibcclient "github.com/cosmos/ibc-go/v3/modules/core/02-client"
 	ibcclientclient "github.com/cosmos/ibc-go/v3/modules/core/02-client/client"
 	ibcclienttypes "github.com/cosmos/ibc-go/v3/modules/core/02-client/types"
+	ibcporttypes "github.com/cosmos/ibc-go/v3/modules/core/05-port/types"
 	porttypes "github.com/cosmos/ibc-go/v3/modules/core/05-port/types"
 	ibchost "github.com/cosmos/ibc-go/v3/modules/core/24-host"
 	ibckeeper "github.com/cosmos/ibc-go/v3/modules/core/keeper"
@@ -122,8 +121,29 @@ import (
 	quadrateante "github.com/QuadrateOrg/core/ante"
 	quadrateappparams "github.com/QuadrateOrg/core/app/params"
 
+	"github.com/QuadrateOrg/core/wasmbinding"
+
 	contractmanagermodulekeeper "github.com/QuadrateOrg/core/x/contractmanager/keeper"
 	contractmanagermoduletypes "github.com/QuadrateOrg/core/x/contractmanager/types"
+
+	"github.com/QuadrateOrg/core/x/interchainqueries"
+	interchainqueriesmodulekeeper "github.com/QuadrateOrg/core/x/interchainqueries/keeper"
+	interchainqueriesmoduletypes "github.com/QuadrateOrg/core/x/interchainqueries/types"
+
+	"github.com/QuadrateOrg/core/x/interchaintxs"
+	interchaintxskeeper "github.com/QuadrateOrg/core/x/interchaintxs/keeper"
+	interchaintxstypes "github.com/QuadrateOrg/core/x/interchaintxs/types"
+
+	"github.com/QuadrateOrg/core/x/feerefunder"
+	feekeeper "github.com/QuadrateOrg/core/x/feerefunder/keeper"
+	feetypes "github.com/QuadrateOrg/core/x/feerefunder/types"
+
+	icacontroller "github.com/cosmos/ibc-go/v3/modules/apps/27-interchain-accounts/controller"
+	icacontrollerkeeper "github.com/cosmos/ibc-go/v3/modules/apps/27-interchain-accounts/controller/keeper"
+	icacontrollertypes "github.com/cosmos/ibc-go/v3/modules/apps/27-interchain-accounts/controller/types"
+
+	transferSudo "github.com/QuadrateOrg/core/x/transfer"
+	wrapkeeper "github.com/QuadrateOrg/core/x/transfer/keeper"
 
 	evmupgrade "github.com/QuadrateOrg/core/app/upgrades/evm"
 
@@ -159,7 +179,6 @@ func GetWasmOpts(appOpts servertypes.AppOptions) []wasm.Option {
 	if cast.ToBool(appOpts.Get("telemetry.enabled")) {
 		wasmOpts = append(wasmOpts, wasmkeeper.WithVMCacheMetrics(prometheus.DefaultRegisterer))
 	}
-
 	return wasmOpts
 }
 
@@ -206,27 +225,30 @@ var (
 		ibc.AppModuleBasic{},
 		upgrade.AppModuleBasic{},
 		evidence.AppModuleBasic{},
-		transfer.AppModuleBasic{},
+		transferSudo.AppModuleBasic{},
 		vesting.AppModuleBasic{},
 		router.AppModuleBasic{},
 		ica.AppModuleBasic{},
 		wasm.AppModuleBasic{},
 		evm.AppModuleBasic{},
 		feemarket.AppModuleBasic{},
+		interchaintxs.AppModuleBasic{},
+		interchainqueries.AppModuleBasic{},
 	)
 
 	// module account permissions
 	maccPerms = map[string][]string{
-		authtypes.FeeCollectorName:     nil,
-		distrtypes.ModuleName:          nil,
-		icatypes.ModuleName:            nil,
-		minttypes.ModuleName:           {authtypes.Minter},
-		stakingtypes.BondedPoolName:    {authtypes.Burner, authtypes.Staking},
-		stakingtypes.NotBondedPoolName: {authtypes.Burner, authtypes.Staking},
-		govtypes.ModuleName:            {authtypes.Burner},
-		ibctransfertypes.ModuleName:    {authtypes.Minter, authtypes.Burner},
-		wasm.ModuleName:                {authtypes.Burner},
-		evmtypes.ModuleName:            {authtypes.Minter, authtypes.Burner}, // used for secure addition and subtraction of balance using module account
+		authtypes.FeeCollectorName:              nil,
+		distrtypes.ModuleName:                   nil,
+		icatypes.ModuleName:                     nil,
+		minttypes.ModuleName:                    {authtypes.Minter},
+		stakingtypes.BondedPoolName:             {authtypes.Burner, authtypes.Staking},
+		stakingtypes.NotBondedPoolName:          {authtypes.Burner, authtypes.Staking},
+		govtypes.ModuleName:                     {authtypes.Burner},
+		ibctransfertypes.ModuleName:             {authtypes.Minter, authtypes.Burner},
+		wasm.ModuleName:                         {authtypes.Burner},
+		interchainqueriesmoduletypes.ModuleName: nil,
+		evmtypes.ModuleName:                     {authtypes.Minter, authtypes.Burner}, // used for secure addition and subtraction of balance using module account
 	}
 )
 
@@ -266,20 +288,26 @@ type QuadrateApp struct { // nolint: golint
 	UpgradeKeeper    upgradekeeper.Keeper
 	ParamsKeeper     paramskeeper.Keeper
 	// IBC Keeper must be a pointer in the app, so we can SetRouter on it correctly
-	IBCKeeper      *ibckeeper.Keeper
-	ICAHostKeeper  icahostkeeper.Keeper
-	EvidenceKeeper evidencekeeper.Keeper
-	TransferKeeper ibctransferkeeper.Keeper
-	FeeGrantKeeper feegrantkeeper.Keeper
-	AuthzKeeper    authzkeeper.Keeper
-	RouterKeeper   routerkeeper.Keeper
+	IBCKeeper           *ibckeeper.Keeper
+	ICAControllerKeeper icacontrollerkeeper.Keeper
+	ICAHostKeeper       icahostkeeper.Keeper
+	EvidenceKeeper      evidencekeeper.Keeper
+	TransferKeeper      wrapkeeper.KeeperTransferWrapper
+	FeeGrantKeeper      feegrantkeeper.Keeper
+	FeeKeeper           *feekeeper.Keeper
+	AuthzKeeper         authzkeeper.Keeper
+	RouterKeeper        routerkeeper.Keeper
 
 	// make scoped keepers public for test purposes
 	ScopedIBCKeeper      capabilitykeeper.ScopedKeeper
 	ScopedTransferKeeper capabilitykeeper.ScopedKeeper
 	ScopedICAHostKeeper  capabilitykeeper.ScopedKeeper
+	ScopedInterTxKeeper  capabilitykeeper.ScopedKeeper
 
 	ContractManagerKeeper contractmanagermodulekeeper.Keeper
+
+	InterchainQueriesKeeper interchainqueriesmodulekeeper.Keeper
+	InterchainTxsKeeper     interchaintxskeeper.Keeper
 
 	wasmKeeper       wasm.Keeper
 	scopedWasmKeeper capabilitykeeper.ScopedKeeper
@@ -291,6 +319,11 @@ type QuadrateApp struct { // nolint: golint
 	mm *module.Manager
 
 	configurator module.Configurator
+}
+
+type QueryPlugin struct {
+	icaControllerKeeper *icacontrollerkeeper.Keeper
+	icqKeeper           *interchainqueriesmodulekeeper.Keeper
 }
 
 func init() {
@@ -332,7 +365,8 @@ func NewQuadrateApp(
 		govtypes.StoreKey, paramstypes.StoreKey, ibchost.StoreKey, upgradetypes.StoreKey,
 		evidencetypes.StoreKey, ibctransfertypes.StoreKey, capabilitytypes.StoreKey,
 		feegrant.StoreKey, authzkeeper.StoreKey, routertypes.StoreKey, icahosttypes.StoreKey,
-		wasm.StoreKey, evmtypes.StoreKey, feemarkettypes.StoreKey,
+		wasm.StoreKey, evmtypes.StoreKey, feemarkettypes.StoreKey, interchainqueriesmoduletypes.StoreKey, icacontrollertypes.StoreKey,
+		interchaintxstypes.StoreKey,
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey, evmtypes.TransientKey, feemarkettypes.TransientKey)
 	memKeys := sdk.NewMemoryStoreKeys(capabilitytypes.MemStoreKey)
@@ -363,8 +397,10 @@ func NewQuadrateApp(
 	// add capability keeper and ScopeToModule for ibc module
 	app.CapabilityKeeper = capabilitykeeper.NewKeeper(appCodec, keys[capabilitytypes.StoreKey], memKeys[capabilitytypes.MemStoreKey])
 	scopedIBCKeeper := app.CapabilityKeeper.ScopeToModule(ibchost.ModuleName)
+	scopedICAControllerKeeper := app.CapabilityKeeper.ScopeToModule(icacontrollertypes.SubModuleName)
 	scopedTransferKeeper := app.CapabilityKeeper.ScopeToModule(ibctransfertypes.ModuleName)
 	scopedICAHostKeeper := app.CapabilityKeeper.ScopeToModule(icahosttypes.SubModuleName)
+	scopedInterTxKeeper := app.CapabilityKeeper.ScopeToModule(interchaintxstypes.ModuleName)
 
 	scopedWasmKeeper := app.CapabilityKeeper.ScopeToModule(wasm.ModuleName)
 
@@ -393,6 +429,10 @@ func NewQuadrateApp(
 		keys[feegrant.StoreKey],
 		app.AccountKeeper,
 	)
+
+	app.FeeKeeper = feekeeper.NewKeeper(appCodec, keys[feetypes.StoreKey], memKeys[feetypes.MemStoreKey], app.GetSubspace(feetypes.ModuleName), app.IBCKeeper.ChannelKeeper, app.BankKeeper)
+	feeModule := feerefunder.NewAppModule(appCodec, *app.FeeKeeper, app.AccountKeeper, app.BankKeeper)
+
 	stakingKeeper := stakingkeeper.NewKeeper(
 		appCodec,
 		keys[stakingtypes.StoreKey],
@@ -471,8 +511,11 @@ func NewQuadrateApp(
 
 	// The last arguments can contain custom message handlers, and custom query handlers,
 	// if we want to allow any custom callbacks
+
 	supportedFeatures := "iterator,staking,stargate"
 	wasmOpts := GetWasmOpts(appOpts)
+	wasmOpts = append(wasmbinding.RegisterCustomPlugins(&app.InterchainTxsKeeper, &app.InterchainQueriesKeeper, app.TransferKeeper), wasmOpts...)
+
 	app.wasmKeeper = wasm.NewKeeper(
 		appCodec,
 		keys[wasm.StoreKey],
@@ -528,19 +571,52 @@ func NewQuadrateApp(
 		evmTrace,
 	)
 
-	app.TransferKeeper = ibctransferkeeper.NewKeeper(
+	app.InterchainQueriesKeeper = *interchainqueriesmodulekeeper.NewKeeper(
+		appCodec,
+		keys[interchainqueriesmoduletypes.StoreKey],
+		keys[interchainqueriesmoduletypes.MemStoreKey],
+		app.GetSubspace(interchainqueriesmoduletypes.ModuleName),
+		app.IBCKeeper,
+		app.BankKeeper,
+		app.ContractManagerKeeper,
+		interchainqueriesmodulekeeper.Verifier{},
+		interchainqueriesmodulekeeper.TransactionVerifier{},
+	)
+
+	app.InterchainTxsKeeper = *interchaintxskeeper.NewKeeper(
+		appCodec,
+		keys[interchaintxstypes.StoreKey],
+		memKeys[interchaintxstypes.MemStoreKey],
+		app.GetSubspace(interchaintxstypes.ModuleName),
+		app.IBCKeeper.ChannelKeeper,
+		app.ICAControllerKeeper,
+		scopedInterTxKeeper,
+		app.ContractManagerKeeper,
+		app.FeeKeeper,
+	)
+
+	app.TransferKeeper = wrapkeeper.NewKeeper(
 		appCodec,
 		keys[ibctransfertypes.StoreKey],
 		app.GetSubspace(ibctransfertypes.ModuleName),
-		app.IBCKeeper.ChannelKeeper,
+		app.IBCKeeper.ChannelKeeper, // essentially still app.IBCKeeper.ChannelKeeper under the hood because no hook overrides
 		app.IBCKeeper.ChannelKeeper,
 		&app.IBCKeeper.PortKeeper,
 		app.AccountKeeper,
 		app.BankKeeper,
 		scopedTransferKeeper,
+		app.FeeKeeper,
+		app.ContractManagerKeeper,
 	)
-	transferModule := transfer.NewAppModule(app.TransferKeeper)
-	transferIBCModule := transfer.NewIBCModule(app.TransferKeeper)
+	transferModule := transferSudo.NewAppModule(app.TransferKeeper)
+	transferIBCModule := transferSudo.NewIBCModule(app.TransferKeeper)
+
+	app.ICAControllerKeeper = icacontrollerkeeper.NewKeeper(
+		appCodec, keys[icacontrollertypes.StoreKey], app.GetSubspace(icacontrollertypes.SubModuleName),
+		app.IBCKeeper.ChannelKeeper, // may be replaced with middleware such as ics29 feerefunder
+		app.IBCKeeper.ChannelKeeper, &app.IBCKeeper.PortKeeper,
+		scopedICAControllerKeeper, app.MsgServiceRouter(),
+	)
 
 	app.ICAHostKeeper = icahostkeeper.NewKeeper(
 		appCodec, keys[icahosttypes.StoreKey],
@@ -551,9 +627,15 @@ func NewQuadrateApp(
 		scopedICAHostKeeper,
 		app.MsgServiceRouter(),
 	)
-	icaModule := ica.NewAppModule(nil, &app.ICAHostKeeper)
+	icaModule := ica.NewAppModule(&app.ICAControllerKeeper, &app.ICAHostKeeper)
+	var icaControllerStack ibcporttypes.IBCModule
+
+	icaControllerStack = interchaintxs.NewIBCModule(app.InterchainTxsKeeper)
+	icaControllerStack = icacontroller.NewIBCModule(app.ICAControllerKeeper, icaControllerStack)
 	icaHostIBCModule := icahost.NewIBCModule(app.ICAHostKeeper)
 
+	interchainQueriesModule := interchainqueries.NewAppModule(appCodec, app.InterchainQueriesKeeper, app.AccountKeeper, app.BankKeeper)
+	interchainTxsModule := interchaintxs.NewAppModule(appCodec, app.InterchainTxsKeeper, app.AccountKeeper, app.BankKeeper)
 	app.ContractManagerKeeper = *contractmanagermodulekeeper.NewKeeper(
 		appCodec,
 		keys[contractmanagermoduletypes.StoreKey],
@@ -568,7 +650,8 @@ func NewQuadrateApp(
 	// create static IBC router, add transfer route, then set and seal it
 	ibcRouter := porttypes.NewRouter()
 	ibcRouter.AddRoute(icahosttypes.SubModuleName, icaHostIBCModule).
-		AddRoute(wasm.ModuleName, wasm.NewIBCHandler(app.wasmKeeper, app.IBCKeeper.ChannelKeeper))
+		AddRoute(wasm.ModuleName, wasm.NewIBCHandler(app.wasmKeeper, app.IBCKeeper.ChannelKeeper)).
+		AddRoute(icacontrollertypes.SubModuleName, icaControllerStack).AddRoute(interchaintxstypes.ModuleName, icaControllerStack)
 	app.IBCKeeper.SetRouter(ibcRouter)
 
 	// create evidence keeper with router
@@ -613,6 +696,9 @@ func NewQuadrateApp(
 		wasm.NewAppModule(appCodec, &app.wasmKeeper, app.StakingKeeper, app.AccountKeeper, app.BankKeeper),
 		evm.NewAppModule(app.EvmKeeper, app.AccountKeeper),
 		feemarket.NewAppModule(app.FeeMarketKeeper),
+		interchainQueriesModule,
+		interchainTxsModule,
+		feeModule,
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
@@ -645,6 +731,8 @@ func NewQuadrateApp(
 		wasm.ModuleName,
 		feemarkettypes.ModuleName,
 		evmtypes.ModuleName,
+		interchainqueriesmoduletypes.ModuleName,
+		interchaintxstypes.ModuleName,
 	)
 	app.mm.SetOrderEndBlockers(
 		crisistypes.ModuleName,
@@ -670,6 +758,8 @@ func NewQuadrateApp(
 		wasm.ModuleName,
 		evmtypes.ModuleName,
 		feemarkettypes.ModuleName,
+		interchainqueriesmoduletypes.ModuleName,
+		interchaintxstypes.ModuleName,
 	)
 
 	// NOTE: The genutils module must occur after staking so that pools are
@@ -702,6 +792,8 @@ func NewQuadrateApp(
 		upgradetypes.ModuleName,
 		vestingtypes.ModuleName,
 		wasm.ModuleName,
+		interchainqueriesmoduletypes.ModuleName,
+		interchaintxstypes.ModuleName,
 	)
 
 	app.mm.RegisterInvariants(&app.CrisisKeeper)
@@ -744,6 +836,8 @@ func NewQuadrateApp(
 	app.ScopedIBCKeeper = scopedIBCKeeper
 	app.ScopedTransferKeeper = scopedTransferKeeper
 	app.scopedWasmKeeper = scopedWasmKeeper
+	app.ScopedInterTxKeeper = scopedInterTxKeeper
+	//app.ScopedCCVConsumerKeeper = scopedCCVConsumerKeeper
 
 	if loadLatest {
 		if err := app.LoadLatestVersion(); err != nil {
@@ -913,6 +1007,8 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(wasm.ModuleName)
 	paramsKeeper.Subspace(feemarkettypes.ModuleName)
 	paramsKeeper.Subspace(evmtypes.ModuleName)
+	paramsKeeper.Subspace(interchainqueriesmoduletypes.ModuleName)
+	paramsKeeper.Subspace(interchaintxstypes.ModuleName)
 
 	return paramsKeeper
 }
@@ -925,6 +1021,10 @@ func (app *QuadrateApp) setUpgradeHandlers() {
 		evmupgrade.CreateUpgradeHandler(app.mm, app.configurator, *app.EvmKeeper, app.FeeMarketKeeper),
 	)
 
+	app.UpgradeKeeper.SetUpgradeHandler(
+		evmupgrade.UpgradeName,
+		evmupgrade.CreateUpgradeHandlerICQ(app.mm, app.configurator, app.InterchainQueriesKeeper),
+	)
 	// When a planned update height is reached, the old binary will panic
 	// writing on disk the height and name of the update that triggered it
 	// This will read that value, and execute the preparations for the upgrade.
