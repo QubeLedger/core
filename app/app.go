@@ -119,14 +119,15 @@ import (
 	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
 	"github.com/prometheus/client_golang/prometheus"
 
-	quadrateante "github.com/0xknstntn/quadrate/ante"
-	quadrateappparams "github.com/0xknstntn/quadrate/app/params"
+	quadrateante "github.com/QuadrateOrg/core/ante"
+	quadrateappparams "github.com/QuadrateOrg/core/app/params"
+	wasmbinding "github.com/QuadrateOrg/core/wasmbinding"
 
-	evmupgrade "github.com/0xknstntn/quadrate/app/upgrades/evm"
+	tokenfactory "github.com/QuadrateOrg/core/x/tokenfactory"
+	tokenfactorykeeper "github.com/QuadrateOrg/core/x/tokenfactory/keeper"
+	tokenfactorytypes "github.com/QuadrateOrg/core/x/tokenfactory/types"
 
-	"github.com/0xknstntn/quadrate/x/converter"
-	convertermodulekeeper "github.com/0xknstntn/quadrate/x/converter/keeper"
-	convertermoduletypes "github.com/0xknstntn/quadrate/x/converter/types"
+	evmupgrade "github.com/QuadrateOrg/core/app/upgrades/evm"
 
 	// unnamed import of statik for swagger UI support
 	_ "github.com/cosmos/cosmos-sdk/client/docs/statik"
@@ -214,22 +215,22 @@ var (
 		wasm.AppModuleBasic{},
 		evm.AppModuleBasic{},
 		feemarket.AppModuleBasic{},
-		converter.AppModuleBasic{},
+		tokenfactory.AppModuleBasic{},
 	)
 
 	// module account permissions
 	maccPerms = map[string][]string{
-		authtypes.FeeCollectorName:      nil,
-		distrtypes.ModuleName:           nil,
-		icatypes.ModuleName:             nil,
-		minttypes.ModuleName:            {authtypes.Minter},
-		stakingtypes.BondedPoolName:     {authtypes.Burner, authtypes.Staking},
-		stakingtypes.NotBondedPoolName:  {authtypes.Burner, authtypes.Staking},
-		govtypes.ModuleName:             {authtypes.Burner},
-		ibctransfertypes.ModuleName:     {authtypes.Minter, authtypes.Burner},
-		wasm.ModuleName:                 {authtypes.Burner},
-		evmtypes.ModuleName:             {authtypes.Minter, authtypes.Burner}, // used for secure addition and subtraction of balance using module account
-		convertermoduletypes.ModuleName: {authtypes.Minter, authtypes.Burner, authtypes.Staking},
+		authtypes.FeeCollectorName:     nil,
+		distrtypes.ModuleName:          nil,
+		icatypes.ModuleName:            nil,
+		minttypes.ModuleName:           {authtypes.Minter},
+		stakingtypes.BondedPoolName:    {authtypes.Burner, authtypes.Staking},
+		stakingtypes.NotBondedPoolName: {authtypes.Burner, authtypes.Staking},
+		govtypes.ModuleName:            {authtypes.Burner},
+		ibctransfertypes.ModuleName:    {authtypes.Minter, authtypes.Burner},
+		wasm.ModuleName:                {authtypes.Burner},
+		evmtypes.ModuleName:            {authtypes.Minter, authtypes.Burner}, // used for secure addition and subtraction of balance using module account
+		tokenfactorytypes.ModuleName:   {authtypes.Minter, authtypes.Burner},
 	}
 )
 
@@ -257,17 +258,18 @@ type QuadrateApp struct { // nolint: golint
 	memKeys map[string]*sdk.MemoryStoreKey
 
 	// keepers
-	AccountKeeper    authkeeper.AccountKeeper
-	BankKeeper       bankkeeper.Keeper
-	CapabilityKeeper *capabilitykeeper.Keeper
-	StakingKeeper    stakingkeeper.Keeper
-	SlashingKeeper   slashingkeeper.Keeper
-	MintKeeper       mintkeeper.Keeper
-	DistrKeeper      distrkeeper.Keeper
-	GovKeeper        govkeeper.Keeper
-	CrisisKeeper     crisiskeeper.Keeper
-	UpgradeKeeper    upgradekeeper.Keeper
-	ParamsKeeper     paramskeeper.Keeper
+	AccountKeeper      authkeeper.AccountKeeper
+	BankKeeper         bankkeeper.BaseKeeper
+	CapabilityKeeper   *capabilitykeeper.Keeper
+	StakingKeeper      stakingkeeper.Keeper
+	TokenFactoryKeeper *tokenfactorykeeper.Keeper
+	SlashingKeeper     slashingkeeper.Keeper
+	MintKeeper         mintkeeper.Keeper
+	DistrKeeper        distrkeeper.Keeper
+	GovKeeper          govkeeper.Keeper
+	CrisisKeeper       crisiskeeper.Keeper
+	UpgradeKeeper      upgradekeeper.Keeper
+	ParamsKeeper       paramskeeper.Keeper
 	// IBC Keeper must be a pointer in the app, so we can SetRouter on it correctly
 	IBCKeeper      *ibckeeper.Keeper
 	ICAHostKeeper  icahostkeeper.Keeper
@@ -287,7 +289,6 @@ type QuadrateApp struct { // nolint: golint
 
 	EvmKeeper       *evmkeeper.Keeper
 	FeeMarketKeeper feemarketkeeper.Keeper
-	ConverterKeeper convertermodulekeeper.Keeper
 
 	// the module manager
 	mm *module.Manager
@@ -334,7 +335,7 @@ func NewQuadrateApp(
 		govtypes.StoreKey, paramstypes.StoreKey, ibchost.StoreKey, upgradetypes.StoreKey,
 		evidencetypes.StoreKey, ibctransfertypes.StoreKey, capabilitytypes.StoreKey,
 		feegrant.StoreKey, authzkeeper.StoreKey, routertypes.StoreKey, icahosttypes.StoreKey,
-		wasm.StoreKey, evmtypes.StoreKey, feemarkettypes.StoreKey, convertermoduletypes.StoreKey,
+		wasm.StoreKey, evmtypes.StoreKey, feemarkettypes.StoreKey, tokenfactorytypes.StoreKey,
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey, evmtypes.TransientKey, feemarkettypes.TransientKey)
 	memKeys := sdk.NewMemoryStoreKeys(capabilitytypes.MemStoreKey)
@@ -441,23 +442,20 @@ func NewQuadrateApp(
 		nil,
 	)
 
-	app.ConverterKeeper = *convertermodulekeeper.NewKeeper(
-		appCodec,
-		keys[convertermoduletypes.StoreKey],
-		keys[convertermoduletypes.MemStoreKey],
-		app.GetSubspace(convertermoduletypes.ModuleName),
-		app.BankKeeper,
-		app.EvmKeeper,
-		app.wasmKeeper,
-		app.AccountKeeper,
-	)
-	//converterModule := converter.NewAppModule(appCodec, app.ConverterKeeper, app.AccountKeeper, app.BankKeeper, app.EvmKeeper, app.wasmKeeper)
-
 	// register the staking hooks
 	// NOTE: stakingKeeper above is passed by reference, so that it will contain these hooks
 	app.StakingKeeper = *stakingKeeper.SetHooks(
 		stakingtypes.NewMultiStakingHooks(app.DistrKeeper.Hooks(), app.SlashingKeeper.Hooks()),
 	)
+
+	tokenFactoryKeeper := tokenfactorykeeper.NewKeeper(
+		appCodec,
+		app.keys[tokenfactorytypes.StoreKey],
+		app.GetSubspace(tokenfactorytypes.ModuleName),
+		app.AccountKeeper,
+		app.BankKeeper.WithMintCoinsRestriction(tokenfactorytypes.NewTokenFactoryDenomMintCoinsRestriction()),
+	)
+	app.TokenFactoryKeeper = &tokenFactoryKeeper
 
 	app.IBCKeeper = ibckeeper.NewKeeper(
 		appCodec,
@@ -487,6 +485,7 @@ func NewQuadrateApp(
 	// if we want to allow any custom callbacks
 	supportedFeatures := "iterator,staking,stargate"
 	wasmOpts := GetWasmOpts(appOpts)
+	wasmOpts = append(wasmbinding.RegisterCustomPlugins(&app.BankKeeper, app.TokenFactoryKeeper), wasmOpts...)
 	app.wasmKeeper = wasm.NewKeeper(
 		appCodec,
 		keys[wasm.StoreKey],
@@ -621,7 +620,7 @@ func NewQuadrateApp(
 		wasm.NewAppModule(appCodec, &app.wasmKeeper, app.StakingKeeper, app.AccountKeeper, app.BankKeeper),
 		evm.NewAppModule(app.EvmKeeper, app.AccountKeeper),
 		feemarket.NewAppModule(app.FeeMarketKeeper),
-		converter.NewAppModule(appCodec, app.ConverterKeeper, app.AccountKeeper, app.BankKeeper, app.EvmKeeper, app.wasmKeeper),
+		tokenfactory.NewAppModule(appCodec, *app.TokenFactoryKeeper, app.AccountKeeper, app.BankKeeper),
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
@@ -636,6 +635,7 @@ func NewQuadrateApp(
 		crisistypes.ModuleName,
 		govtypes.ModuleName,
 		stakingtypes.ModuleName,
+		tokenfactorytypes.ModuleName,
 		ibctransfertypes.ModuleName,
 		ibchost.ModuleName,
 		icatypes.ModuleName,
@@ -654,12 +654,12 @@ func NewQuadrateApp(
 		wasm.ModuleName,
 		feemarkettypes.ModuleName,
 		evmtypes.ModuleName,
-		convertermoduletypes.ModuleName,
 	)
 	app.mm.SetOrderEndBlockers(
 		crisistypes.ModuleName,
 		govtypes.ModuleName,
 		stakingtypes.ModuleName,
+		tokenfactorytypes.ModuleName,
 		ibctransfertypes.ModuleName,
 		ibchost.ModuleName,
 		icatypes.ModuleName,
@@ -680,7 +680,6 @@ func NewQuadrateApp(
 		wasm.ModuleName,
 		evmtypes.ModuleName,
 		feemarkettypes.ModuleName,
-		convertermoduletypes.ModuleName,
 	)
 
 	// NOTE: The genutils module must occur after staking so that pools are
@@ -695,6 +694,7 @@ func NewQuadrateApp(
 		banktypes.ModuleName,
 		distrtypes.ModuleName,
 		stakingtypes.ModuleName,
+		tokenfactorytypes.ModuleName,
 		slashingtypes.ModuleName,
 		govtypes.ModuleName,
 		minttypes.ModuleName,
@@ -716,7 +716,6 @@ func NewQuadrateApp(
 		upgradetypes.ModuleName,
 		vestingtypes.ModuleName,
 		wasm.ModuleName,
-		convertermoduletypes.ModuleName,
 	)
 
 	app.mm.RegisterInvariants(&app.CrisisKeeper)
@@ -927,7 +926,6 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(wasm.ModuleName)
 	paramsKeeper.Subspace(feemarkettypes.ModuleName)
 	paramsKeeper.Subspace(evmtypes.ModuleName)
-	paramsKeeper.Subspace(convertermoduletypes.ModuleName)
 
 	return paramsKeeper
 }

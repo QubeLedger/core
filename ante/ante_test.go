@@ -16,8 +16,8 @@ import (
 	"github.com/stretchr/testify/suite"
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 
-	quadrateapp "github.com/0xknstntn/quadrate/app"
-	quadratehelpers "github.com/0xknstntn/quadrate/app/helpers"
+	quadrateapp "github.com/QuadrateOrg/core/app"
+	quadratehelpers "github.com/QuadrateOrg/core/app/helpers"
 )
 
 type IntegrationTestSuite struct {

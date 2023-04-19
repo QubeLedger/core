@@ -1,9 +1,10 @@
-module github.com/0xknstntn/quadrate
+module github.com/QuadrateOrg/core
 
 go 1.18
 
 require (
 	github.com/CosmWasm/wasmd v0.28.0
+	github.com/CosmWasm/wasmvm v1.0.0
 	github.com/cosmos/cosmos-sdk v0.45.9
 	github.com/cosmos/ibc-go/v3 v3.2.0
 	github.com/ethereum/go-ethereum v1.10.19
@@ -21,10 +22,8 @@ require (
 	github.com/stretchr/testify v1.8.0
 	github.com/tendermint/tendermint v0.34.21
 	github.com/tendermint/tm-db v0.6.7
-	github.com/tharsis/evmos v1.1.3
 	google.golang.org/genproto v0.0.0-20220810155839-1856144b1d9c
 	google.golang.org/grpc v1.48.0
-	gopkg.in/yaml.v2 v2.4.0
 )
 
 require (
@@ -32,11 +31,11 @@ require (
 	filippo.io/edwards25519 v1.0.0-beta.2 // indirect
 	github.com/99designs/keyring v1.1.6 // indirect
 	github.com/ChainSafe/go-schnorrkel v0.0.0-20200405005733-88cbf1b4c40d // indirect
-	github.com/CosmWasm/wasmvm v1.0.0 // indirect
 	github.com/DataDog/zstd v1.4.8 // indirect
 	github.com/StackExchange/wmi v1.2.1 // indirect
 	github.com/VictoriaMetrics/fastcache v1.6.0 // indirect
 	github.com/Workiva/go-datastructures v1.0.53 // indirect
+	github.com/allegro/bigcache v1.2.1 // indirect
 	github.com/armon/go-metrics v0.4.0 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/bgentry/speakeasy v0.1.0 // indirect
@@ -118,6 +117,7 @@ require (
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/mtibben/percent v0.2.1 // indirect
 	github.com/olekukonko/tablewriter v0.0.5 // indirect
+	github.com/onsi/ginkgo v1.16.5 // indirect
 	github.com/pelletier/go-toml v1.9.5 // indirect
 	github.com/pelletier/go-toml/v2 v2.0.2 // indirect
 	github.com/petermattis/goid v0.0.0-20180202154549-b0b1615b78e5 // indirect
@@ -143,7 +143,6 @@ require (
 	github.com/tendermint/btcd v0.1.1 // indirect
 	github.com/tendermint/crypto v0.0.0-20191022145703-50d29ede1e15 // indirect
 	github.com/tendermint/go-amino v0.16.0 // indirect
-	github.com/tharsis/ethermint v0.10.3 // indirect
 	github.com/tklauser/go-sysconf v0.3.7 // indirect
 	github.com/tklauser/numcpus v0.2.3 // indirect
 	github.com/tyler-smith/go-bip39 v1.1.0 // indirect
@@ -159,6 +158,7 @@ require (
 	google.golang.org/protobuf v1.28.1 // indirect
 	gopkg.in/ini.v1 v1.66.6 // indirect
 	gopkg.in/natefinch/npipe.v2 v2.0.0-20160621034901-c1b8fa8bdcce // indirect
+	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	nhooyr.io/websocket v1.8.7 // indirect
 )
