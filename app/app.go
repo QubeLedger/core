@@ -470,8 +470,12 @@ func NewQuadrateApp(
 	app.TokenFactoryKeeper = &tokenFactoryKeeper
 
 	app.Erc20Keeper = erc20keeper.NewKeeper(
-		keys[erc20types.StoreKey], appCodec, app.GetSubspace(erc20types.ModuleName),
-		app.AccountKeeper, app.BankKeeper, app.EvmKeeper,
+		keys[erc20types.StoreKey],
+		appCodec,
+		app.GetSubspace(erc20types.ModuleName),
+		app.AccountKeeper,
+		app.BankKeeper,
+		app.EvmKeeper,
 	)
 
 	app.IBCKeeper = ibckeeper.NewKeeper(
