@@ -119,10 +119,10 @@ import (
 	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
 	"github.com/prometheus/client_golang/prometheus"
 
-	quadrateante "github.com/0xknstntn/quadrate/ante"
-	quadrateappparams "github.com/0xknstntn/quadrate/app/params"
+	quadrateante "github.com/QuadrateOrg/core/ante"
+	quadrateappparams "github.com/QuadrateOrg/core/app/params"
 
-	evmupgrade "github.com/0xknstntn/quadrate/app/upgrades/evm"
+	evmupgrade "github.com/QuadrateOrg/core/app/upgrades/evm"
 
 	// unnamed import of statik for swagger UI support
 	_ "github.com/cosmos/cosmos-sdk/client/docs/statik"

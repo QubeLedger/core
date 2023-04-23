@@ -37,7 +37,7 @@ import (
 	ibcchanneltypes "github.com/cosmos/ibc-go/v3/modules/core/04-channel/types"
 	evmcfg "github.com/evmos/ethermint/server/config"
 
-	"github.com/0xknstntn/quadrate/app/params"
+	"github.com/QuadrateOrg/core/app/params"
 )
 
 var (

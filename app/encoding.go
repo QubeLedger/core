@@ -1,7 +1,7 @@
 package app
 
 import (
-	"github.com/0xknstntn/quadrate/app/params"
+	"github.com/QuadrateOrg/core/app/params"
 
 	"github.com/evmos/ethermint/encoding/codec"
 )

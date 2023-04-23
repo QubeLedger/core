@@ -6,8 +6,8 @@ import (
 	svrcmd "github.com/cosmos/cosmos-sdk/server/cmd"
 	"github.com/stretchr/testify/require"
 
-	app "github.com/0xknstntn/quadrate/app"
-	"github.com/0xknstntn/quadrate/cmd/quadrated/cmd"
+	app "github.com/QuadrateOrg/core/app"
+	"github.com/QuadrateOrg/core/cmd/quadrated/cmd"
 )
 
 func TestRootCmdConfig(t *testing.T) {

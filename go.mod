@@ -1,4 +1,4 @@
-module github.com/0xknstntn/quadrate
+module github.com/QuadrateOrg/core
 
 go 1.18
 
