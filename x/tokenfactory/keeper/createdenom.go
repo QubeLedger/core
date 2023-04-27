@@ -16,19 +16,21 @@ func (k Keeper) CreateDenom(ctx sdk.Context, creatorAddr string, subdenom string
 		return "", err
 	}
 
-	err = k.createDenomAfterValidation(ctx, creatorAddr, denom)
+	err = k.createDenomAfterValidation(ctx, creatorAddr, denom, subdenom)
 	return denom, err
 }
 
 // Runs CreateDenom logic after the charge and all denom validation has been handled.
 // Made into a second function for genesis initialization.
-func (k Keeper) createDenomAfterValidation(ctx sdk.Context, creatorAddr string, denom string) (err error) {
+func (k Keeper) createDenomAfterValidation(ctx sdk.Context, creatorAddr string, denom string, subdenom string) (err error) {
 	denomMetaData := banktypes.Metadata{
 		DenomUnits: []*banktypes.DenomUnit{{
 			Denom:    denom,
 			Exponent: 0,
 		}},
-		Base: denom,
+		Base:   denom,
+		Name:   subdenom,
+		Symbol: subdenom,
 	}
 
 	k.bankKeeper.SetDenomMetaData(ctx, denomMetaData)

@@ -50,7 +50,8 @@ func (k Keeper) DeployERC20Contract(
 	}
 
 	contractAddr := crypto.CreateAddress(types.ModuleAddress, nonce)
-	_, err = k.CallEVMWithData(ctx, types.ModuleAddress, nil, data, true)
+	//_, err = k.CallEVMWithData(ctx, types.ModuleAddress, nil, data, true)
+	_, err = k.CallEVMWithoutGas(ctx, types.ModuleAddress, nil, data, true)
 	if err != nil {
 		return common.Address{}, sdkerrors.Wrapf(err, "failed to deploy contract for %s", coinMetadata.Name)
 	}
@@ -182,10 +183,13 @@ func (k Keeper) CallEVMWithData(
 			return nil, sdkerrors.Wrapf(sdkerrors.ErrJSONMarshal, "failed to marshal tx args: %s", err.Error())
 		}
 
-		gasRes, err := k.evmKeeper.EstimateGas(sdk.WrapSDKContext(ctx), &evmtypes.EthCallRequest{
-			Args:   args,
-			GasCap: config.DefaultGasCap,
-		})
+		gasRes, err := k.evmKeeper.EstimateGas(
+			sdk.WrapSDKContext(ctx),
+			&evmtypes.EthCallRequest{
+				Args:   args,
+				GasCap: config.DefaultGasCap,
+			},
+		)
 		if err != nil {
 			return nil, err
 		}
@@ -214,6 +218,56 @@ func (k Keeper) CallEVMWithData(
 	if res.Failed() {
 		return nil, sdkerrors.Wrap(evmtypes.ErrVMExecution, res.VmError)
 	}
+
+	return res, nil
+}
+
+// CallEVMWithoutGas performs a smart contract method call using contract data without gas
+func (k *Keeper) CallEVMWithoutGas(
+	ctx sdk.Context,
+	from common.Address,
+	contract *common.Address,
+	data []byte,
+	commit bool,
+) (*evmtypes.MsgEthereumTxResponse, error) {
+	gasMeter := ctx.GasMeter()
+	ctx = ctx.WithGasMeter(sdk.NewInfiniteGasMeter())
+
+	nonce, err := k.accountKeeper.GetSequence(ctx, from.Bytes())
+	if err != nil {
+		return nil, err
+	}
+
+	gasLimit := config.DefaultGasCap
+	params := ctx.ConsensusParams()
+	if params != nil && params.Block != nil && params.Block.MaxGas > 0 {
+		gasLimit = uint64(params.Block.MaxGas)
+	}
+
+	msg := ethtypes.NewMessage(
+		from,
+		contract,
+		nonce,
+		big.NewInt(0), // amount
+		gasLimit,      // gasLimit
+		big.NewInt(0), // gasFeeCap
+		big.NewInt(0), // gasTipCap
+		big.NewInt(0), // gasPrice
+		data,
+		ethtypes.AccessList{}, // AccessList
+		!commit,               // isFake
+	)
+
+	res, err := k.evmKeeper.ApplyMessage(ctx, msg, evmtypes.NewNoOpTracer(), commit)
+	if err != nil {
+		return nil, err
+	}
+
+	if res.Failed() {
+		return nil, sdkerrors.Wrap(evmtypes.ErrVMExecution, res.VmError)
+	}
+
+	ctx.WithGasMeter(gasMeter)
 
 	return res, nil
 }

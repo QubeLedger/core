@@ -20,7 +20,7 @@ func (k Keeper) InitGenesis(ctx sdk.Context, genState types.GenesisState) {
 		if err != nil {
 			panic(err)
 		}
-		err = k.createDenomAfterValidation(ctx, creator, genDenom.GetDenom())
+		err = k.createDenomAfterValidation(ctx, creator, genDenom.GetDenom(), "")
 		if err != nil {
 			panic(err)
 		}
