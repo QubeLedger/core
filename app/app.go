@@ -469,15 +469,6 @@ func NewQuadrateApp(
 	)
 	app.TokenFactoryKeeper = &tokenFactoryKeeper
 
-	app.Erc20Keeper = erc20keeper.NewKeeper(
-		keys[erc20types.StoreKey],
-		appCodec,
-		app.GetSubspace(erc20types.ModuleName),
-		app.AccountKeeper,
-		app.BankKeeper,
-		app.EvmKeeper,
-	)
-
 	app.IBCKeeper = ibckeeper.NewKeeper(
 		appCodec,
 		keys[ibchost.StoreKey],
@@ -561,6 +552,24 @@ func NewQuadrateApp(
 		&stakingKeeper,
 		app.FeeMarketKeeper,
 		evmTrace,
+	)
+
+	app.Erc20Keeper = erc20keeper.NewKeeper(
+		keys[erc20types.StoreKey],
+		appCodec,
+		app.GetSubspace(erc20types.ModuleName),
+		app.AccountKeeper,
+		app.BankKeeper,
+		app.EvmKeeper,
+	)
+
+	app.EvmKeeper = app.EvmKeeper.SetHooks(
+		evmkeeper.NewMultiEvmHooks(
+			app.Erc20Keeper.Hooks(),
+			/*app.IncentivesKeeper.Hooks(),
+			app.RevenueKeeper.Hooks(),
+			app.ClaimsKeeper.Hooks(),*/
+		),
 	)
 
 	app.TransferKeeper = ibctransferkeeper.NewKeeper(
