@@ -135,10 +135,6 @@ import (
 	erc20keeper "github.com/QuadrateOrg/core/x/erc20/keeper"
 	erc20types "github.com/QuadrateOrg/core/x/erc20/types"
 
-
-	evmupgrade "github.com/QuadrateOrg/core/app/upgrades/evm"
-
-
 	// unnamed import of statik for swagger UI support
 	_ "github.com/cosmos/cosmos-sdk/client/docs/statik"
 )
