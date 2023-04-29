@@ -81,13 +81,12 @@ import (
 	icahostkeeper "github.com/cosmos/ibc-go/v3/modules/apps/27-interchain-accounts/host/keeper"
 	icahosttypes "github.com/cosmos/ibc-go/v3/modules/apps/27-interchain-accounts/host/types"
 	icatypes "github.com/cosmos/ibc-go/v3/modules/apps/27-interchain-accounts/types"
-	"github.com/cosmos/ibc-go/v3/modules/apps/transfer"
-	ibctransferkeeper "github.com/cosmos/ibc-go/v3/modules/apps/transfer/keeper"
 	ibctransfertypes "github.com/cosmos/ibc-go/v3/modules/apps/transfer/types"
 	ibc "github.com/cosmos/ibc-go/v3/modules/core"
 	ibcclient "github.com/cosmos/ibc-go/v3/modules/core/02-client"
 	ibcclientclient "github.com/cosmos/ibc-go/v3/modules/core/02-client/client"
 	ibcclienttypes "github.com/cosmos/ibc-go/v3/modules/core/02-client/types"
+	ibcporttypes "github.com/cosmos/ibc-go/v3/modules/core/05-port/types"
 	porttypes "github.com/cosmos/ibc-go/v3/modules/core/05-port/types"
 	ibchost "github.com/cosmos/ibc-go/v3/modules/core/24-host"
 	ibckeeper "github.com/cosmos/ibc-go/v3/modules/core/keeper"
@@ -134,6 +133,28 @@ import (
 	erc20client "github.com/QuadrateOrg/core/x/erc20/client"
 	erc20keeper "github.com/QuadrateOrg/core/x/erc20/keeper"
 	erc20types "github.com/QuadrateOrg/core/x/erc20/types"
+
+	contractmanagermodulekeeper "github.com/QuadrateOrg/core/x/contractmanager/keeper"
+	contractmanagermoduletypes "github.com/QuadrateOrg/core/x/contractmanager/types"
+
+	"github.com/QuadrateOrg/core/x/interchainqueries"
+	interchainqueriesmodulekeeper "github.com/QuadrateOrg/core/x/interchainqueries/keeper"
+	interchainqueriesmoduletypes "github.com/QuadrateOrg/core/x/interchainqueries/types"
+
+	"github.com/QuadrateOrg/core/x/interchaintxs"
+	interchaintxskeeper "github.com/QuadrateOrg/core/x/interchaintxs/keeper"
+	interchaintxstypes "github.com/QuadrateOrg/core/x/interchaintxs/types"
+
+	"github.com/QuadrateOrg/core/x/feerefunder"
+	feekeeper "github.com/QuadrateOrg/core/x/feerefunder/keeper"
+	feetypes "github.com/QuadrateOrg/core/x/feerefunder/types"
+
+	icacontroller "github.com/cosmos/ibc-go/v3/modules/apps/27-interchain-accounts/controller"
+	icacontrollerkeeper "github.com/cosmos/ibc-go/v3/modules/apps/27-interchain-accounts/controller/keeper"
+	icacontrollertypes "github.com/cosmos/ibc-go/v3/modules/apps/27-interchain-accounts/controller/types"
+
+	transferSudo "github.com/QuadrateOrg/core/x/transfer"
+	wrapkeeper "github.com/QuadrateOrg/core/x/transfer/keeper"
 
 	// unnamed import of statik for swagger UI support
 	_ "github.com/cosmos/cosmos-sdk/client/docs/statik"
@@ -217,7 +238,7 @@ var (
 		ibc.AppModuleBasic{},
 		upgrade.AppModuleBasic{},
 		evidence.AppModuleBasic{},
-		transfer.AppModuleBasic{},
+		//transfer.AppModuleBasic{},
 		vesting.AppModuleBasic{},
 		//router.AppModuleBasic{},
 		ica.AppModuleBasic{},
@@ -226,22 +247,26 @@ var (
 		feemarket.AppModuleBasic{},
 		tokenfactory.AppModuleBasic{},
 		erc20.AppModuleBasic{},
+		interchaintxs.AppModuleBasic{},
+		interchainqueries.AppModuleBasic{},
+		transferSudo.AppModuleBasic{},
 	)
 
 	// module account permissions
 	maccPerms = map[string][]string{
-		authtypes.FeeCollectorName:     nil,
-		distrtypes.ModuleName:          nil,
-		icatypes.ModuleName:            nil,
-		minttypes.ModuleName:           {authtypes.Minter},
-		stakingtypes.BondedPoolName:    {authtypes.Burner, authtypes.Staking},
-		stakingtypes.NotBondedPoolName: {authtypes.Burner, authtypes.Staking},
-		govtypes.ModuleName:            {authtypes.Burner},
-		ibctransfertypes.ModuleName:    {authtypes.Minter, authtypes.Burner},
-		wasm.ModuleName:                {authtypes.Burner},
-		evmtypes.ModuleName:            {authtypes.Minter, authtypes.Burner}, // used for secure addition and subtraction of balance using module account
-		tokenfactorytypes.ModuleName:   {authtypes.Minter, authtypes.Burner},
-		erc20types.ModuleName:          {authtypes.Minter, authtypes.Burner},
+		authtypes.FeeCollectorName:              nil,
+		distrtypes.ModuleName:                   nil,
+		icatypes.ModuleName:                     nil,
+		minttypes.ModuleName:                    {authtypes.Minter},
+		stakingtypes.BondedPoolName:             {authtypes.Burner, authtypes.Staking},
+		stakingtypes.NotBondedPoolName:          {authtypes.Burner, authtypes.Staking},
+		govtypes.ModuleName:                     {authtypes.Burner},
+		ibctransfertypes.ModuleName:             {authtypes.Minter, authtypes.Burner},
+		wasm.ModuleName:                         {authtypes.Burner},
+		evmtypes.ModuleName:                     {authtypes.Minter, authtypes.Burner}, // used for secure addition and subtraction of balance using module account
+		tokenfactorytypes.ModuleName:            {authtypes.Minter, authtypes.Burner},
+		erc20types.ModuleName:                   {authtypes.Minter, authtypes.Burner},
+		interchainqueriesmoduletypes.ModuleName: nil,
 	}
 )
 
@@ -283,18 +308,26 @@ type QuadrateApp struct { // nolint: golint
 	UpgradeKeeper      upgradekeeper.Keeper
 	ParamsKeeper       paramskeeper.Keeper
 	// IBC Keeper must be a pointer in the app, so we can SetRouter on it correctly
-	IBCKeeper      *ibckeeper.Keeper
-	ICAHostKeeper  icahostkeeper.Keeper
-	EvidenceKeeper evidencekeeper.Keeper
-	TransferKeeper ibctransferkeeper.Keeper
-	FeeGrantKeeper feegrantkeeper.Keeper
-	AuthzKeeper    authzkeeper.Keeper
+	IBCKeeper           *ibckeeper.Keeper
+	ICAControllerKeeper icacontrollerkeeper.Keeper
+	ICAHostKeeper       icahostkeeper.Keeper
+	EvidenceKeeper      evidencekeeper.Keeper
+	TransferKeeper      wrapkeeper.KeeperTransferWrapper
+	FeeGrantKeeper      feegrantkeeper.Keeper
+	FeeKeeper           *feekeeper.Keeper
+	AuthzKeeper         authzkeeper.Keeper
 	//RouterKeeper   routerkeeper.Keeper
 
 	// make scoped keepers public for test purposes
 	ScopedIBCKeeper      capabilitykeeper.ScopedKeeper
 	ScopedTransferKeeper capabilitykeeper.ScopedKeeper
 	ScopedICAHostKeeper  capabilitykeeper.ScopedKeeper
+	ScopedInterTxKeeper  capabilitykeeper.ScopedKeeper
+
+	ContractManagerKeeper contractmanagermodulekeeper.Keeper
+
+	InterchainQueriesKeeper interchainqueriesmodulekeeper.Keeper
+	InterchainTxsKeeper     interchaintxskeeper.Keeper
 
 	wasmKeeper       wasm.Keeper
 	scopedWasmKeeper capabilitykeeper.ScopedKeeper
@@ -348,10 +381,15 @@ func NewQuadrateApp(
 		evidencetypes.StoreKey, ibctransfertypes.StoreKey, capabilitytypes.StoreKey,
 		feegrant.StoreKey, authzkeeper.StoreKey, icahosttypes.StoreKey,
 		wasm.StoreKey, evmtypes.StoreKey, feemarkettypes.StoreKey, tokenfactorytypes.StoreKey,
-		erc20types.StoreKey, /*routertypes.StoreKey,*/
+		erc20types.StoreKey,
+		interchainqueriesmoduletypes.StoreKey,
+		icacontrollertypes.StoreKey,
+		interchaintxstypes.StoreKey,
+		feetypes.StoreKey,
+		/*routertypes.StoreKey,*/
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey, evmtypes.TransientKey, feemarkettypes.TransientKey)
-	memKeys := sdk.NewMemoryStoreKeys(capabilitytypes.MemStoreKey)
+	memKeys := sdk.NewMemoryStoreKeys(capabilitytypes.MemStoreKey, feetypes.MemStoreKey)
 
 	app := &QuadrateApp{
 		BaseApp:           bApp,
@@ -381,7 +419,7 @@ func NewQuadrateApp(
 	scopedIBCKeeper := app.CapabilityKeeper.ScopeToModule(ibchost.ModuleName)
 	scopedTransferKeeper := app.CapabilityKeeper.ScopeToModule(ibctransfertypes.ModuleName)
 	scopedICAHostKeeper := app.CapabilityKeeper.ScopeToModule(icahosttypes.SubModuleName)
-
+	scopedInterTxKeeper := app.CapabilityKeeper.ScopeToModule(interchaintxstypes.ModuleName)
 	scopedWasmKeeper := app.CapabilityKeeper.ScopeToModule(wasm.ModuleName)
 
 	// add keepers
@@ -409,6 +447,7 @@ func NewQuadrateApp(
 		keys[feegrant.StoreKey],
 		app.AccountKeeper,
 	)
+
 	stakingKeeper := stakingkeeper.NewKeeper(
 		appCodec,
 		keys[stakingtypes.StoreKey],
@@ -479,6 +518,16 @@ func NewQuadrateApp(
 		scopedIBCKeeper,
 	)
 
+	app.FeeKeeper = feekeeper.NewKeeper(
+		appCodec,
+		keys[feetypes.StoreKey],
+		memKeys[feetypes.MemStoreKey],
+		app.GetSubspace(feetypes.ModuleName),
+		app.IBCKeeper.ChannelKeeper,
+		app.BankKeeper,
+	)
+	feeModule := feerefunder.NewAppModule(appCodec, *app.FeeKeeper, app.AccountKeeper, app.BankKeeper)
+
 	// register the proposal types
 	govRouter := govtypes.NewRouter()
 	govRouter.
@@ -499,7 +548,7 @@ func NewQuadrateApp(
 	// if we want to allow any custom callbacks
 	supportedFeatures := "iterator,staking,stargate"
 	wasmOpts := GetWasmOpts(appOpts)
-	wasmOpts = append(wasmbinding.RegisterCustomPlugins(&app.BankKeeper, app.TokenFactoryKeeper), wasmOpts...)
+	wasmOpts = append(wasmbinding.RegisterCustomPlugins(&app.BankKeeper, app.TokenFactoryKeeper, &app.InterchainTxsKeeper, &app.InterchainQueriesKeeper, app.TransferKeeper), wasmOpts...)
 	app.wasmKeeper = wasm.NewKeeper(
 		appCodec,
 		keys[wasm.StoreKey],
@@ -573,19 +622,45 @@ func NewQuadrateApp(
 		),
 	)
 
-	app.TransferKeeper = ibctransferkeeper.NewKeeper(
+	app.InterchainQueriesKeeper = *interchainqueriesmodulekeeper.NewKeeper(
+		appCodec,
+		keys[interchainqueriesmoduletypes.StoreKey],
+		keys[interchainqueriesmoduletypes.MemStoreKey],
+		app.GetSubspace(interchainqueriesmoduletypes.ModuleName),
+		app.IBCKeeper,
+		app.BankKeeper,
+		app.ContractManagerKeeper,
+		interchainqueriesmodulekeeper.Verifier{},
+		interchainqueriesmodulekeeper.TransactionVerifier{},
+	)
+
+	app.InterchainTxsKeeper = *interchaintxskeeper.NewKeeper(
+		appCodec,
+		keys[interchaintxstypes.StoreKey],
+		memKeys[interchaintxstypes.MemStoreKey],
+		app.GetSubspace(interchaintxstypes.ModuleName),
+		app.IBCKeeper.ChannelKeeper,
+		app.ICAControllerKeeper,
+		scopedInterTxKeeper,
+		app.ContractManagerKeeper,
+		app.FeeKeeper,
+	)
+
+	app.TransferKeeper = wrapkeeper.NewKeeper(
 		appCodec,
 		keys[ibctransfertypes.StoreKey],
 		app.GetSubspace(ibctransfertypes.ModuleName),
-		app.IBCKeeper.ChannelKeeper,
+		app.IBCKeeper.ChannelKeeper, // essentially still app.IBCKeeper.ChannelKeeper under the hood because no hook overrides
 		app.IBCKeeper.ChannelKeeper,
 		&app.IBCKeeper.PortKeeper,
 		app.AccountKeeper,
 		app.BankKeeper,
 		scopedTransferKeeper,
+		app.FeeKeeper,
+		app.ContractManagerKeeper,
 	)
-	transferModule := transfer.NewAppModule(app.TransferKeeper)
-	transferIBCModule := transfer.NewIBCModule(app.TransferKeeper)
+	transferModule := transferSudo.NewAppModule(app.TransferKeeper)
+	transferIBCModule := transferSudo.NewIBCModule(app.TransferKeeper)
 
 	app.ICAHostKeeper = icahostkeeper.NewKeeper(
 		appCodec, keys[icahosttypes.StoreKey],
@@ -597,7 +672,22 @@ func NewQuadrateApp(
 		app.MsgServiceRouter(),
 	)
 	icaModule := ica.NewAppModule(nil, &app.ICAHostKeeper)
+	var icaControllerStack ibcporttypes.IBCModule
+
+	icaControllerStack = interchaintxs.NewIBCModule(app.InterchainTxsKeeper)
+	icaControllerStack = icacontroller.NewIBCModule(app.ICAControllerKeeper, icaControllerStack)
 	icaHostIBCModule := icahost.NewIBCModule(app.ICAHostKeeper)
+
+	interchainQueriesModule := interchainqueries.NewAppModule(appCodec, app.InterchainQueriesKeeper, app.AccountKeeper, app.BankKeeper)
+	interchainTxsModule := interchaintxs.NewAppModule(appCodec, app.InterchainTxsKeeper, app.AccountKeeper, app.BankKeeper)
+
+	app.ContractManagerKeeper = *contractmanagermodulekeeper.NewKeeper(
+		appCodec,
+		keys[contractmanagermoduletypes.StoreKey],
+		keys[contractmanagermoduletypes.MemStoreKey],
+		app.GetSubspace(contractmanagermoduletypes.ModuleName),
+		&app.wasmKeeper,
+	)
 
 	//app.RouterKeeper = routerkeeper.NewKeeper(appCodec, keys[routertypes.StoreKey], app.GetSubspace(routertypes.ModuleName), app.TransferKeeper, app.DistrKeeper)
 
@@ -607,7 +697,8 @@ func NewQuadrateApp(
 	ibcRouter.AddRoute(icahosttypes.SubModuleName, icaHostIBCModule).
 		AddRoute(wasm.ModuleName, wasm.NewIBCHandler(app.wasmKeeper, app.IBCKeeper.ChannelKeeper)).
 		AddRoute(ibctransfertypes.ModuleName, transferIBCModule).
-		AddRoute(erc20types.ModuleName, transferIBCModule)
+		AddRoute(erc20types.ModuleName, transferIBCModule).
+		AddRoute(interchaintxstypes.ModuleName, icaControllerStack)
 
 	app.IBCKeeper.SetRouter(ibcRouter)
 
@@ -655,6 +746,9 @@ func NewQuadrateApp(
 		feemarket.NewAppModule(app.FeeMarketKeeper),
 		tokenfactory.NewAppModule(appCodec, *app.TokenFactoryKeeper, app.AccountKeeper, app.BankKeeper),
 		erc20.NewAppModule(app.Erc20Keeper, app.AccountKeeper),
+		interchainQueriesModule,
+		interchainTxsModule,
+		feeModule,
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
@@ -689,6 +783,9 @@ func NewQuadrateApp(
 		feemarkettypes.ModuleName,
 		evmtypes.ModuleName,
 		erc20types.ModuleName,
+		interchainqueriesmoduletypes.ModuleName,
+		interchaintxstypes.ModuleName,
+		feetypes.ModuleName,
 	)
 	app.mm.SetOrderEndBlockers(
 		crisistypes.ModuleName,
@@ -716,6 +813,9 @@ func NewQuadrateApp(
 		evmtypes.ModuleName,
 		feemarkettypes.ModuleName,
 		erc20types.ModuleName,
+		interchainqueriesmoduletypes.ModuleName,
+		interchaintxstypes.ModuleName,
+		feetypes.ModuleName,
 	)
 
 	// NOTE: The genutils module must occur after staking so that pools are
@@ -753,6 +853,9 @@ func NewQuadrateApp(
 		vestingtypes.ModuleName,
 		wasm.ModuleName,
 		erc20types.ModuleName,
+		interchainqueriesmoduletypes.ModuleName,
+		interchaintxstypes.ModuleName,
+		feetypes.ModuleName,
 	)
 
 	app.mm.RegisterInvariants(&app.CrisisKeeper)
@@ -795,6 +898,7 @@ func NewQuadrateApp(
 	app.ScopedIBCKeeper = scopedIBCKeeper
 	app.ScopedTransferKeeper = scopedTransferKeeper
 	app.scopedWasmKeeper = scopedWasmKeeper
+	app.ScopedInterTxKeeper = scopedInterTxKeeper
 
 	if loadLatest {
 		if err := app.LoadLatestVersion(); err != nil {
@@ -964,6 +1068,9 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(feemarkettypes.ModuleName)
 	paramsKeeper.Subspace(evmtypes.ModuleName)
 	paramsKeeper.Subspace(erc20types.ModuleName)
+	paramsKeeper.Subspace(interchainqueriesmoduletypes.ModuleName)
+	paramsKeeper.Subspace(interchaintxstypes.ModuleName)
+	paramsKeeper.Subspace(feetypes.ModuleName)
 
 	return paramsKeeper
 }
