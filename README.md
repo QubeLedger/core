@@ -10,6 +10,7 @@
   developed.](https://img.shields.io/badge/repo%20status-Active-green.svg?style=flat-square)](https://www.repostatus.org/#active)
   [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
   [![Telegram!](https://patrolavia.github.io/telegram-badge/follow.png)](https://t.me/QuadrateOrg)
+  [![LoC](https://tokei.rs/b1/github/QuadrateOrg/core)](https://github.com/QuadrateOrg/core)
 </div>
 
 ## Install quadrated
@@ -23,3 +24,6 @@
 ## Contributing
 The contributing guide for Quadrate explains the branching structure, how to use the SDK fork, and how to make / test updates to SDK branches.
 
+## Supporters
+
+[![Stargazers repo roster for @QuadrateOrg/core](https://reporoster.com/stars/QuadrateOrg/core)](https://github.com/QuadrateOrg/core)
