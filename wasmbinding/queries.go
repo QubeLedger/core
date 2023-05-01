@@ -6,6 +6,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	sdkquery "github.com/cosmos/cosmos-sdk/types/query"
+	evmkeeper "github.com/evmos/ethermint/x/evm/keeper"
 
 	"github.com/QuadrateOrg/core/wasmbinding/bindings"
 	tokenfactorykeeper "github.com/QuadrateOrg/core/x/tokenfactory/keeper"
@@ -20,14 +21,16 @@ type QueryPlugin struct {
 	tokenFactoryKeeper  *tokenfactorykeeper.Keeper
 	icaControllerKeeper *icacontrollerkeeper.Keeper
 	icqKeeper           *icqkeeper.Keeper
+	evm                 evmkeeper.Keeper
 }
 
 // NewQueryPlugin returns a reference to a new QueryPlugin.
-func NewQueryPlugin(tfk *tokenfactorykeeper.Keeper, icaControllerKeeper *icacontrollerkeeper.Keeper, icqKeeper *icqkeeper.Keeper) *QueryPlugin {
+func NewQueryPlugin(tfk *tokenfactorykeeper.Keeper, icaControllerKeeper *icacontrollerkeeper.Keeper, icqKeeper *icqkeeper.Keeper, evm evmkeeper.Keeper) *QueryPlugin {
 	return &QueryPlugin{
 		tokenFactoryKeeper:  tfk,
 		icaControllerKeeper: icaControllerKeeper,
 		icqKeeper:           icqKeeper,
+		evm:                 evm,
 	}
 }
 

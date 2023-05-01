@@ -11,6 +11,7 @@ import (
 	interchaintransactionsmodulekeeper "github.com/QuadrateOrg/core/x/interchaintxs/keeper"
 	tokenfactorykeeper "github.com/QuadrateOrg/core/x/tokenfactory/keeper"
 	transfer "github.com/QuadrateOrg/core/x/transfer/keeper"
+	evmkeeper "github.com/evmos/ethermint/x/evm/keeper"
 )
 
 func RegisterCustomPlugins(
@@ -19,14 +20,15 @@ func RegisterCustomPlugins(
 	ictxKeeper *interchaintransactionsmodulekeeper.Keeper,
 	icqKeeper *interchainqueriesmodulekeeper.Keeper,
 	transfer transfer.KeeperTransferWrapper,
+	evm evmkeeper.Keeper,
 ) []wasmkeeper.Option {
-	wasmQueryPlugin := NewQueryPlugin(tokenFactory, ictxKeeper, icqKeeper)
+	wasmQueryPlugin := NewQueryPlugin(tokenFactory, ictxKeeper, icqKeeper, evm)
 
 	queryPluginOpt := wasmkeeper.WithQueryPlugins(&wasmkeeper.QueryPlugins{
 		Custom: CustomQuerier(wasmQueryPlugin),
 	})
 	messengerDecoratorOpt := wasmkeeper.WithMessageHandlerDecorator(
-		CustomMessageDecorator(bank, tokenFactory, ictxKeeper, icqKeeper, transfer),
+		CustomMessageDecorator(bank, tokenFactory, ictxKeeper, icqKeeper, transfer, evm),
 	)
 
 	return []wasm.Option{
