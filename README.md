@@ -1,6 +1,4 @@
 <div align="center">
-  <img src="assets/banner.png"/>
-  <br/>
   <h1> Quadrate </h1>
   <p> Cosmos SDK L1 blockchain, built for decentralized, trust-free, stable economy </p>
   <br/>
