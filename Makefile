@@ -8,7 +8,7 @@ BUILDDIR ?= $(CURDIR)/build
 DOCKER := $(shell which docker)
 
 # don't override user values
-VERSION := intechain
+VERSION := interchain
 
 TM_VERSION := $(shell go list -m github.com/tendermint/tendermint | sed 's:.* ::')
 
