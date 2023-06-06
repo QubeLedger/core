@@ -135,6 +135,10 @@ import (
 	erc20keeper "github.com/QuadrateOrg/core/x/erc20/keeper"
 	erc20types "github.com/QuadrateOrg/core/x/erc20/types"
 
+	oraclemodule "github.com/QuadrateOrg/core/x/oracle"
+	oraclemodulekeeper "github.com/QuadrateOrg/core/x/oracle/keeper"
+	oraclemoduletypes "github.com/QuadrateOrg/core/x/oracle/types"
+
 	// unnamed import of statik for swagger UI support
 	_ "github.com/cosmos/cosmos-sdk/client/docs/statik"
 )
@@ -226,6 +230,7 @@ var (
 		feemarket.AppModuleBasic{},
 		tokenfactory.AppModuleBasic{},
 		erc20.AppModuleBasic{},
+		oraclemodule.AppModuleBasic{},
 	)
 
 	// module account permissions
@@ -242,6 +247,7 @@ var (
 		evmtypes.ModuleName:            {authtypes.Minter, authtypes.Burner}, // used for secure addition and subtraction of balance using module account
 		tokenfactorytypes.ModuleName:   {authtypes.Minter, authtypes.Burner},
 		erc20types.ModuleName:          {authtypes.Minter, authtypes.Burner},
+		oraclemoduletypes.ModuleName:   {authtypes.Minter, authtypes.Burner, authtypes.Staking},
 	}
 )
 
@@ -289,6 +295,7 @@ type QuadrateApp struct { // nolint: golint
 	TransferKeeper ibctransferkeeper.Keeper
 	FeeGrantKeeper feegrantkeeper.Keeper
 	AuthzKeeper    authzkeeper.Keeper
+	OracleKeeper   oraclemodulekeeper.Keeper
 	//RouterKeeper   routerkeeper.Keeper
 
 	// make scoped keepers public for test purposes
@@ -348,7 +355,7 @@ func NewQuadrateApp(
 		evidencetypes.StoreKey, ibctransfertypes.StoreKey, capabilitytypes.StoreKey,
 		feegrant.StoreKey, authzkeeper.StoreKey, icahosttypes.StoreKey,
 		wasm.StoreKey, evmtypes.StoreKey, feemarkettypes.StoreKey, tokenfactorytypes.StoreKey,
-		erc20types.StoreKey, /*routertypes.StoreKey,*/
+		erc20types.StoreKey, oraclemoduletypes.StoreKey, /*routertypes.StoreKey,*/
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey, evmtypes.TransientKey, feemarkettypes.TransientKey)
 	memKeys := sdk.NewMemoryStoreKeys(capabilitytypes.MemStoreKey)
@@ -478,6 +485,14 @@ func NewQuadrateApp(
 		app.UpgradeKeeper,
 		scopedIBCKeeper,
 	)
+
+	app.OracleKeeper = *oraclemodulekeeper.NewKeeper(
+		appCodec,
+		keys[oraclemoduletypes.StoreKey],
+		keys[oraclemoduletypes.MemStoreKey],
+		app.GetSubspace(oraclemoduletypes.ModuleName),
+	)
+	oracleModule := oraclemodule.NewAppModule(appCodec, app.OracleKeeper)
 
 	// register the proposal types
 	govRouter := govtypes.NewRouter()
@@ -649,6 +664,7 @@ func NewQuadrateApp(
 		params.NewAppModule(app.ParamsKeeper),
 		transferModule,
 		icaModule,
+		oracleModule,
 		//routerModule,
 		wasm.NewAppModule(appCodec, &app.wasmKeeper, app.StakingKeeper, app.AccountKeeper, app.BankKeeper),
 		evm.NewAppModule(app.EvmKeeper, app.AccountKeeper),
@@ -689,6 +705,7 @@ func NewQuadrateApp(
 		feemarkettypes.ModuleName,
 		evmtypes.ModuleName,
 		erc20types.ModuleName,
+		oraclemoduletypes.ModuleName,
 	)
 	app.mm.SetOrderEndBlockers(
 		crisistypes.ModuleName,
@@ -716,6 +733,7 @@ func NewQuadrateApp(
 		evmtypes.ModuleName,
 		feemarkettypes.ModuleName,
 		erc20types.ModuleName,
+		oraclemoduletypes.ModuleName,
 	)
 
 	// NOTE: The genutils module must occur after staking so that pools are
@@ -753,6 +771,7 @@ func NewQuadrateApp(
 		vestingtypes.ModuleName,
 		wasm.ModuleName,
 		erc20types.ModuleName,
+		oraclemoduletypes.ModuleName,
 	)
 
 	app.mm.RegisterInvariants(&app.CrisisKeeper)
@@ -964,6 +983,7 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(feemarkettypes.ModuleName)
 	paramsKeeper.Subspace(evmtypes.ModuleName)
 	paramsKeeper.Subspace(erc20types.ModuleName)
+	paramsKeeper.Subspace(oraclemoduletypes.ModuleName)
 
 	return paramsKeeper
 }

@@ -25,6 +25,7 @@ require (
 	github.com/tendermint/tm-db v0.6.7
 	google.golang.org/genproto v0.0.0-20220921223823-23cae91e6737
 	google.golang.org/grpc v1.50.0
+	github.com/buger/jsonparser v1.1.1
 )
 
 require (
