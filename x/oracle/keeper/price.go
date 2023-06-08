@@ -65,6 +65,9 @@ func (k Keeper) SetPrice(ctx sdk.Context, price types.Price) {
 	store.Set(GetPriceIDBytes(price.Id), b)
 }
 
+// TODO
+// Sometimes the osmosis api does not return the stATOM price
+// Set a more reliable stATOM price source
 func (k Keeper) GetTokensActualPrice(ctx sdk.Context) (string, string, error) {
 	tr := &http.Transport{
 		MaxIdleConns:       10,
@@ -82,6 +85,8 @@ func (k Keeper) GetTokensActualPrice(ctx sdk.Context) (string, string, error) {
 	var atomPrice string
 	if value, err := jsonparser.GetString(body, "data", "rates", "USD"); err == nil {
 		atomPrice = value
+	} else {
+		return "", "", err
 	}
 
 	res1, err := client.Get("https://api.osmosis.zone/tokens/v2/price/statom")
@@ -93,6 +98,8 @@ func (k Keeper) GetTokensActualPrice(ctx sdk.Context) (string, string, error) {
 	var statomPrice string
 	if value, err := jsonparser.GetFloat(body1, "price"); err == nil {
 		statomPrice = fmt.Sprintf("%v", value)
+	} else {
+		return "", "", err
 	}
 	return atomPrice, statomPrice, nil
 }
