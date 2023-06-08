@@ -8,6 +8,8 @@ type OsmosisQuery struct {
 	FullDenom *FullDenom `json:"full_denom,omitempty"`
 	/// Returns the admin of a denom, if the denom is a Token Factory denom.
 	DenomAdmin *DenomAdmin `json:"denom_admin,omitempty"`
+
+	ActualPrice *ActualPrice `json:"actual_price,omitempty"`
 }
 
 type FullDenom struct {
@@ -15,12 +17,19 @@ type FullDenom struct {
 	Subdenom    string `json:"subdenom"`
 }
 
+type ActualPrice struct{}
+
 type DenomAdmin struct {
 	Subdenom string `json:"subdenom"`
 }
 
 type DenomAdminResponse struct {
 	Admin string `json:"admin"`
+}
+
+type ActualPriceResponse struct {
+	Atom   string `json:"atom"`
+	StAtom string `json:"statom"`
 }
 
 type FullDenomResponse struct {

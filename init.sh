@@ -1,7 +1,7 @@
 #!/bin/bash
 
 KEY="quadratetestkey"
-CHAINID="quadrate_2100-1"
+CHAINID="quadrate_5120-1"
 MONIKER="localtestnet"
 KEYRING="os"
 KEYALGO="eth_secp256k1"
