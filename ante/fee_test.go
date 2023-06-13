@@ -11,7 +11,7 @@ import (
 )
 
 func (s *IntegrationTestSuite) TestMempoolFeeDecorator() {
-	s.SetupTest()
+	s.SetupTestAnte()
 	s.txBuilder = s.clientCtx.TxConfig.NewTxBuilder()
 
 	mfd := ante.NewMempoolFeeDecorator([]string{
@@ -34,7 +34,7 @@ func (s *IntegrationTestSuite) TestMempoolFeeDecorator() {
 	s.Require().NoError(err)
 
 	// Set high gas price so standard test fee fails
-	feeAmt := sdk.NewDecCoinFromDec("uatom", sdk.NewDec(200).Quo(sdk.NewDec(100000)))
+	feeAmt := sdk.NewDecCoinFromDec("uqube", sdk.NewDec(200).Quo(sdk.NewDec(100000)))
 	minGasPrice := []sdk.DecCoin{feeAmt}
 	s.ctx = s.ctx.WithMinGasPrices(minGasPrice).WithIsCheckTx(true)
 

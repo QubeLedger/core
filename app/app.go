@@ -128,7 +128,7 @@ import (
 	tokenfactorykeeper "github.com/QuadrateOrg/core/x/tokenfactory/keeper"
 	tokenfactorytypes "github.com/QuadrateOrg/core/x/tokenfactory/types"
 
-	evmupgrade "github.com/QuadrateOrg/core/app/upgrades/evm"
+	etupgrade "github.com/QuadrateOrg/core/app/upgrades"
 
 	"github.com/QuadrateOrg/core/x/erc20"
 	erc20client "github.com/QuadrateOrg/core/x/erc20/client"
@@ -964,7 +964,7 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(feemarkettypes.ModuleName)
 	paramsKeeper.Subspace(evmtypes.ModuleName)
 	paramsKeeper.Subspace(erc20types.ModuleName)
-
+	paramsKeeper.Subspace(tokenfactorytypes.ModuleName)
 	return paramsKeeper
 }
 
@@ -972,8 +972,14 @@ func (app *QuadrateApp) setUpgradeHandlers() {
 
 	// evm upgrade handler
 	app.UpgradeKeeper.SetUpgradeHandler(
-		evmupgrade.UpgradeName,
-		evmupgrade.CreateUpgradeHandler(app.mm, app.configurator, *app.EvmKeeper, app.FeeMarketKeeper),
+		etupgrade.UpgradeName,
+		etupgrade.CreateUpgradeHandler(
+			app.mm,
+			app.configurator,
+			*app.EvmKeeper,
+			app.FeeMarketKeeper,
+			*app.TokenFactoryKeeper,
+		),
 	)
 
 	// When a planned update height is reached, the old binary will panic
@@ -991,9 +997,9 @@ func (app *QuadrateApp) setUpgradeHandlers() {
 	var storeUpgrades *storetypes.StoreUpgrades
 
 	switch upgradeInfo.Name {
-	case evmupgrade.UpgradeName:
+	case etupgrade.UpgradeName:
 		storeUpgrades = &storetypes.StoreUpgrades{
-			Added: evmupgrade.AddModules,
+			Added: etupgrade.AddModules,
 		}
 	}
 

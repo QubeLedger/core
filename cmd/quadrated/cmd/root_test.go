@@ -13,9 +13,9 @@ import (
 func TestRootCmdConfig(t *testing.T) {
 	rootCmd, _ := cmd.NewRootCmd()
 	rootCmd.SetArgs([]string{
-		"config",          // Test the config cmd
-		"keyring-backend", // key
-		"test",            // value
+		"config",
+		"keyring-backend",
+		"test",
 	})
 
 	require.NoError(t, svrcmd.Execute(rootCmd, app.DefaultNodeHome))

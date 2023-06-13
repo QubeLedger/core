@@ -1,8 +1,6 @@
 package ante_test
 
 import (
-	"fmt"
-	"math/rand"
 	"testing"
 
 	"github.com/cosmos/cosmos-sdk/client"
@@ -34,12 +32,11 @@ func TestIntegrationTestSuite(t *testing.T) {
 	suite.Run(t, new(IntegrationTestSuite))
 }
 
-func (s *IntegrationTestSuite) SetupTest() {
-	chainId := fmt.Sprintf("test_%d-%d", rand.Intn(1000), rand.Intn(10))
+func (s *IntegrationTestSuite) SetupTestAnte() {
 
-	app := quadratehelpers.Setup(s.T(), chainId, false, 1)
+	app := quadratehelpers.Setup(s.T(), "quadrate_5120-1", false, 1)
 	ctx := app.BaseApp.NewContext(false, tmproto.Header{
-		ChainID: chainId,
+		ChainID: "quadrate_5120-1",
 		Height:  1,
 	})
 
