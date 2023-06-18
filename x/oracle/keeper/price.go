@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/QuadrateOrg/core/x/oracle/types"
@@ -82,26 +83,30 @@ func (k Keeper) GetTokensActualPrice(ctx sdk.Context) (string, string, error) {
 	}
 	body, _ := ioutil.ReadAll(res.Body)
 
-	var atomPrice string
+	var atomPriceString string
+	var atomPrice float64
 	if value, err := jsonparser.GetString(body, "data", "rates", "USD"); err == nil {
-		atomPrice = value
+		atomPrice, _ = strconv.ParseFloat(value, 64)
+		atomPriceString = fmt.Sprintf("%v", value)
 	} else {
 		return "", "", err
 	}
 
-	res1, err := client.Get("https://api.osmosis.zone/tokens/v2/price/statom")
+	res1, err := client.Get("https://stride-api.polkachu.com/Stride-Labs/stride/stakeibc/host_zone/cosmoshub-4")
 	if err != nil {
-		return atomPrice, "", err
+		return atomPriceString, "", err
 	}
 	body1, _ := ioutil.ReadAll(res1.Body)
 
 	var statomPrice string
-	if value, err := jsonparser.GetFloat(body1, "price"); err == nil {
-		statomPrice = fmt.Sprintf("%v", value)
+	if value, err := jsonparser.GetString(body1, "host_zone", "redemption_rate"); err == nil {
+		redemption_rate, _ := strconv.ParseFloat(value, 64)
+		priceStAtom := atomPrice * redemption_rate
+		statomPrice = fmt.Sprintf("%v", priceStAtom)
 	} else {
 		return "", "", err
 	}
-	return atomPrice, statomPrice, nil
+	return atomPriceString, statomPrice, nil
 }
 
 // GetPrice returns a price from its id
