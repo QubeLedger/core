@@ -5,6 +5,7 @@ import (
 
 	"github.com/QuadrateOrg/core/app"
 	quadrateapptest "github.com/QuadrateOrg/core/app/helpers"
+	"github.com/QuadrateOrg/core/x/erc20/types"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/simapp"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -20,6 +21,18 @@ type KeeperTestHelper struct {
 	Ctx         sdk.Context
 	QueryHelper *baseapp.QueryServiceTestHelper
 	TestAccs    []sdk.AccAddress
+}
+
+type Erc20GenesisTestSuite struct {
+	suite.Suite
+	ctx     sdk.Context
+	app     *app.QuadrateApp
+	genesis types.GenesisState
+}
+
+func (s *Erc20GenesisTestSuite) Setup() {
+	s.app = quadrateapptest.Setup(s.T(), "quadrate_5120-1", false, 1)
+
 }
 
 func (s *KeeperTestHelper) Setup() {
