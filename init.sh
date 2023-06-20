@@ -26,20 +26,20 @@ rm -rf ~/.quadrate*
 # Set moniker and chain-id for Ethermint (Moniker can be anything, chain-id must be an integer)
 ./quadrated init $MONIKER --chain-id $CHAINID
 
-cat $HOME/.quadrate/config/genesis.json | jq '.app_state["staking"]["params"]["bond_denom"]="qube"' > $HOME/.quadrate/config/tmp_genesis.json && mv $HOME/.quadrate/config/tmp_genesis.json $HOME/.quadrate/config/genesis.json
-cat $HOME/.quadrate/config/genesis.json | jq '.app_state["crisis"]["constant_fee"]["denom"]="qube"' > $HOME/.quadrate/config/tmp_genesis.json && mv $HOME/.quadrate/config/tmp_genesis.json $HOME/.quadrate/config/genesis.json
-cat $HOME/.quadrate/config/genesis.json | jq '.app_state["gov"]["deposit_params"]["min_deposit"][0]["denom"]="qube"' > $HOME/.quadrate/config/tmp_genesis.json && mv $HOME/.quadrate/config/tmp_genesis.json $HOME/.quadrate/config/genesis.json
-cat $HOME/.quadrate/config/genesis.json | jq '.app_state["mint"]["params"]["mint_denom"]="qube"' > $HOME/.quadrate/config/tmp_genesis.json && mv $HOME/.quadrate/config/tmp_genesis.json $HOME/.quadrate/config/genesis.json
-cat $HOME/.quadrate/config/genesis.json | jq '.app_state["evm"]["params"]["evm_denom"]="qube"' > $HOME/.quadrate/config/tmp_genesis.json && mv $HOME/.quadrate/config/tmp_genesis.json $HOME/.quadrate/config/genesis.json
+cat $HOME/.quadrate/config/genesis.json | jq '.app_state["staking"]["params"]["bond_denom"]="uqube"' > $HOME/.quadrate/config/tmp_genesis.json && mv $HOME/.quadrate/config/tmp_genesis.json $HOME/.quadrate/config/genesis.json
+cat $HOME/.quadrate/config/genesis.json | jq '.app_state["crisis"]["constant_fee"]["denom"]="uqube"' > $HOME/.quadrate/config/tmp_genesis.json && mv $HOME/.quadrate/config/tmp_genesis.json $HOME/.quadrate/config/genesis.json
+cat $HOME/.quadrate/config/genesis.json | jq '.app_state["gov"]["deposit_params"]["min_deposit"][0]["denom"]="uqube"' > $HOME/.quadrate/config/tmp_genesis.json && mv $HOME/.quadrate/config/tmp_genesis.json $HOME/.quadrate/config/genesis.json
+cat $HOME/.quadrate/config/genesis.json | jq '.app_state["mint"]["params"]["mint_denom"]="uqube"' > $HOME/.quadrate/config/tmp_genesis.json && mv $HOME/.quadrate/config/tmp_genesis.json $HOME/.quadrate/config/genesis.json
+cat $HOME/.quadrate/config/genesis.json | jq '.app_state["evm"]["params"]["evm_denom"]="uqube"' > $HOME/.quadrate/config/tmp_genesis.json && mv $HOME/.quadrate/config/tmp_genesis.json $HOME/.quadrate/config/genesis.json
 
 # Set gas limit in genesis
 cat $HOME/.quadrate/config/genesis.json | jq '.consensus_params["block"]["max_gas"]="20000000"' > $HOME/.quadrate/config/tmp_genesis.json && mv $HOME/.quadrate/config/tmp_genesis.json $HOME/.quadrate/config/genesis.json
 
 # Allocate genesis accounts (cosmos formatted addresses)
-./quadrated add-genesis-account $KEY 100000000000000000000000000qube --keyring-backend $KEYRING
+./quadrated add-genesis-account $KEY 100000000000000000000000000uqube --keyring-backend $KEYRING
 
 # Sign genesis transaction
-./quadrated gentx $KEY 1000000000000000000000qube --keyring-backend $KEYRING --chain-id $CHAINID
+./quadrated gentx $KEY 1000000000000000000000uqube --keyring-backend $KEYRING --chain-id $CHAINID
 
 # Collect genesis tx
 ./quadrated collect-gentxs
@@ -86,4 +86,4 @@ if [[ $1 == "pending" ]]; then
 fi
 
 # Start the node (remove the --pruning=nothing flag if historical queries are not needed)
-./quadrated start --pruning=nothing --evm.tracer=json $TRACE --log_level $LOGLEVEL --minimum-gas-prices=0.0001qube --json-rpc.api eth,txpool,personal,net,debug,web3,miner --api.enable
+./quadrated start --pruning=nothing --evm.tracer=json $TRACE --log_level $LOGLEVEL --minimum-gas-prices=0.0001uqube --json-rpc.api eth,txpool,personal,net,debug,web3,miner --api.enable
