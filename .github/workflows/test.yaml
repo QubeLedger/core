@@ -20,11 +20,5 @@ jobs:
           go mod tidy
           go build ./cmd/quadrated/
 
-      - name: Testing x/tokenfactory/keeper
-        run: go test -v github.com/QuadrateOrg/core/x/tokenfactory/keeper
-      
-      - name: Testing x/tokenfactory/types
-        run: go test -v github.com/QuadrateOrg/core/x/tokenfactory/types
-
-      - name: Testing x/erc20
-        run: go test -v github.com/QuadrateOrg/core/x/erc20/keeper
+      - name: Rux x/ tests
+        run: go test -v -tags='ledger test_ledger_mock' ./x/...
