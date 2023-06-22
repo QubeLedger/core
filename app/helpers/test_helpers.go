@@ -5,7 +5,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/require"
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/libs/log"
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
@@ -17,7 +16,7 @@ import (
 
 // SimAppChainID hardcoded chainID for simulation
 const (
-	SimAppChainID = "quadrate-app"
+	SimAppChainID = "quadrate_5120-1"
 )
 
 // DefaultConsensusParams defines the default Tendermint consensus params used
@@ -42,14 +41,43 @@ type EmptyAppOptions struct{}
 
 func (EmptyAppOptions) Get(o string) interface{} { return nil }
 
-func Setup(t *testing.T, chainId string, isCheckTx bool, invCheckPeriod uint) *quadrateapp.QuadrateApp {
-	t.Helper()
+var defaultGenesisBz []byte
 
-	app, genesisState := setup(!isCheckTx, invCheckPeriod)
+func getDefaultGenesisStateBytes() []byte {
+	if len(defaultGenesisBz) == 0 {
+		genesisState := quadrateapp.NewDefaultGenesisState()
+		stateBytes, _ := json.MarshalIndent(genesisState, "", " ")
+		/*if err != nil {
+			panic(err)
+		}*/
+		defaultGenesisBz = stateBytes
+	}
+	return defaultGenesisBz
+}
+
+func Setup(t *testing.T, chainId string, isCheckTx bool, invCheckPeriod uint) *quadrateapp.QuadrateApp {
+	//t.Helper()
+
+	db := dbm.NewMemDB()
+	encCdc := quadrateapp.MakeEncodingConfig()
+	app := quadrateapp.NewQuadrateApp(
+		log.NewNopLogger(),
+		db,
+		nil,
+		true,
+		map[int64]bool{},
+		quadrateapp.DefaultNodeHome,
+		invCheckPeriod,
+		encCdc,
+		EmptyAppOptions{},
+	)
+
 	if !isCheckTx {
 		// InitChain must be called to stop deliverState from being nil
-		stateBytes, err := json.MarshalIndent(genesisState, "", " ")
-		require.NoError(t, err)
+		//stateBytes, err := json.MarshalIndent(genesisState, "", " ")
+		//require.NoError(t, err)
+
+		//stateBytes := getDefaultGenesisStateBytes()
 
 		// Initialize the chain
 		app.InitChain(
@@ -57,7 +85,7 @@ func Setup(t *testing.T, chainId string, isCheckTx bool, invCheckPeriod uint) *q
 				ChainId:         chainId,
 				Validators:      []abci.ValidatorUpdate{},
 				ConsensusParams: DefaultConsensusParams,
-				AppStateBytes:   stateBytes,
+				AppStateBytes:   getDefaultGenesisStateBytes(),
 			},
 		)
 	}
@@ -65,7 +93,7 @@ func Setup(t *testing.T, chainId string, isCheckTx bool, invCheckPeriod uint) *q
 	return app
 }
 
-func setup(withGenesis bool, invCheckPeriod uint) (*quadrateapp.QuadrateApp, quadrateapp.GenesisState) {
+/*func setup(withGenesis bool, invCheckPeriod uint) (*quadrateapp.QuadrateApp, quadrateapp.GenesisState) {
 	db := dbm.NewMemDB()
 	encCdc := quadrateapp.MakeEncodingConfig()
 	app := quadrateapp.NewQuadrateApp(
@@ -83,5 +111,5 @@ func setup(withGenesis bool, invCheckPeriod uint) (*quadrateapp.QuadrateApp, qua
 		return app, quadrateapp.NewDefaultGenesisState()
 	}
 
-	return app, quadrateapp.GenesisState{}
-}
+	return app, quadrateapp.NewDefaultGenesisState()
+}*/
