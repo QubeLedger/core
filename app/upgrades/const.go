@@ -6,7 +6,7 @@ import (
 )
 
 const (
-	UpgradeName = "EVM"
+	UpgradeName = "TF"
 )
 
 var (

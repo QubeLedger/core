@@ -2,7 +2,7 @@ package types
 
 const (
 	// Default Denom
-	DefaultDenom = "qube"
+	DefaultDenom = "uqube"
 
 	// CoinType
 	CoinType = 60
