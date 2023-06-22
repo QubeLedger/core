@@ -6,17 +6,20 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	"github.com/QuadrateOrg/core/wasmbinding/bindings"
+	oraclekeeper "github.com/QuadrateOrg/core/x/oracle/keeper"
 	tokenfactorykeeper "github.com/QuadrateOrg/core/x/tokenfactory/keeper"
 )
 
 type QueryPlugin struct {
 	tokenFactoryKeeper *tokenfactorykeeper.Keeper
+	oracleKeeper       *oraclekeeper.Keeper
 }
 
 // NewQueryPlugin returns a reference to a new QueryPlugin.
-func NewQueryPlugin(tfk *tokenfactorykeeper.Keeper) *QueryPlugin {
+func NewQueryPlugin(tfk *tokenfactorykeeper.Keeper, oracle *oraclekeeper.Keeper) *QueryPlugin {
 	return &QueryPlugin{
 		tokenFactoryKeeper: tfk,
+		oracleKeeper:       oracle,
 	}
 }
 
@@ -28,4 +31,17 @@ func (qp QueryPlugin) GetDenomAdmin(ctx sdk.Context, denom string) (*bindings.De
 	}
 
 	return &bindings.DenomAdminResponse{Admin: metadata.Admin}, nil
+}
+
+// GetActualProce is a query to get denom admin.
+func (qp QueryPlugin) GetActualPrice(ctx sdk.Context) (*bindings.ActualPriceResponse, error) {
+	price, err := qp.oracleKeeper.GetPrice(ctx, 0)
+	if err == false {
+		return nil, fmt.Errorf("oracle error")
+	}
+
+	return &bindings.ActualPriceResponse{
+		Atom:   price.AtomPrice,
+		StAtom: price.StatomPrice,
+	}, nil
 }

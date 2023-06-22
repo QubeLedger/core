@@ -54,8 +54,21 @@ func CustomQuerier(qp *QueryPlugin) func(ctx sdk.Context, request json.RawMessag
 
 			return bz, nil
 
+		case contractQuery.ActualPrice != nil:
+			res, err := qp.GetActualPrice(ctx)
+			if err != nil {
+				return nil, err
+			}
+
+			bz, err := json.Marshal(res)
+			if err != nil {
+				return nil, fmt.Errorf("failed to JSON marshal ActualPrice response: %w", err)
+			}
+
+			return bz, nil
+
 		default:
-			return nil, wasmvmtypes.UnsupportedRequest{Kind: "unknown osmosis query variant"}
+			return nil, wasmvmtypes.UnsupportedRequest{Kind: "unknown wasmbinding query variant"}
 		}
 	}
 }

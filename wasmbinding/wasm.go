@@ -8,13 +8,16 @@ import (
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 
 	tokenfactorykeeper "github.com/QuadrateOrg/core/x/tokenfactory/keeper"
+
+	oraclekeeper "github.com/QuadrateOrg/core/x/oracle/keeper"
 )
 
 func RegisterCustomPlugins(
 	bank *bankkeeper.BaseKeeper,
 	tokenFactory *tokenfactorykeeper.Keeper,
+	oracle *oraclekeeper.Keeper,
 ) []wasmkeeper.Option {
-	wasmQueryPlugin := NewQueryPlugin(tokenFactory)
+	wasmQueryPlugin := NewQueryPlugin(tokenFactory, oracle)
 
 	queryPluginOpt := wasmkeeper.WithQueryPlugins(&wasmkeeper.QueryPlugins{
 		Custom: CustomQuerier(wasmQueryPlugin),
