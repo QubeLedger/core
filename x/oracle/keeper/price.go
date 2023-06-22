@@ -70,6 +70,11 @@ func (k Keeper) SetPrice(ctx sdk.Context, price types.Price) {
 // Sometimes the osmosis api does not return the stATOM price
 // Set a more reliable stATOM price source
 func (k Keeper) GetTokensActualPrice(ctx sdk.Context) (string, string, error) {
+
+	var atomPriceString string
+	var atomPrice float64
+	var statomPrice string
+
 	tr := &http.Transport{
 		MaxIdleConns:       10,
 		IdleConnTimeout:    30 * time.Second,
@@ -83,8 +88,12 @@ func (k Keeper) GetTokensActualPrice(ctx sdk.Context) (string, string, error) {
 	}
 	body, _ := ioutil.ReadAll(res.Body)
 
-	var atomPriceString string
-	var atomPrice float64
+	res1, err := client.Get("https://stride-api.polkachu.com/Stride-Labs/stride/stakeibc/host_zone/cosmoshub-4")
+	if err != nil {
+		return atomPriceString, "", err
+	}
+	body1, _ := ioutil.ReadAll(res1.Body)
+
 	if value, err := jsonparser.GetString(body, "data", "rates", "USD"); err == nil {
 		atomPrice, _ = strconv.ParseFloat(value, 64)
 		atomPriceString = fmt.Sprintf("%v", value)
@@ -92,13 +101,6 @@ func (k Keeper) GetTokensActualPrice(ctx sdk.Context) (string, string, error) {
 		return "", "", err
 	}
 
-	res1, err := client.Get("https://stride-api.polkachu.com/Stride-Labs/stride/stakeibc/host_zone/cosmoshub-4")
-	if err != nil {
-		return atomPriceString, "", err
-	}
-	body1, _ := ioutil.ReadAll(res1.Body)
-
-	var statomPrice string
 	if value, err := jsonparser.GetString(body1, "host_zone", "redemption_rate"); err == nil {
 		redemption_rate, _ := strconv.ParseFloat(value, 64)
 		priceStAtom := atomPrice * redemption_rate
@@ -106,6 +108,7 @@ func (k Keeper) GetTokensActualPrice(ctx sdk.Context) (string, string, error) {
 	} else {
 		return "", "", err
 	}
+
 	return atomPriceString, statomPrice, nil
 }
 
