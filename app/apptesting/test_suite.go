@@ -25,9 +25,9 @@ type KeeperTestHelper struct {
 
 type Erc20GenesisTestSuite struct {
 	suite.Suite
-	ctx     sdk.Context
-	app     *app.QuadrateApp
-	genesis types.GenesisState
+	_   sdk.Context
+	app *app.QuadrateApp
+	_   types.GenesisState
 }
 
 func (s *Erc20GenesisTestSuite) Setup() {
