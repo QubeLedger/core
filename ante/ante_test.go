@@ -21,11 +21,11 @@ import (
 type IntegrationTestSuite struct {
 	suite.Suite
 
-	app         *quadrateapp.QuadrateApp
-	anteHandler sdk.AnteHandler
-	ctx         sdk.Context
-	clientCtx   client.Context
-	txBuilder   client.TxBuilder
+	app       *quadrateapp.QuadrateApp
+	_         sdk.AnteHandler
+	ctx       sdk.Context
+	clientCtx client.Context
+	txBuilder client.TxBuilder
 }
 
 func TestIntegrationTestSuite(t *testing.T) {

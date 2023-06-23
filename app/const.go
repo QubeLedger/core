@@ -1,6 +1,6 @@
 package app
 
-// nolint: gosec
+//nolint:all
 const (
 	appName = "QuadrateApp"
 
