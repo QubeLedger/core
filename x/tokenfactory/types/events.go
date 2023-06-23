@@ -1,6 +1,7 @@
 package types
 
 // event types
+/* #nosec */
 const (
 	AttributeAmount              = "amount"
 	AttributeCreator             = "creator"

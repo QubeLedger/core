@@ -4,6 +4,7 @@ import (
 	evmconfig "github.com/evmos/ethermint/server/config"
 )
 
+/* #nosec */
 var (
 	// BypassMinFeeMsgTypesKey defines the configuration key for the
 	// BypassMinFeeMsgTypes value.

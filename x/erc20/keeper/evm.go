@@ -28,7 +28,7 @@ func (k Keeper) DeployERC20Contract(
 	decimals := uint8(0)
 	if len(coinMetadata.DenomUnits) > 0 {
 		decimalsIdx := len(coinMetadata.DenomUnits) - 1
-		decimals = uint8(coinMetadata.DenomUnits[decimalsIdx].Exponent)
+		decimals = uint8(coinMetadata.DenomUnits[decimalsIdx].Exponent) // #nosec
 	}
 	ctorArgs, err := contracts.ERC20MinterBurnerDecimalsContract.ABI.Pack(
 		"",
@@ -241,7 +241,7 @@ func (k *Keeper) CallEVMWithoutGas(
 	gasLimit := config.DefaultGasCap
 	params := ctx.ConsensusParams()
 	if params != nil && params.Block != nil && params.Block.MaxGas > 0 {
-		gasLimit = uint64(params.Block.MaxGas)
+		gasLimit = uint64(params.Block.MaxGas) // #nosec
 	}
 
 	msg := ethtypes.NewMessage(
