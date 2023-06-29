@@ -11,6 +11,7 @@ import (
 
 	"github.com/QuadrateOrg/core/x/erc20/keeper"
 	"github.com/QuadrateOrg/core/x/erc20/types"
+	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	"github.com/evmos/ethermint/x/evm/statedb"
 	evmtypes "github.com/evmos/ethermint/x/evm/types"
 )
@@ -24,6 +25,7 @@ func (suite *KeeperTestSuite) TestConvertCoinNativeCoin() {
 		extra          func()
 		expPass        bool
 		selfdestructed bool
+		factoryToken   bool
 	}{
 		{
 			"ok - sufficient funds",
@@ -33,6 +35,7 @@ func (suite *KeeperTestSuite) TestConvertCoinNativeCoin() {
 			func() {},
 			true,
 			false,
+			false,
 		},
 		{
 			"ok - equal funds",
@@ -41,6 +44,7 @@ func (suite *KeeperTestSuite) TestConvertCoinNativeCoin() {
 			func(common.Address) {},
 			func() {},
 			true,
+			false,
 			false,
 		},
 		{
@@ -56,6 +60,17 @@ func (suite *KeeperTestSuite) TestConvertCoinNativeCoin() {
 			func() {},
 			true,
 			true,
+			false,
+		},
+		{
+			"ok - factory token convert",
+			100,
+			10,
+			func(common.Address) {},
+			func() {},
+			true,
+			false,
+			true,
 		},
 		{
 			"fail - insufficient funds",
@@ -63,6 +78,7 @@ func (suite *KeeperTestSuite) TestConvertCoinNativeCoin() {
 			10,
 			func(common.Address) {},
 			func() {},
+			false,
 			false,
 			false,
 		},
@@ -78,13 +94,14 @@ func (suite *KeeperTestSuite) TestConvertCoinNativeCoin() {
 			func() {},
 			false,
 			false,
+			false,
 		},
 		{
 			"fail - deleted module account - force fail", 100, 10, func(common.Address) {},
 			func() {
 				acc := suite.app.AccountKeeper.GetAccount(suite.ctx, types.ModuleAddress.Bytes())
 				suite.app.AccountKeeper.RemoveAccount(suite.ctx, acc)
-			}, false, false,
+			}, false, false, false,
 		},
 		{
 			"fail - force evm fail", 100, 10, func(common.Address) {},
@@ -100,7 +117,7 @@ func (suite *KeeperTestSuite) TestConvertCoinNativeCoin() {
 				mockEVMKeeper.On("ApplyMessage", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(&evmtypes.MsgEthereumTxResponse{Ret: balance}, nil).Once()
 				mockEVMKeeper.On("ApplyMessage", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil, fmt.Errorf("forced ApplyMessage error"))
 				mockEVMKeeper.On("GetAccountWithoutBalance", mock.Anything, mock.Anything).Return(existingAcc, nil)
-			}, false, false,
+			}, false, false, false,
 		},
 		{
 			"fail - force evm balance error", 100, 10, func(common.Address) {},
@@ -122,7 +139,7 @@ func (suite *KeeperTestSuite) TestConvertCoinNativeCoin() {
 				// Extra call on test
 				mockEVMKeeper.On("ApplyMessage", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(&evmtypes.MsgEthereumTxResponse{}, nil)
 				mockEVMKeeper.On("GetAccountWithoutBalance", mock.Anything, mock.Anything).Return(existingAcc, nil)
-			}, false, false,
+			}, false, false, false,
 		},
 		{
 			"fail - force balance error", 100, 10, func(common.Address) {},
@@ -137,24 +154,37 @@ func (suite *KeeperTestSuite) TestConvertCoinNativeCoin() {
 				mockEVMKeeper.On("EstimateGas", mock.Anything, mock.Anything).Return(&evmtypes.EstimateGasResponse{Gas: uint64(200)}, nil)
 				mockEVMKeeper.On("ApplyMessage", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(&evmtypes.MsgEthereumTxResponse{Ret: balance}, nil).Times(4)
 				mockEVMKeeper.On("GetAccountWithoutBalance", mock.Anything, mock.Anything).Return(existingAcc, nil)
-			}, false, false,
+			}, false, false, false,
 		},
 	}
 	for _, tc := range testCases {
 		suite.Run(fmt.Sprintf("Case %s", tc.name), func() {
 			suite.mintFeeCollector = true
 			suite.SetupTest()
-			metadata, pair := suite.setupRegisterCoin()
+			var metadata banktypes.Metadata
+			var pair *types.TokenPair
+			if tc.factoryToken == false {
+				metadata, pair = suite.setupRegisterCoin()
+			} else if tc.factoryToken == true {
+				metadata, pair = suite.setupRegisterFactoryCoin()
+			}
 			suite.Require().NotNil(metadata)
 			erc20 := pair.GetERC20Contract()
 			tc.malleate(erc20)
 			suite.Commit()
 
 			ctx := sdk.WrapSDKContext(suite.ctx)
-			coins := sdk.NewCoins(sdk.NewCoin(cosmosTokenBase, sdk.NewInt(tc.mint)))
+			var tokenBase string
+			if tc.factoryToken == false {
+				tokenBase = cosmosTokenBase
+			} else if tc.factoryToken == true {
+				tokenBase = factoryTokenBase
+			}
+			fmt.Printf("Use tokenBase %s", tokenBase)
+			coins := sdk.NewCoins(sdk.NewCoin(tokenBase, sdk.NewInt(tc.mint)))
 			sender := sdk.AccAddress(suite.address.Bytes())
 			msg := types.NewMsgConvertCoin(
-				sdk.NewCoin(cosmosTokenBase, sdk.NewInt(tc.burn)),
+				sdk.NewCoin(tokenBase, sdk.NewInt(tc.burn)),
 				suite.address,
 				sender,
 			)

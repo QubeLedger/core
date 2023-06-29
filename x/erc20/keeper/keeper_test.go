@@ -86,6 +86,7 @@ const (
 	defaultExponent    = uint32(18)
 	zeroExponent       = uint32(0)
 	ibcBase            = "ibc/7F1D3FCF4AE79E1554D670D1AD949A9BA4E4A3C76C63093E17E446A46061A7A2"
+	factoryTokenBase   = "factory/qube1gjrrme22cyha4ht2xapn3f08zzw6z3d4uxx6fyy9zd5dyr3yxgzqkgu6jz/bitcoin"
 )
 
 func (s *KeeperTestSuite) Setup() {
@@ -520,6 +521,36 @@ func (suite *KeeperTestSuite) setupRegisterCoin() (banktypes.Metadata, *types.To
 		Name:    cosmosTokenBase,
 		Symbol:  erc20Symbol,
 		Display: cosmosTokenBase,
+	}
+
+	err := suite.app.BankKeeper.MintCoins(suite.ctx, tokenfactorytypes.ModuleName, sdk.Coins{sdk.NewInt64Coin(validMetadata.Base, 1)})
+	suite.Require().NoError(err)
+
+	// pair := types.NewTokenPair(contractAddr, cosmosTokenBase, true, types.OWNER_MODULE)
+	pair, err := suite.app.Erc20Keeper.RegisterCoin(suite.ctx, validMetadata)
+	suite.Require().NoError(err)
+	suite.Commit()
+	return validMetadata, pair
+}
+
+func (suite *KeeperTestSuite) setupRegisterFactoryCoin() (banktypes.Metadata, *types.TokenPair) {
+	validMetadata := banktypes.Metadata{
+		Description: "description of the token",
+		Base:        factoryTokenBase,
+		// NOTE: Denom units MUST be increasing
+		DenomUnits: []*banktypes.DenomUnit{
+			{
+				Denom:    factoryTokenBase,
+				Exponent: 0,
+			},
+			{
+				Denom:    "bitcoin",
+				Exponent: uint32(18),
+			},
+		},
+		Name:    "bitcoin",
+		Symbol:  erc20Symbol,
+		Display: "bitcoin",
 	}
 
 	err := suite.app.BankKeeper.MintCoins(suite.ctx, tokenfactorytypes.ModuleName, sdk.Coins{sdk.NewInt64Coin(validMetadata.Base, 1)})
