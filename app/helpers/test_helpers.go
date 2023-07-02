@@ -47,17 +47,12 @@ func getDefaultGenesisStateBytes() []byte {
 	if len(defaultGenesisBz) == 0 {
 		genesisState := quadrateapp.NewDefaultGenesisState()
 		stateBytes, _ := json.MarshalIndent(genesisState, "", " ")
-		/*if err != nil {
-			panic(err)
-		}*/
 		defaultGenesisBz = stateBytes
 	}
 	return defaultGenesisBz
 }
 
 func Setup(t *testing.T, chainId string, isCheckTx bool, invCheckPeriod uint) *quadrateapp.QuadrateApp {
-	//t.Helper()
-
 	db := dbm.NewMemDB()
 	encCdc := quadrateapp.MakeEncodingConfig()
 	app := quadrateapp.NewQuadrateApp(
@@ -73,12 +68,6 @@ func Setup(t *testing.T, chainId string, isCheckTx bool, invCheckPeriod uint) *q
 	)
 
 	if !isCheckTx {
-		// InitChain must be called to stop deliverState from being nil
-		//stateBytes, err := json.MarshalIndent(genesisState, "", " ")
-		//require.NoError(t, err)
-
-		//stateBytes := getDefaultGenesisStateBytes()
-
 		// Initialize the chain
 		app.InitChain(
 			abci.RequestInitChain{
