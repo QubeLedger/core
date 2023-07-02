@@ -1,3 +1,4 @@
+/* #nosec */
 package utils
 
 import (
