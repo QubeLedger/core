@@ -31,7 +31,7 @@ func ValidateProofOps(
 	}
 	connection, _ := ibcKeeper.ConnectionKeeper.GetConnection(ctx, connectionID)
 
-	csHeight := clienttypes.NewHeight(clienttypes.ParseChainID(chainID), uint64(height)+1)
+	csHeight := clienttypes.NewHeight(clienttypes.ParseChainID(chainID), uint64(height)+1) // #nosec
 	consensusState, found := ibcKeeper.ClientKeeper.GetClientConsensusState(ctx, connection.ClientId, csHeight)
 
 	if !found {

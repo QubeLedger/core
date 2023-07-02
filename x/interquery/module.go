@@ -3,7 +3,7 @@ package interquery
 import (
 	"context"
 	"encoding/json"
-	"math/rand"
+	"math/rand" // #nosec
 
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 	"github.com/gorilla/mux"

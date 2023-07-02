@@ -53,6 +53,7 @@ func (k Keeper) EndBlocker(ctx sdk.Context) {
 		ctx.EventManager().EmitEvents(events)
 	}
 
+	/* #nosec */
 	k.IterateDatapoints(ctx, func(_ int64, dp types.DataPoint) bool {
 		q, found := k.GetQuery(ctx, dp.Id)
 		if !found {

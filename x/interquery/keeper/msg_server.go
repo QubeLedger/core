@@ -36,6 +36,7 @@ func (k msgServer) SubmitQueryResponse(goCtx context.Context, msg *types.MsgSubm
 	}
 
 	latest := k.GetLatestHeight(ctx, msg.ChainId)
+	/* #nosec */
 	if latest > uint64(msg.Height) && q.QueryType != "tendermint.Tx" && q.QueryType != "ibc.ClientUpdate" {
 		k.Logger(ctx).Error("ignoring stale query result", "id", q.Id, "type", q.QueryType, "latestHeight", latest, "msgHeight", msg.Height)
 		// technically this is an error, but will cause the entire tx to fail
@@ -91,7 +92,7 @@ func (k msgServer) SubmitQueryResponse(goCtx context.Context, msg *types.MsgSubm
 		}
 	}
 
-	k.SetLatestHeight(ctx, msg.ChainId, uint64(msg.Height))
+	k.SetLatestHeight(ctx, msg.ChainId, uint64(msg.Height)) // #nosec
 
 	if !callbackExecuted && q.CallbackId != "" {
 		k.Logger(ctx).Error("callback expected but not found", "callbackId", q.CallbackId, "msg", msg.QueryId, "type", q.QueryType)

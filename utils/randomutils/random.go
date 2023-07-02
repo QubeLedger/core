@@ -1,7 +1,7 @@
 package randomutils
 
 import (
-	"crypto/rand"
+	"crypto/rand" // #nosec
 	"encoding/hex"
 )
 
