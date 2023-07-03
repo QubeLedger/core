@@ -1,5 +1,6 @@
 package utils
 
+/*
 import (
 	"errors"
 	"fmt"
@@ -137,3 +138,4 @@ func MustGetDec(storeObj store.KVStore, key []byte) sdk.Dec {
 	MustGet(storeObj, key, result)
 	return result.Dec
 }
+*/
