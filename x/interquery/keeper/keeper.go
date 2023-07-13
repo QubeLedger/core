@@ -12,23 +12,26 @@ import (
 	"github.com/tendermint/tendermint/libs/log"
 
 	"github.com/QuadrateOrg/core/x/interquery/types"
+	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
 )
 
 // Keeper of this module maintains collections of registered zones.
 type Keeper struct {
-	cdc       codec.Codec
-	storeKey  storetypes.StoreKey
-	callbacks map[string]types.QueryCallbacks
-	IBCKeeper *ibckeeper.Keeper
+	cdc        codec.Codec
+	storeKey   storetypes.StoreKey
+	callbacks  map[string]types.QueryCallbacks
+	IBCKeeper  *ibckeeper.Keeper
+	paramstore paramtypes.Subspace
 }
 
 // NewKeeper returns a new instance of zones Keeper.
-func NewKeeper(cdc codec.Codec, storeKey storetypes.StoreKey, ibcKeeper *ibckeeper.Keeper) Keeper {
+func NewKeeper(cdc codec.Codec, storeKey storetypes.StoreKey, ibcKeeper *ibckeeper.Keeper, param paramtypes.Subspace) Keeper {
 	return Keeper{
-		cdc:       cdc,
-		storeKey:  storeKey,
-		callbacks: make(map[string]types.QueryCallbacks),
-		IBCKeeper: ibcKeeper,
+		cdc:        cdc,
+		storeKey:   storeKey,
+		callbacks:  make(map[string]types.QueryCallbacks),
+		IBCKeeper:  ibcKeeper,
+		paramstore: param,
 	}
 }
 

@@ -7,9 +7,9 @@ import (
 
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 	"github.com/gorilla/mux"
+	"github.com/spf13/cobra"
 
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
-	"github.com/spf13/cobra"
 
 	abci "github.com/tendermint/tendermint/abci/types"
 
@@ -19,6 +19,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 
+	"github.com/QuadrateOrg/core/x/interquery/client/cli"
 	"github.com/QuadrateOrg/core/x/interquery/keeper"
 
 	"github.com/QuadrateOrg/core/x/interquery/types"
@@ -51,7 +52,7 @@ func (AppModuleBasic) Name() string {
 
 // RegisterLegacyAminoCodec registers a legacy amino codec.
 func (AppModuleBasic) RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
-	types.RegisterLegacyAminoCodec(cdc)
+	types.RegisterCodec(cdc)
 }
 
 // RegisterInterfaces registers the module's interface types.
@@ -87,9 +88,9 @@ func (a AppModuleBasic) GetTxCmd() *cobra.Command {
 	return nil
 }
 
-// GetQueryCmd returns the capability module's root query command.
+// GetQueryCmd returns no root query command for the erc20 module.
 func (AppModuleBasic) GetQueryCmd() *cobra.Command {
-	return nil
+	return cli.GetQueryCmd()
 }
 
 // ----------------------------------------------------------------------------
@@ -121,7 +122,7 @@ func (am AppModule) Route() sdk.Route {
 }
 
 // QuerierRoute returns the capability module's query routing key.
-func (AppModule) QuerierRoute() string { return types.QuerierRoute }
+func (AppModule) QuerierRoute() string { return types.RouterKey }
 
 // LegacyQuerierHandler returns the capability module's Querier.
 func (am AppModule) LegacyQuerierHandler(_ *codec.LegacyAmino) sdk.Querier {
@@ -131,6 +132,7 @@ func (am AppModule) LegacyQuerierHandler(_ *codec.LegacyAmino) sdk.Querier {
 // RegisterServices registers a GRPC query service to respond to the
 // module-specific GRPC queries.
 func (am AppModule) RegisterServices(cfg module.Configurator) {
+	// TODO
 	types.RegisterMsgServer(cfg.MsgServer(), keeper.NewMsgServerImpl(am.keeper))
 	types.RegisterQuerySrvrServer(cfg.QueryServer(), am.keeper)
 }

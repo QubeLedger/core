@@ -508,6 +508,7 @@ func NewQuadrateApp(
 		appCodec,
 		app.keys[interquerymoduletypes.StoreKey],
 		app.IBCKeeper,
+		app.GetSubspace(interquerymoduletypes.ModuleName),
 	)
 
 	// register the proposal types
@@ -638,7 +639,8 @@ func NewQuadrateApp(
 	ibcRouter.AddRoute(icahosttypes.SubModuleName, icaHostIBCModule).
 		AddRoute(wasm.ModuleName, wasm.NewIBCHandler(app.wasmKeeper, app.IBCKeeper.ChannelKeeper)).
 		AddRoute(ibctransfertypes.ModuleName, transferIBCModule).
-		AddRoute(erc20types.ModuleName, transferIBCModule)
+		AddRoute(erc20types.ModuleName, transferIBCModule).
+		AddRoute(interquerymoduletypes.ModuleName, transferIBCModule)
 
 	app.IBCKeeper.SetRouter(ibcRouter)
 

@@ -128,3 +128,25 @@ func (k msgServer) SubmitQueryResponse(goCtx context.Context, msg *types.MsgSubm
 
 	return &types.MsgSubmitQueryResponseResponse{}, nil
 }
+
+func (k msgServer) MakeInterchainRequest(goCtx context.Context, msg *types.MsgMakeInterchainRequest) (*types.MsgMakeInterchainRequestResponse, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+	k.MakeRequest(
+		ctx,
+		msg.ConnectionId,
+		msg.ChainId,
+		msg.QueryType,
+		msg.Request,
+		sdk.NewInt(msg.Period),
+		msg.Module,
+		msg.CallbackId,
+		uint64(msg.Ttl),
+	)
+	ctx.EventManager().EmitEvents(sdk.Events{
+		sdk.NewEvent(
+			sdk.EventTypeMessage,
+			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
+		),
+	})
+	return &types.MsgMakeInterchainRequestResponse{}, nil
+}
