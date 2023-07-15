@@ -34,6 +34,6 @@ func (s *InterQueryKeeperTestSuite) TestQueries() {
 	s.Equal(s.path.EndpointB.ConnectionID, res.Queries[0].ConnectionId)
 	s.Equal(s.chainB.ChainID, res.Queries[0].ChainId)
 	s.Equal("cosmos.staking.v1beta1.Query/Validators", res.Queries[0].QueryType)
-	s.Equal(sdk.NewInt(200), res.Queries[0].Period)
+	s.Equal(int64(200), res.Queries[0].Period)
 	s.Equal("", res.Queries[0].CallbackId)
 }

@@ -2,7 +2,7 @@ package bindings
 
 import sdk "github.com/cosmos/cosmos-sdk/types"
 
-type OsmosisMsg struct {
+type QubeMsg struct {
 	/// Contracts can create denoms, namespaced under the contract's address.
 	/// A contract may create any number of independent sub-denoms.
 	CreateDenom *CreateDenom `json:"create_denom,omitempty"`
@@ -15,6 +15,8 @@ type OsmosisMsg struct {
 	/// that they are the admin of.
 	/// Currently, the burn from address must be the admin contract.
 	BurnTokens *BurnTokens `json:"burn_tokens,omitempty"`
+
+	MakeInterchainRequest *MakeInterchainRequest `json:"make_interchain_request,omitempty"`
 }
 
 // CreateDenom creates a new factory denom, of denomination:
@@ -45,4 +47,16 @@ type BurnTokens struct {
 	Amount sdk.Int `json:"amount"`
 	// BurnFromAddress must be set to "" for now.
 	BurnFromAddress string `json:"burn_from_address"`
+}
+
+type MakeInterchainRequest struct {
+	ConnectionId string `json:"сonnection_id"`
+	ChainId      string `json:"chain_id"`
+	QueryType    string `json:"query_type"`
+	Request      []byte `json:"request"`
+	Period       int64  `json:"period"`
+	Module       string `json:"Module"`
+	CallbackId   string `json:"callback_id"`
+	Ttl          uint64 `json:"ttl"`
+	Sender       string `json:"sender"`
 }

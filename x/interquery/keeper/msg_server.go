@@ -46,7 +46,7 @@ func (k msgServer) SubmitQueryResponse(goCtx context.Context, msg *types.MsgSubm
 
 	// check if query was previously processed
 	// - indicated by query.LastHeight matching current Block Height;
-	if q.LastHeight.Int64() == ctx.BlockHeader().Height {
+	if q.LastHeight == ctx.BlockHeader().Height {
 		k.Logger(ctx).Debug("ignoring duplicate query", "id", q.Id, "type", q.QueryType)
 		// technically this is an error, but will cause the entire tx to fail
 		// if we have one 'bad' message, so we can just no-op here.
@@ -110,12 +110,12 @@ func (k msgServer) SubmitQueryResponse(goCtx context.Context, msg *types.MsgSubm
 	// check for and delete non-repeating queries, update any other
 	// - Period.IsNegative() indicates a single query;
 	// - noDelete indicates a response that triggered a re-query;
-	if q.Period.IsNegative() {
+	if q.Period < 0 {
 		if !noDelete {
 			k.DeleteQuery(ctx, msg.QueryId)
 		}
 	} else {
-		q.LastHeight = sdk.NewInt(ctx.BlockHeight())
+		q.LastHeight = ctx.BlockHeight()
 		k.SetQuery(ctx, q)
 	}
 
@@ -130,23 +130,5 @@ func (k msgServer) SubmitQueryResponse(goCtx context.Context, msg *types.MsgSubm
 }
 
 func (k msgServer) MakeInterchainRequest(goCtx context.Context, msg *types.MsgMakeInterchainRequest) (*types.MsgMakeInterchainRequestResponse, error) {
-	ctx := sdk.UnwrapSDKContext(goCtx)
-	k.MakeRequest(
-		ctx,
-		msg.ConnectionId,
-		msg.ChainId,
-		msg.QueryType,
-		msg.Request,
-		sdk.NewInt(msg.Period),
-		msg.Module,
-		msg.CallbackId,
-		uint64(msg.Ttl),
-	)
-	ctx.EventManager().EmitEvents(sdk.Events{
-		sdk.NewEvent(
-			sdk.EventTypeMessage,
-			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
-		),
-	})
 	return &types.MsgMakeInterchainRequestResponse{}, nil
 }

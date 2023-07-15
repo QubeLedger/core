@@ -35,3 +35,22 @@ type ActualPriceResponse struct {
 type FullDenomResponse struct {
 	Denom string `json:"denom"`
 }
+
+type InterchainQueryResponse struct {
+	Id           string `json:"id"`
+	ConnectionId string `json:"сonnection_id"`
+	ChainId      string `json:"chain_id"`
+	QueryType    string `json:"query_type"`
+	Request      []byte `json:"request"`
+	Period       int64  `json:"period"`
+	LastHeight   int64  `json:"last_height"`
+	CallbackId   string `json:"callback_id"`
+	Ttl          uint64 `json:"ttl"`
+}
+
+type InterchainQueryResultResponse struct {
+	Id           string `json:"id"`
+	LocalHeight  int64  `json:"local_height"`
+	RemoteHeight int64  `json:"remote_height"`
+	Value        []byte `json:"value"`
+}

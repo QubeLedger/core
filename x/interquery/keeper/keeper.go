@@ -95,7 +95,7 @@ func (k Keeper) DeleteDatapoint(ctx sdk.Context, id string) {
 }
 
 func (k *Keeper) GetDatapoint(ctx sdk.Context, module, connectionID, chainID, queryType string, request []byte) (types.DataPoint, error) {
-	id := GenerateQueryHash(connectionID, chainID, queryType, request, module)
+	id := GenerateQueryHash(connectionID, chainID, queryType, request, module, sdk.AccAddress{})
 	return k.GetDatapointForID(ctx, id)
 }
 
@@ -103,12 +103,12 @@ func (k *Keeper) GetDatapointOrRequest(ctx sdk.Context, module, connectionID, ch
 	val, err := k.GetDatapoint(ctx, module, connectionID, chainID, queryType, request)
 	if err != nil {
 		// no datapoint
-		k.MakeRequest(ctx, connectionID, chainID, queryType, request, sdk.NewInt(-1), "", "", maxAge)
+		k.MakeRequest(ctx, connectionID, chainID, queryType, request, sdk.NewInt(-1), "", "", maxAge, nil)
 		return types.DataPoint{}, errors.New("no data; query submitted")
 	}
 	/* #nosec */
-	if val.LocalHeight.LT(sdk.NewInt(ctx.BlockHeight() - int64(maxAge))) { // this is somewhat arbitrary; TODO: make this better
-		k.MakeRequest(ctx, connectionID, chainID, queryType, request, sdk.NewInt(-1), "", "", maxAge)
+	if val.LocalHeight.LT(sdk.NewInt(ctx.BlockHeight() - int64(maxAge))) {
+		k.MakeRequest(ctx, connectionID, chainID, queryType, request, sdk.NewInt(-1), "", "", maxAge, nil)
 		return types.DataPoint{}, errors.New("stale data; query submitted")
 	}
 	// check ttl
@@ -125,6 +125,7 @@ func (k *Keeper) MakeRequest(
 	module string,
 	callbackID string,
 	ttl uint64,
+	sender sdk.AccAddress,
 ) {
 	k.Logger(ctx).Info(
 		"MakeRequest",
@@ -136,8 +137,9 @@ func (k *Keeper) MakeRequest(
 		"module", module,
 		"callback", callbackID,
 		"ttl", ttl,
+		"sender", sender.String(),
 	)
-	key := GenerateQueryHash(connectionID, chainID, queryType, request, module)
+	key := GenerateQueryHash(connectionID, chainID, queryType, request, module, sdk.AccAddress{})
 	existingQuery, found := k.GetQuery(ctx, key)
 	if !found {
 		if module != "" && callbackID != "" {
@@ -156,8 +158,19 @@ func (k *Keeper) MakeRequest(
 		k.SetQuery(ctx, *newQuery)
 	} else {
 		// a re-request of an existing query triggers resetting of height to trigger immediately.
-		k.Logger(ctx).Info("re-request", "LastHeight", existingQuery.LastHeight)
-		existingQuery.LastHeight = sdk.ZeroInt()
+		eq := sdk.AccAddress(existingQuery.FromAddress).Equals(sender)
+		if !eq {
+			err := fmt.Errorf("no callback handler registered for module %s", module)
+			k.Logger(ctx).Error(err.Error())
+			panic(err)
+		}
+		k.Logger(ctx).Info(
+			"re-request",
+			"RequestId", existingQuery.Id,
+			"LastHeight", existingQuery.LastHeight,
+			"FromAddress", existingQuery.FromAddress,
+		)
+		existingQuery.LastHeight = sdk.ZeroInt().Int64()
 		k.SetQuery(ctx, existingQuery)
 	}
 }

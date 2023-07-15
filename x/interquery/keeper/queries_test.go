@@ -27,13 +27,13 @@ func (s *InterQueryKeeperTestSuite) TestQuery() {
 	s.GetSimApp(s.chainA).InterQueryKeeper.SetQuery(s.chainA.GetContext(), *query)
 
 	// get the stored query
-	id := keeper.GenerateQueryHash(query.ConnectionId, query.ChainId, query.QueryType, query.Request, "")
+	id := keeper.GenerateQueryHash(query.ConnectionId, query.ChainId, query.QueryType, query.Request, "", sdk.AccAddress{})
 	getQuery, found := s.GetSimApp(s.chainA).InterQueryKeeper.GetQuery(s.chainA.GetContext(), id)
 	s.True(found)
 	s.Equal(s.path.EndpointB.ConnectionID, getQuery.ConnectionId)
 	s.Equal(s.chainB.ChainID, getQuery.ChainId)
 	s.Equal("cosmos.staking.v1beta1.Query/Validators", getQuery.QueryType)
-	s.Equal(sdk.NewInt(200), getQuery.Period)
+	s.Equal(int64(200), getQuery.Period)
 	s.Equal(uint64(0), getQuery.Ttl)
 	s.Equal("", getQuery.CallbackId)
 

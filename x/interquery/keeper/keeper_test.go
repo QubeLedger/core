@@ -69,15 +69,16 @@ func (s *InterQueryKeeperTestSuite) TestMakeRequest() {
 		"",
 		"",
 		0,
+		nil,
 	)
 
-	id := keeper.GenerateQueryHash(s.path.EndpointB.ConnectionID, s.chainB.ChainID, "cosmos.staking.v1beta1.Query/Validators", bz, "")
+	id := keeper.GenerateQueryHash(s.path.EndpointB.ConnectionID, s.chainB.ChainID, "cosmos.staking.v1beta1.Query/Validators", bz, "", sdk.AccAddress{})
 	query, found := s.GetSimApp(s.chainA).InterQueryKeeper.GetQuery(s.chainA.GetContext(), id)
 	s.True(found)
 	s.Equal(s.path.EndpointB.ConnectionID, query.ConnectionId)
 	s.Equal(s.chainB.ChainID, query.ChainId)
 	s.Equal("cosmos.staking.v1beta1.Query/Validators", query.QueryType)
-	s.Equal(sdk.NewInt(200), query.Period)
+	s.Equal(int64(200), query.Period)
 	s.Equal("", query.CallbackId)
 
 	s.GetSimApp(s.chainA).InterQueryKeeper.MakeRequest(
@@ -90,6 +91,7 @@ func (s *InterQueryKeeperTestSuite) TestMakeRequest() {
 		"",
 		"",
 		0,
+		nil,
 	)
 }
 
@@ -179,7 +181,7 @@ func (s *InterQueryKeeperTestSuite) TestSubmitQueryResponse() {
 
 		qmsg := icqtypes.MsgSubmitQueryResponse{
 			ChainId:     s.chainB.ChainID,
-			QueryId:     keeper.GenerateQueryHash(tc.query.ConnectionId, tc.query.ChainId, tc.query.QueryType, bz, ""),
+			QueryId:     keeper.GenerateQueryHash(tc.query.ConnectionId, tc.query.ChainId, tc.query.QueryType, bz, "", sdk.AccAddress{}),
 			Result:      s.GetSimApp(s.chainB).AppCodec().MustMarshalJSON(&qvr),
 			Height:      s.chainB.CurrentHeader.Height,
 			FromAddress: TestOwnerAddress,
@@ -199,7 +201,7 @@ func (s *InterQueryKeeperTestSuite) TestDataPoints() {
 		Validators: s.GetSimApp(s.chainB).StakingKeeper.GetBondedValidatorsByPower(s.chainB.GetContext()),
 	}
 
-	id := keeper.GenerateQueryHash(s.path.EndpointB.ConnectionID, s.chainB.ChainID, "cosmos.staking.v1beta1.Query/Validators", bz, "")
+	id := keeper.GenerateQueryHash(s.path.EndpointB.ConnectionID, s.chainB.ChainID, "cosmos.staking.v1beta1.Query/Validators", bz, "", sdk.AccAddress{})
 
 	err = s.GetSimApp(s.chainA).InterQueryKeeper.SetDatapointForID(
 		s.chainA.GetContext(),

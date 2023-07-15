@@ -13,15 +13,18 @@ import (
 
 	tokenfactorykeeper "github.com/QuadrateOrg/core/x/tokenfactory/keeper"
 	tokenfactorytypes "github.com/QuadrateOrg/core/x/tokenfactory/types"
+
+	interquerykeeper "github.com/QuadrateOrg/core/x/interquery/keeper"
 )
 
 // CustomMessageDecorator returns decorator for custom CosmWasm bindings messages
-func CustomMessageDecorator(bank *bankkeeper.BaseKeeper, tokenFactory *tokenfactorykeeper.Keeper) func(wasmkeeper.Messenger) wasmkeeper.Messenger {
+func CustomMessageDecorator(bank *bankkeeper.BaseKeeper, tokenFactory *tokenfactorykeeper.Keeper, interquery *interquerykeeper.Keeper) func(wasmkeeper.Messenger) wasmkeeper.Messenger {
 	return func(old wasmkeeper.Messenger) wasmkeeper.Messenger {
 		return &CustomMessenger{
 			wrapped:      old,
 			bank:         bank,
 			tokenFactory: tokenFactory,
+			interquery:   interquery,
 		}
 	}
 }
@@ -30,6 +33,7 @@ type CustomMessenger struct {
 	wrapped      wasmkeeper.Messenger
 	bank         *bankkeeper.BaseKeeper
 	tokenFactory *tokenfactorykeeper.Keeper
+	interquery   *interquerykeeper.Keeper
 }
 
 var _ wasmkeeper.Messenger = (*CustomMessenger)(nil)
@@ -39,9 +43,9 @@ func (m *CustomMessenger) DispatchMsg(ctx sdk.Context, contractAddr sdk.AccAddre
 	if msg.Custom != nil {
 		// only handle the happy path where this is really creating / minting / swapping ...
 		// leave everything else for the wrapped version
-		var contractMsg bindings.OsmosisMsg
+		var contractMsg bindings.QubeMsg
 		if err := json.Unmarshal(msg.Custom, &contractMsg); err != nil {
-			return nil, nil, sdkerrors.Wrap(err, "osmosis msg")
+			return nil, nil, sdkerrors.Wrap(err, "qube msg")
 		}
 		if contractMsg.CreateDenom != nil {
 			return m.createDenom(ctx, contractAddr, contractMsg.CreateDenom)
@@ -55,8 +59,17 @@ func (m *CustomMessenger) DispatchMsg(ctx sdk.Context, contractAddr sdk.AccAddre
 		if contractMsg.BurnTokens != nil {
 			return m.burnTokens(ctx, contractAddr, contractMsg.BurnTokens)
 		}
+		if contractMsg.MakeInterchainRequest != nil {
+			return m.makeInterchainRequest(ctx, contractAddr, contractMsg.MakeInterchainRequest)
+		}
 	}
 	return m.wrapped.DispatchMsg(ctx, contractAddr, contractIBCPortID, msg)
+}
+
+// makeInterchainRequest make a new icq request
+func (m *CustomMessenger) makeInterchainRequest(ctx sdk.Context, contractAddr sdk.AccAddress, msg *bindings.MakeInterchainRequest) ([]sdk.Event, [][]byte, error) {
+	m.interquery.MakeRequest(ctx, msg.ConnectionId, msg.ChainId, msg.QueryType, msg.Request, sdk.NewInt(msg.Period), msg.Module, msg.CallbackId, msg.Ttl, contractAddr)
+	return nil, nil, nil
 }
 
 // createDenom creates a new token denom

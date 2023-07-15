@@ -10,8 +10,8 @@ import (
 	"github.com/QuadrateOrg/core/x/interquery/types"
 )
 
-func GenerateQueryHash(connectionID, chainID, queryType string, request []byte, module string) string {
-	return fmt.Sprintf("%x", crypto.Sha256(append([]byte(module+connectionID+chainID+queryType), request...)))
+func GenerateQueryHash(connectionID, chainID, queryType string, request []byte, module string, sender sdk.Address) string {
+	return fmt.Sprintf("%x", crypto.Sha256(append([]byte(module+connectionID+chainID+queryType+sender.String()), request...)))
 }
 
 // ----------------------------------------------------------------
@@ -27,13 +27,13 @@ func (k Keeper) NewQuery(
 	ttl uint64,
 ) *types.Query {
 	return &types.Query{
-		Id:           GenerateQueryHash(connectionID, chainID, queryType, request, module),
+		Id:           GenerateQueryHash(connectionID, chainID, queryType, request, module, sdk.AccAddress{}),
 		ConnectionId: connectionID,
 		ChainId:      chainID,
 		QueryType:    queryType,
 		Request:      request,
-		Period:       period,
-		LastHeight:   sdk.ZeroInt(),
+		Period:       period.Int64(),
+		LastHeight:   sdk.ZeroInt().Int64(),
 		CallbackId:   callbackID,
 		Ttl:          ttl,
 	}

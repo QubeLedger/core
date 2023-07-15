@@ -16,7 +16,7 @@ func (s *InterQueryKeeperTestSuite) TestEndBlocker() {
 	bz, err := bondedQuery.Marshal()
 	s.NoError(err)
 
-	id := keeper.GenerateQueryHash(s.path.EndpointB.ConnectionID, s.chainB.ChainID, "cosmos.staking.v1beta1.Query/Validators", bz, "")
+	id := keeper.GenerateQueryHash(s.path.EndpointB.ConnectionID, s.chainB.ChainID, "cosmos.staking.v1beta1.Query/Validators", bz, "", sdk.AccAddress{})
 
 	query := s.GetSimApp(s.chainA).InterQueryKeeper.NewQuery(
 		"",

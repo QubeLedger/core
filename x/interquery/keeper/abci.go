@@ -26,7 +26,7 @@ func (k Keeper) EndBlocker(ctx sdk.Context) {
 		// 	k.Logger(ctx).Error("Deleting stale query")
 		// 	return false
 		// }
-		if queryInfo.LastEmission.IsNil() || queryInfo.LastEmission.IsZero() || queryInfo.LastEmission.Add(queryInfo.Period).Equal(sdk.NewInt(ctx.BlockHeight())) {
+		if queryInfo.LastEmission.IsNil() || queryInfo.LastEmission.IsZero() || queryInfo.LastEmission.Add(sdk.NewInt(queryInfo.Period)).Equal(sdk.NewInt(ctx.BlockHeight())) {
 			k.Logger(ctx).Debug("interquery event emitted", "id", queryInfo.Id)
 			event := sdk.NewEvent(
 				sdk.EventTypeMessage,
