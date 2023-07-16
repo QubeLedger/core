@@ -15,7 +15,7 @@ import (
 // CustomQuerier dispatches custom CosmWasm bindings queries.
 func CustomQuerier(qp *QueryPlugin) func(ctx sdk.Context, request json.RawMessage) ([]byte, error) {
 	return func(ctx sdk.Context, request json.RawMessage) ([]byte, error) {
-		var contractQuery bindings.OsmosisQuery
+		var contractQuery bindings.QubeQuery
 		if err := json.Unmarshal(request, &contractQuery); err != nil {
 			return nil, sdkerrors.Wrap(err, "osmosis query")
 		}
@@ -63,6 +63,30 @@ func CustomQuerier(qp *QueryPlugin) func(ctx sdk.Context, request json.RawMessag
 			bz, err := json.Marshal(res)
 			if err != nil {
 				return nil, fmt.Errorf("failed to JSON marshal ActualPrice response: %w", err)
+			}
+
+			return bz, nil
+
+		case contractQuery.InterchainQuery != nil:
+			res, err := qp.GetInterchainQuery(ctx, contractQuery.InterchainQuery.Id)
+			if err != nil {
+				return nil, err
+			}
+			bz, err := json.Marshal(res)
+			if err != nil {
+				return nil, fmt.Errorf("failed to JSON marshal InterchainQuery response: %w", err)
+			}
+
+			return bz, nil
+
+		case contractQuery.InterchainQueryResult != nil:
+			res, err := qp.GetInterchainQueryResult(ctx, contractQuery.InterchainQueryResult.Module, contractQuery.InterchainQueryResult.ConnectionId, contractQuery.InterchainQueryResult.ChainId, contractQuery.InterchainQueryResult.QueryType, contractQuery.InterchainQueryResult.Request)
+			if err != nil {
+				return nil, err
+			}
+			bz, err := json.Marshal(res)
+			if err != nil {
+				return nil, fmt.Errorf("failed to JSON marshal InterchainQueryResult response: %w", err)
 			}
 
 			return bz, nil

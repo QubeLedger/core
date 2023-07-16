@@ -1,15 +1,11 @@
 package bindings
 
-// OsmosisQuery contains osmosis custom queries.
-// See https://github.com/osmosis-labs/osmosis-bindings/blob/main/packages/bindings/src/query.rs
-type OsmosisQuery struct {
-	/// Given a subdenom minted by a contract via `OsmosisMsg::MintTokens`,
-	/// returns the full denom as used by `BankMsg::Send`.
-	FullDenom *FullDenom `json:"full_denom,omitempty"`
-	/// Returns the admin of a denom, if the denom is a Token Factory denom.
-	DenomAdmin *DenomAdmin `json:"denom_admin,omitempty"`
-
-	ActualPrice *ActualPrice `json:"actual_price,omitempty"`
+type QubeQuery struct {
+	FullDenom             *FullDenom             `json:"full_denom,omitempty"`
+	DenomAdmin            *DenomAdmin            `json:"denom_admin,omitempty"`
+	ActualPrice           *ActualPrice           `json:"actual_price,omitempty"`
+	InterchainQuery       *InterchainQuery       `json:"interchain_query,omitempty"`
+	InterchainQueryResult *InterchainQueryResult `json:"interchain_query_result,omitempty"`
 }
 
 type FullDenom struct {
@@ -34,6 +30,18 @@ type ActualPriceResponse struct {
 
 type FullDenomResponse struct {
 	Denom string `json:"denom"`
+}
+
+type InterchainQuery struct {
+	Id string `json:"id"`
+}
+
+type InterchainQueryResult struct {
+	Module       string `json:"module"`
+	ConnectionId string `json:"сonnection_id"`
+	ChainId      string `json:"chain_id"`
+	QueryType    string `json:"query_type"`
+	Request      []byte `json:"request"`
 }
 
 type InterchainQueryResponse struct {
