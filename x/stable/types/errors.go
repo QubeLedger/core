@@ -27,6 +27,10 @@ var (
 	ErrSendBaseTokenDenom   = sdkerrors.Register(ModuleName, 1601, "ErrSendBaseTokenDenom err")
 )
 
+var (
+	ErrUnrecognizedPacketType = sdkerrors.Register(ModuleName, 15, "unrecognized packet type")
+)
+
 // GMD errors
 var (
 	ErrMintBlocked = sdkerrors.Register(ModuleName, 100, "Backing Ration >= 225%")

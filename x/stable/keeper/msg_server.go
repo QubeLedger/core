@@ -2,7 +2,6 @@ package keeper
 
 import (
 	"context"
-	"fmt"
 
 	gmd "github.com/QuadrateOrg/core/x/stable/gmb"
 	"github.com/QuadrateOrg/core/x/stable/types"
@@ -179,7 +178,6 @@ func (k Keeper) BurnUsq(goCtx context.Context, msg *types.MsgBurnUsq) (*types.Ms
 	if !burningFee.IsZero() {
 		// ((((uusd * 1000000000) / price) * fee) / 1000) / 100000
 		feeForStabilityFund := k.CalculateBurningFeeForStabilityFund(uusdTokenAmount, atomPrice, burningFee)
-		fmt.Printf("feeForStabilityFund %s \n", feeForStabilityFund)
 		atomFeeForStabilityFund := sdk.NewCoin(BaseTokenDenom, feeForStabilityFund)
 		err = k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, StabilityFundAddress, sdk.NewCoins(atomFeeForStabilityFund))
 		if err != nil {

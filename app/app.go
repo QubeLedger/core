@@ -482,6 +482,8 @@ func NewQuadrateApp(
 		scopedStableKeeper,
 		app.BankKeeper,
 	)
+	stableModule := stablemodule.NewAppModule(appCodec, app.StableKeeper, app.AccountKeeper, app.BankKeeper, app.OracleKeeper)
+	stableIBCModule := stablemodule.NewIBCModule(app.StableKeeper)
 
 	// register the proposal types
 	govRouter := govtypes.NewRouter()
@@ -580,7 +582,8 @@ func NewQuadrateApp(
 	ibcRouter := porttypes.NewRouter()
 	ibcRouter.AddRoute(icahosttypes.SubModuleName, icaHostIBCModule).
 		AddRoute(wasm.ModuleName, wasm.NewIBCHandler(app.wasmKeeper, app.IBCKeeper.ChannelKeeper, app.IBCKeeper.ChannelKeeper)).
-		AddRoute(ibctransfertypes.ModuleName, transferIBCModule)
+		AddRoute(ibctransfertypes.ModuleName, transferIBCModule).
+		AddRoute(stablemoduletypes.ModuleName, stableIBCModule)
 
 	app.IBCKeeper.SetRouter(ibcRouter)
 
@@ -626,6 +629,7 @@ func NewQuadrateApp(
 		packetforward.NewAppModule(app.PacketForwardKeeper),
 		wasm.NewAppModule(appCodec, &app.wasmKeeper, app.StakingKeeper, app.AccountKeeper, app.BankKeeper),
 		tokenfactory.NewAppModule(appCodec, *app.TokenFactoryKeeper, app.AccountKeeper, app.BankKeeper),
+		stableModule,
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
@@ -658,6 +662,7 @@ func NewQuadrateApp(
 		vestingtypes.ModuleName,
 		wasm.ModuleName,
 		oraclemoduletypes.ModuleName,
+		stablemoduletypes.ModuleName,
 	)
 
 	app.mm.SetOrderEndBlockers(
@@ -684,6 +689,7 @@ func NewQuadrateApp(
 		vestingtypes.ModuleName,
 		wasm.ModuleName,
 		oraclemoduletypes.ModuleName,
+		stablemoduletypes.ModuleName,
 	)
 
 	app.mm.SetOrderInitGenesis(
@@ -710,6 +716,7 @@ func NewQuadrateApp(
 		vestingtypes.ModuleName,
 		wasm.ModuleName,
 		oraclemoduletypes.ModuleName,
+		stablemoduletypes.ModuleName,
 	)
 
 	app.mm.RegisterInvariants(&app.CrisisKeeper)
@@ -916,6 +923,7 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(wasm.ModuleName)
 	paramsKeeper.Subspace(tokenfactorytypes.ModuleName)
 	paramsKeeper.Subspace(oraclemoduletypes.ModuleName)
+	paramsKeeper.Subspace(stablemoduletypes.ModuleName)
 
 	return paramsKeeper
 }

@@ -24,7 +24,7 @@ type StableKeeperTestSuite struct {
 var s *StableKeeperTestSuite
 
 func (s *StableKeeperTestSuite) Setup() {
-	s.app = quadrateapptest.Setup(s.T(), "quadrate_5120-1", false, 1)
+	s.app = quadrateapptest.Setup(s.T(), "qube-1", false, 1)
 	s.Address = apptesting.CreateRandomAccounts(1)[0]
 }
 

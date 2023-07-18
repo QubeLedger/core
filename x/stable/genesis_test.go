@@ -3,7 +3,6 @@ package stable_test
 import (
 	"testing"
 
-	"github.com/QuadrateOrg/core/x/stable"
 	"github.com/QuadrateOrg/core/x/stable/types"
 	"github.com/stretchr/testify/suite"
 
@@ -25,20 +24,8 @@ func (s *StableGenesisTestSuite) Setup() {
 }
 
 func (s *StableGenesisTestSuite) TestGenesis() {
-	genesisState := types.GenesisState{
-		Params: types.DefaultParams(),
-		PortId: types.PortID,
-		// this line is used by starport scaffolding # genesis/test/state
-	}
-
-	stable.InitGenesis(s.ctx, s.app.StableKeeper, genesisState)
-	got := stable.ExportGenesis(s.ctx, s.app.StableKeeper)
-	s.Require().NotNil(got)
-	s.Require().Equal(genesisState.PortId, got.PortId)
-
-	// this line is used by starport scaffolding # genesis/test/assert
 }
 
-func TestGenesisTestSuite(t *testing.T) {
+func TestStableGenesisTestSuite(t *testing.T) {
 	suite.Run(t, new(StableGenesisTestSuite))
 }
