@@ -42,8 +42,8 @@ func NewKeeper(
 	channelKeeper types.ChannelKeeper,
 	portKeeper types.PortKeeper,
 	scopedKeeper capabilitykeeper.ScopedKeeper,
-
 	bankKeeper types.BankKeeper,
+	oracleKeeper types.OracleKeeper,
 ) *Keeper {
 	// set KeyTable if it has not already been set
 	if !ps.HasKeyTable() {
@@ -60,7 +60,8 @@ func NewKeeper(
 		portKeeper:    portKeeper,
 		scopedKeeper:  scopedKeeper,
 
-		bankKeeper: bankKeeper,
+		bankKeeper:   bankKeeper,
+		oracleKeeper: oracleKeeper,
 	}
 }
 

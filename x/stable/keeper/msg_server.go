@@ -14,6 +14,7 @@ func (k Keeper) MintUsq(goCtx context.Context, msg *types.MsgMintUsq) (*types.Ms
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	// Oracle
+	k.UpdateAtomPrice(ctx)
 	atomPrice := k.GetAtomPrice(ctx)
 
 	// GMD math logic

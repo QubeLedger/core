@@ -6,10 +6,14 @@ import (
 )
 
 var (
-	AtomPrice sdk.Int
+	AtomPrice   sdk.Int
+	TestingMode bool = false
 )
 
-func (k Keeper) SetAtomPriceFromOracle(ctx sdk.Context) error {
+func (k Keeper) UpdateAtomPrice(ctx sdk.Context) error {
+	if TestingMode {
+		return nil
+	}
 	if AtomPrice.IsNil() {
 		AtomPrice = sdk.NewInt(0)
 	}
@@ -24,10 +28,18 @@ func (k Keeper) SetAtomPriceFromOracle(ctx sdk.Context) error {
 	return nil
 }
 
-func (k Keeper) SetAtomPriceForTest(ctx sdk.Context, price sdk.Int) {
+func (k Keeper) UpdateAtomPriceTesting(ctx sdk.Context, price sdk.Int) error {
+	if !TestingMode {
+		return nil
+	}
 	AtomPrice = price
+	return nil
 }
 
 func (k Keeper) GetAtomPrice(ctx sdk.Context) sdk.Int {
 	return AtomPrice
+}
+
+func (k Keeper) SetTestingMode(value bool) {
+	TestingMode = value
 }
