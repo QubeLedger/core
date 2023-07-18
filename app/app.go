@@ -124,6 +124,10 @@ import (
 	oraclemodulekeeper "github.com/QuadrateOrg/core/x/oracle/keeper"
 	oraclemoduletypes "github.com/QuadrateOrg/core/x/oracle/types"
 
+	stablemodule "github.com/QuadrateOrg/core/x/stable"
+	stablemodulekeeper "github.com/QuadrateOrg/core/x/stable/keeper"
+	stablemoduletypes "github.com/QuadrateOrg/core/x/stable/types"
+
 	// unnamed import of statik for swagger UI support
 	_ "github.com/cosmos/cosmos-sdk/client/docs/statik"
 )
@@ -210,6 +214,7 @@ var (
 		wasm.AppModuleBasic{},
 		tokenfactory.AppModuleBasic{},
 		oraclemodule.AppModuleBasic{},
+		stablemodule.AppModuleBasic{},
 	)
 
 	// module account permissions
@@ -225,6 +230,7 @@ var (
 		wasm.ModuleName:                {authtypes.Burner},
 		tokenfactorytypes.ModuleName:   {authtypes.Minter, authtypes.Burner},
 		oraclemoduletypes.ModuleName:   {authtypes.Minter, authtypes.Burner, authtypes.Staking},
+		stablemoduletypes.ModuleName:   {authtypes.Minter, authtypes.Burner},
 	}
 )
 
@@ -270,11 +276,13 @@ type QuadrateApp struct { // nolint: golint
 	AuthzKeeper         authzkeeper.Keeper
 	OracleKeeper        oraclemodulekeeper.Keeper
 	PacketForwardKeeper *packetforwardkeeper.Keeper
+	StableKeeper        stablemodulekeeper.Keeper
 
 	// make scoped keepers public for test purposes
 	ScopedIBCKeeper      capabilitykeeper.ScopedKeeper
 	ScopedTransferKeeper capabilitykeeper.ScopedKeeper
 	ScopedICAHostKeeper  capabilitykeeper.ScopedKeeper
+	ScopedStableKeeper   capabilitykeeper.ScopedKeeper
 
 	wasmKeeper       wasm.Keeper
 	scopedWasmKeeper capabilitykeeper.ScopedKeeper
@@ -325,7 +333,7 @@ func NewQuadrateApp(
 		evidencetypes.StoreKey, ibctransfertypes.StoreKey, capabilitytypes.StoreKey,
 		feegrant.StoreKey, authzkeeper.StoreKey, icahosttypes.StoreKey,
 		wasm.StoreKey, tokenfactorytypes.StoreKey,
-		oraclemoduletypes.StoreKey, packetforwardtypes.StoreKey,
+		oraclemoduletypes.StoreKey, packetforwardtypes.StoreKey, stablemoduletypes.StoreKey,
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
 	memKeys := sdk.NewMemoryStoreKeys(capabilitytypes.MemStoreKey)
@@ -358,7 +366,7 @@ func NewQuadrateApp(
 	scopedIBCKeeper := app.CapabilityKeeper.ScopeToModule(ibchost.ModuleName)
 	scopedTransferKeeper := app.CapabilityKeeper.ScopeToModule(ibctransfertypes.ModuleName)
 	scopedICAHostKeeper := app.CapabilityKeeper.ScopeToModule(icahosttypes.SubModuleName)
-
+	scopedStableKeeper := app.CapabilityKeeper.ScopeToModule(stablemoduletypes.ModuleName)
 	scopedWasmKeeper := app.CapabilityKeeper.ScopeToModule(wasm.ModuleName)
 
 	// add keepers
@@ -463,6 +471,17 @@ func NewQuadrateApp(
 		app.GetSubspace(oraclemoduletypes.ModuleName),
 	)
 	oracleModule := oraclemodule.NewAppModule(appCodec, app.OracleKeeper)
+
+	app.StableKeeper = *stablemodulekeeper.NewKeeper(
+		appCodec,
+		keys[stablemoduletypes.StoreKey],
+		keys[stablemoduletypes.StoreKey],
+		app.GetSubspace(stablemoduletypes.ModuleName),
+		app.IBCKeeper.ChannelKeeper,
+		&app.IBCKeeper.PortKeeper,
+		scopedStableKeeper,
+		app.BankKeeper,
+	)
 
 	// register the proposal types
 	govRouter := govtypes.NewRouter()

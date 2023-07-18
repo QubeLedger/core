@@ -152,8 +152,10 @@ update-swagger-docs: statik
 proto-all: proto-swagger-gen proto-gen
 
 proto-gen:
-	@echo "Generating Protobuf files"
-	$(DOCKER) run --rm -v $(CURDIR):/workspace --workdir /workspace tendermintdev/sdk-proto-gen:v0.3 sh ./scripts/protocgen.sh
+	@echo "🤖 Generating code from protobuf..."
+	@$(DOCKER) run --rm --volume "$(PWD)":/workspace --workdir /workspace \
+		tendermintdev/sdk-proto-gen sh ./proto/generate.sh
+	@echo "✅ Completed code generation!"
 
 proto-swagger-gen:
 	@echo "Generating Swagger files"
