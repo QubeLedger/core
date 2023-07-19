@@ -16,9 +16,8 @@ func CalculateBackingRatio(afp sdk.Int, ar sdk.Int, qm sdk.Int) sdk.Int {
 		panic(types.ErrQmNegative)
 	}
 
-	// ERROR
-	// backing_ratio always 100 or 200
-	backing_ratio := afp.Mul(ar).Quo(qm).Quo(sdk.NewInt(100)) //((afp.Mul(ar)).Quo(qm)).Mul(sdk.NewInt(int64(100)))
+	backing_ratio := (afp.Mul(ar).Quo(qm).Quo(sdk.NewInt(100)))
+
 	if backing_ratio.IsNegative() {
 		panic(types.ErrBackingRatioNegative)
 	}
