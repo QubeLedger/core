@@ -9,7 +9,7 @@ import (
 	"github.com/QuadrateOrg/core/x/stable/types"
 )
 
-func NewErc20ProposalHandler(k *keeper.Keeper) govtypes.Handler {
+func NewChangeBaseTokenDenomProposalHandler(k *keeper.Keeper) govtypes.Handler {
 	return func(ctx sdk.Context, content govtypes.Content) error {
 		switch c := content.(type) {
 		case *types.ChangeBaseTokenDenom:

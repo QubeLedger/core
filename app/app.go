@@ -125,6 +125,7 @@ import (
 	oraclemoduletypes "github.com/QuadrateOrg/core/x/oracle/types"
 
 	stablemodule "github.com/QuadrateOrg/core/x/stable"
+	stableclient "github.com/QuadrateOrg/core/x/stable/client"
 	stablemodulekeeper "github.com/QuadrateOrg/core/x/stable/keeper"
 	stablemoduletypes "github.com/QuadrateOrg/core/x/stable/types"
 
@@ -176,6 +177,7 @@ func getGovProposalHandlers() []govclient.ProposalHandler {
 		upgradeclient.CancelProposalHandler,
 		ibcclientclient.UpdateClientProposalHandler,
 		ibcclientclient.UpgradeProposalHandler,
+		stableclient.RegisterChangeBaseTokenDenomHendler,
 	)
 
 	return govProposalHandlers
@@ -493,7 +495,8 @@ func NewQuadrateApp(
 		AddRoute(paramproposal.RouterKey, params.NewParamChangeProposalHandler(app.ParamsKeeper)).
 		AddRoute(distrtypes.RouterKey, distr.NewCommunityPoolSpendProposalHandler(app.DistrKeeper)).
 		AddRoute(upgradetypes.RouterKey, upgrade.NewSoftwareUpgradeProposalHandler(app.UpgradeKeeper)).
-		AddRoute(ibcclienttypes.RouterKey, ibcclient.NewClientProposalHandler(app.IBCKeeper.ClientKeeper))
+		AddRoute(ibcclienttypes.RouterKey, ibcclient.NewClientProposalHandler(app.IBCKeeper.ClientKeeper)).
+		AddRoute(stablemoduletypes.RouterKey, stablemodule.NewChangeBaseTokenDenomProposalHandler(&app.StableKeeper))
 
 	wasmDir := filepath.Join(homePath, "data")
 	wasmConfig, err := wasm.ReadWasmConfig(appOpts)
