@@ -421,7 +421,7 @@ func (suite *StableKeeperTestSuite) TestExtremeMarketSituations() {
 
 func (suite *StableKeeperTestSuite) TestMarketDropOf40() {
 	rand.Seed(time.Now().UnixNano())
-	burnUser := apptesting.CreateRandomAccounts(1)[0]
+	actionUser := apptesting.CreateRandomAccounts(1)[0]
 	type testCase struct {
 		name                string
 		baseTokenDenom      string
@@ -454,7 +454,7 @@ func (suite *StableKeeperTestSuite) TestMarketDropOf40() {
 		testCases = append(testCases, newTestCase)
 	}
 
-	burnTestCase := testCase{
+	burnTestCaseFail := testCase{
 		name:                fmt.Sprintf("burn"),
 		baseTokenDenom:      "uatom",
 		sendTokenDenom:      "uusd",
@@ -465,9 +465,37 @@ func (suite *StableKeeperTestSuite) TestMarketDropOf40() {
 		err:                 true,
 		errString:           "Backing Ration < 85%",
 		action:              "burn",
-		address:             burnUser,
+		address:             actionUser,
 	}
-	testCases = append(testCases, burnTestCase)
+	mintForTest := testCase{
+		name:                fmt.Sprintf("mint"),
+		baseTokenDenom:      "uatom",
+		sendTokenDenom:      "uatom",
+		expectedTokenDenom:  "uusd",
+		sendTokenAmount:     1000,
+		expectedTokenAmount: 100,
+		atomPrice:           int64(rand.Intn(96000-90000) + 90000),
+		err:                 false,
+		errString:           "",
+		action:              "mint",
+		address:             actionUser,
+	}
+	burnTestCase1Succses := testCase{
+		name:                fmt.Sprintf("burn"),
+		baseTokenDenom:      "uatom",
+		sendTokenDenom:      "uusd",
+		expectedTokenDenom:  "uatom",
+		sendTokenAmount:     8000,
+		expectedTokenAmount: 50,
+		atomPrice:           int64(84000),
+		err:                 false,
+		errString:           "Backing Ration < 85%",
+		action:              "burn",
+		address:             actionUser,
+	}
+	testCases = append(testCases, burnTestCaseFail)
+	testCases = append(testCases, mintForTest)
+	testCases = append(testCases, burnTestCase1Succses)
 
 	suite.Setup()
 	suite.Commit()
