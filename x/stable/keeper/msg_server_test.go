@@ -49,7 +49,7 @@ func (suite *StableKeeperTestSuite) TestMintUsq() {
 			9471,
 			int64(1500000),
 			true,
-			"Backing Ration >= 225%",
+			"Backing Ration >= 120%",
 		},
 	}
 
@@ -121,7 +121,7 @@ func (suite *StableKeeperTestSuite) TestBurnUsq() {
 			104,
 			int64(3300),
 			true,
-			"Backing Ration < 75%",
+			"Backing Ration < 85%",
 		},
 	}
 	for _, tc := range testCases {
