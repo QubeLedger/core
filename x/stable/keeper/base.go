@@ -11,13 +11,10 @@ import (
 
 var (
 	BaseTokenDenom string
+	SendTokenDenom string
 )
 
 func (k Keeper) ChangeBaseTokenDenom(ctx sdk.Context, coinMetadata banktypes.Metadata) error {
-	if !k.bankKeeper.HasSupply(ctx, coinMetadata.Base) {
-		return sdkerrors.Wrapf(types.ErrInvalidCoins, "base denomination '%s' cannot have a supply of 0", coinMetadata.Base)
-	}
-
 	if err := k.verifyMetadata(ctx, coinMetadata); err != nil {
 		return sdkerrors.Wrapf(types.ErrInvalidCoins, "base denomination '%s' cannot have a supply of 0", coinMetadata.Base)
 	}
@@ -25,8 +22,20 @@ func (k Keeper) ChangeBaseTokenDenom(ctx sdk.Context, coinMetadata banktypes.Met
 	return nil
 }
 
+func (k Keeper) ChangeSendTokenDenom(ctx sdk.Context, coinMetadata banktypes.Metadata) error {
+	if err := k.verifyMetadata(ctx, coinMetadata); err != nil {
+		return sdkerrors.Wrapf(types.ErrInvalidCoins, "base denomination '%s' cannot have a supply of 0", coinMetadata.Base)
+	}
+	k.SetSendTokenDenom(ctx, coinMetadata.Base)
+	return nil
+}
+
 func (k Keeper) SetBaseTokenDenom(ctx sdk.Context, newBaseTokenDenom string) {
 	BaseTokenDenom = newBaseTokenDenom
+}
+
+func (k Keeper) SetSendTokenDenom(ctx sdk.Context, newSendTokenDenom string) {
+	SendTokenDenom = newSendTokenDenom
 }
 
 func (k Keeper) GetBaseTokenDenom(ctx sdk.Context) string {

@@ -22,6 +22,14 @@ type ChangeBaseTokenDenom struct {
 	Metadata    banktypes.Metadata `json:"metadata" yaml:"metadata"`
 }
 
+type ChangeSendTokenDenom struct {
+	BaseReq     rest.BaseReq       `json:"base_req" yaml:"base_req"`
+	Title       string             `json:"title" yaml:"title"`
+	Description string             `json:"description" yaml:"description"`
+	Deposit     sdk.Coins          `json:"deposit" yaml:"deposit"`
+	Metadata    banktypes.Metadata `json:"metadata" yaml:"metadata"`
+}
+
 func RegisterChangeBaseTokenDenomRESTHandler(clientCtx client.Context) govrest.ProposalRESTHandler {
 	return govrest.ProposalRESTHandler{
 		SubRoute: types.ModuleName,
@@ -48,6 +56,45 @@ func newRegisterChangeBaseTokenDenom(clientCtx client.Context) http.HandlerFunc 
 		}
 
 		content := types.NewRegisterChangeBaseTokenDenomProposal(req.Title, req.Description, req.Metadata)
+		msg, err := govtypes.NewMsgSubmitProposal(content, req.Deposit, fromAddr)
+		if rest.CheckBadRequestError(w, err) {
+			return
+		}
+
+		if rest.CheckBadRequestError(w, msg.ValidateBasic()) {
+			return
+		}
+
+		tx.WriteGeneratedTxResponse(clientCtx, w, req.BaseReq, msg)
+	}
+}
+
+func RegisterChangeSendTokenDenomRESTHandler(clientCtx client.Context) govrest.ProposalRESTHandler {
+	return govrest.ProposalRESTHandler{
+		SubRoute: types.ModuleName,
+		Handler:  newRegisterChangeSendTokenDenom(clientCtx),
+	}
+}
+
+func newRegisterChangeSendTokenDenom(clientCtx client.Context) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		var req ChangeBaseTokenDenom
+
+		if !rest.ReadRESTReq(w, r, clientCtx.LegacyAmino, &req) {
+			return
+		}
+
+		req.BaseReq = req.BaseReq.Sanitize()
+		if !req.BaseReq.ValidateBasic(w) {
+			return
+		}
+
+		fromAddr, err := sdk.AccAddressFromBech32(req.BaseReq.From)
+		if rest.CheckBadRequestError(w, err) {
+			return
+		}
+
+		content := types.NewRegisterChangeSendTokenDenomProposal(req.Title, req.Description, req.Metadata)
 		msg, err := govtypes.NewMsgSubmitProposal(content, req.Deposit, fromAddr)
 		if rest.CheckBadRequestError(w, err) {
 			return

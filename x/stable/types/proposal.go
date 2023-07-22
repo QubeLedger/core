@@ -12,16 +12,19 @@ import (
 // constants
 const (
 	ProposalTypeChangeBaseTokenDenom string = "ChangeBaseTokenDenom"
+	ProposalTypeChangeSendTokenDenom string = "ChangeSendTokenDenom"
 )
 
 // Implements Proposal Interface
 var (
 	_ govtypes.Content = &ChangeBaseTokenDenom{}
+	_ govtypes.Content = &ChangeSendTokenDenom{}
 )
 
 func init() {
 	govtypes.RegisterProposalType(ProposalTypeChangeBaseTokenDenom)
 	govtypes.RegisterProposalTypeCodec(&ChangeBaseTokenDenom{}, "stable/ChangeBaseTokenDenom")
+	govtypes.RegisterProposalTypeCodec(&ChangeSendTokenDenom{}, "stable/ChangeSendTokenDenom")
 }
 
 func NewRegisterChangeBaseTokenDenomProposal(title, description string, coinMetadata ...banktypes.Metadata) govtypes.Content {
@@ -36,6 +39,34 @@ func (*ChangeBaseTokenDenom) ProposalRoute() string { return RouterKey }
 
 func (*ChangeBaseTokenDenom) ProposalType() string {
 	return ProposalTypeChangeBaseTokenDenom
+}
+
+func NewRegisterChangeSendTokenDenomProposal(title, description string, coinMetadata ...banktypes.Metadata) govtypes.Content {
+	return &ChangeSendTokenDenom{
+		Title:       title,
+		Description: description,
+		Metadata:    coinMetadata,
+	}
+}
+
+func (*ChangeSendTokenDenom) ProposalRoute() string { return RouterKey }
+
+func (*ChangeSendTokenDenom) ProposalType() string {
+	return ProposalTypeChangeSendTokenDenom
+}
+
+func (rtbp *ChangeSendTokenDenom) ValidateBasic() error {
+	for _, metadata := range rtbp.Metadata {
+		if err := ibctransfertypes.ValidateIBCDenom(metadata.Base); err != nil {
+			return err
+		}
+
+		if err := validateIBCVoucherMetadata(metadata); err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 func (rtbp *ChangeBaseTokenDenom) ValidateBasic() error {

@@ -178,6 +178,7 @@ func getGovProposalHandlers() []govclient.ProposalHandler {
 		ibcclientclient.UpdateClientProposalHandler,
 		ibcclientclient.UpgradeProposalHandler,
 		stableclient.RegisterChangeBaseTokenDenomHendler,
+		stableclient.RegisterChangeSendTokenDenomHendler,
 	)
 
 	return govProposalHandlers
@@ -496,8 +497,7 @@ func NewQuadrateApp(
 		AddRoute(distrtypes.RouterKey, distr.NewCommunityPoolSpendProposalHandler(app.DistrKeeper)).
 		AddRoute(upgradetypes.RouterKey, upgrade.NewSoftwareUpgradeProposalHandler(app.UpgradeKeeper)).
 		AddRoute(ibcclienttypes.RouterKey, ibcclient.NewClientProposalHandler(app.IBCKeeper.ClientKeeper)).
-		AddRoute(stablemoduletypes.RouterKey, stablemodule.NewChangeBaseTokenDenomProposalHandler(&app.StableKeeper))
-
+		AddRoute(stablemoduletypes.RouterKey, stablemodule.NewStableProposalHandler(&app.StableKeeper))
 	wasmDir := filepath.Join(homePath, "data")
 	wasmConfig, err := wasm.ReadWasmConfig(appOpts)
 	if err != nil {

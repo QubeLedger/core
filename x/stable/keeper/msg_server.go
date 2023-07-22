@@ -25,8 +25,6 @@ func (k Keeper) MintUsq(goCtx context.Context, msg *types.MsgMintUsq) (*types.Ms
 	if qm.IsNil() && ar.IsNil() {
 		k.InitAtomReserve(ctx)
 		k.InitStablecoinSupply(ctx)
-		//k.IncreaseAtomReserve(ctx, sdk.NewInt(1))
-		//k.IncreaseStablecoinSupply(ctx, sdk.NewInt(1))
 	}
 
 	qm = k.GetStablecoinSupply(ctx)
