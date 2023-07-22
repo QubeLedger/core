@@ -82,7 +82,7 @@ func (k Keeper) MintUsq(goCtx context.Context, msg *types.MsgMintUsq) (*types.Ms
 	k.IncreaseAtomReserve(ctx, amount.AmountOf(BaseTokenDenom))
 	k.IncreaseStablecoinSupply(ctx, amountUsqToMint)
 
-	uusd := sdk.NewCoin("uusd", amountUsqToMint)
+	uusd := sdk.NewCoin(SendTokenDenom, amountUsqToMint)
 	err = k.bankKeeper.MintCoins(ctx, types.ModuleName, sdk.NewCoins(uusd))
 	if err != nil {
 		return nil, err
@@ -148,11 +148,11 @@ func (k Keeper) BurnUsq(goCtx context.Context, msg *types.MsgBurnUsq) (*types.Ms
 	}
 
 	// TODO
-	if amount.GetDenomByIndex(0) != "uusd" {
+	if amount.GetDenomByIndex(0) != SendTokenDenom {
 		return nil, types.ErrSendBaseTokenDenom
 	}
 
-	uusdTokenAmount := amount.AmountOf("uusd")
+	uusdTokenAmount := amount.AmountOf(SendTokenDenom)
 
 	err = k.bankKeeper.SendCoinsFromAccountToModule(ctx, creator, types.ModuleName, amount)
 	if err != nil {
@@ -166,7 +166,7 @@ func (k Keeper) BurnUsq(goCtx context.Context, msg *types.MsgBurnUsq) (*types.Ms
 	}
 
 	k.ReduceAtomReserve(ctx, amountAtomToSend)
-	k.ReduceStablecoinSupply(ctx, amount.AmountOf("uusd"))
+	k.ReduceStablecoinSupply(ctx, amount.AmountOf(SendTokenDenom))
 
 	atom := sdk.NewCoin(BaseTokenDenom, amountAtomToSend)
 	err = k.bankKeeper.BurnCoins(ctx, types.ModuleName, amount)

@@ -60,6 +60,7 @@ func (suite *StableKeeperTestSuite) TestMintUsq() {
 		suite.app.StableKeeper.SetTestingMode(true)
 		suite.Run(fmt.Sprintf("Case---%s", tc.name), func() {
 			suite.app.StableKeeper.SetBaseTokenDenom(suite.ctx, tc.baseTokenDenom)
+			suite.app.StableKeeper.SetSendTokenDenom(suite.ctx, "uusd")
 			suite.app.StableKeeper.UpdateAtomPriceTesting(suite.ctx, sdk.NewInt(tc.atomPrice))
 
 			suite.app.BankKeeper.MintCoins(suite.ctx, types.ModuleName, sdk.NewCoins(sdk.NewCoin("uatom", sdk.NewInt(tc.atomAmount))))
@@ -143,6 +144,7 @@ func (suite *StableKeeperTestSuite) TestBurnUsq() {
 
 		suite.Run(fmt.Sprintf("Case---%s", tc.name), func() {
 			suite.app.StableKeeper.SetBaseTokenDenom(suite.ctx, tc.baseTokenDenom)
+			suite.app.StableKeeper.SetSendTokenDenom(suite.ctx, "uusd")
 			suite.app.StableKeeper.UpdateAtomPriceTesting(suite.ctx, sdk.NewInt(tc.atomPrice))
 
 			msg := types.NewMsgBurnUsq(
@@ -205,6 +207,7 @@ func (suite *StableKeeperTestSuite) TestMintUsqGetPriceFromOracle() {
 			suite.app.BankKeeper.MintCoins(suite.ctx, types.ModuleName, sdk.NewCoins(sdk.NewCoin("uatom", sdk.NewInt(10000))))
 			suite.app.BankKeeper.SendCoinsFromModuleToAccount(suite.ctx, types.ModuleName, suite.Address, sdk.NewCoins(sdk.NewCoin("uatom", sdk.NewInt(10000))))
 			suite.app.StableKeeper.SetBaseTokenDenom(suite.ctx, tc.baseTokenDenom)
+			suite.app.StableKeeper.SetSendTokenDenom(suite.ctx, "uusd")
 			msg := types.NewMsgMintUsq(
 				suite.Address.String(),
 				sdk.NewInt(tc.atomAmount).String()+tc.sendTokenDenom,
@@ -266,6 +269,7 @@ func (suite *StableKeeperTestSuite) TestBurnUsqGetPriceFromOracle() {
 	suite.Require().NoError(err)
 
 	suite.app.StableKeeper.SetBaseTokenDenom(suite.ctx, suite.app.StableKeeper.GetBaseTokenDenom(suite.ctx))
+	suite.app.StableKeeper.SetSendTokenDenom(suite.ctx, "uusd")
 	for _, tc := range testCases {
 		suite.Run(fmt.Sprintf("Case---%s", tc.name), func() {
 			msg := types.NewMsgBurnUsq(
@@ -385,6 +389,7 @@ func (suite *StableKeeperTestSuite) TestExtremeMarketSituations() {
 		if tc.action == "mint" {
 			suite.IncreaseBalance(tc.address, tc.baseTokenDenom, sdk.NewInt(tc.sendTokenAmount))
 			suite.app.StableKeeper.SetBaseTokenDenom(suite.ctx, tc.baseTokenDenom)
+			suite.app.StableKeeper.SetSendTokenDenom(suite.ctx, "uusd")
 		}
 	}
 
@@ -504,6 +509,7 @@ func (suite *StableKeeperTestSuite) TestMarketDropOf40() {
 		if tc.action == "mint" {
 			suite.IncreaseBalance(tc.address, tc.baseTokenDenom, sdk.NewInt(tc.sendTokenAmount))
 			suite.app.StableKeeper.SetBaseTokenDenom(suite.ctx, tc.baseTokenDenom)
+			suite.app.StableKeeper.SetSendTokenDenom(suite.ctx, "uusd")
 		}
 	}
 
