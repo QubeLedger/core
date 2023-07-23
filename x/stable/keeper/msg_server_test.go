@@ -58,11 +58,10 @@ func (suite *StableKeeperTestSuite) TestMintUsq() {
 		suite.Setup()
 		suite.Commit()
 		suite.app.StableKeeper.SetTestingMode(true)
+		suite.app.StableKeeper.SetBaseTokenDenom(suite.ctx, tc.baseTokenDenom)
+		suite.app.StableKeeper.SetSendTokenDenom(suite.ctx, "uusd")
 		suite.Run(fmt.Sprintf("Case---%s", tc.name), func() {
-			suite.app.StableKeeper.SetBaseTokenDenom(suite.ctx, tc.baseTokenDenom)
-			suite.app.StableKeeper.SetSendTokenDenom(suite.ctx, "uusd")
 			suite.app.StableKeeper.UpdateAtomPriceTesting(suite.ctx, sdk.NewInt(tc.atomPrice))
-
 			suite.app.BankKeeper.MintCoins(suite.ctx, types.ModuleName, sdk.NewCoins(sdk.NewCoin("uatom", sdk.NewInt(tc.atomAmount))))
 			suite.app.BankKeeper.SendCoinsFromModuleToAccount(suite.ctx, types.ModuleName, suite.Address, sdk.NewCoins(sdk.NewCoin("uatom", sdk.NewInt(tc.atomAmount))))
 
@@ -132,6 +131,9 @@ func (suite *StableKeeperTestSuite) TestBurnUsq() {
 
 		suite.app.StableKeeper.SetTestingMode(true)
 
+		suite.app.StableKeeper.SetBaseTokenDenom(suite.ctx, tc.baseTokenDenom)
+		suite.app.StableKeeper.SetSendTokenDenom(suite.ctx, "uusd")
+
 		suite.app.BankKeeper.MintCoins(suite.ctx, types.ModuleName, sdk.NewCoins(sdk.NewCoin("uatom", sdk.NewInt(10000))))
 		suite.app.BankKeeper.SendCoinsFromModuleToAccount(suite.ctx, types.ModuleName, suite.Address, sdk.NewCoins(sdk.NewCoin("uatom", sdk.NewInt(10000))))
 
@@ -143,8 +145,6 @@ func (suite *StableKeeperTestSuite) TestBurnUsq() {
 		suite.Require().NoError(err)
 
 		suite.Run(fmt.Sprintf("Case---%s", tc.name), func() {
-			suite.app.StableKeeper.SetBaseTokenDenom(suite.ctx, tc.baseTokenDenom)
-			suite.app.StableKeeper.SetSendTokenDenom(suite.ctx, "uusd")
 			suite.app.StableKeeper.UpdateAtomPriceTesting(suite.ctx, sdk.NewInt(tc.atomPrice))
 
 			msg := types.NewMsgBurnUsq(
