@@ -6,6 +6,7 @@ import (
 
 var (
 	Multiplier        sdk.Int = sdk.NewInt(int64(10000))
+	FeeMultiplier     sdk.Int = sdk.NewInt(int64(100000))
 	MintUsqMultiplier sdk.Int = sdk.NewInt(int64(1000))
 	BurnUsqMultiplier sdk.Int = sdk.NewInt(int64(1000000000))
 )
