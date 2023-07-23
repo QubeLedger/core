@@ -76,21 +76,21 @@ import (
 	upgradeclient "github.com/cosmos/cosmos-sdk/x/upgrade/client"
 	upgradekeeper "github.com/cosmos/cosmos-sdk/x/upgrade/keeper"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
-	ica "github.com/cosmos/ibc-go/v3/modules/apps/27-interchain-accounts"
-	icahost "github.com/cosmos/ibc-go/v3/modules/apps/27-interchain-accounts/host"
-	icahostkeeper "github.com/cosmos/ibc-go/v3/modules/apps/27-interchain-accounts/host/keeper"
-	icahosttypes "github.com/cosmos/ibc-go/v3/modules/apps/27-interchain-accounts/host/types"
-	icatypes "github.com/cosmos/ibc-go/v3/modules/apps/27-interchain-accounts/types"
-	"github.com/cosmos/ibc-go/v3/modules/apps/transfer"
-	ibctransferkeeper "github.com/cosmos/ibc-go/v3/modules/apps/transfer/keeper"
-	ibctransfertypes "github.com/cosmos/ibc-go/v3/modules/apps/transfer/types"
-	ibc "github.com/cosmos/ibc-go/v3/modules/core"
-	ibcclient "github.com/cosmos/ibc-go/v3/modules/core/02-client"
-	ibcclientclient "github.com/cosmos/ibc-go/v3/modules/core/02-client/client"
-	ibcclienttypes "github.com/cosmos/ibc-go/v3/modules/core/02-client/types"
-	porttypes "github.com/cosmos/ibc-go/v3/modules/core/05-port/types"
-	ibchost "github.com/cosmos/ibc-go/v3/modules/core/24-host"
-	ibckeeper "github.com/cosmos/ibc-go/v3/modules/core/keeper"
+	ica "github.com/cosmos/ibc-go/v4/modules/apps/27-interchain-accounts"
+	icahost "github.com/cosmos/ibc-go/v4/modules/apps/27-interchain-accounts/host"
+	icahostkeeper "github.com/cosmos/ibc-go/v4/modules/apps/27-interchain-accounts/host/keeper"
+	icahosttypes "github.com/cosmos/ibc-go/v4/modules/apps/27-interchain-accounts/host/types"
+	icatypes "github.com/cosmos/ibc-go/v4/modules/apps/27-interchain-accounts/types"
+	"github.com/cosmos/ibc-go/v4/modules/apps/transfer"
+	ibctransferkeeper "github.com/cosmos/ibc-go/v4/modules/apps/transfer/keeper"
+	ibctransfertypes "github.com/cosmos/ibc-go/v4/modules/apps/transfer/types"
+	ibc "github.com/cosmos/ibc-go/v4/modules/core"
+	ibcclient "github.com/cosmos/ibc-go/v4/modules/core/02-client"
+	ibcclientclient "github.com/cosmos/ibc-go/v4/modules/core/02-client/client"
+	ibcclienttypes "github.com/cosmos/ibc-go/v4/modules/core/02-client/types"
+	porttypes "github.com/cosmos/ibc-go/v4/modules/core/05-port/types"
+	ibchost "github.com/cosmos/ibc-go/v4/modules/core/24-host"
+	ibckeeper "github.com/cosmos/ibc-go/v4/modules/core/keeper"
 	"github.com/gorilla/mux"
 	"github.com/rakyll/statik/fs"
 	"github.com/spf13/cast"
@@ -100,19 +100,9 @@ import (
 	tmos "github.com/tendermint/tendermint/libs/os"
 	dbm "github.com/tendermint/tm-db"
 
-	ethermintapp "github.com/evmos/ethermint/app"
-	etherminttypes "github.com/evmos/ethermint/types"
-	"github.com/evmos/ethermint/x/evm"
-	evmrest "github.com/evmos/ethermint/x/evm/client/rest"
-	evmkeeper "github.com/evmos/ethermint/x/evm/keeper"
-	evmtypes "github.com/evmos/ethermint/x/evm/types"
-	"github.com/evmos/ethermint/x/feemarket"
-	feemarketkeeper "github.com/evmos/ethermint/x/feemarket/keeper"
-	feemarkettypes "github.com/evmos/ethermint/x/feemarket/types"
-
-	packetforward "github.com/strangelove-ventures/packet-forward-middleware/v3/router"
-	packetforwardkeeper "github.com/strangelove-ventures/packet-forward-middleware/v3/router/keeper"
-	packetforwardtypes "github.com/strangelove-ventures/packet-forward-middleware/v3/router/types"
+	packetforward "github.com/strangelove-ventures/packet-forward-middleware/v4/router"
+	packetforwardkeeper "github.com/strangelove-ventures/packet-forward-middleware/v4/router/keeper"
+	packetforwardtypes "github.com/strangelove-ventures/packet-forward-middleware/v4/router/types"
 
 	"github.com/CosmWasm/wasmd/x/wasm"
 	wasmclient "github.com/CosmWasm/wasmd/x/wasm/client"
@@ -129,11 +119,6 @@ import (
 	tokenfactorytypes "github.com/QuadrateOrg/core/x/tokenfactory/types"
 
 	etupgrade "github.com/QuadrateOrg/core/app/upgrades"
-
-	"github.com/QuadrateOrg/core/x/erc20"
-	erc20client "github.com/QuadrateOrg/core/x/erc20/client"
-	erc20keeper "github.com/QuadrateOrg/core/x/erc20/keeper"
-	erc20types "github.com/QuadrateOrg/core/x/erc20/types"
 
 	oraclemodule "github.com/QuadrateOrg/core/x/oracle"
 	oraclemodulekeeper "github.com/QuadrateOrg/core/x/oracle/keeper"
@@ -187,9 +172,6 @@ func getGovProposalHandlers() []govclient.ProposalHandler {
 		upgradeclient.CancelProposalHandler,
 		ibcclientclient.UpdateClientProposalHandler,
 		ibcclientclient.UpgradeProposalHandler,
-		erc20client.RegisterCoinProposalHandler,
-		erc20client.RegisterERC20ProposalHandler,
-		erc20client.ToggleTokenConversionProposalHandler,
 	)
 
 	return govProposalHandlers
@@ -226,10 +208,7 @@ var (
 		packetforward.AppModuleBasic{},
 		ica.AppModuleBasic{},
 		wasm.AppModuleBasic{},
-		evm.AppModuleBasic{},
-		feemarket.AppModuleBasic{},
 		tokenfactory.AppModuleBasic{},
-		erc20.AppModuleBasic{},
 		oraclemodule.AppModuleBasic{},
 	)
 
@@ -244,18 +223,13 @@ var (
 		govtypes.ModuleName:            {authtypes.Burner},
 		ibctransfertypes.ModuleName:    {authtypes.Minter, authtypes.Burner},
 		wasm.ModuleName:                {authtypes.Burner},
-		evmtypes.ModuleName:            {authtypes.Minter, authtypes.Burner}, // used for secure addition and subtraction of balance using module account
 		tokenfactorytypes.ModuleName:   {authtypes.Minter, authtypes.Burner},
-		erc20types.ModuleName:          {authtypes.Minter, authtypes.Burner},
 		oraclemoduletypes.ModuleName:   {authtypes.Minter, authtypes.Burner, authtypes.Staking},
 	}
 )
 
 var (
 	_ servertypes.Application = (*QuadrateApp)(nil)
-	// TODO: after test, take this values from appOpts
-	evmTrace               = ""     //ethermintconfig.DefaultEVMTracer,
-	evmMaxGasWanted uint64 = 500000 //ethermintconfig.DefaultMaxTxGasWanted
 )
 
 // QuadrateApp extends an ABCI application, but with most of its parameters exported.
@@ -282,7 +256,6 @@ type QuadrateApp struct { // nolint: golint
 	TokenFactoryKeeper *tokenfactorykeeper.Keeper
 	SlashingKeeper     slashingkeeper.Keeper
 	MintKeeper         mintkeeper.Keeper
-	Erc20Keeper        erc20keeper.Keeper
 	DistrKeeper        distrkeeper.Keeper
 	GovKeeper          govkeeper.Keeper
 	CrisisKeeper       crisiskeeper.Keeper
@@ -305,9 +278,6 @@ type QuadrateApp struct { // nolint: golint
 
 	wasmKeeper       wasm.Keeper
 	scopedWasmKeeper capabilitykeeper.ScopedKeeper
-
-	EvmKeeper       *evmkeeper.Keeper
-	FeeMarketKeeper feemarketkeeper.Keeper
 
 	// the module manager
 	mm *module.Manager
@@ -354,10 +324,10 @@ func NewQuadrateApp(
 		govtypes.StoreKey, paramstypes.StoreKey, ibchost.StoreKey, upgradetypes.StoreKey,
 		evidencetypes.StoreKey, ibctransfertypes.StoreKey, capabilitytypes.StoreKey,
 		feegrant.StoreKey, authzkeeper.StoreKey, icahosttypes.StoreKey,
-		wasm.StoreKey, evmtypes.StoreKey, feemarkettypes.StoreKey, tokenfactorytypes.StoreKey,
-		erc20types.StoreKey, oraclemoduletypes.StoreKey, packetforwardtypes.StoreKey,
+		wasm.StoreKey, tokenfactorytypes.StoreKey,
+		oraclemoduletypes.StoreKey, packetforwardtypes.StoreKey,
 	)
-	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey, evmtypes.TransientKey, feemarkettypes.TransientKey)
+	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
 	memKeys := sdk.NewMemoryStoreKeys(capabilitytypes.MemStoreKey)
 
 	app := &QuadrateApp{
@@ -396,7 +366,7 @@ func NewQuadrateApp(
 		appCodec,
 		keys[authtypes.StoreKey],
 		app.GetSubspace(authtypes.ModuleName),
-		etherminttypes.ProtoAccount,
+		authtypes.ProtoBaseAccount,
 		maccPerms,
 	)
 	app.BankKeeper = bankkeeper.NewBaseKeeper(
@@ -501,8 +471,7 @@ func NewQuadrateApp(
 		AddRoute(paramproposal.RouterKey, params.NewParamChangeProposalHandler(app.ParamsKeeper)).
 		AddRoute(distrtypes.RouterKey, distr.NewCommunityPoolSpendProposalHandler(app.DistrKeeper)).
 		AddRoute(upgradetypes.RouterKey, upgrade.NewSoftwareUpgradeProposalHandler(app.UpgradeKeeper)).
-		AddRoute(ibcclienttypes.RouterKey, ibcclient.NewClientProposalHandler(app.IBCKeeper.ClientKeeper)).
-		AddRoute(erc20types.RouterKey, erc20.NewErc20ProposalHandler(&app.Erc20Keeper))
+		AddRoute(ibcclienttypes.RouterKey, ibcclient.NewClientProposalHandler(app.IBCKeeper.ClientKeeper))
 
 	wasmDir := filepath.Join(homePath, "data")
 	wasmConfig, err := wasm.ReadWasmConfig(appOpts)
@@ -550,44 +519,6 @@ func NewQuadrateApp(
 		govRouter,
 	)
 
-	// Create Ethermint keepers
-	app.FeeMarketKeeper = feemarketkeeper.NewKeeper(
-		appCodec,
-		app.GetSubspace(feemarkettypes.ModuleName),
-		keys[feemarkettypes.StoreKey],
-		tkeys[feemarkettypes.TransientKey],
-	)
-
-	app.EvmKeeper = evmkeeper.NewKeeper(
-		appCodec,
-		keys[evmtypes.StoreKey],
-		tkeys[evmtypes.TransientKey],
-		app.GetSubspace(evmtypes.ModuleName),
-		app.AccountKeeper,
-		app.BankKeeper,
-		&stakingKeeper,
-		app.FeeMarketKeeper,
-		evmTrace,
-	)
-
-	app.Erc20Keeper = erc20keeper.NewKeeper(
-		keys[erc20types.StoreKey],
-		appCodec,
-		app.GetSubspace(erc20types.ModuleName),
-		app.AccountKeeper,
-		app.BankKeeper,
-		app.EvmKeeper,
-	)
-
-	app.EvmKeeper = app.EvmKeeper.SetHooks(
-		evmkeeper.NewMultiEvmHooks(
-			app.Erc20Keeper.Hooks(),
-			/*app.IncentivesKeeper.Hooks(),
-			app.RevenueKeeper.Hooks(),
-			app.ClaimsKeeper.Hooks(),*/
-		),
-	)
-
 	app.TransferKeeper = ibctransferkeeper.NewKeeper(
 		appCodec,
 		keys[ibctransfertypes.StoreKey],
@@ -629,9 +560,8 @@ func NewQuadrateApp(
 	// create static IBC router, add transfer route, then set and seal it
 	ibcRouter := porttypes.NewRouter()
 	ibcRouter.AddRoute(icahosttypes.SubModuleName, icaHostIBCModule).
-		AddRoute(wasm.ModuleName, wasm.NewIBCHandler(app.wasmKeeper, app.IBCKeeper.ChannelKeeper)).
-		AddRoute(ibctransfertypes.ModuleName, transferIBCModule).
-		AddRoute(erc20types.ModuleName, transferIBCModule)
+		AddRoute(wasm.ModuleName, wasm.NewIBCHandler(app.wasmKeeper, app.IBCKeeper.ChannelKeeper, app.IBCKeeper.ChannelKeeper)).
+		AddRoute(ibctransfertypes.ModuleName, transferIBCModule)
 
 	app.IBCKeeper.SetRouter(ibcRouter)
 
@@ -655,7 +585,7 @@ func NewQuadrateApp(
 			app.BaseApp.DeliverTx,
 			encodingConfig.TxConfig,
 		),
-		auth.NewAppModule(appCodec, app.AccountKeeper, ethermintapp.RandomGenesisAccounts),
+		auth.NewAppModule(appCodec, app.AccountKeeper, nil),
 		vesting.NewAppModule(app.AccountKeeper, app.BankKeeper),
 		bank.NewAppModule(appCodec, app.BankKeeper, app.AccountKeeper),
 		capability.NewAppModule(appCodec, *app.CapabilityKeeper),
@@ -676,10 +606,7 @@ func NewQuadrateApp(
 		oracleModule,
 		packetforward.NewAppModule(app.PacketForwardKeeper),
 		wasm.NewAppModule(appCodec, &app.wasmKeeper, app.StakingKeeper, app.AccountKeeper, app.BankKeeper),
-		evm.NewAppModule(app.EvmKeeper, app.AccountKeeper),
-		feemarket.NewAppModule(app.FeeMarketKeeper),
 		tokenfactory.NewAppModule(appCodec, *app.TokenFactoryKeeper, app.AccountKeeper, app.BankKeeper),
-		erc20.NewAppModule(app.Erc20Keeper, app.AccountKeeper),
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
@@ -711,9 +638,6 @@ func NewQuadrateApp(
 		paramstypes.ModuleName,
 		vestingtypes.ModuleName,
 		wasm.ModuleName,
-		feemarkettypes.ModuleName,
-		evmtypes.ModuleName,
-		erc20types.ModuleName,
 		oraclemoduletypes.ModuleName,
 	)
 
@@ -740,9 +664,6 @@ func NewQuadrateApp(
 		upgradetypes.ModuleName,
 		vestingtypes.ModuleName,
 		wasm.ModuleName,
-		evmtypes.ModuleName,
-		feemarkettypes.ModuleName,
-		erc20types.ModuleName,
 		oraclemoduletypes.ModuleName,
 	)
 
@@ -763,15 +684,12 @@ func NewQuadrateApp(
 		evidencetypes.ModuleName,
 		feegrant.ModuleName,
 		authz.ModuleName,
-		evmtypes.ModuleName,
-		feemarkettypes.ModuleName,
 		genutiltypes.ModuleName,
 		packetforwardtypes.ModuleName,
 		paramstypes.ModuleName,
 		upgradetypes.ModuleName,
 		vestingtypes.ModuleName,
 		wasm.ModuleName,
-		erc20types.ModuleName,
 		oraclemoduletypes.ModuleName,
 	)
 
@@ -788,18 +706,14 @@ func NewQuadrateApp(
 
 	anteHandler, err := quadrateante.NewAnteHandler(
 		quadrateante.HandlerOptions{
-			AccountKeeper:        app.AccountKeeper,
-			BankKeeper:           app.BankKeeper,
-			EvmKeeper:            app.EvmKeeper,
-			FeeMarketKeeper:      app.FeeMarketKeeper,
-			FeegrantKeeper:       app.FeeGrantKeeper,
-			SignModeHandler:      encodingConfig.TxConfig.SignModeHandler(),
-			SigGasConsumer:       quadrateante.SigVerificationGasConsumer,
-			IBCKeeper:            app.IBCKeeper,
-			BypassMinFeeMsgTypes: cast.ToStringSlice(appOpts.Get(quadrateappparams.BypassMinFeeMsgTypesKey)),
-			TxCounterStoreKey:    keys[wasm.StoreKey],
-			WasmConfig:           wasmConfig,
-			MaxTxGasWanted:       evmMaxGasWanted,
+			AccountKeeper:     app.AccountKeeper,
+			BankKeeper:        app.BankKeeper,
+			FeegrantKeeper:    app.FeeGrantKeeper,
+			SignModeHandler:   encodingConfig.TxConfig.SignModeHandler(),
+			SigGasConsumer:    quadrateante.SigVerificationGasConsumer,
+			IBCKeeper:         app.IBCKeeper,
+			TxCounterStoreKey: keys[wasm.StoreKey],
+			WasmConfig:        wasmConfig,
 		},
 	)
 	if err != nil {
@@ -935,7 +849,6 @@ func (app *QuadrateApp) RegisterAPIRoutes(apiSvr *api.Server, apiConfig config.A
 	tmservice.RegisterGRPCGatewayRoutes(clientCtx, apiSvr.GRPCGatewayRouter)
 
 	// Register legacy and grpc-gateway routes for all modules.
-	evmrest.RegisterTxRoutes(clientCtx, apiSvr.Router)
 	ModuleBasics.RegisterGRPCGatewayRoutes(clientCtx, apiSvr.GRPCGatewayRouter)
 
 	// register swagger API from root so that other applications can override easily
@@ -982,9 +895,6 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(packetforwardtypes.ModuleName).WithKeyTable(packetforwardtypes.ParamKeyTable())
 	paramsKeeper.Subspace(icahosttypes.SubModuleName)
 	paramsKeeper.Subspace(wasm.ModuleName)
-	paramsKeeper.Subspace(feemarkettypes.ModuleName)
-	paramsKeeper.Subspace(evmtypes.ModuleName)
-	paramsKeeper.Subspace(erc20types.ModuleName)
 	paramsKeeper.Subspace(tokenfactorytypes.ModuleName)
 	paramsKeeper.Subspace(oraclemoduletypes.ModuleName)
 
@@ -992,15 +902,11 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 }
 
 func (app *QuadrateApp) setUpgradeHandlers() {
-
-	// evm upgrade handler
 	app.UpgradeKeeper.SetUpgradeHandler(
 		etupgrade.UpgradeName,
 		etupgrade.CreateUpgradeHandler(
 			app.mm,
 			app.configurator,
-			*app.EvmKeeper,
-			app.FeeMarketKeeper,
 			*app.TokenFactoryKeeper,
 		),
 	)
@@ -1018,13 +924,6 @@ func (app *QuadrateApp) setUpgradeHandlers() {
 	}
 
 	var storeUpgrades *storetypes.StoreUpgrades
-
-	switch upgradeInfo.Name {
-	case etupgrade.UpgradeName:
-		storeUpgrades = &storetypes.StoreUpgrades{
-			Added: etupgrade.AddModules,
-		}
-	}
 
 	if storeUpgrades != nil {
 		// configure store loader that checks if version == upgradeHeight and applies store upgrades

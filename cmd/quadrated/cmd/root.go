@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"errors"
-	"fmt"
 	"io"
 	"os"
 	"path/filepath"
@@ -11,9 +10,9 @@ import (
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/config"
 	"github.com/cosmos/cosmos-sdk/client/flags"
+	"github.com/cosmos/cosmos-sdk/client/keys"
 	"github.com/cosmos/cosmos-sdk/client/rpc"
 	"github.com/cosmos/cosmos-sdk/server"
-	servertypes "github.com/cosmos/cosmos-sdk/server/types"
 	"github.com/cosmos/cosmos-sdk/snapshots"
 	"github.com/cosmos/cosmos-sdk/store"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -22,8 +21,8 @@ import (
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	"github.com/cosmos/cosmos-sdk/x/crisis"
 	genutilcli "github.com/cosmos/cosmos-sdk/x/genutil/client/cli"
-	ibcclienttypes "github.com/cosmos/ibc-go/v3/modules/core/02-client/types"
-	ibcchanneltypes "github.com/cosmos/ibc-go/v3/modules/core/04-channel/types"
+	ibcclienttypes "github.com/cosmos/ibc-go/v4/modules/core/02-client/types"
+	ibcchanneltypes "github.com/cosmos/ibc-go/v4/modules/core/04-channel/types"
 	"github.com/spf13/cast"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -31,15 +30,11 @@ import (
 	"github.com/tendermint/tendermint/libs/log"
 	dbm "github.com/tendermint/tm-db"
 
-	ethermintclient "github.com/evmos/ethermint/client"
-	"github.com/evmos/ethermint/crypto/hd"
-	ethermintserver "github.com/evmos/ethermint/server"
-	evmcfg "github.com/evmos/ethermint/server/config"
-
 	quadrate "github.com/QuadrateOrg/core/app"
+
 	"github.com/QuadrateOrg/core/app/params"
-	quadratetypes "github.com/QuadrateOrg/core/types"
-	"github.com/evmos/ethermint/client/debug"
+	serverconfig "github.com/cosmos/cosmos-sdk/server/config"
+	servertypes "github.com/cosmos/cosmos-sdk/server/types"
 )
 
 // NewRootCmd creates a new root command for simd. It is called once in the
@@ -54,7 +49,6 @@ func NewRootCmd() (*cobra.Command, params.EncodingConfig) {
 		WithInput(os.Stdin).
 		WithAccountRetriever(types.AccountRetriever{}).
 		WithHomeDir(quadrate.DefaultNodeHome).
-		WithKeyringOptions(hd.EthSecp256k1Option()).
 		WithViper("quadrate")
 
 	rootCmd := &cobra.Command{
@@ -91,17 +85,12 @@ func NewRootCmd() (*cobra.Command, params.EncodingConfig) {
 }
 
 func initAppConfig() (string, interface{}) {
-	customAppTemplate, customAppConfig := evmcfg.AppConfig(quadratetypes.DefaultDenom)
-	srvCfg, ok := customAppConfig.(evmcfg.Config)
-	if !ok {
-		panic(fmt.Errorf("unknown app config type %T", customAppConfig))
-	}
-
+	srvCfg := serverconfig.DefaultConfig()
 	srvCfg.StateSync.SnapshotInterval = 1000
 	srvCfg.StateSync.SnapshotKeepRecent = 10
 
-	return customAppTemplate + params.CustomConfigTemplate, params.CustomAppConfig{
-		Config: srvCfg,
+	return params.CustomConfigTemplate(), params.CustomAppConfig{
+		Config: *srvCfg,
 		BypassMinFeeMsgTypes: []string{
 			sdk.MsgTypeURL(&ibcchanneltypes.MsgRecvPacket{}),
 			sdk.MsgTypeURL(&ibcchanneltypes.MsgAcknowledgement{}),
@@ -116,30 +105,27 @@ func initRootCmd(rootCmd *cobra.Command, encodingConfig params.EncodingConfig) {
 	cfg.Seal()
 
 	rootCmd.AddCommand(
-		ethermintclient.ValidateChainID(
-			genutilcli.InitCmd(quadrate.ModuleBasics, quadrate.DefaultNodeHome),
-		),
+		genutilcli.InitCmd(quadrate.ModuleBasics, quadrate.DefaultNodeHome),
 		genutilcli.CollectGenTxsCmd(banktypes.GenesisBalancesIterator{}, quadrate.DefaultNodeHome),
 		genutilcli.GenTxCmd(quadrate.ModuleBasics, encodingConfig.TxConfig, banktypes.GenesisBalancesIterator{}, quadrate.DefaultNodeHome),
 		genutilcli.ValidateGenesisCmd(quadrate.ModuleBasics),
 		AddGenesisAccountCmd(quadrate.DefaultNodeHome),
 		tmcli.NewCompletionCmd(rootCmd, true),
 		testnetCmd(quadrate.ModuleBasics, banktypes.GenesisBalancesIterator{}),
-		debug.Cmd(),
 		config.Cmd(),
 	)
 
 	ac := appCreator{
 		encCfg: encodingConfig,
 	}
-	ethermintserver.AddCommands(rootCmd, quadrate.DefaultNodeHome, ac.newApp, ac.appExport, addModuleInitFlags)
+	server.AddCommands(rootCmd, quadrate.DefaultNodeHome, ac.newApp, ac.appExport, addModuleInitFlags)
 
 	// add keybase, auxiliary RPC, query, and tx child commands
 	rootCmd.AddCommand(
 		rpc.StatusCommand(),
 		queryCommand(),
 		txCommand(),
-		ethermintclient.KeyCommands(quadrate.DefaultNodeHome),
+		keys.Commands(quadrate.DefaultNodeHome),
 	)
 }
 
