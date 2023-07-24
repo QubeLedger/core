@@ -8,13 +8,7 @@ BUILDDIR ?= $(CURDIR)/build
 DOCKER := $(shell which docker)
 
 # don't override user values
-ifeq (,$(VERSION))
-  VERSION := $(shell git describe --tags)
-  # if VERSION is empty, then populate it with branch's name and raw commit hash
-  ifeq (,$(VERSION))
-    VERSION := $(BRANCH)-$(COMMIT)
-  endif
-endif
+VERSION = main
 
 TM_VERSION := $(shell go list -m github.com/tendermint/tendermint | sed 's:.* ::')
 
@@ -110,6 +104,10 @@ endif
 include contrib/devtools/Makefile
 
 all: tools install lint test
+
+###############################################################################
+###                                Build                                    ###
+###############################################################################
 
 build: go.sum
 ifeq ($(OS),Windows_NT)
