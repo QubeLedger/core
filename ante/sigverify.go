@@ -16,10 +16,6 @@ import (
 
 var _ authante.SignatureVerificationGasConsumer = SigVerificationGasConsumer
 
-const (
-	secp256k1VerifyCost uint64 = 21000
-)
-
 // SigVerificationGasConsumer consumes gas for signature verification based upon the public key type.
 // The cost is fetched from the given params and is matched by the concrete type.
 // The types of keys supported are:
