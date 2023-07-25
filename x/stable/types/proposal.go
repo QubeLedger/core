@@ -4,6 +4,7 @@ import (
 	fmt "fmt"
 	"strings"
 
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 	ibctransfertypes "github.com/cosmos/ibc-go/v4/modules/apps/transfer/types"
@@ -57,6 +58,21 @@ func (*ChangeSendTokenDenom) ProposalType() string {
 
 func (rtbp *ChangeSendTokenDenom) ValidateBasic() error {
 	for _, metadata := range rtbp.Metadata {
+		if strings.TrimSpace(metadata.Name) == "" {
+			return fmt.Errorf("name field cannot be blank")
+		}
+
+		if strings.TrimSpace(metadata.Symbol) == "" {
+			return fmt.Errorf("symbol field cannot be blank")
+		}
+
+		if err := sdk.ValidateDenom(metadata.Base); err != nil {
+			return fmt.Errorf("invalid metadata base denom: %w", err)
+		}
+
+		if err := sdk.ValidateDenom(metadata.Display); err != nil {
+			return fmt.Errorf("invalid metadata display denom: %w", err)
+		}
 		if err := ibctransfertypes.ValidateIBCDenom(metadata.Base); err != nil {
 			return err
 		}
@@ -71,6 +87,21 @@ func (rtbp *ChangeSendTokenDenom) ValidateBasic() error {
 
 func (rtbp *ChangeBaseTokenDenom) ValidateBasic() error {
 	for _, metadata := range rtbp.Metadata {
+		if strings.TrimSpace(metadata.Name) == "" {
+			return fmt.Errorf("name field cannot be blank")
+		}
+
+		if strings.TrimSpace(metadata.Symbol) == "" {
+			return fmt.Errorf("symbol field cannot be blank")
+		}
+
+		if err := sdk.ValidateDenom(metadata.Base); err != nil {
+			return fmt.Errorf("invalid metadata base denom: %w", err)
+		}
+
+		if err := sdk.ValidateDenom(metadata.Display); err != nil {
+			return fmt.Errorf("invalid metadata display denom: %w", err)
+		}
 		if err := ibctransfertypes.ValidateIBCDenom(metadata.Base); err != nil {
 			return err
 		}

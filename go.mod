@@ -28,7 +28,11 @@ require (
 
 require gopkg.in/yaml.v2 v2.4.0
 
-require github.com/regen-network/cosmos-proto v0.3.1
+require (
+	github.com/onsi/ginkgo/v2 v2.1.4
+	github.com/onsi/gomega v1.20.1
+	github.com/regen-network/cosmos-proto v0.3.1
+)
 
 require (
 	cosmossdk.io/api v0.2.6 // indirect
@@ -116,7 +120,6 @@ require (
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/mtibben/percent v0.2.1 // indirect
 	github.com/onsi/ginkgo v1.16.5 // indirect
-	github.com/onsi/gomega v1.20.1 // indirect
 	github.com/opencontainers/go-digest v1.0.0 // indirect
 	github.com/pelletier/go-toml v1.9.5 // indirect
 	github.com/pelletier/go-toml/v2 v2.0.5 // indirect
