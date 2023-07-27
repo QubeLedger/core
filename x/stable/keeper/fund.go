@@ -17,6 +17,6 @@ func (k Keeper) SetStabilityFundAddress(ctx sdk.Context, newStabilityFundAddress
 	StabilityFundAddress = newStabilityFundAddress
 }
 
-func (k Keeper) GetStabilityFundAddress(ctx sdk.Context) sdk.Address {
+func (k Keeper) GetStabilityFundAddress(ctx sdk.Context) sdk.AccAddress {
 	return StabilityFundAddress
 }

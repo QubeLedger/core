@@ -76,6 +76,9 @@ func (suite *StableKeeperTestSuite) TestMintUsq() {
 				suite.Require().NoError(err, tc.name)
 				uusdAmount := suite.app.BankKeeper.GetBalance(suite.ctx, suite.Address, "uusd")
 				suite.Require().Equal(uusdAmount.Amount, sdk.NewInt(int64(tc.uusdAmount)))
+				stabilityfundBalance := suite.app.BankKeeper.GetBalance(suite.ctx, suite.app.StableKeeper.GetStabilityFundAddress(suite.ctx), "uatom")
+				feeForStabilityFund := suite.app.StableKeeper.CalculateMintingFeeForStabilityFund(sdk.NewInt(tc.atomAmount), sdk.NewInt(tc.atomPrice), sdk.NewInt(3))
+				suite.Require().Equal(stabilityfundBalance.Amount, feeForStabilityFund)
 			} else {
 				suite.Require().Error(err, tc.errString)
 			}
