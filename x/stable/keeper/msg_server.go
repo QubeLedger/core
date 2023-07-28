@@ -31,10 +31,17 @@ func (k Keeper) MintUsq(goCtx context.Context, msg *types.MsgMintUsq) (*types.Ms
 	ar = k.GetAtomReserve(ctx)
 
 	var backing_ratio sdk.Int
+	var err error
 	if qm.IsZero() && ar.IsZero() {
 		backing_ratio = sdk.NewInt(100)
 	} else {
-		backing_ratio = gmd.CalculateBackingRatio(atomPrice, ar, qm)
+		backing_ratio, err = gmd.CalculateBackingRatio(atomPrice, ar, qm)
+		if err != nil {
+			return nil, err
+		}
+		if backing_ratio.IsNil() {
+			return nil, types.ErrSdkIntError
+		}
 	}
 
 	mintingFee, allow, err := gmd.CalculateMintingFee(backing_ratio)
@@ -122,7 +129,13 @@ func (k Keeper) BurnUsq(goCtx context.Context, msg *types.MsgBurnUsq) (*types.Ms
 	qm := k.GetStablecoinSupply(ctx)
 	ar := k.GetAtomReserve(ctx)
 
-	backing_ratio := gmd.CalculateBackingRatio(atomPrice, ar, qm)
+	backing_ratio, err := gmd.CalculateBackingRatio(atomPrice, ar, qm)
+	if err != nil {
+		return nil, err
+	}
+	if backing_ratio.IsNil() {
+		return nil, types.ErrSdkIntError
+	}
 	burningFee, allow, err := gmd.CalculateBurningFee(backing_ratio)
 
 	if !allow {

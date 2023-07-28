@@ -52,7 +52,10 @@ func (suite *StableKeeperTestSuite) GetBackingRatio() int64 {
 	atomPrice := suite.app.StableKeeper.GetAtomPrice(suite.ctx)
 	qm := suite.app.StableKeeper.GetStablecoinSupply(suite.ctx)
 	ar := suite.app.StableKeeper.GetAtomReserve(suite.ctx)
-	backing_ratio := gmd.CalculateBackingRatio(atomPrice, ar, qm)
+	backing_ratio, err := gmd.CalculateBackingRatio(atomPrice, ar, qm)
+	if err != nil {
+		panic(err)
+	}
 	return backing_ratio.Int64()
 }
 
