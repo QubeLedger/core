@@ -71,7 +71,7 @@ func CalculateBurningFee(backing_ratio sdk.Int) (sdk.Int, bool, error) {
 		return sdk.NewInt(int64(3)), true, nil
 
 	case sdk.NewInt(int64(85)).GT(backing_ratio):
-		return sdk.NewInt(int64(0)), true, nil
+		return sdk.Int{}, false, nil
 
 	default:
 		return sdk.Int{}, false, types.ErrCalculateBurningFee

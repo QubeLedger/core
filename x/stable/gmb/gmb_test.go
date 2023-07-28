@@ -93,7 +93,7 @@ func TestCalculateMintingFee(t *testing.T) {
 	}
 
 	for _, tc := range tests {
-		backing_ratio, allow, err := gmb.CalculateMintingFee(tc.backing_ratio)
+		fee, allow, err := gmb.CalculateMintingFee(tc.backing_ratio)
 
 		if tc.expectedErr {
 			require.Error(t, err)
@@ -103,7 +103,7 @@ func TestCalculateMintingFee(t *testing.T) {
 
 		if tc.expectedAllow {
 			require.Equal(t, true, allow)
-			require.Equal(t, tc.expectedRes, backing_ratio.Int64())
+			require.Equal(t, tc.expectedRes, fee.Int64())
 		}
 	}
 }
@@ -142,7 +142,7 @@ func TestCalculateBurningFee(t *testing.T) {
 	}
 
 	for _, tc := range tests {
-		backing_ratio, allow, err := gmb.CalculateBurningFee(tc.backing_ratio)
+		fee, allow, err := gmb.CalculateBurningFee(tc.backing_ratio)
 
 		if tc.expectedErr {
 			require.Error(t, err)
@@ -152,7 +152,7 @@ func TestCalculateBurningFee(t *testing.T) {
 
 		if tc.expectedAllow {
 			require.Equal(t, true, allow)
-			require.Equal(t, tc.expectedRes, backing_ratio.Int64())
+			require.Equal(t, tc.expectedRes, fee.Int64())
 		}
 	}
 }

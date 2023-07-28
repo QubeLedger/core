@@ -46,12 +46,12 @@ func (k Keeper) MintUsq(goCtx context.Context, msg *types.MsgMintUsq) (*types.Ms
 
 	mintingFee, allow, err := gmd.CalculateMintingFee(backing_ratio)
 
-	if !allow {
-		return nil, types.ErrMintBlocked
-	}
-
 	if err != nil {
 		return nil, err
+	}
+
+	if !allow {
+		return nil, types.ErrMintBlocked
 	}
 
 	creator, err := sdk.AccAddressFromBech32(msg.Creator)
@@ -138,12 +138,12 @@ func (k Keeper) BurnUsq(goCtx context.Context, msg *types.MsgBurnUsq) (*types.Ms
 	}
 	burningFee, allow, err := gmd.CalculateBurningFee(backing_ratio)
 
-	if !allow {
-		return nil, types.ErrBurnBlocked
-	}
-
 	if err != nil {
 		return nil, err
+	}
+
+	if !allow {
+		return nil, types.ErrBurnBlocked
 	}
 
 	creator, err := sdk.AccAddressFromBech32(msg.Creator)

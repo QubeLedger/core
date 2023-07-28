@@ -289,7 +289,6 @@ func (suite *StableKeeperTestSuite) TestBurnUsqGetPriceFromOracle() {
 			_, err := suite.app.StableKeeper.BurnUsq(ctx, msg)
 			suite.Require().NoError(err)
 			uatomSuply := suite.app.BankKeeper.GetBalance(suite.ctx, suite.Address, "uatom")
-			fmt.Printf("uatomSuply: %s \n", uatomSuply)
 			suite.Require().Greater(uatomSuply.Amount.Int64(), int64(0))
 		})
 	}
