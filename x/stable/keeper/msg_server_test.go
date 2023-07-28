@@ -101,8 +101,8 @@ func (suite *StableKeeperTestSuite) TestBurnUsq() {
 			"ok - burn",
 			"uatom",
 			"uusd",
-			1000,
-			104,
+			1000000,
+			104947,
 			int64(95000),
 			false,
 			"",
@@ -137,15 +137,17 @@ func (suite *StableKeeperTestSuite) TestBurnUsq() {
 		suite.app.StableKeeper.SetBaseTokenDenom(suite.ctx, tc.baseTokenDenom)
 		suite.app.StableKeeper.SetSendTokenDenom(suite.ctx, "uusd")
 
-		suite.app.BankKeeper.MintCoins(suite.ctx, types.ModuleName, sdk.NewCoins(sdk.NewCoin("uatom", sdk.NewInt(10000))))
-		suite.app.BankKeeper.SendCoinsFromModuleToAccount(suite.ctx, types.ModuleName, suite.Address, sdk.NewCoins(sdk.NewCoin("uatom", sdk.NewInt(10000))))
+		suite.app.BankKeeper.MintCoins(suite.ctx, types.ModuleName, sdk.NewCoins(sdk.NewCoin("uatom", sdk.NewInt(1000000000))))
+		suite.app.BankKeeper.SendCoinsFromModuleToAccount(suite.ctx, types.ModuleName, suite.Address, sdk.NewCoins(sdk.NewCoin("uatom", sdk.NewInt(1000000000))))
 
 		atomAmount := suite.app.BankKeeper.GetBalance(suite.ctx, suite.Address, "uatom")
-		suite.Require().Equal(atomAmount.Amount, sdk.NewInt(10000))
+		suite.Require().Equal(atomAmount.Amount, sdk.NewInt(1000000000))
 		suite.Commit()
 
-		err := suite.MintUsq()
+		err := suite.MintUsq(1000000000)
 		suite.Require().NoError(err)
+
+		stabilityFundBalanceBeforeBurn := suite.app.BankKeeper.GetBalance(suite.ctx, suite.app.StableKeeper.GetStabilityFundAddress(suite.ctx), "uatom")
 
 		suite.Run(fmt.Sprintf("Case---%s", tc.name), func() {
 			suite.app.StableKeeper.UpdateAtomPriceTesting(suite.ctx, sdk.NewInt(tc.atomPrice))
@@ -161,6 +163,10 @@ func (suite *StableKeeperTestSuite) TestBurnUsq() {
 				suite.Require().NoError(err, tc.name)
 				atomAmount := suite.app.BankKeeper.GetBalance(suite.ctx, suite.Address, "uatom")
 				suite.Require().Equal(atomAmount.Amount, sdk.NewInt(int64(tc.atomAmount)))
+
+				stabilityfundBalance := suite.app.BankKeeper.GetBalance(suite.ctx, suite.app.StableKeeper.GetStabilityFundAddress(suite.ctx), "uatom")
+				feeForStabilityFund := suite.app.StableKeeper.CalculateBurningFeeForStabilityFund(sdk.NewInt(tc.uusdAmount), sdk.NewInt(tc.atomPrice), sdk.NewInt(3))
+				suite.Require().Equal(stabilityfundBalance.Amount.Sub(stabilityFundBalanceBeforeBurn.Amount), feeForStabilityFund)
 			} else {
 				suite.Require().Error(err, tc.errString)
 			}
@@ -268,7 +274,7 @@ func (suite *StableKeeperTestSuite) TestBurnUsqGetPriceFromOracle() {
 	suite.Require().Equal(atomAmount.Amount, sdk.NewInt(10000))
 	suite.Commit()
 
-	err := suite.MintUsq()
+	err := suite.MintUsq(10000)
 	suite.Require().NoError(err)
 
 	suite.app.StableKeeper.SetBaseTokenDenom(suite.ctx, suite.app.StableKeeper.GetBaseTokenDenom(suite.ctx))
