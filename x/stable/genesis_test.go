@@ -19,7 +19,7 @@ type StableGenesisTestSuite struct {
 }
 
 func (s *StableGenesisTestSuite) Setup() {
-	s.app = quadrateapptest.Setup(s.T(), "quadrate_5120-1", false, 1)
+	s.app = quadrateapptest.Setup(s.T(), "qube-1", false, 1)
 
 }
 

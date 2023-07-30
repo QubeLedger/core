@@ -14,12 +14,20 @@ message MsgMintUsq {
   string amount  = 2;
 }
 
-message MsgMintUsqResponse {}
+message MsgMintUsqResponse {
+  string creator = 1;
+  string amountInt = 2;
+  string amountOut = 3;
+}
 
 message MsgBurnUsq {
   string creator = 1;
   string amount  = 2;
 }
 
-message MsgBurnUsqResponse {}
+message MsgBurnUsqResponse {
+  string creator = 1;
+  string amountInt = 2;
+  string amountOut = 3;
+}
 
