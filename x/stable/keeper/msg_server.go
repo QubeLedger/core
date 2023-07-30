@@ -40,6 +40,7 @@ func (k Keeper) MintUsq(goCtx context.Context, msg *types.MsgMintUsq) (*types.Ms
 func (k Keeper) BurnUsq(goCtx context.Context, msg *types.MsgBurnUsq) (*types.MsgBurnUsqResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
+	k.UpdateAtomPrice(ctx)
 	atomPrice := k.GetAtomPrice(ctx)
 
 	err, amountOut := k.ExecuteBurn(ctx, msg, atomPrice)
