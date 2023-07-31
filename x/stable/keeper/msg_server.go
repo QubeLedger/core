@@ -9,7 +9,7 @@ import (
 
 var _ types.MsgServer = Keeper{}
 
-func (k Keeper) MintUsq(goCtx context.Context, msg *types.MsgMintUsq) (*types.MsgMintUsqResponse, error) {
+func (k Keeper) Mint(goCtx context.Context, msg *types.MsgMint) (*types.MsgMintResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	k.UpdateAtomPrice(ctx)
@@ -30,14 +30,14 @@ func (k Keeper) MintUsq(goCtx context.Context, msg *types.MsgMintUsq) (*types.Ms
 		),
 	})
 
-	return &types.MsgMintUsqResponse{
+	return &types.MsgMintResponse{
 		Creator:   msg.Creator,
 		AmountInt: msg.Amount,
 		AmountOut: amountOut.String(),
 	}, nil
 }
 
-func (k Keeper) BurnUsq(goCtx context.Context, msg *types.MsgBurnUsq) (*types.MsgBurnUsqResponse, error) {
+func (k Keeper) Burn(goCtx context.Context, msg *types.MsgBurn) (*types.MsgBurnResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	k.UpdateAtomPrice(ctx)
@@ -58,7 +58,7 @@ func (k Keeper) BurnUsq(goCtx context.Context, msg *types.MsgBurnUsq) (*types.Ms
 		),
 	})
 
-	return &types.MsgBurnUsqResponse{
+	return &types.MsgBurnResponse{
 		Creator:   msg.Creator,
 		AmountInt: msg.Amount,
 		AmountOut: amountOut.String(),

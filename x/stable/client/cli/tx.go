@@ -45,8 +45,8 @@ func GetTxCmd() *cobra.Command {
 
 func CmdMintUsq() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "mint-usq [amount]",
-		Short: "Broadcast message mint-usq",
+		Use:   "mint [amount]",
+		Short: "Broadcast message mint",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			argAmount := args[0]
@@ -56,7 +56,7 @@ func CmdMintUsq() *cobra.Command {
 				return err
 			}
 
-			msg := types.NewMsgMintUsq(
+			msg := types.NewMsgMint(
 				clientCtx.GetFromAddress().String(),
 				argAmount,
 			)
@@ -74,8 +74,8 @@ func CmdMintUsq() *cobra.Command {
 
 func CmdBurnUsq() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "burn-usq [amount]",
-		Short: "Broadcast message burn-usq",
+		Use:   "burn [amount]",
+		Short: "Broadcast message burn",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			argAmount := args[0]
@@ -85,7 +85,7 @@ func CmdBurnUsq() *cobra.Command {
 				return err
 			}
 
-			msg := types.NewMsgBurnUsq(
+			msg := types.NewMsgBurn(
 				clientCtx.GetFromAddress().String(),
 				argAmount,
 			)

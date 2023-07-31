@@ -30,7 +30,7 @@ func TestMsgMintUsq(t *testing.T) {
 	}
 
 	for _, tc := range tests {
-		msg := types.NewMsgMintUsq(tc.addr.String(), tc.amount.String())
+		msg := types.NewMsgMint(tc.addr.String(), tc.amount.String())
 		if tc.expectedErr == "" {
 			require.Nil(t, msg.ValidateBasic())
 		} else {
@@ -61,7 +61,7 @@ func TestMsgBurnUsq(t *testing.T) {
 	}
 
 	for _, tc := range tests {
-		msg := types.NewMsgBurnUsq(tc.addr.String(), tc.amount.String())
+		msg := types.NewMsgBurn(tc.addr.String(), tc.amount.String())
 		if tc.expectedErr == "" {
 			require.Nil(t, msg.ValidateBasic())
 		} else {

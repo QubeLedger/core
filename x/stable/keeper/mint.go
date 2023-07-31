@@ -6,7 +6,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-func (k Keeper) ExecuteMint(ctx sdk.Context, msg *types.MsgMintUsq, atomPrice sdk.Int) (error, sdk.Coin) {
+func (k Keeper) ExecuteMint(ctx sdk.Context, msg *types.MsgMint, atomPrice sdk.Int) (error, sdk.Coin) {
 	// GMD math logic
 
 	qm := k.GetStablecoinSupply(ctx)

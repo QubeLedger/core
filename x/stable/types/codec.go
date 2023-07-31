@@ -8,17 +8,17 @@ import (
 )
 
 func RegisterCodec(cdc *codec.LegacyAmino) {
-	cdc.RegisterConcrete(&MsgMintUsq{}, "stable/MintUsq", nil)
-	cdc.RegisterConcrete(&MsgBurnUsq{}, "stable/BurnUsq", nil)
+	cdc.RegisterConcrete(&MsgMint{}, "stable/Mint", nil)
+	cdc.RegisterConcrete(&MsgBurn{}, "stable/Burn", nil)
 	// this line is used by starport scaffolding # 2
 }
 
 func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
 	registry.RegisterImplementations((*sdk.Msg)(nil),
-		&MsgMintUsq{},
+		&MsgMint{},
 	)
 	registry.RegisterImplementations((*sdk.Msg)(nil),
-		&MsgBurnUsq{},
+		&MsgBurn{},
 	)
 	// this line is used by starport scaffolding # 3
 

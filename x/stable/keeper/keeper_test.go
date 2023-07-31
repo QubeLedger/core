@@ -59,15 +59,15 @@ func (suite *StableKeeperTestSuite) GetBackingRatio() int64 {
 	return backing_ratio.Int64()
 }
 
-func (suite *StableKeeperTestSuite) MintUsq(amount int64) error {
+func (suite *StableKeeperTestSuite) MintStable(amount int64) error {
 	suite.app.StableKeeper.SetBaseTokenDenom(suite.ctx, "uatom")
 	suite.app.StableKeeper.UpdateAtomPriceTesting(suite.ctx, sdk.NewInt(95000))
-	msg := types.NewMsgMintUsq(
+	msg := types.NewMsgMint(
 		suite.Address.String(),
 		sdk.NewInt(amount).String()+"uatom",
 	)
 	ctx := sdk.WrapSDKContext(suite.ctx)
-	_, err := suite.app.StableKeeper.MintUsq(ctx, msg)
+	_, err := suite.app.StableKeeper.Mint(ctx, msg)
 	if err != nil {
 		return err
 	}

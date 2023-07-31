@@ -6,7 +6,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-func (k Keeper) ExecuteBurn(ctx sdk.Context, msg *types.MsgBurnUsq, atomPrice sdk.Int) (error, sdk.Coin) {
+func (k Keeper) ExecuteBurn(ctx sdk.Context, msg *types.MsgBurn, atomPrice sdk.Int) (error, sdk.Coin) {
 	qm := k.GetStablecoinSupply(ctx)
 	ar := k.GetAtomReserve(ctx)
 

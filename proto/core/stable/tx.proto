@@ -6,26 +6,26 @@ option go_package = "github.com/QuadrateOrg/core/x/stable/types";
 
 // Msg defines the Msg service.
 service Msg {
-  rpc MintUsq (MsgMintUsq) returns (MsgMintUsqResponse);
-  rpc BurnUsq (MsgBurnUsq) returns (MsgBurnUsqResponse);
+  rpc Mint (MsgMint) returns (MsgMintResponse);
+  rpc Burn (MsgBurn) returns (MsgBurnResponse);
 }
-message MsgMintUsq {
+message MsgMint {
   string creator = 1;
   string amount  = 2;
 }
 
-message MsgMintUsqResponse {
+message MsgMintResponse {
   string creator = 1;
   string amountInt = 2;
   string amountOut = 3;
 }
 
-message MsgBurnUsq {
+message MsgBurn {
   string creator = 1;
   string amount  = 2;
 }
 
-message MsgBurnUsqResponse {
+message MsgBurnResponse {
   string creator = 1;
   string amountInt = 2;
   string amountOut = 3;
