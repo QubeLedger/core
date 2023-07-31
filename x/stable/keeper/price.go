@@ -36,8 +36,12 @@ func (k Keeper) UpdateAtomPriceTesting(ctx sdk.Context, price sdk.Int) error {
 	return nil
 }
 
-func (k Keeper) GetAtomPrice(ctx sdk.Context) sdk.Int {
-	return AtomPrice
+func (k Keeper) GetAtomPrice(ctx sdk.Context) (sdk.Int, error) {
+	err := k.UpdateAtomPrice(ctx)
+	if err != nil {
+		return sdk.Int{}, err
+	}
+	return AtomPrice, err
 }
 
 func (k Keeper) SetTestingMode(value bool) {

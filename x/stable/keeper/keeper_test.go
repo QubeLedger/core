@@ -49,7 +49,7 @@ func (suite *StableKeeperTestSuite) IncreaseBalance(address sdk.AccAddress, deno
 }
 
 func (suite *StableKeeperTestSuite) GetBackingRatio() int64 {
-	atomPrice := suite.app.StableKeeper.GetAtomPrice(suite.ctx)
+	atomPrice, _ := suite.app.StableKeeper.GetAtomPrice(suite.ctx)
 	qm := suite.app.StableKeeper.GetStablecoinSupply(suite.ctx)
 	ar := suite.app.StableKeeper.GetAtomReserve(suite.ctx)
 	backing_ratio, err := gmd.CalculateBackingRatio(atomPrice, ar, qm)

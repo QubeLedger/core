@@ -12,10 +12,7 @@ var _ types.MsgServer = Keeper{}
 func (k Keeper) Mint(goCtx context.Context, msg *types.MsgMint) (*types.MsgMintResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	k.UpdateAtomPrice(ctx)
-	atomPrice := k.GetAtomPrice(ctx)
-
-	err, amountOut := k.ExecuteMint(ctx, msg, atomPrice)
+	err, amountOut := k.ExecuteMint(ctx, msg)
 
 	if err != nil {
 		return nil, err
@@ -40,10 +37,7 @@ func (k Keeper) Mint(goCtx context.Context, msg *types.MsgMint) (*types.MsgMintR
 func (k Keeper) Burn(goCtx context.Context, msg *types.MsgBurn) (*types.MsgBurnResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	k.UpdateAtomPrice(ctx)
-	atomPrice := k.GetAtomPrice(ctx)
-
-	err, amountOut := k.ExecuteBurn(ctx, msg, atomPrice)
+	err, amountOut := k.ExecuteBurn(ctx, msg)
 
 	if err != nil {
 		return nil, err

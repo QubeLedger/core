@@ -6,103 +6,105 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-func (k Keeper) ExecuteMint(ctx sdk.Context, msg *types.MsgMint, atomPrice sdk.Int) (error, sdk.Coin) {
-	// GMD math logic
+var (
+	backing_ratio sdk.Int
+	err           error
+)
 
-	qm := k.GetStablecoinSupply(ctx)
-	ar := k.GetAtomReserve(ctx)
+func (k Keeper) ExecuteMint(ctx sdk.Context, msg *types.MsgMint) (error, sdk.Coin) {
 
-	if qm.IsNil() && ar.IsNil() {
-		k.InitAtomReserve(ctx)
-		k.InitStablecoinSupply(ctx)
-	}
-
-	qm = k.GetStablecoinSupply(ctx)
-	ar = k.GetAtomReserve(ctx)
-
-	var backing_ratio sdk.Int
-	var err error
-	if qm.IsZero() && ar.IsZero() {
-		backing_ratio = sdk.NewInt(100)
-	} else {
-		backing_ratio, err = gmd.CalculateBackingRatio(atomPrice, ar, qm)
-		if err != nil {
-			return err, sdk.Coin{}
-		}
-		if backing_ratio.IsNil() {
-			return types.ErrSdkIntError, sdk.Coin{}
-		}
-	}
-
-	mintingFee, allow, err := gmd.CalculateMintingFee(backing_ratio)
+	atomPrice, err := k.GetAtomPrice(ctx)
 
 	if err != nil {
 		return err, sdk.Coin{}
 	}
 
+	qm, ar := k.GetReserve(ctx)
+
+	backing_ratio, err = CalculateBackingRatio(qm, ar, atomPrice)
+	if err != nil {
+		return err, sdk.Coin{}
+	}
+
+	mintingFee, allow, err := gmd.CalculateMintingFee(backing_ratio)
+	if err != nil {
+		return err, sdk.Coin{}
+	}
 	if !allow {
 		return types.ErrMintBlocked, sdk.Coin{}
 	}
 
-	creator, err := sdk.AccAddressFromBech32(msg.Creator)
+	sender, err := sdk.AccAddressFromBech32(msg.Creator)
 	if err != nil {
 		panic(err)
 	}
-	amount, err := sdk.ParseCoinsNormalized(msg.Amount)
+	amountIntCoin, err := sdk.ParseCoinsNormalized(msg.Amount)
 	if err != nil {
 		return err, sdk.Coin{}
 	}
 
 	// TODO
-	if amount.Len() != 1 {
+	// Verification of denom and number of coins
+	if amountIntCoin.Len() != 1 {
 		return types.ErrSend1Token, sdk.Coin{}
 	}
-
-	// TODO
-	if amount.GetDenomByIndex(0) != BaseTokenDenom {
+	if amountIntCoin.GetDenomByIndex(0) != BaseTokenDenom {
 		return types.ErrSendBaseTokenDenom, sdk.Coin{}
 	}
 
-	ibcBaseTokenDenomAmount := amount.AmountOf(BaseTokenDenom)
-
-	sdkError := k.bankKeeper.SendCoinsFromAccountToModule(ctx, creator, types.ModuleName, amount)
-	if sdkError != nil {
-		return sdkError, sdk.Coin{}
+	amountInt := amountIntCoin.AmountOf(BaseTokenDenom)
+	err = k.bankKeeper.SendCoinsFromAccountToModule(ctx, sender, types.ModuleName, amountIntCoin)
+	if err != nil {
+		return err, sdk.Coin{}
 	}
-	//((atom * price) - (((atom * price) * fee) / 1000)) / 10000
-	amountUsqToMint := k.CalculateAmountUsqToMint(ibcBaseTokenDenomAmount, atomPrice, mintingFee)
 
-	if amountUsqToMint.IsNil() {
+	amountOutToMint := k.CalculateAmountToMint(amountInt, atomPrice, mintingFee)
+	if amountOutToMint.IsNil() {
 		return types.ErrSdkIntError, sdk.Coin{}
 	}
 
-	k.IncreaseAtomReserve(ctx, amount.AmountOf(BaseTokenDenom))
-	k.IncreaseStablecoinSupply(ctx, amountUsqToMint)
+	err = k.IncreaseReserve(ctx, amountInt, amountOutToMint)
+	if err != nil {
+		return err, sdk.Coin{}
+	}
 
-	uusd := sdk.NewCoin(SendTokenDenom, amountUsqToMint)
-	err = k.bankKeeper.MintCoins(ctx, types.ModuleName, sdk.NewCoins(uusd))
+	amountOut := sdk.NewCoin(SendTokenDenom, amountOutToMint)
+	err = k.bankKeeper.MintCoins(ctx, types.ModuleName, sdk.NewCoins(amountOut))
 	if err != nil {
 		return err, sdk.Coin{}
 	}
 
 	if !mintingFee.IsZero() {
-		// (((atom * price) * fee) / 1000) / 10000
-		feeForStabilityFund := k.CalculateMintingFeeForStabilityFund(ibcBaseTokenDenomAmount, atomPrice, mintingFee)
-		atomFeeForStabilityFund := sdk.NewCoin(amount.GetDenomByIndex(0), feeForStabilityFund)
-		err = k.bankKeeper.MintCoins(ctx, types.ModuleName, sdk.NewCoins(atomFeeForStabilityFund))
+		feeForStabilityFund := k.CalculateMintingFeeForStabilityFund(amountInt, atomPrice, mintingFee)
+		err = k.bankKeeper.MintCoins(ctx, types.ModuleName, types.CreateCoins(BaseTokenDenom, feeForStabilityFund))
 		if err != nil {
 			return err, sdk.Coin{}
 		}
-		err = k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, StabilityFundAddress, sdk.NewCoins(atomFeeForStabilityFund))
+		err = k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, StabilityFundAddress, types.CreateCoins(BaseTokenDenom, feeForStabilityFund))
 		if err != nil {
 			return err, sdk.Coin{}
 		}
 	}
 
-	err = k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, creator, sdk.NewCoins(uusd))
+	err = k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, sender, sdk.NewCoins(amountOut))
 	if err != nil {
 		return err, sdk.Coin{}
 	}
 
-	return nil, uusd
+	return nil, amountOut
+}
+
+func CalculateBackingRatio(qm sdk.Int, ar sdk.Int, atomPrice sdk.Int) (sdk.Int, error) {
+	if qm.IsZero() && ar.IsZero() {
+		backing_ratio = sdk.NewInt(100)
+	} else {
+		backing_ratio, err = gmd.CalculateBackingRatio(atomPrice, ar, qm)
+		if err != nil {
+			return sdk.Int{}, err
+		}
+		if backing_ratio.IsNil() {
+			return sdk.Int{}, types.ErrSdkIntError
+		}
+	}
+	return backing_ratio, nil
 }
