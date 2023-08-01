@@ -14,7 +14,6 @@ var (
 func (k Keeper) ExecuteMint(ctx sdk.Context, msg *types.MsgMint) (error, sdk.Coin) {
 
 	atomPrice, err := k.GetAtomPrice(ctx)
-
 	if err != nil {
 		return err, sdk.Coin{}
 	}
@@ -26,34 +25,28 @@ func (k Keeper) ExecuteMint(ctx sdk.Context, msg *types.MsgMint) (error, sdk.Coi
 		return err, sdk.Coin{}
 	}
 
-	mintingFee, allow, err := gmd.CalculateMintingFee(backing_ratio)
+	mintingFee, err := gmd.CalculateMintingFee(backing_ratio)
 	if err != nil {
 		return err, sdk.Coin{}
-	}
-	if !allow {
-		return types.ErrMintBlocked, sdk.Coin{}
 	}
 
 	sender, err := sdk.AccAddressFromBech32(msg.Creator)
 	if err != nil {
 		panic(err)
 	}
-	amountIntCoin, err := sdk.ParseCoinsNormalized(msg.Amount)
+
+	amountIntCoins, err := sdk.ParseCoinsNormalized(msg.Amount)
 	if err != nil {
 		return err, sdk.Coin{}
 	}
 
-	// TODO
-	// Verification of denom and number of coins
-	if amountIntCoin.Len() != 1 {
-		return types.ErrSend1Token, sdk.Coin{}
-	}
-	if amountIntCoin.GetDenomByIndex(0) != BaseTokenDenom {
-		return types.ErrSendBaseTokenDenom, sdk.Coin{}
+	err = VerificationDenomCoins(amountIntCoins)
+	if err != nil {
+		return err, sdk.Coin{}
 	}
 
-	amountInt := amountIntCoin.AmountOf(BaseTokenDenom)
-	err = k.bankKeeper.SendCoinsFromAccountToModule(ctx, sender, types.ModuleName, amountIntCoin)
+	amountInt := amountIntCoins.AmountOf(BaseTokenDenom)
+	err = k.bankKeeper.SendCoinsFromAccountToModule(ctx, sender, types.ModuleName, amountIntCoins)
 	if err != nil {
 		return err, sdk.Coin{}
 	}
@@ -92,19 +85,4 @@ func (k Keeper) ExecuteMint(ctx sdk.Context, msg *types.MsgMint) (error, sdk.Coi
 	}
 
 	return nil, amountOut
-}
-
-func CalculateBackingRatio(qm sdk.Int, ar sdk.Int, atomPrice sdk.Int) (sdk.Int, error) {
-	if qm.IsZero() && ar.IsZero() {
-		backing_ratio = sdk.NewInt(100)
-	} else {
-		backing_ratio, err = gmd.CalculateBackingRatio(atomPrice, ar, qm)
-		if err != nil {
-			return sdk.Int{}, err
-		}
-		if backing_ratio.IsNil() {
-			return sdk.Int{}, types.ErrSdkIntError
-		}
-	}
-	return backing_ratio, nil
 }

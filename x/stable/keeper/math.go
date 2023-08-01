@@ -14,12 +14,10 @@ func (k Keeper) CalculateMintingFeeForStabilityFund(ibcBaseTokenDenomAmount sdk.
 }
 
 func (k Keeper) CalculateAmountToSend(uusdTokenAmount sdk.Int, atomPrice sdk.Int, burningFee sdk.Int) sdk.Int {
-	//  (( ((uusd * 1000000000) / price) ) - ( ( ((uusd * 1000000000) / price) ) * fee) / 1000 ) / 100000
 	fee := (((uusdTokenAmount.Mul(types.BurnUsqMultiplier)).Quo(atomPrice)).Mul(burningFee)).Quo(types.MintUsqMultiplier)
 	return (((uusdTokenAmount.Mul(types.BurnUsqMultiplier)).Quo(atomPrice)).Sub(fee)).Quo(types.FeeMultiplier)
 }
 
 func (k Keeper) CalculateBurningFeeForStabilityFund(uusdTokenAmount sdk.Int, atomPrice sdk.Int, burningFee sdk.Int) sdk.Int {
-	// ((((uusd * 1000000000) / price) * fee) / 1000) / 100000
 	return ((((uusdTokenAmount.Mul(types.BurnUsqMultiplier)).Quo(atomPrice)).Mul(burningFee)).Quo(types.MintUsqMultiplier)).Quo(types.FeeMultiplier)
 }

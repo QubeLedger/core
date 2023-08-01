@@ -63,46 +63,37 @@ func TestCalculateMintingFee(t *testing.T) {
 	tests := []struct {
 		backing_ratio sdk.Int
 		expectedRes   int64
-		expectedAllow bool
 		expectedErr   bool
 	}{
 		{
 			sdk.NewInt(100),
 			3,
-			true,
 			false,
 		},
 		{
 			sdk.NewInt(121),
 			0,
-			false,
-			false,
+			true,
 		},
 		{
 			sdk.NewInt(84),
 			0,
-			true,
 			false,
 		},
 		{
 			sdk.Int{},
 			0,
-			false,
 			true,
 		},
 	}
 
 	for _, tc := range tests {
-		fee, allow, err := gmb.CalculateMintingFee(tc.backing_ratio)
+		fee, err := gmb.CalculateMintingFee(tc.backing_ratio)
 
 		if tc.expectedErr {
 			require.Error(t, err)
 		} else {
 			require.NoError(t, err)
-		}
-
-		if tc.expectedAllow {
-			require.Equal(t, true, allow)
 			require.Equal(t, tc.expectedRes, fee.Int64())
 		}
 	}
@@ -112,46 +103,37 @@ func TestCalculateBurningFee(t *testing.T) {
 	tests := []struct {
 		backing_ratio sdk.Int
 		expectedRes   int64
-		expectedAllow bool
 		expectedErr   bool
 	}{
 		{
 			sdk.NewInt(100),
 			3,
-			true,
 			false,
 		},
 		{
 			sdk.NewInt(121),
 			0,
-			true,
 			false,
 		},
 		{
 			sdk.NewInt(84),
 			0,
-			false,
-			false,
+			true,
 		},
 		{
 			sdk.Int{},
 			0,
-			false,
 			true,
 		},
 	}
 
 	for _, tc := range tests {
-		fee, allow, err := gmb.CalculateBurningFee(tc.backing_ratio)
+		fee, err := gmb.CalculateBurningFee(tc.backing_ratio)
 
 		if tc.expectedErr {
 			require.Error(t, err)
 		} else {
 			require.NoError(t, err)
-		}
-
-		if tc.expectedAllow {
-			require.Equal(t, true, allow)
 			require.Equal(t, tc.expectedRes, fee.Int64())
 		}
 	}

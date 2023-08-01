@@ -20,12 +20,9 @@ func (k Keeper) ExecuteBurn(ctx sdk.Context, msg *types.MsgBurn) (error, sdk.Coi
 		return err, sdk.Coin{}
 	}
 
-	burningFee, allow, err := gmd.CalculateBurningFee(backing_ratio)
+	burningFee, err := gmd.CalculateBurningFee(backing_ratio)
 	if err != nil {
 		return err, sdk.Coin{}
-	}
-	if !allow {
-		return types.ErrBurnBlocked, sdk.Coin{}
 	}
 
 	sender, err := sdk.AccAddressFromBech32(msg.Creator)
@@ -37,13 +34,9 @@ func (k Keeper) ExecuteBurn(ctx sdk.Context, msg *types.MsgBurn) (error, sdk.Coi
 		return err, sdk.Coin{}
 	}
 
-	// TODO
-	// Verification of denom and number of coins
-	if amountIntCoins.Len() != 1 {
-		return types.ErrSend1Token, sdk.Coin{}
-	}
-	if amountIntCoins.GetDenomByIndex(0) != SendTokenDenom {
-		return types.ErrSendBaseTokenDenom, sdk.Coin{}
+	err = VerificationDenomCoins(amountIntCoins)
+	if err != nil {
+		return err, sdk.Coin{}
 	}
 
 	amountInt := amountIntCoins.AmountOf(SendTokenDenom)
