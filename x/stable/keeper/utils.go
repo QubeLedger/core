@@ -21,7 +21,7 @@ func CalculateBackingRatio(qm sdk.Int, ar sdk.Int, atomPrice sdk.Int) (sdk.Int, 
 	return backing_ratio, nil
 }
 
-func VerificationDenomCoins(coins sdk.Coins) error {
+func VerificationBaseDenomCoins(coins sdk.Coins) error {
 	// TODO
 	// Verification of denom and number of coins
 	if coins.Len() != 1 {
@@ -29,6 +29,18 @@ func VerificationDenomCoins(coins sdk.Coins) error {
 	}
 	if coins.GetDenomByIndex(0) != BaseTokenDenom {
 		return types.ErrSendBaseTokenDenom
+	}
+	return nil
+}
+
+func VerificationSendDenomCoins(coins sdk.Coins) error {
+	// TODO
+	// Verification of denom and number of coins
+	if coins.Len() != 1 {
+		return types.ErrMultipleCoinsLockupNotSupported
+	}
+	if coins.GetDenomByIndex(0) != SendTokenDenom {
+		return types.ErrSendSendTokenDenom
 	}
 	return nil
 }

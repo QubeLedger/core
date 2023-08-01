@@ -34,7 +34,7 @@ func (k Keeper) ExecuteBurn(ctx sdk.Context, msg *types.MsgBurn) (error, sdk.Coi
 		return err, sdk.Coin{}
 	}
 
-	err = VerificationDenomCoins(amountIntCoins)
+	err = VerificationSendDenomCoins(amountIntCoins)
 	if err != nil {
 		return err, sdk.Coin{}
 	}

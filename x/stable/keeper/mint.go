@@ -32,7 +32,7 @@ func (k Keeper) ExecuteMint(ctx sdk.Context, msg *types.MsgMint) (error, sdk.Coi
 
 	sender, err := sdk.AccAddressFromBech32(msg.Creator)
 	if err != nil {
-		panic(err)
+		return err, sdk.Coin{}
 	}
 
 	amountIntCoins, err := sdk.ParseCoinsNormalized(msg.Amount)
@@ -40,7 +40,7 @@ func (k Keeper) ExecuteMint(ctx sdk.Context, msg *types.MsgMint) (error, sdk.Coi
 		return err, sdk.Coin{}
 	}
 
-	err = VerificationDenomCoins(amountIntCoins)
+	err = VerificationBaseDenomCoins(amountIntCoins)
 	if err != nil {
 		return err, sdk.Coin{}
 	}

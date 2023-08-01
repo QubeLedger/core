@@ -25,6 +25,7 @@ var (
 	ErrAtomPriceNil                    = sdkerrors.Register(ModuleName, 1000, "ErrAtomPriceNil err")
 	ErrMultipleCoinsLockupNotSupported = sdkerrors.Register(ModuleName, 1600, "ErrMultipleCoinsLockupNotSupported multiple coins lockup is not supported")
 	ErrSendBaseTokenDenom              = sdkerrors.Register(ModuleName, 1601, "ErrSendBaseTokenDenom err")
+	ErrSendSendTokenDenom              = sdkerrors.Register(ModuleName, 1602, "ErrSendSendTokenDenom err")
 )
 
 var (
