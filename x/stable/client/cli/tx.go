@@ -18,12 +18,7 @@ import (
 )
 
 var (
-	DefaultRelativePacketTimeoutTimestamp = uint64((time.Duration(10) * time.Minute).Nanoseconds())
-)
-
-const (
-	flagPacketTimeoutTimestamp = "packet-timeout-timestamp"
-	listSeparator              = ","
+	DefaultRelativePacketTimeoutTimestamp = uint64((time.Duration(10) * time.Minute).Nanoseconds()) // #nosec
 )
 
 // GetTxCmd returns the transaction commands for this module
@@ -140,6 +135,9 @@ func NewRegisterChangeBaseTokenDenomProposalCmd() *cobra.Command {
 			content := types.NewRegisterChangeBaseTokenDenomProposal(title, description, metadata)
 
 			msg, err := govtypes.NewMsgSubmitProposal(content, deposit, from)
+			if err != nil {
+				return err
+			}
 
 			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
 		},
@@ -199,7 +197,9 @@ func NewRegisterChangeSendTokenDenomProposalCmd() *cobra.Command {
 			content := types.NewRegisterChangeSendTokenDenomProposal(title, description, metadata)
 
 			msg, err := govtypes.NewMsgSubmitProposal(content, deposit, from)
-
+			if err != nil {
+				return err
+			}
 			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
 		},
 	}

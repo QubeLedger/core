@@ -7,8 +7,14 @@ func (k Keeper) GetReserve(ctx sdk.Context) (sdk.Int, sdk.Int) {
 	ar := k.GetAtomReserve(ctx)
 
 	if qm.IsNil() && ar.IsNil() {
-		k.InitAtomReserve(ctx)
-		k.InitStablecoinSupply(ctx)
+		err := k.InitAtomReserve(ctx) // #nosec
+		if err != nil {
+			panic(err)
+		}
+		err = k.InitStablecoinSupply(ctx) // #nosec
+		if err != nil {
+			panic(err)
+		}
 	}
 
 	qm = k.GetStablecoinSupply(ctx)

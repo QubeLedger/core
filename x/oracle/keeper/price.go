@@ -139,7 +139,7 @@ func (k Keeper) GetTokensActualPriceInt(ctx sdk.Context) (sdk.Int, sdk.Int, erro
 
 	if value, err := jsonparser.GetString(body, "data", "rates", "USD"); err == nil {
 		atomPriceFloat, _ = strconv.ParseFloat(value, 64)
-		atomPrice = int64(atomPriceFloat * 10000)
+		atomPrice = int64(atomPriceFloat * 10000) // #nosec
 	} else {
 		return sdk.Int{}, sdk.Int{}, err
 	}
@@ -147,7 +147,7 @@ func (k Keeper) GetTokensActualPriceInt(ctx sdk.Context) (sdk.Int, sdk.Int, erro
 	if value, err := jsonparser.GetString(body1, "host_zone", "redemption_rate"); err == nil {
 		redemption_rate, _ := strconv.ParseFloat(value, 64)
 		priceStAtom := atomPriceFloat * redemption_rate
-		statomPrice = int64(priceStAtom * 10000)
+		statomPrice = int64(priceStAtom * 10000) // #nosec
 	} else {
 		return sdk.Int{}, sdk.Int{}, err
 	}

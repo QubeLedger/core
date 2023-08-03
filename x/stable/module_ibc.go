@@ -134,6 +134,8 @@ func (im IBCModule) OnChanCloseConfirm(
 }
 
 // OnRecvPacket implements the IBCModule interface
+//
+//nolint:all
 func (im IBCModule) OnRecvPacket(
 	ctx sdk.Context,
 	modulePacket channeltypes.Packet,
@@ -160,6 +162,8 @@ func (im IBCModule) OnRecvPacket(
 }
 
 // OnAcknowledgementPacket implements the IBCModule interface
+//
+//nolint:all
 func (im IBCModule) OnAcknowledgementPacket(
 	ctx sdk.Context,
 	modulePacket channeltypes.Packet,
@@ -217,6 +221,8 @@ func (im IBCModule) OnAcknowledgementPacket(
 }
 
 // OnTimeoutPacket implements the IBCModule interface
+//
+//nolint:all
 func (im IBCModule) OnTimeoutPacket(
 	ctx sdk.Context,
 	modulePacket channeltypes.Packet,
