@@ -52,7 +52,7 @@ func NewRootCmd() (*cobra.Command, params.EncodingConfig) {
 		WithViper("quadrate")
 
 	rootCmd := &cobra.Command{
-		Use:   "quadrated",
+		Use:   "qubed",
 		Short: "quadrate App",
 		PersistentPreRunE: func(cmd *cobra.Command, _ []string) error {
 			cmd.SetOut(cmd.OutOrStdout())

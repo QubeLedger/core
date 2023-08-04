@@ -8,7 +8,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	app "github.com/QuadrateOrg/core/app"
-	"github.com/QuadrateOrg/core/cmd/quadrated/cmd"
+	"github.com/QuadrateOrg/core/cmd/qubed/cmd"
 	"github.com/QuadrateOrg/core/types"
 )
 

@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	app "github.com/QuadrateOrg/core/app"
-	"github.com/QuadrateOrg/core/cmd/quadrated/cmd"
+	"github.com/QuadrateOrg/core/cmd/qubed/cmd"
 )
 
 func TestRootCmdConfig(t *testing.T) {

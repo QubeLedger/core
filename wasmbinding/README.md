@@ -23,13 +23,13 @@ This package allows for custom queries and custom messages sends from contract.
 - Commands
 
 ```sh
-  quadrated tx wasm -h
+  qubed tx wasm -h
 ```
 
 - Query
 
 ```sh
-  quadrated q wasm -h
+  qubed q wasm -h
 ```
 
 ## Tests
