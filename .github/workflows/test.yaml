@@ -18,7 +18,7 @@ jobs:
       - name: Build
         run: |
           go mod tidy
-          go build ./cmd/quadrated/
+          go build ./cmd/qubed/
 
       - name: Rux x/ tests
         run: go test -v -tags='ledger test_ledger_mock' ./x/...

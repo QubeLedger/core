@@ -60,8 +60,8 @@ build_tags_comma_sep := $(subst $(whitespace),$(comma),$(build_tags))
 
 # process linker flags
 
-ldflags = -X github.com/cosmos/cosmos-sdk/version.Name=quadrate \
-		  -X github.com/cosmos/cosmos-sdk/version.AppName=quadrated \
+ldflags = -X github.com/cosmos/cosmos-sdk/version.Name=qube \
+		  -X github.com/cosmos/cosmos-sdk/version.AppName=qubed \
 		  -X github.com/cosmos/cosmos-sdk/version.Version=$(VERSION) \
 		  -X github.com/cosmos/cosmos-sdk/version.Commit=$(COMMIT) \
 		  -X "github.com/cosmos/cosmos-sdk/version.BuildTags=$(build_tags_comma_sep)" \
@@ -113,26 +113,26 @@ build: go.sum
 ifeq ($(OS),Windows_NT)
 	exit 1
 else
-	go build $(BUILD_FLAGS) ./cmd/quadrated
+	go build $(BUILD_FLAGS) ./cmd/qubed
 endif
 
 build-linux:
 	mkdir -p $(BUILDDIR)
 	docker build --no-cache --tag quadrate/core ./
 	docker create --name temp quadrate/core:latest
-	docker cp temp:/usr/local/bin/quadrated $(BUILDDIR)/
+	docker cp temp:/usr/local/bin/qubed $(BUILDDIR)/
 	docker rm temp
 
 build-linux-with-shared-library:
 	mkdir -p $(BUILDDIR)
 	docker build --tag quadrate/core-shared ./ -f ./shared.Dockerfile
 	docker create --name temp quadrate/core-shared:latest
-	docker cp temp:/usr/local/bin/quadrated $(BUILDDIR)/
+	docker cp temp:/usr/local/bin/qubed $(BUILDDIR)/
 	docker cp temp:/lib/libwasmvm.so $(BUILDDIR)/
 	docker rm temp
 
 install: go.sum 
-	go build $(BUILD_FLAGS) ./cmd/quadrated
+	go build $(BUILD_FLAGS) ./cmd/qubed
 
 update-swagger-docs: statik
 	$(BINDIR)/statik -src=client/docs/swagger-ui -dest=client/docs -f -m
@@ -177,7 +177,7 @@ go.sum: go.mod
 draw-deps:
 	@# requires brew install graphviz or apt-get install graphviz
 	go get github.com/RobotsAndPencils/goviz
-	@goviz -i ./cmd/quadrated -d 2 | dot -Tpng -o dependency-graph.png
+	@goviz -i ./cmd/qubed -d 2 | dot -Tpng -o dependency-graph.png
 
 distclean: clean tools-clean
 clean:
