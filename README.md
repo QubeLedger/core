@@ -1,5 +1,5 @@
 <div align="center">
-  <h1> Quadrate </h1>
+  <h1> Qube </h1>
   <p> Cosmos SDK L1 blockchain, built for decentralized, trust-free, stable economy </p>
   <br/>
   
@@ -10,7 +10,7 @@
   [![Telegram!](https://patrolavia.github.io/telegram-badge/follow.png)](https://t.me/QuadrateOrg)
 </div>
 
-## Install quadrated
+## Install qubed
 ``` make install ```
 ## Start local node
 ``` ./init.sh ```
