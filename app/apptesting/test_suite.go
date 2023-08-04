@@ -5,7 +5,6 @@ import (
 
 	"github.com/QuadrateOrg/core/app"
 	quadrateapptest "github.com/QuadrateOrg/core/app/helpers"
-	"github.com/QuadrateOrg/core/x/erc20/types"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/simapp"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -23,21 +22,9 @@ type KeeperTestHelper struct {
 	TestAccs    []sdk.AccAddress
 }
 
-type Erc20GenesisTestSuite struct {
-	suite.Suite
-	_   sdk.Context
-	app *app.QuadrateApp
-	_   types.GenesisState
-}
-
-func (s *Erc20GenesisTestSuite) Setup() {
-	s.app = quadrateapptest.Setup(s.T(), "quadrate_5120-1", false, 1)
-
-}
-
 func (s *KeeperTestHelper) Setup() {
-	s.App = quadrateapptest.Setup(s.T(), "quadrate_5120-1", false, 1)
-	s.Ctx = s.App.BaseApp.NewContext(false, tmproto.Header{Height: 1, ChainID: "quadrate_5120-1", Time: time.Now().UTC()})
+	s.App = quadrateapptest.Setup(s.T(), "qube-1", false, 1)
+	s.Ctx = s.App.BaseApp.NewContext(false, tmproto.Header{Height: 1, ChainID: "qube-1", Time: time.Now().UTC()})
 	s.QueryHelper = &baseapp.QueryServiceTestHelper{
 		GRPCQueryRouter: s.App.GRPCQueryRouter(),
 		Ctx:             s.Ctx,

@@ -1,0 +1,12 @@
+syntax = "proto3";
+package core.stable;
+
+import "gogoproto/gogo.proto";
+
+option go_package = "github.com/QuadrateOrg/core/x/stable/types";
+
+// Params defines the parameters for the module.
+message Params {
+  option (gogoproto.goproto_stringer) = false;
+  
+}

@@ -112,6 +112,49 @@ func (k Keeper) GetTokensActualPrice(ctx sdk.Context) (string, string, error) {
 	return atomPriceString, statomPrice, nil
 }
 
+func (k Keeper) GetTokensActualPriceInt(ctx sdk.Context) (sdk.Int, sdk.Int, error) {
+
+	var atomPriceFloat float64
+	var atomPrice int64
+	var statomPrice int64
+
+	tr := &http.Transport{
+		MaxIdleConns:       10,
+		IdleConnTimeout:    30 * time.Second,
+		DisableCompression: true,
+	}
+	client := &http.Client{Transport: tr}
+
+	res, err := client.Get("https://api.coinbase.com/v2/exchange-rates?currency=ATOM")
+	if err != nil {
+		return sdk.Int{}, sdk.Int{}, err
+	}
+	body, _ := ioutil.ReadAll(res.Body)
+
+	res1, err := client.Get("https://stride-api.polkachu.com/Stride-Labs/stride/stakeibc/host_zone/cosmoshub-4")
+	if err != nil {
+		return sdk.Int{}, sdk.Int{}, err
+	}
+	body1, _ := ioutil.ReadAll(res1.Body)
+
+	if value, err := jsonparser.GetString(body, "data", "rates", "USD"); err == nil {
+		atomPriceFloat, _ = strconv.ParseFloat(value, 64)
+		atomPrice = int64(atomPriceFloat * 10000) // #nosec
+	} else {
+		return sdk.Int{}, sdk.Int{}, err
+	}
+
+	if value, err := jsonparser.GetString(body1, "host_zone", "redemption_rate"); err == nil {
+		redemption_rate, _ := strconv.ParseFloat(value, 64)
+		priceStAtom := atomPriceFloat * redemption_rate
+		statomPrice = int64(priceStAtom * 10000) // #nosec
+	} else {
+		return sdk.Int{}, sdk.Int{}, err
+	}
+
+	return sdk.NewInt(atomPrice), sdk.NewInt(statomPrice), nil
+}
+
 // GetPrice returns a price from its id
 func (k Keeper) GetPrice(ctx sdk.Context, id uint64) (val types.Price, found bool) {
 	atom, statom, err := k.GetTokensActualPrice(ctx)

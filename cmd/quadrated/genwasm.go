@@ -1,6 +1,6 @@
 package main
 
-import (
+/*import (
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/spf13/cobra"
 
@@ -10,13 +10,14 @@ import (
 // AddGenesisWasmMsgCmd add wasm genesis message
 func AddGenesisWasmMsgCmd(defaultNodeHome string) *cobra.Command {
 	txCmd := &cobra.Command{
-		Use:                        "add-wasm-genesis-message",
+		Use:                        "add-wasm-message",
 		Short:                      "Wasm genesis subcommands",
 		DisableFlagParsing:         true,
 		SuggestionsMinimumDistance: 2,
 		RunE:                       client.ValidateCmd,
 	}
 	genesisIO := wasmcli.NewDefaultGenesisIO()
+
 	txCmd.AddCommand(
 		wasmcli.GenesisStoreCodeCmd(defaultNodeHome, genesisIO),
 		wasmcli.GenesisInstantiateContractCmd(defaultNodeHome, genesisIO),
@@ -26,4 +27,4 @@ func AddGenesisWasmMsgCmd(defaultNodeHome string) *cobra.Command {
 	)
 
 	return txCmd
-}
+}*/

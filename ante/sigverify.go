@@ -12,21 +12,13 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/tx/signing"
 	authante "github.com/cosmos/cosmos-sdk/x/auth/ante"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
-
-	"github.com/evmos/ethermint/crypto/ethsecp256k1"
 )
 
 var _ authante.SignatureVerificationGasConsumer = SigVerificationGasConsumer
 
-const (
-	secp256k1VerifyCost uint64 = 21000
-)
-
 // SigVerificationGasConsumer consumes gas for signature verification based upon the public key type.
 // The cost is fetched from the given params and is matched by the concrete type.
 // The types of keys supported are:
-//
-// - ethsecp256k1 (Ethereum keys)
 //
 // - ed25519 (Validators)
 //
@@ -38,10 +30,6 @@ func SigVerificationGasConsumer(
 ) error {
 	pubkey := sig.PubKey
 	switch pubkey := pubkey.(type) {
-
-	case *ethsecp256k1.PubKey:
-		meter.ConsumeGas(secp256k1VerifyCost, "ante verify: eth_secp256k1")
-		return nil
 
 	case *ed25519.PubKey:
 		meter.ConsumeGas(params.SigVerifyCostED25519, "ante verify: ed25519")

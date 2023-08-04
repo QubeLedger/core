@@ -8,13 +8,7 @@ BUILDDIR ?= $(CURDIR)/build
 DOCKER := $(shell which docker)
 
 # don't override user values
-ifeq (,$(VERSION))
-  VERSION := $(shell git describe --tags)
-  # if VERSION is empty, then populate it with branch's name and raw commit hash
-  ifeq (,$(VERSION))
-    VERSION := $(BRANCH)-$(COMMIT)
-  endif
-endif
+VERSION = main
 
 TM_VERSION := $(shell go list -m github.com/tendermint/tendermint | sed 's:.* ::')
 
@@ -111,6 +105,10 @@ include contrib/devtools/Makefile
 
 all: tools install lint test
 
+###############################################################################
+###                                Build                                    ###
+###############################################################################
+
 build: go.sum
 ifeq ($(OS),Windows_NT)
 	exit 1
@@ -154,8 +152,10 @@ update-swagger-docs: statik
 proto-all: proto-swagger-gen proto-gen
 
 proto-gen:
-	@echo "Generating Protobuf files"
-	$(DOCKER) run --rm -v $(CURDIR):/workspace --workdir /workspace tendermintdev/sdk-proto-gen:v0.3 sh ./scripts/protocgen.sh
+	@echo "🤖 Generating code from protobuf..."
+	@$(DOCKER) run --rm --volume "$(PWD)":/workspace --workdir /workspace \
+		tendermintdev/sdk-proto-gen sh ./proto/generate.sh
+	@echo "✅ Completed code generation!"
 
 proto-swagger-gen:
 	@echo "Generating Swagger files"
