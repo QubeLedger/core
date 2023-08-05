@@ -40,12 +40,10 @@ func GetTxCmd() *cobra.Command {
 
 func CmdMintUsq() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "mint [amount]",
+		Use:   "mint [amount] [denom]",
 		Short: "Broadcast message mint",
-		Args:  cobra.ExactArgs(1),
+		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
-			argAmount := args[0]
-
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
@@ -53,7 +51,8 @@ func CmdMintUsq() *cobra.Command {
 
 			msg := types.NewMsgMint(
 				clientCtx.GetFromAddress().String(),
-				argAmount,
+				args[0],
+				args[1],
 			)
 			if err := msg.ValidateBasic(); err != nil {
 				return err
@@ -69,12 +68,10 @@ func CmdMintUsq() *cobra.Command {
 
 func CmdBurnUsq() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "burn [amount]",
+		Use:   "burn [amount] [denom]",
 		Short: "Broadcast message burn",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
-			argAmount := args[0]
-
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
@@ -82,7 +79,8 @@ func CmdBurnUsq() *cobra.Command {
 
 			msg := types.NewMsgBurn(
 				clientCtx.GetFromAddress().String(),
-				argAmount,
+				args[0],
+				args[1],
 			)
 			if err := msg.ValidateBasic(); err != nil {
 				return err

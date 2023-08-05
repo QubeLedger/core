@@ -1,17 +1,19 @@
 package keeper_test
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/QuadrateOrg/core/app"
 	apptesting "github.com/QuadrateOrg/core/app/apptesting"
 	quadrateapptest "github.com/QuadrateOrg/core/app/helpers"
-	gmd "github.com/QuadrateOrg/core/x/stable/gmb"
 	"github.com/QuadrateOrg/core/x/stable/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/stretchr/testify/suite"
+	"github.com/tendermint/tendermint/crypto"
 )
 
 type StableKeeperTestSuite struct {
@@ -43,28 +45,12 @@ func (suite *StableKeeperTestSuite) Commit() {
 	suite.ctx = suite.app.BaseApp.NewContext(false, header)
 }
 
-func (suite *StableKeeperTestSuite) IncreaseBalance(address sdk.AccAddress, denom string, amount sdk.Int) {
-	suite.app.BankKeeper.MintCoins(suite.ctx, types.ModuleName, sdk.NewCoins(sdk.NewCoin(denom, amount)))
-	suite.app.BankKeeper.SendCoinsFromModuleToAccount(suite.ctx, types.ModuleName, address, sdk.NewCoins(sdk.NewCoin("uatom", amount)))
-}
-
-func (suite *StableKeeperTestSuite) GetBackingRatio() int64 {
-	atomPrice, _ := suite.app.StableKeeper.GetAtomPrice(suite.ctx)
-	qm := suite.app.StableKeeper.GetStablecoinSupply(suite.ctx)
-	ar := suite.app.StableKeeper.GetAtomReserve(suite.ctx)
-	backing_ratio, err := gmd.CalculateBackingRatio(atomPrice, ar, qm)
-	if err != nil {
-		panic(err)
-	}
-	return backing_ratio.Int64()
-}
-
-func (suite *StableKeeperTestSuite) MintStable(amount int64) error {
-	suite.app.StableKeeper.SetBaseTokenDenom(suite.ctx, "uatom")
+func (suite *StableKeeperTestSuite) MintStable(amount int64, pair types.Pair) error {
 	suite.app.StableKeeper.UpdateAtomPriceTesting(suite.ctx, sdk.NewInt(95000))
 	msg := types.NewMsgMint(
 		suite.Address.String(),
-		sdk.NewInt(amount).String()+"uatom",
+		sdk.NewInt(amount).String()+pair.AmountInMetadata.Base,
+		pair.AmountOutMetadata.Base,
 	)
 	ctx := sdk.WrapSDKContext(suite.ctx)
 	_, err := suite.app.StableKeeper.Mint(ctx, msg)
@@ -72,4 +58,50 @@ func (suite *StableKeeperTestSuite) MintStable(amount int64) error {
 		return err
 	}
 	return nil
+}
+
+func (s *StableKeeperTestSuite) GetNormalPair(id uint64) types.Pair {
+	pair := types.Pair{
+		Id:     id,
+		PairId: fmt.Sprintf("%x", crypto.Sha256(append([]byte("uatom"+"uusd")))),
+		AmountInMetadata: banktypes.Metadata{
+			Description: "",
+			DenomUnits: []*banktypes.DenomUnit{
+				{Denom: "uatom", Exponent: uint32(0), Aliases: []string{"microatom"}},
+			},
+			Base:    "uatom",
+			Display: "atom",
+			Name:    "ATOM",
+			Symbol:  "ATOM",
+		},
+		AmountOutMetadata: banktypes.Metadata{
+			Description: "",
+			DenomUnits: []*banktypes.DenomUnit{
+				{Denom: "uusd", Exponent: uint32(0), Aliases: []string{"microusd"}},
+			},
+			Base:    "uusd",
+			Display: "usd",
+			Name:    "USQ",
+			Symbol:  "USQ",
+		},
+		Qm:           sdk.NewInt(0),
+		Ar:           sdk.NewInt(0),
+		MinAmountInt: "20uatom",
+	}
+
+	return pair
+}
+
+func (s *StableKeeperTestSuite) AddTestCoins(amount int64, denom string) {
+	s.app.BankKeeper.MintCoins(s.ctx, types.ModuleName, sdk.NewCoins(sdk.NewCoin(denom, sdk.NewInt(amount))))
+	s.app.BankKeeper.SendCoinsFromModuleToAccount(s.ctx, types.ModuleName, s.Address, sdk.NewCoins(sdk.NewCoin(denom, sdk.NewInt(amount))))
+}
+
+func (suite *StableKeeperTestSuite) IncreaseModuleBalance(amount int64, denom string) {
+	suite.app.BankKeeper.MintCoins(suite.ctx, types.ModuleName, sdk.NewCoins(sdk.NewCoin(denom, sdk.NewInt(amount))))
+}
+
+func (s *StableKeeperTestSuite) AddTestCoinsToAccount(amount int64, denom string, acc sdk.AccAddress) {
+	s.app.BankKeeper.MintCoins(s.ctx, types.ModuleName, sdk.NewCoins(sdk.NewCoin(denom, sdk.NewInt(amount))))
+	s.app.BankKeeper.SendCoinsFromModuleToAccount(s.ctx, types.ModuleName, acc, sdk.NewCoins(sdk.NewCoin(denom, sdk.NewInt(amount))))
 }

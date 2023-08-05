@@ -12,8 +12,13 @@ var _ types.MsgServer = Keeper{}
 func (k Keeper) Mint(goCtx context.Context, msg *types.MsgMint) (*types.MsgMintResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	err, amountOut := k.ExecuteMint(ctx, msg)
+	pairId, err := k.GetPairIdMint(msg.AmountInt, msg.DenomOut)
+	pair, found := k.GetPairByPairID(ctx, pairId)
+	if !found {
+		return nil, types.ErrPairNotFound
+	}
 
+	err, amountOut := k.ExecuteMint(ctx, msg, pair)
 	if err != nil {
 		return nil, err
 	}
@@ -29,7 +34,7 @@ func (k Keeper) Mint(goCtx context.Context, msg *types.MsgMint) (*types.MsgMintR
 
 	return &types.MsgMintResponse{
 		Creator:   msg.Creator,
-		AmountInt: msg.Amount,
+		AmountInt: msg.AmountInt,
 		AmountOut: amountOut.String(),
 	}, nil
 }
@@ -37,7 +42,12 @@ func (k Keeper) Mint(goCtx context.Context, msg *types.MsgMint) (*types.MsgMintR
 func (k Keeper) Burn(goCtx context.Context, msg *types.MsgBurn) (*types.MsgBurnResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	err, amountOut := k.ExecuteBurn(ctx, msg)
+	pairId, err := k.GetPairIdBurn(msg.AmountInt, msg.DenomOut)
+	pair, found := k.GetPairByPairID(ctx, pairId)
+	if !found {
+		return nil, types.ErrPairNotFound
+	}
+	err, amountOut := k.ExecuteBurn(ctx, msg, pair)
 
 	if err != nil {
 		return nil, err
@@ -54,7 +64,7 @@ func (k Keeper) Burn(goCtx context.Context, msg *types.MsgBurn) (*types.MsgBurnR
 
 	return &types.MsgBurnResponse{
 		Creator:   msg.Creator,
-		AmountInt: msg.Amount,
+		AmountInt: msg.AmountInt,
 		AmountOut: amountOut.String(),
 	}, nil
 }
