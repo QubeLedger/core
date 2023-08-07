@@ -9,7 +9,7 @@ func (k Keeper) CalculateAmountToMint(ibcBaseTokenDenomAmount sdk.Int, atomPrice
 	return (ibcBaseTokenDenomAmount.Mul(atomPrice).Sub((ibcBaseTokenDenomAmount.Mul(atomPrice).Mul(mintingFee)).Quo(types.MintUsqMultiplier))).Quo(types.Multiplier)
 }
 
-func (k Keeper) CalculateMintingFeeForStabilityFund(ibcBaseTokenDenomAmount sdk.Int, atomPrice sdk.Int, mintingFee sdk.Int) sdk.Int {
+func (k Keeper) CalculateMintingFeeForBurningFund(ibcBaseTokenDenomAmount sdk.Int, atomPrice sdk.Int, mintingFee sdk.Int) sdk.Int {
 	return (((ibcBaseTokenDenomAmount.Mul(atomPrice)).Mul(mintingFee)).Quo(types.MintUsqMultiplier)).Quo(types.Multiplier)
 }
 
@@ -18,6 +18,6 @@ func (k Keeper) CalculateAmountToSend(uusdTokenAmount sdk.Int, atomPrice sdk.Int
 	return (((uusdTokenAmount.Mul(types.BurnUsqMultiplier)).Quo(atomPrice)).Sub(fee)).Quo(types.FeeMultiplier)
 }
 
-func (k Keeper) CalculateBurningFeeForStabilityFund(uusdTokenAmount sdk.Int, atomPrice sdk.Int, burningFee sdk.Int) sdk.Int {
+func (k Keeper) CalculateBurningFeeForBurningFund(uusdTokenAmount sdk.Int, atomPrice sdk.Int, burningFee sdk.Int) sdk.Int {
 	return ((((uusdTokenAmount.Mul(types.BurnUsqMultiplier)).Quo(atomPrice)).Mul(burningFee)).Quo(types.MintUsqMultiplier)).Quo(types.FeeMultiplier)
 }

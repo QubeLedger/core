@@ -24,7 +24,7 @@ type RegisterPairProposal struct {
 	MinAmountIn       string             `json:"minAmountIn" yaml:"minAmountIn"`
 }
 
-type RegisterChangeStabilityFundAddressProposal struct {
+type RegisterChangeBurningFundAddressProposal struct {
 	BaseReq     rest.BaseReq `json:"base_req" yaml:"base_req"`
 	Title       string       `json:"title" yaml:"title"`
 	Description string       `json:"description" yaml:"description"`
@@ -71,16 +71,16 @@ func newRegisterPair(clientCtx client.Context) http.HandlerFunc {
 	}
 }
 
-func RegisterChangeStabilityFundAddressProposalRESTHandler(clientCtx client.Context) govrest.ProposalRESTHandler {
+func RegisterChangeBurningFundAddressProposalRESTHandler(clientCtx client.Context) govrest.ProposalRESTHandler {
 	return govrest.ProposalRESTHandler{
 		SubRoute: types.ModuleName,
-		Handler:  newRegisterChangeStabilityFundAddressProposal(clientCtx),
+		Handler:  newRegisterChangeBurningFundAddressProposal(clientCtx),
 	}
 }
 
-func newRegisterChangeStabilityFundAddressProposal(clientCtx client.Context) http.HandlerFunc {
+func newRegisterChangeBurningFundAddressProposal(clientCtx client.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var req RegisterChangeStabilityFundAddressProposal
+		var req RegisterChangeBurningFundAddressProposal
 
 		if !rest.ReadRESTReq(w, r, clientCtx.LegacyAmino, &req) {
 			return
@@ -96,7 +96,7 @@ func newRegisterChangeStabilityFundAddressProposal(clientCtx client.Context) htt
 			return
 		}
 
-		content := types.NewRegisterChangeStabilityFundAddressProposal(req.Title, req.Description, req.Address)
+		content := types.NewRegisterChangeBurningFundAddressProposal(req.Title, req.Description, req.Address)
 		msg, err := govtypes.NewMsgSubmitProposal(content, req.Deposit, fromAddr)
 		if rest.CheckBadRequestError(w, err) {
 			return

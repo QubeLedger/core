@@ -8,6 +8,6 @@ import (
 )
 
 var (
-	RegisterPairHandler                       = govclient.NewProposalHandler(cli.NewRegisterPairProposalCmd, rest.RegisterPairRESTHandler)
-	RegisterChangeStabilityFundAddressHandler = govclient.NewProposalHandler(cli.NewRegisterChangeStabilityFundAddressProposalCmd, rest.RegisterChangeStabilityFundAddressProposalRESTHandler)
+	RegisterPairHandler                     = govclient.NewProposalHandler(cli.NewRegisterPairProposalCmd, rest.RegisterPairRESTHandler)
+	RegisterChangeBurningFundAddressHandler = govclient.NewProposalHandler(cli.NewRegisterChangeBurningFundAddressProposalCmd, rest.RegisterChangeBurningFundAddressProposalRESTHandler)
 )

@@ -84,9 +84,9 @@ func (s *StableKeeperTestSuite) GetNormalPair(id uint64) types.Pair {
 			Name:    "USQ",
 			Symbol:  "USQ",
 		},
-		Qm:           sdk.NewInt(0),
-		Ar:           sdk.NewInt(0),
-		MinAmountInt: "20uatom",
+		Qm:          sdk.NewInt(0),
+		Ar:          sdk.NewInt(0),
+		MinAmountIn: "20uatom",
 	}
 
 	return pair

@@ -199,7 +199,7 @@ func NewRegisterPairProposalCmd() *cobra.Command {
 	return cmd
 }
 
-func NewRegisterChangeStabilityFundAddressProposalCmd() *cobra.Command {
+func NewRegisterChangeBurningFundAddressProposalCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "change-stability-fund [address]",
 		Args:  cobra.ExactArgs(1),
@@ -232,7 +232,7 @@ func NewRegisterChangeStabilityFundAddressProposalCmd() *cobra.Command {
 
 			from := clientCtx.GetFromAddress()
 
-			content := types.NewRegisterChangeStabilityFundAddressProposal(title, description, args[0])
+			content := types.NewRegisterChangeBurningFundAddressProposal(title, description, args[0])
 
 			msg, err := govtypes.NewMsgSubmitProposal(content, deposit, from)
 			if err != nil {

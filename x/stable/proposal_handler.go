@@ -14,8 +14,8 @@ func NewStableProposalHandler(k *keeper.Keeper) govtypes.Handler {
 		switch c := content.(type) {
 		case *types.RegisterPairProposal:
 			return handleRegisterPairProposal(ctx, k, c)
-		case *types.RegisterChangeStabilityFundAddressProposal:
-			return handleRegisterChangeStabilityFundAddressProposal(ctx, k, c)
+		case *types.RegisterChangeBurningFundAddressProposal:
+			return handleRegisterChangeBurningFundAddressProposal(ctx, k, c)
 		default:
 			return sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "unrecognized %s proposal content type: %T", types.ModuleName, c)
 		}
@@ -26,7 +26,7 @@ func handleRegisterPairProposal(ctx sdk.Context, k *keeper.Keeper, p *types.Regi
 	pair := types.Pair{
 		AmountInMetadata:  p.AmountInMetadata,
 		AmountOutMetadata: p.AmountOutMetadata,
-		MinAmountInt:      p.MinAmountIn,
+		MinAmountIn:       p.MinAmountIn,
 	}
 	err := k.RegisterPair(ctx, pair)
 	if err != nil {
@@ -40,18 +40,18 @@ func handleRegisterPairProposal(ctx sdk.Context, k *keeper.Keeper, p *types.Regi
 	return nil
 }
 
-func handleRegisterChangeStabilityFundAddressProposal(ctx sdk.Context, k *keeper.Keeper, p *types.RegisterChangeStabilityFundAddressProposal) error {
+func handleRegisterChangeBurningFundAddressProposal(ctx sdk.Context, k *keeper.Keeper, p *types.RegisterChangeBurningFundAddressProposal) error {
 	address, err := sdk.AccAddressFromBech32(p.Address)
 	if err != nil {
 		return err
 	}
-	err = k.ChangeStabilityFundAddress(ctx, address)
+	err = k.ChangeBurningFundAddress(ctx, address)
 	if err != nil {
 		return err
 	}
 	ctx.EventManager().EmitEvent(
 		sdk.NewEvent(
-			types.EventRegisterChangeStabilityFundAddressProposal,
+			types.EventRegisterChangeBurningFundAddressProposal,
 		),
 	)
 	return nil

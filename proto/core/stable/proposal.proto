@@ -22,7 +22,7 @@ message ProposalMetadata {
   string minAmountIn = 3;
 }
 
-message RegisterChangeStabilityFundAddressProposal {
+message RegisterChangeBurningFundAddressProposal {
   option (gogoproto.equal) = false;
   // title of the proposal
   string title = 1;

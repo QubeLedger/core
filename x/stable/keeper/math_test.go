@@ -11,12 +11,12 @@ func (suite *StableKeeperTestSuite) TestCalculateAmountToMint() {
 	suite.Assert().Equal(res, sdk.NewInt(9471500000))
 }
 
-func (suite *StableKeeperTestSuite) TestCalculateMintingFeeForStabilityFund() {
+func (suite *StableKeeperTestSuite) TestCalculateMintingFeeForBurningFund() {
 	suite.Setup()
 	atom := sdk.NewInt(1000).Mul(sdk.NewInt(1000000))
 	price := sdk.NewInt(95000)
 	fee := sdk.NewInt(3)
-	res := suite.app.StableKeeper.CalculateMintingFeeForStabilityFund(atom, price, fee)
+	res := suite.app.StableKeeper.CalculateMintingFeeForBurningFund(atom, price, fee)
 	suite.Assert().Equal(res, sdk.NewInt(28500000))
 }
 
@@ -29,11 +29,11 @@ func (suite *StableKeeperTestSuite) TestCalculateAmountToSend() {
 	suite.Assert().Equal(res, sdk.NewInt(10494736))
 }
 
-func (suite *StableKeeperTestSuite) TestCalculateBurningFeeForStabilityFund() {
+func (suite *StableKeeperTestSuite) TestCalculateBurningFeeForBurningFund() {
 	suite.Setup()
 	stable := sdk.NewInt(100).Mul(sdk.NewInt(1000000))
 	price := sdk.NewInt(95000)
 	fee := sdk.NewInt(3)
-	res := suite.app.StableKeeper.CalculateBurningFeeForStabilityFund(stable, price, fee)
+	res := suite.app.StableKeeper.CalculateBurningFeeForBurningFund(stable, price, fee)
 	suite.Assert().Equal(res, sdk.NewInt(31578))
 }

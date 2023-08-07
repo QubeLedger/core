@@ -24,7 +24,7 @@ func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
 	registry.RegisterImplementations(
 		(*gov.Content)(nil),
 		&RegisterPairProposal{},
-		&RegisterChangeStabilityFundAddressProposal{},
+		&RegisterChangeBurningFundAddressProposal{},
 	)
 	// this line is used by starport scaffolding # 3
 

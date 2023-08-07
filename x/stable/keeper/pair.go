@@ -84,6 +84,16 @@ func (k Keeper) GetPairByPairID(ctx sdk.Context, pairId string) (val types.Pair,
 	return val, false
 }
 
+func (k Keeper) GetPairByID(ctx sdk.Context, id uint64) (val types.Pair, found bool) {
+	allPair := k.GetAllPair(ctx)
+	for _, v := range allPair {
+		if v.Id == id {
+			return v, true
+		}
+	}
+	return val, false
+}
+
 func (k Keeper) GeneratePairIdHash(denom1 string, denom2 string) string {
 	return fmt.Sprintf("%x", crypto.Sha256(append([]byte(denom1+denom2))))
 }
@@ -111,7 +121,7 @@ func (k Keeper) RegisterPair(ctx sdk.Context, p types.Pair) error {
 		AmountOutMetadata: p.AmountOutMetadata,
 		Qm:                sdk.NewInt(0),
 		Ar:                sdk.NewInt(0),
-		MinAmountInt:      p.MinAmountInt,
+		MinAmountIn:       p.MinAmountIn,
 	}
 	_ = k.AppendPair(ctx, pair)
 	return nil

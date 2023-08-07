@@ -32,7 +32,7 @@ type Pair struct {
 	AmountOutMetadata types.Metadata                         `protobuf:"bytes,4,opt,name=amountOutMetadata,proto3" json:"amountOutMetadata" yaml:"amountOutMetadata"`
 	Qm                github_com_cosmos_cosmos_sdk_types.Int `protobuf:"bytes,5,opt,name=qm,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Int" json:"qm" yaml:"qm"`
 	Ar                github_com_cosmos_cosmos_sdk_types.Int `protobuf:"bytes,6,opt,name=ar,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Int" json:"ar" yaml:"ar"`
-	MinAmountInt      string                                 `protobuf:"bytes,7,opt,name=minAmountInt,proto3" json:"minAmountInt,omitempty"`
+	MinAmountIn      string                                 `protobuf:"bytes,7,opt,name=minAmountInt,proto3" json:"minAmountInt,omitempty"`
 }
 
 func (m *Pair) Reset()         { *m = Pair{} }
@@ -96,9 +96,9 @@ func (m *Pair) GetAmountOutMetadata() types.Metadata {
 	return types.Metadata{}
 }
 
-func (m *Pair) GetMinAmountInt() string {
+func (m *Pair) GetMinAmountIn() string {
 	if m != nil {
-		return m.MinAmountInt
+		return m.MinAmountIn
 	}
 	return ""
 }
@@ -157,10 +157,10 @@ func (m *Pair) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if len(m.MinAmountInt) > 0 {
-		i -= len(m.MinAmountInt)
-		copy(dAtA[i:], m.MinAmountInt)
-		i = encodeVarintPair(dAtA, i, uint64(len(m.MinAmountInt)))
+	if len(m.MinAmountIn) > 0 {
+		i -= len(m.MinAmountIn)
+		copy(dAtA[i:], m.MinAmountIn)
+		i = encodeVarintPair(dAtA, i, uint64(len(m.MinAmountIn)))
 		i--
 		dAtA[i] = 0x3a
 	}
@@ -251,7 +251,7 @@ func (m *Pair) Size() (n int) {
 	n += 1 + l + sovPair(uint64(l))
 	l = m.Ar.Size()
 	n += 1 + l + sovPair(uint64(l))
-	l = len(m.MinAmountInt)
+	l = len(m.MinAmountIn)
 	if l > 0 {
 		n += 1 + l + sovPair(uint64(l))
 	}
@@ -480,7 +480,7 @@ func (m *Pair) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 7:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field MinAmountInt", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field MinAmountIn", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -508,7 +508,7 @@ func (m *Pair) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.MinAmountInt = string(dAtA[iNdEx:postIndex])
+			m.MinAmountIn = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex

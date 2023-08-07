@@ -116,7 +116,7 @@ func TestRegisterPairProposal(t *testing.T) {
 	}
 }
 
-func TestRegisterChangeStabilityFundAddressProposal(t *testing.T) {
+func TestRegisterChangeBurningFundAddressProposal(t *testing.T) {
 	tests := []struct {
 		title       string
 		description string
@@ -138,7 +138,7 @@ func TestRegisterChangeStabilityFundAddressProposal(t *testing.T) {
 	}
 
 	for _, tc := range tests {
-		msg := types.NewRegisterChangeStabilityFundAddressProposal(tc.title, tc.description, tc.address)
+		msg := types.NewRegisterChangeBurningFundAddressProposal(tc.title, tc.description, tc.address)
 		err := msg.ValidateBasic()
 		if tc.expectedErr {
 			require.Error(t, err)

@@ -12,22 +12,22 @@ import (
 
 // constants
 const (
-	ProposalTypeRegisterPairProposal                       string = "RegisterPairProposal"
-	ProposalTypeRegisterChangeStabilityFundAddressProposal string = "RegisterChangeStabilityFundAddressProposal"
+	ProposalTypeRegisterPairProposal                     string = "RegisterPairProposal"
+	ProposalTypeRegisterChangeBurningFundAddressProposal string = "RegisterChangeBurningFundAddressProposal"
 )
 
 // Implements Proposal Interface
 var (
 	_ govtypes.Content = &RegisterPairProposal{}
-	_ govtypes.Content = &RegisterChangeStabilityFundAddressProposal{}
+	_ govtypes.Content = &RegisterChangeBurningFundAddressProposal{}
 )
 
 func init() {
 	govtypes.RegisterProposalType(ProposalTypeRegisterPairProposal)
 	govtypes.RegisterProposalTypeCodec(&RegisterPairProposal{}, "stable/RegisterPairProposal")
 
-	govtypes.RegisterProposalType(ProposalTypeRegisterChangeStabilityFundAddressProposal)
-	govtypes.RegisterProposalTypeCodec(&RegisterChangeStabilityFundAddressProposal{}, "stable/RegisterChangeStabilityFundAddressProposal")
+	govtypes.RegisterProposalType(ProposalTypeRegisterChangeBurningFundAddressProposal)
+	govtypes.RegisterProposalTypeCodec(&RegisterChangeBurningFundAddressProposal{}, "stable/RegisterChangeBurningFundAddressProposal")
 }
 
 func NewRegisterPairProposal(title, description string, amountInDenom banktypes.Metadata, amountOutDenom banktypes.Metadata, minAmount string) govtypes.Content {
@@ -40,21 +40,21 @@ func NewRegisterPairProposal(title, description string, amountInDenom banktypes.
 	}
 }
 
-func NewRegisterChangeStabilityFundAddressProposal(title, description string, address string) govtypes.Content {
-	return &RegisterChangeStabilityFundAddressProposal{
+func NewRegisterChangeBurningFundAddressProposal(title, description string, address string) govtypes.Content {
+	return &RegisterChangeBurningFundAddressProposal{
 		Title:       title,
 		Description: description,
 		Address:     address,
 	}
 }
 
-func (*RegisterChangeStabilityFundAddressProposal) ProposalRoute() string { return RouterKey }
+func (*RegisterChangeBurningFundAddressProposal) ProposalRoute() string { return RouterKey }
 
-func (*RegisterChangeStabilityFundAddressProposal) ProposalType() string {
-	return ProposalTypeRegisterChangeStabilityFundAddressProposal
+func (*RegisterChangeBurningFundAddressProposal) ProposalType() string {
+	return ProposalTypeRegisterChangeBurningFundAddressProposal
 }
 
-func (rtbp *RegisterChangeStabilityFundAddressProposal) ValidateBasic() error {
+func (rtbp *RegisterChangeBurningFundAddressProposal) ValidateBasic() error {
 	if len(rtbp.Address) == 0 {
 		return ErrInvalidLength
 	}
