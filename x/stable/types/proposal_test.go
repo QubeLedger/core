@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestChangeBaseTokenDenomProposal(t *testing.T) {
+func TestRegisterPairProposal(t *testing.T) {
 	tests := []struct {
 		title             string
 		description       string
@@ -107,6 +107,38 @@ func TestChangeBaseTokenDenomProposal(t *testing.T) {
 
 	for _, tc := range tests {
 		msg := types.NewRegisterPairProposal(tc.title, tc.description, tc.amountInMetadata, tc.amountOutMetadata, tc.minAmount)
+		err := msg.ValidateBasic()
+		if tc.expectedErr {
+			require.Error(t, err)
+		} else {
+			require.NoError(t, err)
+		}
+	}
+}
+
+func TestRegisterChangeStabilityFundAddressProposal(t *testing.T) {
+	tests := []struct {
+		title       string
+		description string
+		address     string
+		expectedErr bool
+	}{
+		{
+			"test",
+			"test",
+			"qube17ca7p2gvf6qcg0n6ucnkjpe3estscfdhaj9ep9",
+			false,
+		},
+		{
+			"test",
+			"test",
+			"",
+			true,
+		},
+	}
+
+	for _, tc := range tests {
+		msg := types.NewRegisterChangeStabilityFundAddressProposal(tc.title, tc.description, tc.address)
 		err := msg.ValidateBasic()
 		if tc.expectedErr {
 			require.Error(t, err)

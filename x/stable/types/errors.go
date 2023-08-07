@@ -10,6 +10,7 @@ import (
 var (
 	ErrSample                          = sdkerrors.Register(ModuleName, 1100, "sample error")
 	ErrSdkIntError                     = sdkerrors.Register(ModuleName, 1101, "sdk.Int error")
+	ErrInvalidLength                   = sdkerrors.Register(ModuleName, 1102, "invalid length")
 	ErrInvalidPacketTimeout            = sdkerrors.Register(ModuleName, 1500, "invalid packet timeout")
 	ErrInvalidVersion                  = sdkerrors.Register(ModuleName, 1501, "invalid version")
 	ErrAfpNegative                     = sdkerrors.Register(ModuleName, 1200, "AFP negative")

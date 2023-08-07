@@ -21,3 +21,13 @@ message ProposalMetadata {
   cosmos.bank.v1beta1.Metadata amountOutMetadata = 2 [ (gogoproto.moretags) = "yaml:\"amountOutMetadata\"", (gogoproto.nullable)   = false ];
   string minAmountIn = 3;
 }
+
+message RegisterChangeStabilityFundAddressProposal {
+  option (gogoproto.equal) = false;
+  // title of the proposal
+  string title = 1;
+  // description of the proposal
+  string description = 2;
+
+  string address = 3;
+}

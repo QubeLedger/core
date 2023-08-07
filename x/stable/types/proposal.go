@@ -12,17 +12,22 @@ import (
 
 // constants
 const (
-	ProposalTypeRegisterPairProposal string = "RegisterPairProposal"
+	ProposalTypeRegisterPairProposal                       string = "RegisterPairProposal"
+	ProposalTypeRegisterChangeStabilityFundAddressProposal string = "RegisterChangeStabilityFundAddressProposal"
 )
 
 // Implements Proposal Interface
 var (
 	_ govtypes.Content = &RegisterPairProposal{}
+	_ govtypes.Content = &RegisterChangeStabilityFundAddressProposal{}
 )
 
 func init() {
 	govtypes.RegisterProposalType(ProposalTypeRegisterPairProposal)
 	govtypes.RegisterProposalTypeCodec(&RegisterPairProposal{}, "stable/RegisterPairProposal")
+
+	govtypes.RegisterProposalType(ProposalTypeRegisterChangeStabilityFundAddressProposal)
+	govtypes.RegisterProposalTypeCodec(&RegisterChangeStabilityFundAddressProposal{}, "stable/RegisterChangeStabilityFundAddressProposal")
 }
 
 func NewRegisterPairProposal(title, description string, amountInDenom banktypes.Metadata, amountOutDenom banktypes.Metadata, minAmount string) govtypes.Content {
@@ -33,6 +38,31 @@ func NewRegisterPairProposal(title, description string, amountInDenom banktypes.
 		AmountOutMetadata: amountOutDenom,
 		MinAmountIn:       minAmount,
 	}
+}
+
+func NewRegisterChangeStabilityFundAddressProposal(title, description string, address string) govtypes.Content {
+	return &RegisterChangeStabilityFundAddressProposal{
+		Title:       title,
+		Description: description,
+		Address:     address,
+	}
+}
+
+func (*RegisterChangeStabilityFundAddressProposal) ProposalRoute() string { return RouterKey }
+
+func (*RegisterChangeStabilityFundAddressProposal) ProposalType() string {
+	return ProposalTypeRegisterChangeStabilityFundAddressProposal
+}
+
+func (rtbp *RegisterChangeStabilityFundAddressProposal) ValidateBasic() error {
+	if len(rtbp.Address) == 0 {
+		return ErrInvalidLength
+	}
+	_, err := sdk.AccAddressFromBech32(rtbp.Address)
+	if err != nil {
+		return nil
+	}
+	return nil
 }
 
 func (*RegisterPairProposal) ProposalRoute() string { return RouterKey }
