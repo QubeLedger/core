@@ -9,11 +9,11 @@ const TypeMsgMint = "mint"
 
 var _ sdk.Msg = &MsgMint{}
 
-func NewMsgMint(creator string, amountInt string, denomOut string) *MsgMint {
+func NewMsgMint(creator string, amountIn string, denomOut string) *MsgMint {
 	return &MsgMint{
-		Creator:   creator,
-		AmountInt: amountInt,
-		DenomOut:  denomOut,
+		Creator:  creator,
+		AmountIn: amountIn,
+		DenomOut: denomOut,
 	}
 }
 
@@ -50,11 +50,11 @@ const TypeMsgBurn = "burn"
 
 var _ sdk.Msg = &MsgBurn{}
 
-func NewMsgBurn(creator string, amountInt string, denomOut string) *MsgBurn {
+func NewMsgBurn(creator string, amountIn string, denomOut string) *MsgBurn {
 	return &MsgBurn{
-		Creator:   creator,
-		AmountInt: amountInt,
-		DenomOut:  denomOut,
+		Creator:  creator,
+		AmountIn: amountIn,
+		DenomOut: denomOut,
 	}
 }
 

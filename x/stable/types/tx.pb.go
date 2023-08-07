@@ -29,7 +29,7 @@ const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
 type MsgMint struct {
 	Creator   string `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
-	AmountInt string `protobuf:"bytes,2,opt,name=amountInt,proto3" json:"amountInt,omitempty"`
+	AmountIn string `protobuf:"bytes,2,opt,name=amountInt,proto3" json:"amountInt,omitempty"`
 	DenomOut  string `protobuf:"bytes,3,opt,name=denomOut,proto3" json:"denomOut,omitempty"`
 }
 
@@ -73,9 +73,9 @@ func (m *MsgMint) GetCreator() string {
 	return ""
 }
 
-func (m *MsgMint) GetAmountInt() string {
+func (m *MsgMint) GetAmountIn() string {
 	if m != nil {
-		return m.AmountInt
+		return m.AmountIn
 	}
 	return ""
 }
@@ -89,7 +89,7 @@ func (m *MsgMint) GetDenomOut() string {
 
 type MsgMintResponse struct {
 	Creator   string `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
-	AmountInt string `protobuf:"bytes,2,opt,name=amountInt,proto3" json:"amountInt,omitempty"`
+	AmountIn string `protobuf:"bytes,2,opt,name=amountInt,proto3" json:"amountInt,omitempty"`
 	AmountOut string `protobuf:"bytes,3,opt,name=amountOut,proto3" json:"amountOut,omitempty"`
 }
 
@@ -133,9 +133,9 @@ func (m *MsgMintResponse) GetCreator() string {
 	return ""
 }
 
-func (m *MsgMintResponse) GetAmountInt() string {
+func (m *MsgMintResponse) GetAmountIn() string {
 	if m != nil {
-		return m.AmountInt
+		return m.AmountIn
 	}
 	return ""
 }
@@ -149,7 +149,7 @@ func (m *MsgMintResponse) GetAmountOut() string {
 
 type MsgBurn struct {
 	Creator   string `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
-	AmountInt string `protobuf:"bytes,2,opt,name=amountInt,proto3" json:"amountInt,omitempty"`
+	AmountIn string `protobuf:"bytes,2,opt,name=amountInt,proto3" json:"amountInt,omitempty"`
 	DenomOut  string `protobuf:"bytes,3,opt,name=denomOut,proto3" json:"denomOut,omitempty"`
 }
 
@@ -193,9 +193,9 @@ func (m *MsgBurn) GetCreator() string {
 	return ""
 }
 
-func (m *MsgBurn) GetAmountInt() string {
+func (m *MsgBurn) GetAmountIn() string {
 	if m != nil {
-		return m.AmountInt
+		return m.AmountIn
 	}
 	return ""
 }
@@ -209,7 +209,7 @@ func (m *MsgBurn) GetDenomOut() string {
 
 type MsgBurnResponse struct {
 	Creator   string `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
-	AmountInt string `protobuf:"bytes,2,opt,name=amountInt,proto3" json:"amountInt,omitempty"`
+	AmountIn string `protobuf:"bytes,2,opt,name=amountInt,proto3" json:"amountInt,omitempty"`
 	AmountOut string `protobuf:"bytes,3,opt,name=amountOut,proto3" json:"amountOut,omitempty"`
 }
 
@@ -253,9 +253,9 @@ func (m *MsgBurnResponse) GetCreator() string {
 	return ""
 }
 
-func (m *MsgBurnResponse) GetAmountInt() string {
+func (m *MsgBurnResponse) GetAmountIn() string {
 	if m != nil {
-		return m.AmountInt
+		return m.AmountIn
 	}
 	return ""
 }
@@ -441,10 +441,10 @@ func (m *MsgMint) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i--
 		dAtA[i] = 0x1a
 	}
-	if len(m.AmountInt) > 0 {
-		i -= len(m.AmountInt)
-		copy(dAtA[i:], m.AmountInt)
-		i = encodeVarintTx(dAtA, i, uint64(len(m.AmountInt)))
+	if len(m.AmountIn) > 0 {
+		i -= len(m.AmountIn)
+		copy(dAtA[i:], m.AmountIn)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.AmountIn)))
 		i--
 		dAtA[i] = 0x12
 	}
@@ -485,10 +485,10 @@ func (m *MsgMintResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i--
 		dAtA[i] = 0x1a
 	}
-	if len(m.AmountInt) > 0 {
-		i -= len(m.AmountInt)
-		copy(dAtA[i:], m.AmountInt)
-		i = encodeVarintTx(dAtA, i, uint64(len(m.AmountInt)))
+	if len(m.AmountIn) > 0 {
+		i -= len(m.AmountIn)
+		copy(dAtA[i:], m.AmountIn)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.AmountIn)))
 		i--
 		dAtA[i] = 0x12
 	}
@@ -529,10 +529,10 @@ func (m *MsgBurn) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i--
 		dAtA[i] = 0x1a
 	}
-	if len(m.AmountInt) > 0 {
-		i -= len(m.AmountInt)
-		copy(dAtA[i:], m.AmountInt)
-		i = encodeVarintTx(dAtA, i, uint64(len(m.AmountInt)))
+	if len(m.AmountIn) > 0 {
+		i -= len(m.AmountIn)
+		copy(dAtA[i:], m.AmountIn)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.AmountIn)))
 		i--
 		dAtA[i] = 0x12
 	}
@@ -573,10 +573,10 @@ func (m *MsgBurnResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i--
 		dAtA[i] = 0x1a
 	}
-	if len(m.AmountInt) > 0 {
-		i -= len(m.AmountInt)
-		copy(dAtA[i:], m.AmountInt)
-		i = encodeVarintTx(dAtA, i, uint64(len(m.AmountInt)))
+	if len(m.AmountIn) > 0 {
+		i -= len(m.AmountIn)
+		copy(dAtA[i:], m.AmountIn)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.AmountIn)))
 		i--
 		dAtA[i] = 0x12
 	}
@@ -611,7 +611,7 @@ func (m *MsgMint) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovTx(uint64(l))
 	}
-	l = len(m.AmountInt)
+	l = len(m.AmountIn)
 	if l > 0 {
 		n += 1 + l + sovTx(uint64(l))
 	}
@@ -632,7 +632,7 @@ func (m *MsgMintResponse) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovTx(uint64(l))
 	}
-	l = len(m.AmountInt)
+	l = len(m.AmountIn)
 	if l > 0 {
 		n += 1 + l + sovTx(uint64(l))
 	}
@@ -653,7 +653,7 @@ func (m *MsgBurn) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovTx(uint64(l))
 	}
-	l = len(m.AmountInt)
+	l = len(m.AmountIn)
 	if l > 0 {
 		n += 1 + l + sovTx(uint64(l))
 	}
@@ -674,7 +674,7 @@ func (m *MsgBurnResponse) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovTx(uint64(l))
 	}
-	l = len(m.AmountInt)
+	l = len(m.AmountIn)
 	if l > 0 {
 		n += 1 + l + sovTx(uint64(l))
 	}
@@ -754,7 +754,7 @@ func (m *MsgMint) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field AmountInt", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field AmountIn", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -782,7 +782,7 @@ func (m *MsgMint) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.AmountInt = string(dAtA[iNdEx:postIndex])
+			m.AmountIn = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 3:
 			if wireType != 2 {
@@ -900,7 +900,7 @@ func (m *MsgMintResponse) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field AmountInt", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field AmountIn", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -928,7 +928,7 @@ func (m *MsgMintResponse) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.AmountInt = string(dAtA[iNdEx:postIndex])
+			m.AmountIn = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 3:
 			if wireType != 2 {
@@ -1046,7 +1046,7 @@ func (m *MsgBurn) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field AmountInt", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field AmountIn", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -1074,7 +1074,7 @@ func (m *MsgBurn) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.AmountInt = string(dAtA[iNdEx:postIndex])
+			m.AmountIn = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 3:
 			if wireType != 2 {
@@ -1192,7 +1192,7 @@ func (m *MsgBurnResponse) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field AmountInt", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field AmountIn", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -1220,7 +1220,7 @@ func (m *MsgBurnResponse) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.AmountInt = string(dAtA[iNdEx:postIndex])
+			m.AmountIn = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 3:
 			if wireType != 2 {

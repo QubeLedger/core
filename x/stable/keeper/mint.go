@@ -35,7 +35,7 @@ func (k Keeper) ExecuteMint(ctx sdk.Context, msg *types.MsgMint, pair types.Pair
 		return err, sdk.Coin{}
 	}
 
-	amountIntCoins, err := sdk.ParseCoinsNormalized(msg.AmountInt)
+	amountIntCoins, err := sdk.ParseCoinsNormalized(msg.AmountIn)
 	if err != nil {
 		return err, sdk.Coin{}
 	}

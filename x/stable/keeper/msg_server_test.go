@@ -52,6 +52,16 @@ func (suite *StableKeeperTestSuite) TestMint() {
 			true,
 			"Backing Ration >= 120%",
 		},
+		{
+			"fail-amountIn less minAmountIn",
+			s.GetNormalPair(0),
+			"uatom",
+			19,
+			0,
+			int64(93000),
+			true,
+			"ErrAmountInGTEminAmountIn err",
+		},
 	}
 
 	suite.Setup()

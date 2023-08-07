@@ -44,3 +44,20 @@ func VerificationBurnDenomCoins(coins sdk.Coins, pair types.Pair) error {
 	}
 	return nil
 }
+
+func (k Keeper) CheckMinAmount(msgAmountIn string, pair types.Pair) error {
+	msgAmountInCoins, err := sdk.ParseCoinsNormalized(msgAmountIn)
+	if err != nil {
+		return err
+	}
+
+	pairMinAmountInCoins, err := sdk.ParseCoinsNormalized(pair.MinAmountIn)
+	if err != nil {
+		return err
+	}
+	if !msgAmountInCoins.AmountOf(pair.AmountInMetadata.Base).GT(pairMinAmountInCoins.AmountOf(pair.AmountInMetadata.Base)) {
+		return types.ErrAmountInGTEminAmountIn
+	}
+
+	return nil
+}

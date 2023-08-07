@@ -29,7 +29,7 @@ func (k Keeper) ExecuteBurn(ctx sdk.Context, msg *types.MsgBurn, pair types.Pair
 	if err != nil {
 		return err, sdk.Coin{}
 	}
-	amountIntCoins, err := sdk.ParseCoinsNormalized(msg.AmountInt)
+	amountIntCoins, err := sdk.ParseCoinsNormalized(msg.AmountIn)
 	if err != nil {
 		return err, sdk.Coin{}
 	}
