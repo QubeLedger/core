@@ -6,6 +6,7 @@ package types
 import (
 	fmt "fmt"
 	types "github.com/cosmos/cosmos-sdk/x/bank/types"
+	_ "github.com/cosmos/gogoproto/gogoproto"
 	proto "github.com/gogo/protobuf/proto"
 	io "io"
 	math "math"
@@ -23,27 +24,29 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
-type ChangeBaseTokenDenom struct {
+type RegisterPairProposal struct {
 	// title of the proposal
 	Title string `protobuf:"bytes,1,opt,name=title,proto3" json:"title,omitempty"`
 	// description of the proposal
 	Description string `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`
 	// metadata slice of the native Cosmos coins
-	Metadata []types.Metadata `protobuf:"bytes,3,rep,name=metadata,proto3" json:"metadata"`
+	AmountInMetadata  types.Metadata `protobuf:"bytes,3,opt,name=amountInMetadata,proto3" json:"amountInMetadata" yaml:"amountInMetadata"`
+	AmountOutMetadata types.Metadata `protobuf:"bytes,4,opt,name=amountOutMetadata,proto3" json:"amountOutMetadata" yaml:"amountOutMetadata"`
+	MinAmountIn       string         `protobuf:"bytes,5,opt,name=minAmountIn,proto3" json:"minAmountIn,omitempty"`
 }
 
-func (m *ChangeBaseTokenDenom) Reset()         { *m = ChangeBaseTokenDenom{} }
-func (m *ChangeBaseTokenDenom) String() string { return proto.CompactTextString(m) }
-func (*ChangeBaseTokenDenom) ProtoMessage()    {}
-func (*ChangeBaseTokenDenom) Descriptor() ([]byte, []int) {
+func (m *RegisterPairProposal) Reset()         { *m = RegisterPairProposal{} }
+func (m *RegisterPairProposal) String() string { return proto.CompactTextString(m) }
+func (*RegisterPairProposal) ProtoMessage()    {}
+func (*RegisterPairProposal) Descriptor() ([]byte, []int) {
 	return fileDescriptor_65b2ec78985a1875, []int{0}
 }
-func (m *ChangeBaseTokenDenom) XXX_Unmarshal(b []byte) error {
+func (m *RegisterPairProposal) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *ChangeBaseTokenDenom) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *RegisterPairProposal) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_ChangeBaseTokenDenom.Marshal(b, m, deterministic)
+		return xxx_messageInfo_RegisterPairProposal.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -53,60 +56,135 @@ func (m *ChangeBaseTokenDenom) XXX_Marshal(b []byte, deterministic bool) ([]byte
 		return b[:n], nil
 	}
 }
-func (m *ChangeBaseTokenDenom) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_ChangeBaseTokenDenom.Merge(m, src)
+func (m *RegisterPairProposal) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_RegisterPairProposal.Merge(m, src)
 }
-func (m *ChangeBaseTokenDenom) XXX_Size() int {
+func (m *RegisterPairProposal) XXX_Size() int {
 	return m.Size()
 }
-func (m *ChangeBaseTokenDenom) XXX_DiscardUnknown() {
-	xxx_messageInfo_ChangeBaseTokenDenom.DiscardUnknown(m)
+func (m *RegisterPairProposal) XXX_DiscardUnknown() {
+	xxx_messageInfo_RegisterPairProposal.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_ChangeBaseTokenDenom proto.InternalMessageInfo
+var xxx_messageInfo_RegisterPairProposal proto.InternalMessageInfo
 
-func (m *ChangeBaseTokenDenom) GetTitle() string {
+func (m *RegisterPairProposal) GetTitle() string {
 	if m != nil {
 		return m.Title
 	}
 	return ""
 }
 
-func (m *ChangeBaseTokenDenom) GetDescription() string {
+func (m *RegisterPairProposal) GetDescription() string {
 	if m != nil {
 		return m.Description
 	}
 	return ""
 }
 
-func (m *ChangeBaseTokenDenom) GetMetadata() []types.Metadata {
+func (m *RegisterPairProposal) GetAmountInMetadata() types.Metadata {
 	if m != nil {
-		return m.Metadata
+		return m.AmountInMetadata
 	}
-	return nil
+	return types.Metadata{}
 }
 
-type ChangeSendTokenDenom struct {
+func (m *RegisterPairProposal) GetAmountOutMetadata() types.Metadata {
+	if m != nil {
+		return m.AmountOutMetadata
+	}
+	return types.Metadata{}
+}
+
+func (m *RegisterPairProposal) GetMinAmountIn() string {
+	if m != nil {
+		return m.MinAmountIn
+	}
+	return ""
+}
+
+type ProposalMetadata struct {
+	AmountInMetadata  types.Metadata `protobuf:"bytes,1,opt,name=amountInMetadata,proto3" json:"amountInMetadata" yaml:"amountInMetadata"`
+	AmountOutMetadata types.Metadata `protobuf:"bytes,2,opt,name=amountOutMetadata,proto3" json:"amountOutMetadata" yaml:"amountOutMetadata"`
+	MinAmountIn       string         `protobuf:"bytes,3,opt,name=minAmountIn,proto3" json:"minAmountIn,omitempty"`
+}
+
+func (m *ProposalMetadata) Reset()         { *m = ProposalMetadata{} }
+func (m *ProposalMetadata) String() string { return proto.CompactTextString(m) }
+func (*ProposalMetadata) ProtoMessage()    {}
+func (*ProposalMetadata) Descriptor() ([]byte, []int) {
+	return fileDescriptor_65b2ec78985a1875, []int{1}
+}
+func (m *ProposalMetadata) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *ProposalMetadata) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_ProposalMetadata.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *ProposalMetadata) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ProposalMetadata.Merge(m, src)
+}
+func (m *ProposalMetadata) XXX_Size() int {
+	return m.Size()
+}
+func (m *ProposalMetadata) XXX_DiscardUnknown() {
+	xxx_messageInfo_ProposalMetadata.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ProposalMetadata proto.InternalMessageInfo
+
+func (m *ProposalMetadata) GetAmountInMetadata() types.Metadata {
+	if m != nil {
+		return m.AmountInMetadata
+	}
+	return types.Metadata{}
+}
+
+func (m *ProposalMetadata) GetAmountOutMetadata() types.Metadata {
+	if m != nil {
+		return m.AmountOutMetadata
+	}
+	return types.Metadata{}
+}
+
+func (m *ProposalMetadata) GetMinAmountIn() string {
+	if m != nil {
+		return m.MinAmountIn
+	}
+	return ""
+}
+
+type RegisterChangeBurningFundAddressProposal struct {
 	// title of the proposal
 	Title string `protobuf:"bytes,1,opt,name=title,proto3" json:"title,omitempty"`
 	// description of the proposal
 	Description string `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`
-	// metadata slice of the native Cosmos coins
-	Metadata []types.Metadata `protobuf:"bytes,3,rep,name=metadata,proto3" json:"metadata"`
+	Address     string `protobuf:"bytes,3,opt,name=address,proto3" json:"address,omitempty"`
 }
 
-func (m *ChangeSendTokenDenom) Reset()         { *m = ChangeSendTokenDenom{} }
-func (m *ChangeSendTokenDenom) String() string { return proto.CompactTextString(m) }
-func (*ChangeSendTokenDenom) ProtoMessage()    {}
-func (*ChangeSendTokenDenom) Descriptor() ([]byte, []int) {
-	return fileDescriptor_65b2ec78985a1875, []int{1}
+func (m *RegisterChangeBurningFundAddressProposal) Reset() {
+	*m = RegisterChangeBurningFundAddressProposal{}
 }
-func (m *ChangeSendTokenDenom) XXX_Unmarshal(b []byte) error {
+func (m *RegisterChangeBurningFundAddressProposal) String() string { return proto.CompactTextString(m) }
+func (*RegisterChangeBurningFundAddressProposal) ProtoMessage()    {}
+func (*RegisterChangeBurningFundAddressProposal) Descriptor() ([]byte, []int) {
+	return fileDescriptor_65b2ec78985a1875, []int{2}
+}
+func (m *RegisterChangeBurningFundAddressProposal) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *ChangeSendTokenDenom) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *RegisterChangeBurningFundAddressProposal) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_ChangeSendTokenDenom.Marshal(b, m, deterministic)
+		return xxx_messageInfo_RegisterChangeBurningFundAddressProposal.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -116,69 +194,78 @@ func (m *ChangeSendTokenDenom) XXX_Marshal(b []byte, deterministic bool) ([]byte
 		return b[:n], nil
 	}
 }
-func (m *ChangeSendTokenDenom) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_ChangeSendTokenDenom.Merge(m, src)
+func (m *RegisterChangeBurningFundAddressProposal) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_RegisterChangeBurningFundAddressProposal.Merge(m, src)
 }
-func (m *ChangeSendTokenDenom) XXX_Size() int {
+func (m *RegisterChangeBurningFundAddressProposal) XXX_Size() int {
 	return m.Size()
 }
-func (m *ChangeSendTokenDenom) XXX_DiscardUnknown() {
-	xxx_messageInfo_ChangeSendTokenDenom.DiscardUnknown(m)
+func (m *RegisterChangeBurningFundAddressProposal) XXX_DiscardUnknown() {
+	xxx_messageInfo_RegisterChangeBurningFundAddressProposal.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_ChangeSendTokenDenom proto.InternalMessageInfo
+var xxx_messageInfo_RegisterChangeBurningFundAddressProposal proto.InternalMessageInfo
 
-func (m *ChangeSendTokenDenom) GetTitle() string {
+func (m *RegisterChangeBurningFundAddressProposal) GetTitle() string {
 	if m != nil {
 		return m.Title
 	}
 	return ""
 }
 
-func (m *ChangeSendTokenDenom) GetDescription() string {
+func (m *RegisterChangeBurningFundAddressProposal) GetDescription() string {
 	if m != nil {
 		return m.Description
 	}
 	return ""
 }
 
-func (m *ChangeSendTokenDenom) GetMetadata() []types.Metadata {
+func (m *RegisterChangeBurningFundAddressProposal) GetAddress() string {
 	if m != nil {
-		return m.Metadata
+		return m.Address
 	}
-	return nil
+	return ""
 }
 
 func init() {
-	proto.RegisterType((*ChangeBaseTokenDenom)(nil), "core.stable.v1beta1.ChangeBaseTokenDenom")
-	proto.RegisterType((*ChangeSendTokenDenom)(nil), "core.stable.v1beta1.ChangeSendTokenDenom")
+	proto.RegisterType((*RegisterPairProposal)(nil), "core.stable.v1beta1.RegisterPairProposal")
+	proto.RegisterType((*ProposalMetadata)(nil), "core.stable.v1beta1.ProposalMetadata")
+	proto.RegisterType((*RegisterChangeBurningFundAddressProposal)(nil), "core.stable.v1beta1.RegisterChangeBurningFundAddressProposal")
 }
 
 func init() { proto.RegisterFile("core/stable/proposal.proto", fileDescriptor_65b2ec78985a1875) }
 
 var fileDescriptor_65b2ec78985a1875 = []byte{
-	// 286 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xcc, 0x91, 0xb1, 0x4e, 0xc3, 0x30,
-	0x18, 0x84, 0x63, 0x5a, 0x10, 0xa4, 0x5b, 0xc8, 0x10, 0x45, 0xc2, 0x8d, 0x98, 0x2a, 0x06, 0x5b,
-	0x85, 0x8d, 0x05, 0x29, 0x74, 0x45, 0x88, 0xc2, 0xc4, 0xe6, 0x24, 0xbf, 0xd2, 0xa8, 0x89, 0xff,
-	0xc8, 0x76, 0x11, 0xbc, 0x05, 0x0b, 0x3b, 0x8f, 0xd3, 0xb1, 0x23, 0x13, 0x42, 0xc9, 0xc2, 0x63,
-	0xa0, 0x3a, 0x01, 0xf5, 0x11, 0xd8, 0xfe, 0xbb, 0xf3, 0x49, 0x9f, 0x7c, 0x6e, 0x98, 0xa2, 0x02,
-	0xae, 0x8d, 0x48, 0x4a, 0xe0, 0xb5, 0xc2, 0x1a, 0xb5, 0x28, 0x59, 0xad, 0xd0, 0xa0, 0x77, 0xbc,
-	0xcd, 0x58, 0x97, 0xb1, 0xa7, 0x69, 0x02, 0x46, 0x4c, 0x43, 0x9a, 0xa2, 0xae, 0x50, 0xf3, 0x44,
-	0xc8, 0x25, 0xef, 0x4d, 0x2b, 0xba, 0x52, 0xe8, 0xe7, 0x98, 0xa3, 0x3d, 0xf9, 0xf6, 0xea, 0xdc,
-	0xd3, 0x37, 0xe2, 0xfa, 0xd7, 0x0b, 0x21, 0x73, 0x88, 0x85, 0x86, 0x07, 0x5c, 0x82, 0x9c, 0x81,
-	0xc4, 0xca, 0xf3, 0xdd, 0x7d, 0x53, 0x98, 0x12, 0x02, 0x12, 0x91, 0xc9, 0xd1, 0xbc, 0x13, 0x5e,
-	0xe4, 0x8e, 0x32, 0xd0, 0xa9, 0x2a, 0x6a, 0x53, 0xa0, 0x0c, 0xf6, 0x6c, 0xb6, 0x6b, 0x79, 0x57,
-	0xee, 0x61, 0x05, 0x46, 0x64, 0xc2, 0x88, 0x60, 0x10, 0x0d, 0x26, 0xa3, 0xf3, 0x13, 0xd6, 0x91,
-	0x31, 0x0b, 0xd3, 0x93, 0xb1, 0x9b, 0xfe, 0x51, 0x3c, 0x5c, 0x7f, 0x8e, 0x9d, 0xf9, 0x5f, 0xe9,
-	0x72, 0xf8, 0xfd, 0x3e, 0x76, 0x76, 0xb8, 0xee, 0x41, 0x66, 0xff, 0x86, 0x2b, 0x9e, 0xad, 0x1b,
-	0x4a, 0x36, 0x0d, 0x25, 0x5f, 0x0d, 0x25, 0xaf, 0x2d, 0x75, 0x36, 0x2d, 0x75, 0x3e, 0x5a, 0xea,
-	0x3c, 0x9e, 0xe5, 0x85, 0x59, 0xac, 0x12, 0x96, 0x62, 0xc5, 0xef, 0x56, 0x22, 0x53, 0xc2, 0xc0,
-	0xad, 0xca, 0xb9, 0xdd, 0xf1, 0xf9, 0x77, 0x49, 0xf3, 0x52, 0x83, 0x4e, 0x0e, 0xec, 0xe7, 0x5f,
-	0xfc, 0x04, 0x00, 0x00, 0xff, 0xff, 0x41, 0x6c, 0x0b, 0xe3, 0xe5, 0x01, 0x00, 0x00,
+	// 402 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xbc, 0x53, 0xb1, 0x6e, 0xdb, 0x30,
+	0x14, 0x14, 0x65, 0xbb, 0x45, 0xe9, 0xc5, 0x55, 0x0d, 0x54, 0x30, 0x50, 0x49, 0xd0, 0x64, 0x74,
+	0x90, 0xe0, 0x76, 0xf3, 0x66, 0xb7, 0x28, 0xd0, 0xa1, 0xb0, 0xab, 0xb1, 0x1b, 0x25, 0x11, 0x32,
+	0x1b, 0x89, 0x14, 0x48, 0x2a, 0x88, 0xd7, 0xfc, 0x40, 0xf2, 0x09, 0xf9, 0x1c, 0x8f, 0xce, 0x96,
+	0xc9, 0x08, 0xec, 0x25, 0x73, 0xbe, 0x20, 0xb0, 0x28, 0x19, 0x42, 0x9c, 0x21, 0x40, 0x00, 0x6f,
+	0x7a, 0xef, 0x9e, 0xee, 0x8e, 0x47, 0x3e, 0x38, 0x88, 0x18, 0xc7, 0xbe, 0x90, 0x28, 0x4c, 0xb1,
+	0x9f, 0x73, 0x96, 0x33, 0x81, 0x52, 0x2f, 0xe7, 0x4c, 0x32, 0xe3, 0xd3, 0x1e, 0xf3, 0x14, 0xe6,
+	0x9d, 0x8f, 0x42, 0x2c, 0xd1, 0x68, 0xd0, 0x4f, 0x58, 0xc2, 0x4a, 0xdc, 0xdf, 0x7f, 0xa9, 0xd1,
+	0x81, 0x15, 0x31, 0x91, 0x31, 0xe1, 0x87, 0x88, 0x9e, 0xf9, 0xd5, 0x68, 0x59, 0x28, 0xdc, 0xbd,
+	0xd5, 0x61, 0x3f, 0xc0, 0x09, 0x11, 0x12, 0xf3, 0x39, 0x22, 0x7c, 0x5e, 0x29, 0x19, 0x7d, 0xd8,
+	0x91, 0x44, 0xa6, 0xd8, 0x04, 0x0e, 0x18, 0x7e, 0x08, 0x54, 0x61, 0x38, 0xb0, 0x1b, 0x63, 0x11,
+	0x71, 0x92, 0x4b, 0xc2, 0xa8, 0xa9, 0x97, 0x58, 0xb3, 0x65, 0xfc, 0x87, 0x3d, 0x94, 0xb1, 0x82,
+	0xca, 0xdf, 0xf4, 0x0f, 0x96, 0x28, 0x46, 0x12, 0x99, 0x2d, 0x07, 0x0c, 0xbb, 0xdf, 0xbe, 0x78,
+	0xca, 0x8b, 0x57, 0xca, 0x57, 0x5e, 0xbc, 0x7a, 0x68, 0x6a, 0xaf, 0x36, 0xb6, 0xf6, 0xb8, 0xb1,
+	0x3f, 0x2f, 0x51, 0x96, 0x8e, 0xdd, 0xe7, 0x24, 0x6e, 0x70, 0xc4, 0x6b, 0x64, 0xf0, 0xa3, 0xea,
+	0xcd, 0x0a, 0x79, 0x10, 0x6b, 0xbf, 0x46, 0xcc, 0xa9, 0xc4, 0xcc, 0xa6, 0x58, 0x83, 0xc5, 0x0d,
+	0x8e, 0x99, 0xf7, 0x87, 0xcf, 0x08, 0x9d, 0x54, 0x2e, 0xcc, 0x8e, 0x3a, 0x7c, 0xa3, 0x35, 0x6e,
+	0x3f, 0xdc, 0xd8, 0x9a, 0x7b, 0xa5, 0xc3, 0x5e, 0x9d, 0xe3, 0xe1, 0xe7, 0x97, 0x72, 0x01, 0xa7,
+	0xcc, 0x45, 0x3f, 0x55, 0x2e, 0xad, 0xa3, 0x5c, 0xdc, 0x4b, 0x00, 0x87, 0xf5, 0x2b, 0xfb, 0xb1,
+	0x40, 0x34, 0xc1, 0xd3, 0x82, 0x53, 0x42, 0x93, 0x5f, 0x05, 0x8d, 0x27, 0x71, 0xcc, 0xb1, 0x10,
+	0x6f, 0x7e, 0x79, 0x26, 0x7c, 0x8f, 0x14, 0x55, 0x65, 0xa1, 0x2e, 0xd5, 0xb5, 0x4c, 0x7f, 0xae,
+	0xb6, 0x16, 0x58, 0x6f, 0x2d, 0x70, 0xbf, 0xb5, 0xc0, 0xf5, 0xce, 0xd2, 0xd6, 0x3b, 0x4b, 0xbb,
+	0xdb, 0x59, 0xda, 0xbf, 0xaf, 0x09, 0x91, 0x8b, 0x22, 0xf4, 0x22, 0x96, 0xf9, 0x7f, 0x0b, 0x14,
+	0x73, 0x24, 0xf1, 0x8c, 0x27, 0x7e, 0xb9, 0x82, 0x17, 0xf5, 0x12, 0xca, 0x65, 0x8e, 0x45, 0xf8,
+	0xae, 0xdc, 0x9b, 0xef, 0x4f, 0x01, 0x00, 0x00, 0xff, 0xff, 0x42, 0xb2, 0xc0, 0x0d, 0xa0, 0x03,
+	0x00, 0x00,
 }
 
-func (m *ChangeBaseTokenDenom) Marshal() (dAtA []byte, err error) {
+func (m *RegisterPairProposal) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -188,30 +275,43 @@ func (m *ChangeBaseTokenDenom) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *ChangeBaseTokenDenom) MarshalTo(dAtA []byte) (int, error) {
+func (m *RegisterPairProposal) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *ChangeBaseTokenDenom) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *RegisterPairProposal) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if len(m.Metadata) > 0 {
-		for iNdEx := len(m.Metadata) - 1; iNdEx >= 0; iNdEx-- {
-			{
-				size, err := m.Metadata[iNdEx].MarshalToSizedBuffer(dAtA[:i])
-				if err != nil {
-					return 0, err
-				}
-				i -= size
-				i = encodeVarintProposal(dAtA, i, uint64(size))
-			}
-			i--
-			dAtA[i] = 0x1a
-		}
+	if len(m.MinAmountIn) > 0 {
+		i -= len(m.MinAmountIn)
+		copy(dAtA[i:], m.MinAmountIn)
+		i = encodeVarintProposal(dAtA, i, uint64(len(m.MinAmountIn)))
+		i--
+		dAtA[i] = 0x2a
 	}
+	{
+		size, err := m.AmountOutMetadata.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintProposal(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0x22
+	{
+		size, err := m.AmountInMetadata.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintProposal(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0x1a
 	if len(m.Description) > 0 {
 		i -= len(m.Description)
 		copy(dAtA[i:], m.Description)
@@ -229,7 +329,7 @@ func (m *ChangeBaseTokenDenom) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *ChangeSendTokenDenom) Marshal() (dAtA []byte, err error) {
+func (m *ProposalMetadata) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -239,29 +339,72 @@ func (m *ChangeSendTokenDenom) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *ChangeSendTokenDenom) MarshalTo(dAtA []byte) (int, error) {
+func (m *ProposalMetadata) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *ChangeSendTokenDenom) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *ProposalMetadata) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if len(m.Metadata) > 0 {
-		for iNdEx := len(m.Metadata) - 1; iNdEx >= 0; iNdEx-- {
-			{
-				size, err := m.Metadata[iNdEx].MarshalToSizedBuffer(dAtA[:i])
-				if err != nil {
-					return 0, err
-				}
-				i -= size
-				i = encodeVarintProposal(dAtA, i, uint64(size))
-			}
-			i--
-			dAtA[i] = 0x1a
+	if len(m.MinAmountIn) > 0 {
+		i -= len(m.MinAmountIn)
+		copy(dAtA[i:], m.MinAmountIn)
+		i = encodeVarintProposal(dAtA, i, uint64(len(m.MinAmountIn)))
+		i--
+		dAtA[i] = 0x1a
+	}
+	{
+		size, err := m.AmountOutMetadata.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
 		}
+		i -= size
+		i = encodeVarintProposal(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0x12
+	{
+		size, err := m.AmountInMetadata.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintProposal(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
+}
+
+func (m *RegisterChangeBurningFundAddressProposal) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *RegisterChangeBurningFundAddressProposal) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *RegisterChangeBurningFundAddressProposal) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.Address) > 0 {
+		i -= len(m.Address)
+		copy(dAtA[i:], m.Address)
+		i = encodeVarintProposal(dAtA, i, uint64(len(m.Address)))
+		i--
+		dAtA[i] = 0x1a
 	}
 	if len(m.Description) > 0 {
 		i -= len(m.Description)
@@ -291,7 +434,7 @@ func encodeVarintProposal(dAtA []byte, offset int, v uint64) int {
 	dAtA[offset] = uint8(v)
 	return base
 }
-func (m *ChangeBaseTokenDenom) Size() (n int) {
+func (m *RegisterPairProposal) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -305,16 +448,35 @@ func (m *ChangeBaseTokenDenom) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovProposal(uint64(l))
 	}
-	if len(m.Metadata) > 0 {
-		for _, e := range m.Metadata {
-			l = e.Size()
-			n += 1 + l + sovProposal(uint64(l))
-		}
+	l = m.AmountInMetadata.Size()
+	n += 1 + l + sovProposal(uint64(l))
+	l = m.AmountOutMetadata.Size()
+	n += 1 + l + sovProposal(uint64(l))
+	l = len(m.MinAmountIn)
+	if l > 0 {
+		n += 1 + l + sovProposal(uint64(l))
 	}
 	return n
 }
 
-func (m *ChangeSendTokenDenom) Size() (n int) {
+func (m *ProposalMetadata) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = m.AmountInMetadata.Size()
+	n += 1 + l + sovProposal(uint64(l))
+	l = m.AmountOutMetadata.Size()
+	n += 1 + l + sovProposal(uint64(l))
+	l = len(m.MinAmountIn)
+	if l > 0 {
+		n += 1 + l + sovProposal(uint64(l))
+	}
+	return n
+}
+
+func (m *RegisterChangeBurningFundAddressProposal) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -328,11 +490,9 @@ func (m *ChangeSendTokenDenom) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovProposal(uint64(l))
 	}
-	if len(m.Metadata) > 0 {
-		for _, e := range m.Metadata {
-			l = e.Size()
-			n += 1 + l + sovProposal(uint64(l))
-		}
+	l = len(m.Address)
+	if l > 0 {
+		n += 1 + l + sovProposal(uint64(l))
 	}
 	return n
 }
@@ -343,7 +503,7 @@ func sovProposal(x uint64) (n int) {
 func sozProposal(x uint64) (n int) {
 	return sovProposal(uint64((x << 1) ^ uint64((int64(x) >> 63))))
 }
-func (m *ChangeBaseTokenDenom) Unmarshal(dAtA []byte) error {
+func (m *RegisterPairProposal) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -366,10 +526,10 @@ func (m *ChangeBaseTokenDenom) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: ChangeBaseTokenDenom: wiretype end group for non-group")
+			return fmt.Errorf("proto: RegisterPairProposal: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: ChangeBaseTokenDenom: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: RegisterPairProposal: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -438,7 +598,7 @@ func (m *ChangeBaseTokenDenom) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 3:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Metadata", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field AmountInMetadata", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -465,10 +625,74 @@ func (m *ChangeBaseTokenDenom) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Metadata = append(m.Metadata, types.Metadata{})
-			if err := m.Metadata[len(m.Metadata)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			if err := m.AmountInMetadata.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
+			iNdEx = postIndex
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field AmountOutMetadata", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowProposal
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthProposal
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthProposal
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.AmountOutMetadata.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 5:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field MinAmountIn", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowProposal
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthProposal
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthProposal
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.MinAmountIn = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
@@ -491,7 +715,7 @@ func (m *ChangeBaseTokenDenom) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *ChangeSendTokenDenom) Unmarshal(dAtA []byte) error {
+func (m *ProposalMetadata) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -514,10 +738,158 @@ func (m *ChangeSendTokenDenom) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: ChangeSendTokenDenom: wiretype end group for non-group")
+			return fmt.Errorf("proto: ProposalMetadata: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: ChangeSendTokenDenom: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: ProposalMetadata: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field AmountInMetadata", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowProposal
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthProposal
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthProposal
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.AmountInMetadata.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field AmountOutMetadata", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowProposal
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthProposal
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthProposal
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.AmountOutMetadata.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field MinAmountIn", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowProposal
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthProposal
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthProposal
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.MinAmountIn = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipProposal(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthProposal
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *RegisterChangeBurningFundAddressProposal) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowProposal
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: RegisterChangeBurningFundAddressProposal: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: RegisterChangeBurningFundAddressProposal: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -586,9 +958,9 @@ func (m *ChangeSendTokenDenom) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 3:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Metadata", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Address", wireType)
 			}
-			var msglen int
+			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowProposal
@@ -598,25 +970,23 @@ func (m *ChangeSendTokenDenom) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				msglen |= int(b&0x7F) << shift
+				stringLen |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-			if msglen < 0 {
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
 				return ErrInvalidLengthProposal
 			}
-			postIndex := iNdEx + msglen
+			postIndex := iNdEx + intStringLen
 			if postIndex < 0 {
 				return ErrInvalidLengthProposal
 			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Metadata = append(m.Metadata, types.Metadata{})
-			if err := m.Metadata[len(m.Metadata)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
+			m.Address = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex

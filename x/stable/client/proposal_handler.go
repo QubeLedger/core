@@ -8,6 +8,6 @@ import (
 )
 
 var (
-	RegisterChangeBaseTokenDenomHendler = govclient.NewProposalHandler(cli.NewRegisterChangeBaseTokenDenomProposalCmd, rest.RegisterChangeBaseTokenDenomRESTHandler)
-	RegisterChangeSendTokenDenomHendler = govclient.NewProposalHandler(cli.NewRegisterChangeSendTokenDenomProposalCmd, rest.RegisterChangeSendTokenDenomRESTHandler)
+	RegisterPairHandler                     = govclient.NewProposalHandler(cli.NewRegisterPairProposalCmd, rest.RegisterPairRESTHandler)
+	RegisterChangeBurningFundAddressHandler = govclient.NewProposalHandler(cli.NewRegisterChangeBurningFundAddressProposalCmd, rest.RegisterChangeBurningFundAddressProposalRESTHandler)
 )

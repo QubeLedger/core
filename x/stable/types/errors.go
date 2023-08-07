@@ -10,6 +10,7 @@ import (
 var (
 	ErrSample                          = sdkerrors.Register(ModuleName, 1100, "sample error")
 	ErrSdkIntError                     = sdkerrors.Register(ModuleName, 1101, "sdk.Int error")
+	ErrInvalidLength                   = sdkerrors.Register(ModuleName, 1102, "invalid length")
 	ErrInvalidPacketTimeout            = sdkerrors.Register(ModuleName, 1500, "invalid packet timeout")
 	ErrInvalidVersion                  = sdkerrors.Register(ModuleName, 1501, "invalid version")
 	ErrAfpNegative                     = sdkerrors.Register(ModuleName, 1200, "AFP negative")
@@ -26,6 +27,8 @@ var (
 	ErrMultipleCoinsLockupNotSupported = sdkerrors.Register(ModuleName, 1600, "ErrMultipleCoinsLockupNotSupported multiple coins lockup is not supported")
 	ErrSendBaseTokenDenom              = sdkerrors.Register(ModuleName, 1601, "ErrSendBaseTokenDenom err")
 	ErrSendSendTokenDenom              = sdkerrors.Register(ModuleName, 1602, "ErrSendSendTokenDenom err")
+	ErrPairNotFound                    = sdkerrors.Register(ModuleName, 1701, "ErrPairNotFound err")
+	ErrAmountInGTEminAmountIn          = sdkerrors.Register(ModuleName, 1801, "ErrAmountInGTEminAmountIn err")
 )
 
 var (

@@ -6,14 +6,14 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-func (k Keeper) ExecuteBurn(ctx sdk.Context, msg *types.MsgBurn) (error, sdk.Coin) {
+func (k Keeper) ExecuteBurn(ctx sdk.Context, msg *types.MsgBurn, pair types.Pair) (error, sdk.Coin) {
 	atomPrice, err := k.GetAtomPrice(ctx)
 
 	if err != nil {
 		return err, sdk.Coin{}
 	}
 
-	qm, ar := k.GetReserve(ctx)
+	qm, ar := pair.Qm, pair.Ar
 
 	backing_ratio, err = CalculateBackingRatio(qm, ar, atomPrice)
 	if err != nil {
@@ -29,17 +29,17 @@ func (k Keeper) ExecuteBurn(ctx sdk.Context, msg *types.MsgBurn) (error, sdk.Coi
 	if err != nil {
 		return err, sdk.Coin{}
 	}
-	amountIntCoins, err := sdk.ParseCoinsNormalized(msg.Amount)
+	amountIntCoins, err := sdk.ParseCoinsNormalized(msg.AmountIn)
 	if err != nil {
 		return err, sdk.Coin{}
 	}
 
-	err = VerificationSendDenomCoins(amountIntCoins)
+	err = VerificationBurnDenomCoins(amountIntCoins, pair)
 	if err != nil {
 		return err, sdk.Coin{}
 	}
 
-	amountInt := amountIntCoins.AmountOf(SendTokenDenom)
+	amountInt := amountIntCoins.AmountOf(pair.AmountOutMetadata.DenomUnits[0].Denom)
 	err = k.bankKeeper.SendCoinsFromAccountToModule(ctx, sender, types.ModuleName, amountIntCoins)
 	if err != nil {
 		return err, sdk.Coin{}
@@ -50,20 +50,20 @@ func (k Keeper) ExecuteBurn(ctx sdk.Context, msg *types.MsgBurn) (error, sdk.Coi
 		return types.ErrSdkIntError, sdk.Coin{}
 	}
 
-	err = k.ReduceReserve(ctx, amountOutToSend, amountInt)
+	pair = k.ReduceReserve(ctx, amountOutToSend, amountInt, pair)
 	if err != nil {
 		return err, sdk.Coin{}
 	}
 
-	amountOut := sdk.NewCoin(BaseTokenDenom, amountOutToSend)
+	amountOut := sdk.NewCoin(pair.AmountInMetadata.DenomUnits[0].Denom, amountOutToSend)
 	err = k.bankKeeper.BurnCoins(ctx, types.ModuleName, amountIntCoins)
 	if err != nil {
 		return err, sdk.Coin{}
 	}
 
 	if !burningFee.IsZero() {
-		feeForStabilityFund := k.CalculateBurningFeeForStabilityFund(amountInt, atomPrice, burningFee)
-		err = k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, StabilityFundAddress, types.CreateCoins(BaseTokenDenom, feeForStabilityFund))
+		feeForBurningFund := k.CalculateBurningFeeForBurningFund(amountInt, atomPrice, burningFee)
+		err = k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, BurningFundAddress, types.CreateCoins(pair.AmountInMetadata.DenomUnits[0].Denom, feeForBurningFund))
 		if err != nil {
 			return err, sdk.Coin{}
 		}
@@ -73,5 +73,8 @@ func (k Keeper) ExecuteBurn(ctx sdk.Context, msg *types.MsgBurn) (error, sdk.Coi
 	if err != nil {
 		return err, sdk.Coin{}
 	}
+
+	k.SetPair(ctx, pair)
+
 	return nil, amountOut
 }

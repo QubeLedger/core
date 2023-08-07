@@ -5,14 +5,20 @@ import "gogoproto/gogo.proto";
 import "google/api/annotations.proto";
 import "cosmos/base/query/v1beta1/pagination.proto";
 import "core/stable/params.proto";
-
+import "cosmos/bank/v1beta1/bank.proto";
 option go_package = "github.com/QuadrateOrg/core/x/stable/types";
 
 // Query defines the gRPC querier service.
 service Query {
   // Parameters queries the parameters of the module.
   rpc Params(QueryParamsRequest) returns (QueryParamsResponse) {
-    option (google.api.http).get = "/core/stable/params";
+    option (google.api.http).get = "/core/stable/v1beta1/params";
+  }
+  rpc PairByPairId(PairByPairIdRequest) returns (PairRequestResponse) {
+    option (google.api.http).get = "/core/stable/v1beta1/pair/{pairId}";
+  }
+  rpc PairById(PairByIdRequest) returns (PairRequestResponse) {
+    option (google.api.http).get = "/core/stable/v1beta1/pair/{id}";
   }
 }
 
@@ -22,5 +28,31 @@ message QueryParamsRequest {}
 // QueryParamsResponse is response type for the Query/Params RPC method.
 message QueryParamsResponse {
   // params holds all the parameters of this module.
-  Params params = 1 [(gogoproto.nullable) = false];
+  Params params = 1;
 }
+
+message PairByPairIdRequest {
+  string pairId = 1;
+}
+
+message PairByIdRequest {
+  uint64 id = 1;
+}
+
+message PairRequestResponse {
+  string pairId = 1;
+  cosmos.bank.v1beta1.Metadata amountInMetadata = 2 [ (gogoproto.moretags) = "yaml:\"amountInMetadata\"", (gogoproto.nullable)   = false ];
+  cosmos.bank.v1beta1.Metadata amountOutMetadata = 3 [ (gogoproto.moretags) = "yaml:\"amountOutMetadata\"", (gogoproto.nullable)   = false ];
+  string qm = 4 [
+          (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
+          (gogoproto.moretags) = "yaml:\"qm\"",
+          (gogoproto.nullable) = false
+  ];
+  string ar = 5 [
+          (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
+          (gogoproto.moretags) = "yaml:\"ar\"",
+          (gogoproto.nullable) = false
+  ];
+  string minAmountIn = 6;
+}
+

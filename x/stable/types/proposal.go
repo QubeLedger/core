@@ -12,101 +12,111 @@ import (
 
 // constants
 const (
-	ProposalTypeChangeBaseTokenDenom string = "ChangeBaseTokenDenom"
-	ProposalTypeChangeSendTokenDenom string = "ChangeSendTokenDenom"
+	ProposalTypeRegisterPairProposal                     string = "RegisterPairProposal"
+	ProposalTypeRegisterChangeBurningFundAddressProposal string = "RegisterChangeBurningFundAddressProposal"
 )
 
 // Implements Proposal Interface
 var (
-	_ govtypes.Content = &ChangeBaseTokenDenom{}
-	_ govtypes.Content = &ChangeSendTokenDenom{}
+	_ govtypes.Content = &RegisterPairProposal{}
+	_ govtypes.Content = &RegisterChangeBurningFundAddressProposal{}
 )
 
 func init() {
-	govtypes.RegisterProposalType(ProposalTypeChangeBaseTokenDenom)
-	govtypes.RegisterProposalTypeCodec(&ChangeBaseTokenDenom{}, "stable/ChangeBaseTokenDenom")
-	govtypes.RegisterProposalTypeCodec(&ChangeSendTokenDenom{}, "stable/ChangeSendTokenDenom")
+	govtypes.RegisterProposalType(ProposalTypeRegisterPairProposal)
+	govtypes.RegisterProposalTypeCodec(&RegisterPairProposal{}, "stable/RegisterPairProposal")
+
+	govtypes.RegisterProposalType(ProposalTypeRegisterChangeBurningFundAddressProposal)
+	govtypes.RegisterProposalTypeCodec(&RegisterChangeBurningFundAddressProposal{}, "stable/RegisterChangeBurningFundAddressProposal")
 }
 
-func NewRegisterChangeBaseTokenDenomProposal(title, description string, coinMetadata ...banktypes.Metadata) govtypes.Content {
-	return &ChangeBaseTokenDenom{
+func NewRegisterPairProposal(title, description string, amountInDenom banktypes.Metadata, amountOutDenom banktypes.Metadata, minAmount string) govtypes.Content {
+	return &RegisterPairProposal{
+		Title:             title,
+		Description:       description,
+		AmountInMetadata:  amountInDenom,
+		AmountOutMetadata: amountOutDenom,
+		MinAmountIn:       minAmount,
+	}
+}
+
+func NewRegisterChangeBurningFundAddressProposal(title, description string, address string) govtypes.Content {
+	return &RegisterChangeBurningFundAddressProposal{
 		Title:       title,
 		Description: description,
-		Metadata:    coinMetadata,
+		Address:     address,
 	}
 }
 
-func (*ChangeBaseTokenDenom) ProposalRoute() string { return RouterKey }
+func (*RegisterChangeBurningFundAddressProposal) ProposalRoute() string { return RouterKey }
 
-func (*ChangeBaseTokenDenom) ProposalType() string {
-	return ProposalTypeChangeBaseTokenDenom
+func (*RegisterChangeBurningFundAddressProposal) ProposalType() string {
+	return ProposalTypeRegisterChangeBurningFundAddressProposal
 }
 
-func NewRegisterChangeSendTokenDenomProposal(title, description string, coinMetadata ...banktypes.Metadata) govtypes.Content {
-	return &ChangeSendTokenDenom{
-		Title:       title,
-		Description: description,
-		Metadata:    coinMetadata,
+func (rtbp *RegisterChangeBurningFundAddressProposal) ValidateBasic() error {
+	if len(rtbp.Address) == 0 {
+		return ErrInvalidLength
 	}
-}
-
-func (*ChangeSendTokenDenom) ProposalRoute() string { return RouterKey }
-
-func (*ChangeSendTokenDenom) ProposalType() string {
-	return ProposalTypeChangeSendTokenDenom
-}
-
-func (rtbp *ChangeSendTokenDenom) ValidateBasic() error {
-	for _, metadata := range rtbp.Metadata {
-		if strings.TrimSpace(metadata.Name) == "" {
-			return fmt.Errorf("name field cannot be blank")
-		}
-
-		if strings.TrimSpace(metadata.Symbol) == "" {
-			return fmt.Errorf("symbol field cannot be blank")
-		}
-
-		if err := sdk.ValidateDenom(metadata.Base); err != nil {
-			return fmt.Errorf("invalid metadata base denom: %w", err)
-		}
-
-		if err := sdk.ValidateDenom(metadata.Display); err != nil {
-			return fmt.Errorf("invalid metadata display denom: %w", err)
-		}
-		if err := ibctransfertypes.ValidateIBCDenom(metadata.Base); err != nil {
-			return err
-		}
-
-		if err := validateIBCVoucherMetadata(metadata); err != nil {
-			return err
-		}
+	_, err := sdk.AccAddressFromBech32(rtbp.Address)
+	if err != nil {
+		return nil
 	}
-
 	return nil
 }
 
-func (rtbp *ChangeBaseTokenDenom) ValidateBasic() error {
-	for _, metadata := range rtbp.Metadata {
-		if strings.TrimSpace(metadata.Name) == "" {
+func (*RegisterPairProposal) ProposalRoute() string { return RouterKey }
+
+func (*RegisterPairProposal) ProposalType() string {
+	return ProposalTypeRegisterPairProposal
+}
+
+func (rtbp *RegisterPairProposal) ValidateBasic() error {
+	{
+		if strings.TrimSpace(rtbp.AmountInMetadata.Name) == "" {
 			return fmt.Errorf("name field cannot be blank")
 		}
 
-		if strings.TrimSpace(metadata.Symbol) == "" {
+		if strings.TrimSpace(rtbp.AmountInMetadata.Symbol) == "" {
 			return fmt.Errorf("symbol field cannot be blank")
 		}
 
-		if err := sdk.ValidateDenom(metadata.Base); err != nil {
+		if err := sdk.ValidateDenom(rtbp.AmountInMetadata.Base); err != nil {
 			return fmt.Errorf("invalid metadata base denom: %w", err)
 		}
 
-		if err := sdk.ValidateDenom(metadata.Display); err != nil {
+		if err := sdk.ValidateDenom(rtbp.AmountInMetadata.Display); err != nil {
 			return fmt.Errorf("invalid metadata display denom: %w", err)
 		}
-		if err := ibctransfertypes.ValidateIBCDenom(metadata.Base); err != nil {
+		if err := ibctransfertypes.ValidateIBCDenom(rtbp.AmountInMetadata.Base); err != nil {
 			return err
 		}
 
-		if err := validateIBCVoucherMetadata(metadata); err != nil {
+		if err := validateIBCVoucherMetadata(rtbp.AmountInMetadata); err != nil {
+			return err
+		}
+	}
+	{
+		if strings.TrimSpace(rtbp.AmountOutMetadata.Name) == "" {
+			return fmt.Errorf("name field cannot be blank")
+		}
+
+		if strings.TrimSpace(rtbp.AmountOutMetadata.Symbol) == "" {
+			return fmt.Errorf("symbol field cannot be blank")
+		}
+
+		if err := sdk.ValidateDenom(rtbp.AmountOutMetadata.Base); err != nil {
+			return fmt.Errorf("invalid metadata base denom: %w", err)
+		}
+
+		if err := sdk.ValidateDenom(rtbp.AmountOutMetadata.Display); err != nil {
+			return fmt.Errorf("invalid metadata display denom: %w", err)
+		}
+		if err := ibctransfertypes.ValidateIBCDenom(rtbp.AmountOutMetadata.Base); err != nil {
+			return err
+		}
+
+		if err := validateIBCVoucherMetadata(rtbp.AmountOutMetadata); err != nil {
 			return err
 		}
 	}

@@ -1,9 +1,9 @@
 package types
 
 const (
-	EventChangeBaseTokenDenom = "change_base_token_denom"
-	EventChangeSendTokenDenom = "change_send_token_denom"
-	AttributeValueCategory    = ModuleName
-	AttributeKeyActionMint    = "mint"
-	AttributeKeyActionBurn    = "burn"
+	EventRegisterCreateNewPairProposal            = "register_create_new_pair_proposal"
+	EventRegisterChangeBurningFundAddressProposal = "register_change_stability_fund_address_proposal"
+	AttributeValueCategory                        = ModuleName
+	AttributeKeyActionMint                        = "mint"
+	AttributeKeyActionBurn                        = "burn"
 )

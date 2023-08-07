@@ -177,8 +177,8 @@ func getGovProposalHandlers() []govclient.ProposalHandler {
 		upgradeclient.CancelProposalHandler,
 		ibcclientclient.UpdateClientProposalHandler,
 		ibcclientclient.UpgradeProposalHandler,
-		stableclient.RegisterChangeBaseTokenDenomHendler,
-		stableclient.RegisterChangeSendTokenDenomHendler,
+		stableclient.RegisterPairHandler,
+		stableclient.RegisterChangeBurningFundAddressHandler,
 	)
 
 	return govProposalHandlers

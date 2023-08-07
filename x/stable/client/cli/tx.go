@@ -40,12 +40,10 @@ func GetTxCmd() *cobra.Command {
 
 func CmdMintUsq() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "mint [amount]",
+		Use:   "mint [amount] [denom]",
 		Short: "Broadcast message mint",
-		Args:  cobra.ExactArgs(1),
+		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
-			argAmount := args[0]
-
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
@@ -53,7 +51,8 @@ func CmdMintUsq() *cobra.Command {
 
 			msg := types.NewMsgMint(
 				clientCtx.GetFromAddress().String(),
-				argAmount,
+				args[0],
+				args[1],
 			)
 			if err := msg.ValidateBasic(); err != nil {
 				return err
@@ -69,12 +68,10 @@ func CmdMintUsq() *cobra.Command {
 
 func CmdBurnUsq() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "burn [amount]",
+		Use:   "burn [amount] [denom]",
 		Short: "Broadcast message burn",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
-			argAmount := args[0]
-
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
@@ -82,7 +79,8 @@ func CmdBurnUsq() *cobra.Command {
 
 			msg := types.NewMsgBurn(
 				clientCtx.GetFromAddress().String(),
-				argAmount,
+				args[0],
+				args[1],
 			)
 			if err := msg.ValidateBasic(); err != nil {
 				return err
@@ -96,12 +94,56 @@ func CmdBurnUsq() *cobra.Command {
 	return cmd
 }
 
-func NewRegisterChangeBaseTokenDenomProposalCmd() *cobra.Command {
+//nolint:all
+func NewRegisterPairProposalCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "change-base-token-denom [metadata]",
+		Use:   "register-pair [metadata]",
 		Args:  cobra.ExactArgs(1),
-		Short: "Submit a register change BaseTokenDenom proposal",
+		Short: "Submit a register pair proposal",
+		Long:  `Submit a proposal for couple's registration to x/stable along with the down payment. The offer data should be submitted as a JSON file.`,
+		Example: fmt.Sprintf(`qubed tx gov submit-proposal register-pair metadata.json --from=<key_or_address>
 
+		Where metadata.json contains (example):
+		{
+			"amountInMetadata": {
+				"description": "The native staking and governance token of the Cosmos chain",
+				"denom_units": [
+					{
+						"denom": "ibc/<HASH>",
+						"exponent": 0,
+						"aliases": ["ibcuatom"]
+					},
+					{
+						"denom": "ATOM",
+						"exponent": 6
+					}
+				],
+				"base": "ibc/<HASH>",
+				"display": "ATOM",
+				"name": "Atom",
+				"symbol": "ATOM"
+			},
+			"amountOutMetadata": {
+				"description": "First algorithmic stablecoin backed by ATOM",
+				"denom_units": [
+					{
+						"denom": "uusd",
+						"exponent": 0,
+						"aliases": ["uusd"]
+					},
+					{
+						"denom": "USQ",
+						"exponent": 6
+					}
+				],
+				"base": "uusd",
+				"display": "USQ",
+				"name": "USQ",
+				"symbol": "USQ"
+			},
+			"minAmountIn": "20ibc/<HASH>"
+		}`,
+		),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
@@ -126,13 +168,13 @@ func NewRegisterChangeBaseTokenDenomProposalCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			metadata, err := ParseMetadata(clientCtx.Codec, args[0])
+			amountInMetadata, amountoutMetadata, minAmount, err := ParseMetadata(clientCtx.Codec, args[0])
 			if err != nil {
 				return err
 			}
 			from := clientCtx.GetFromAddress()
 
-			content := types.NewRegisterChangeBaseTokenDenomProposal(title, description, metadata)
+			content := types.NewRegisterPairProposal(title, description, amountInMetadata, amountoutMetadata, minAmount)
 
 			msg, err := govtypes.NewMsgSubmitProposal(content, deposit, from)
 			if err != nil {
@@ -144,7 +186,7 @@ func NewRegisterChangeBaseTokenDenomProposalCmd() *cobra.Command {
 	}
 	cmd.Flags().String(cli.FlagTitle, "", "title of proposal")
 	cmd.Flags().String(cli.FlagDescription, "", "description of proposal")
-	cmd.Flags().String(cli.FlagDeposit, "1aevmos", "deposit of proposal")
+	cmd.Flags().String(cli.FlagDeposit, "1uqube", "deposit of proposal")
 	if err := cmd.MarkFlagRequired(cli.FlagTitle); err != nil {
 		panic(err)
 	}
@@ -158,12 +200,12 @@ func NewRegisterChangeBaseTokenDenomProposalCmd() *cobra.Command {
 	return cmd
 }
 
-func NewRegisterChangeSendTokenDenomProposalCmd() *cobra.Command {
+func NewRegisterChangeBurningFundAddressProposalCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "change-send-token-denom [metadata]",
+		Use:   "change-stability-fund [address]",
 		Args:  cobra.ExactArgs(1),
-		Short: "Submit a register change SendTokenDenom proposal",
-
+		Short: "Submit a change stability fund address proposal",
+		Long:  `Submit a proposal for couple's registration to x/stable along with the down payment. The offer data should be submitted as a JSON file.`,
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
@@ -188,24 +230,22 @@ func NewRegisterChangeSendTokenDenomProposalCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			metadata, err := ParseMetadata(clientCtx.Codec, args[0])
-			if err != nil {
-				return err
-			}
+
 			from := clientCtx.GetFromAddress()
 
-			content := types.NewRegisterChangeSendTokenDenomProposal(title, description, metadata)
+			content := types.NewRegisterChangeBurningFundAddressProposal(title, description, args[0])
 
 			msg, err := govtypes.NewMsgSubmitProposal(content, deposit, from)
 			if err != nil {
 				return err
 			}
+
 			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
 		},
 	}
 	cmd.Flags().String(cli.FlagTitle, "", "title of proposal")
 	cmd.Flags().String(cli.FlagDescription, "", "description of proposal")
-	cmd.Flags().String(cli.FlagDeposit, "1aevmos", "deposit of proposal")
+	cmd.Flags().String(cli.FlagDeposit, "1uqube", "deposit of proposal")
 	if err := cmd.MarkFlagRequired(cli.FlagTitle); err != nil {
 		panic(err)
 	}

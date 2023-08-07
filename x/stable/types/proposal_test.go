@@ -8,26 +8,39 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestChangeBaseTokenDenomProposal(t *testing.T) {
+func TestRegisterPairProposal(t *testing.T) {
 	tests := []struct {
-		title       string
-		description string
-		metadata    banktypes.Metadata
-		expectedErr bool
+		title             string
+		description       string
+		amountInMetadata  banktypes.Metadata
+		amountOutMetadata banktypes.Metadata
+		minAmount         string
+		expectedErr       bool
 	}{
 		{
 			"test",
 			"test",
 			banktypes.Metadata{
-				Name:        "Cosmos Hub Atom",
-				Symbol:      "ATOM",
-				Description: "The native staking token of the Cosmos Hub.",
+				Description: "",
 				DenomUnits: []*banktypes.DenomUnit{
-					{"uatom", uint32(0), []string{"microatom"}},
+					{Denom: "uatom", Exponent: uint32(0), Aliases: []string{"microatom"}},
 				},
 				Base:    "uatom",
 				Display: "atom",
+				Name:    "ATOM",
+				Symbol:  "ATOM",
 			},
+			banktypes.Metadata{
+				Description: "",
+				DenomUnits: []*banktypes.DenomUnit{
+					{Denom: "uusd", Exponent: uint32(0), Aliases: []string{"microusd"}},
+				},
+				Base:    "uusd",
+				Display: "usd",
+				Name:    "USQ",
+				Symbol:  "USQ",
+			},
+			"20uatom",
 			false,
 		},
 		{
@@ -36,6 +49,10 @@ func TestChangeBaseTokenDenomProposal(t *testing.T) {
 			banktypes.Metadata{
 				Name: "",
 			},
+			banktypes.Metadata{
+				Name: "",
+			},
+			"",
 			true,
 		},
 		{
@@ -45,6 +62,11 @@ func TestChangeBaseTokenDenomProposal(t *testing.T) {
 				Name:   "Cosmos Hub Atom",
 				Symbol: "",
 			},
+			banktypes.Metadata{
+				Name:   "Cosmos Hub Atom",
+				Symbol: "",
+			},
+			"",
 			true,
 		},
 		{
@@ -55,6 +77,12 @@ func TestChangeBaseTokenDenomProposal(t *testing.T) {
 				Symbol: "ATOM",
 				Base:   "",
 			},
+			banktypes.Metadata{
+				Name:   "Cosmos Hub Atom",
+				Symbol: "ATOM",
+				Base:   "",
+			},
+			"",
 			true,
 		},
 		{
@@ -66,12 +94,19 @@ func TestChangeBaseTokenDenomProposal(t *testing.T) {
 				Base:    "uatom",
 				Display: "",
 			},
+			banktypes.Metadata{
+				Name:    "Cosmos Hub Atom",
+				Symbol:  "ATOM",
+				Base:    "uatom",
+				Display: "",
+			},
+			"",
 			true,
 		},
 	}
 
 	for _, tc := range tests {
-		msg := types.NewRegisterChangeBaseTokenDenomProposal(tc.title, tc.description, tc.metadata)
+		msg := types.NewRegisterPairProposal(tc.title, tc.description, tc.amountInMetadata, tc.amountOutMetadata, tc.minAmount)
 		err := msg.ValidateBasic()
 		if tc.expectedErr {
 			require.Error(t, err)
@@ -81,70 +116,29 @@ func TestChangeBaseTokenDenomProposal(t *testing.T) {
 	}
 }
 
-func TestChangeSendTokenDenomProposal(t *testing.T) {
+func TestRegisterChangeBurningFundAddressProposal(t *testing.T) {
 	tests := []struct {
 		title       string
 		description string
-		metadata    banktypes.Metadata
+		address     string
 		expectedErr bool
 	}{
 		{
 			"test",
 			"test",
-			banktypes.Metadata{
-				Name:        "Cosmos Hub Atom",
-				Symbol:      "ATOM",
-				Description: "The native staking token of the Cosmos Hub.",
-				DenomUnits: []*banktypes.DenomUnit{
-					{"uatom", uint32(0), []string{"microatom"}},
-				},
-				Base:    "uatom",
-				Display: "atom",
-			},
+			"qube17ca7p2gvf6qcg0n6ucnkjpe3estscfdhaj9ep9",
 			false,
 		},
 		{
 			"test",
 			"test",
-			banktypes.Metadata{
-				Name: "",
-			},
-			true,
-		},
-		{
-			"test",
-			"test",
-			banktypes.Metadata{
-				Name:   "Cosmos Hub Atom",
-				Symbol: "",
-			},
-			true,
-		},
-		{
-			"test",
-			"test",
-			banktypes.Metadata{
-				Name:   "Cosmos Hub Atom",
-				Symbol: "ATOM",
-				Base:   "",
-			},
-			true,
-		},
-		{
-			"test",
-			"test",
-			banktypes.Metadata{
-				Name:    "Cosmos Hub Atom",
-				Symbol:  "ATOM",
-				Base:    "uatom",
-				Display: "",
-			},
+			"",
 			true,
 		},
 	}
 
 	for _, tc := range tests {
-		msg := types.NewRegisterChangeSendTokenDenomProposal(tc.title, tc.description, tc.metadata)
+		msg := types.NewRegisterChangeBurningFundAddressProposal(tc.title, tc.description, tc.address)
 		err := msg.ValidateBasic()
 		if tc.expectedErr {
 			require.Error(t, err)

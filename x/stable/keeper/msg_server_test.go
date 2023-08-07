@@ -5,26 +5,26 @@ import (
 	"math/rand"
 	"time"
 
+	apptesting "github.com/QuadrateOrg/core/app/apptesting"
 	"github.com/QuadrateOrg/core/x/stable/types"
 
-	apptesting "github.com/QuadrateOrg/core/app/apptesting"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 func (suite *StableKeeperTestSuite) TestMint() {
 	testCases := []struct {
-		name           string
-		baseTokenDenom string
-		sendTokenDenom string
-		atomAmount     int64
-		uusdAmount     int64
-		atomPrice      int64
-		err            bool
-		errString      string
+		name            string
+		pair            types.Pair
+		sendTokenDenom  string
+		sendTokenAmount int64
+		getTokenAmount  int64
+		price           int64
+		err             bool
+		errString       string
 	}{
 		{
 			"ok-mint",
-			"uatom",
+			s.GetNormalPair(0),
 			"uatom",
 			1000,
 			9471,
@@ -33,52 +33,61 @@ func (suite *StableKeeperTestSuite) TestMint() {
 			"",
 		},
 		{
-			"fail-wrong denom",
-			"uatom",
+			"fail-pair not found",
+			s.GetNormalPair(0),
 			"ukuji",
 			1000,
 			9272,
 			int64(93000),
 			true,
-			"ErrSendBaseTokenDenom err",
+			"ErrPairNotFound err",
 		},
 		{
 			"fail-mint blocked",
-			"uatom",
+			s.GetNormalPair(0),
 			"uatom",
 			1000,
 			9471,
-			int64(1500000),
+			int64(150000000),
 			true,
 			"Backing Ration >= 120%",
 		},
+		{
+			"fail-amountIn less minAmountIn",
+			s.GetNormalPair(0),
+			"uatom",
+			19,
+			0,
+			int64(93000),
+			true,
+			"ErrAmountInGTEminAmountIn err",
+		},
 	}
 
+	suite.Setup()
+	suite.Commit()
+
 	for _, tc := range testCases {
-		suite.Setup()
-		suite.Commit()
 		suite.app.StableKeeper.SetTestingMode(true)
-		suite.app.StableKeeper.SetBaseTokenDenom(suite.ctx, tc.baseTokenDenom)
-		suite.app.StableKeeper.SetSendTokenDenom(suite.ctx, "uusd")
 		suite.Run(fmt.Sprintf("Case---%s", tc.name), func() {
-			suite.app.StableKeeper.UpdateAtomPriceTesting(suite.ctx, sdk.NewInt(tc.atomPrice))
-			suite.app.BankKeeper.MintCoins(suite.ctx, types.ModuleName, sdk.NewCoins(sdk.NewCoin("uatom", sdk.NewInt(tc.atomAmount))))
-			suite.app.BankKeeper.SendCoinsFromModuleToAccount(suite.ctx, types.ModuleName, suite.Address, sdk.NewCoins(sdk.NewCoin("uatom", sdk.NewInt(tc.atomAmount))))
+			suite.app.StableKeeper.AppendPair(suite.ctx, tc.pair)
+			suite.app.StableKeeper.UpdateAtomPriceTesting(suite.ctx, sdk.NewInt(tc.price))
+			suite.AddTestCoins(tc.sendTokenAmount, tc.sendTokenDenom)
 
 			msg := types.NewMsgMint(
 				suite.Address.String(),
-				sdk.NewInt(tc.atomAmount).String()+tc.sendTokenDenom,
+				sdk.NewInt(tc.sendTokenAmount).String()+tc.sendTokenDenom,
+				tc.pair.AmountOutMetadata.Base,
 			)
 			ctx := sdk.WrapSDKContext(suite.ctx)
 			_, err := suite.app.StableKeeper.Mint(ctx, msg)
-
 			if !tc.err {
 				suite.Require().NoError(err, tc.name)
-				uusdAmount := suite.app.BankKeeper.GetBalance(suite.ctx, suite.Address, "uusd")
-				suite.Require().Equal(uusdAmount.Amount, sdk.NewInt(int64(tc.uusdAmount)))
-				stabilityfundBalance := suite.app.BankKeeper.GetBalance(suite.ctx, suite.app.StableKeeper.GetStabilityFundAddress(suite.ctx), "uatom")
-				feeForStabilityFund := suite.app.StableKeeper.CalculateMintingFeeForStabilityFund(sdk.NewInt(tc.atomAmount), sdk.NewInt(tc.atomPrice), sdk.NewInt(3))
-				suite.Require().Equal(stabilityfundBalance.Amount, feeForStabilityFund)
+				getTokenAmountFromBank := suite.app.BankKeeper.GetBalance(suite.ctx, suite.Address, tc.pair.AmountOutMetadata.Base)
+				suite.Require().Equal(getTokenAmountFromBank.Amount, sdk.NewInt(int64(tc.getTokenAmount)))
+				BurningFundBalance := suite.app.BankKeeper.GetBalance(suite.ctx, suite.app.StableKeeper.GetBurningFundAddress(suite.ctx), tc.pair.AmountInMetadata.Base)
+				feeForBurningFund := suite.app.StableKeeper.CalculateMintingFeeForBurningFund(sdk.NewInt(tc.sendTokenAmount), sdk.NewInt(tc.price), sdk.NewInt(3))
+				suite.Require().Equal(BurningFundBalance.Amount, feeForBurningFund)
 			} else {
 				suite.Require().Error(err, tc.errString)
 			}
@@ -88,18 +97,18 @@ func (suite *StableKeeperTestSuite) TestMint() {
 
 func (suite *StableKeeperTestSuite) TestBurn() {
 	testCases := []struct {
-		name           string
-		baseTokenDenom string
-		sendTokenDenom string
-		uusdAmount     int64
-		atomAmount     int64
-		atomPrice      int64
-		err            bool
-		errString      string
+		name            string
+		pair            types.Pair
+		sendTokenDenom  string
+		sendTokenAmount int64
+		getTokenAmount  int64
+		price           int64
+		err             bool
+		errString       string
 	}{
 		{
 			"ok - burn",
-			"uatom",
+			s.GetNormalPair(0),
 			"uusd",
 			1000000,
 			104947,
@@ -109,7 +118,7 @@ func (suite *StableKeeperTestSuite) TestBurn() {
 		},
 		{
 			"fail - wrong denom",
-			"uatom",
+			s.GetNormalPair(0),
 			"ukuji",
 			1000,
 			104,
@@ -119,7 +128,7 @@ func (suite *StableKeeperTestSuite) TestBurn() {
 		},
 		{
 			"fail - burn blocked",
-			"uatom",
+			s.GetNormalPair(0),
 			"uusd",
 			1000,
 			104,
@@ -131,42 +140,31 @@ func (suite *StableKeeperTestSuite) TestBurn() {
 	for _, tc := range testCases {
 		suite.Setup()
 		suite.Commit()
-
 		suite.app.StableKeeper.SetTestingMode(true)
+		suite.app.StableKeeper.AppendPair(suite.ctx, tc.pair)
 
-		suite.app.StableKeeper.SetBaseTokenDenom(suite.ctx, tc.baseTokenDenom)
-		suite.app.StableKeeper.SetSendTokenDenom(suite.ctx, "uusd")
-
-		suite.app.BankKeeper.MintCoins(suite.ctx, types.ModuleName, sdk.NewCoins(sdk.NewCoin("uatom", sdk.NewInt(1000000000))))
-		suite.app.BankKeeper.SendCoinsFromModuleToAccount(suite.ctx, types.ModuleName, suite.Address, sdk.NewCoins(sdk.NewCoin("uatom", sdk.NewInt(1000000000))))
-
-		atomAmount := suite.app.BankKeeper.GetBalance(suite.ctx, suite.Address, "uatom")
-		suite.Require().Equal(atomAmount.Amount, sdk.NewInt(1000000000))
-		suite.Commit()
-
-		err := suite.MintStable(1000000000)
-		suite.Require().NoError(err)
-
-		stabilityFundBalanceBeforeBurn := suite.app.BankKeeper.GetBalance(suite.ctx, suite.app.StableKeeper.GetStabilityFundAddress(suite.ctx), "uatom")
-
+		suite.AddTestCoins(1000000, tc.pair.AmountInMetadata.Base)
+		suite.MintStable(1000000, tc.pair)
+		BurningFundBalanceBeforeBurn := suite.app.BankKeeper.GetBalance(suite.ctx, suite.app.StableKeeper.GetBurningFundAddress(suite.ctx), tc.pair.AmountInMetadata.Base)
 		suite.Run(fmt.Sprintf("Case---%s", tc.name), func() {
-			suite.app.StableKeeper.UpdateAtomPriceTesting(suite.ctx, sdk.NewInt(tc.atomPrice))
+			suite.app.StableKeeper.UpdateAtomPriceTesting(suite.ctx, sdk.NewInt(tc.price))
 
 			msg := types.NewMsgBurn(
 				suite.Address.String(),
-				sdk.NewInt(tc.uusdAmount).String()+tc.sendTokenDenom,
+				sdk.NewInt(tc.sendTokenAmount).String()+tc.sendTokenDenom,
+				tc.pair.AmountInMetadata.Base,
 			)
 			ctx := sdk.WrapSDKContext(suite.ctx)
-			_, err = suite.app.StableKeeper.Burn(ctx, msg)
+			_, err := suite.app.StableKeeper.Burn(ctx, msg)
 
 			if !tc.err {
 				suite.Require().NoError(err, tc.name)
-				atomAmount := suite.app.BankKeeper.GetBalance(suite.ctx, suite.Address, "uatom")
-				suite.Require().Equal(atomAmount.Amount, sdk.NewInt(int64(tc.atomAmount)))
+				getTokenAmountFromBank := suite.app.BankKeeper.GetBalance(suite.ctx, suite.Address, tc.pair.AmountInMetadata.Base)
+				suite.Require().Equal(getTokenAmountFromBank.Amount, sdk.NewInt(int64(tc.getTokenAmount)))
 
-				stabilityfundBalance := suite.app.BankKeeper.GetBalance(suite.ctx, suite.app.StableKeeper.GetStabilityFundAddress(suite.ctx), "uatom")
-				feeForStabilityFund := suite.app.StableKeeper.CalculateBurningFeeForStabilityFund(sdk.NewInt(tc.uusdAmount), sdk.NewInt(tc.atomPrice), sdk.NewInt(3))
-				suite.Require().Equal(stabilityfundBalance.Amount.Sub(stabilityFundBalanceBeforeBurn.Amount), feeForStabilityFund)
+				BurningFundBalance := suite.app.BankKeeper.GetBalance(suite.ctx, suite.app.StableKeeper.GetBurningFundAddress(suite.ctx), tc.pair.AmountInMetadata.Base)
+				feeForBurningFund := suite.app.StableKeeper.CalculateBurningFeeForBurningFund(sdk.NewInt(tc.sendTokenAmount), sdk.NewInt(tc.price), sdk.NewInt(3))
+				suite.Require().Equal(BurningFundBalance.Amount.Sub(BurningFundBalanceBeforeBurn.Amount), feeForBurningFund)
 			} else {
 				suite.Require().Error(err, tc.errString)
 			}
@@ -176,88 +174,89 @@ func (suite *StableKeeperTestSuite) TestBurn() {
 
 func (suite *StableKeeperTestSuite) TestMintGetPriceFromOracle() {
 	testCases := []struct {
-		name           string
-		baseTokenDenom string
-		sendTokenDenom string
-		atomAmount     int64
-		err            bool
-		errString      string
+		name            string
+		pair            types.Pair
+		sendTokenDenom  string
+		sendTokenAmount int64
+		err             bool
+		errString       string
 	}{
 		{
-			"ok - mint",
-			"uatom",
+			"ok-mint№1",
+			s.GetNormalPair(0),
 			"uatom",
 			1000,
 			false,
 			"",
 		},
 		{
-			"ok - mint",
-			"uatom",
+			"ok-mint№2",
+			s.GetNormalPair(0),
 			"uatom",
 			300,
 			false,
 			"",
 		},
 		{
-			"ok - mint",
-			"uatom",
+			"ok-mint№3",
+			s.GetNormalPair(0),
 			"uatom",
 			730,
 			false,
 			"",
 		},
 	}
+	suite.Setup()
+	suite.Commit()
+	suite.app.StableKeeper.SetTestingMode(false)
 	for _, tc := range testCases {
-		suite.Setup()
-		suite.Commit()
-		suite.app.StableKeeper.SetTestingMode(false)
-		suite.Run(fmt.Sprintf("Case---%s", tc.name), func() {
-			suite.app.BankKeeper.MintCoins(suite.ctx, types.ModuleName, sdk.NewCoins(sdk.NewCoin("uatom", sdk.NewInt(10000))))
-			suite.app.BankKeeper.SendCoinsFromModuleToAccount(suite.ctx, types.ModuleName, suite.Address, sdk.NewCoins(sdk.NewCoin("uatom", sdk.NewInt(10000))))
-			suite.app.StableKeeper.SetBaseTokenDenom(suite.ctx, tc.baseTokenDenom)
-			suite.app.StableKeeper.SetSendTokenDenom(suite.ctx, "uusd")
+		suite.app.StableKeeper.AppendPair(s.ctx, tc.pair)
+		price, _ := suite.app.StableKeeper.GetAtomPrice(suite.ctx)
+		suite.Run(fmt.Sprintf("Case---%s---price---%f", tc.name, float64(float64(price.Int64())/10000)), func() {
+			suite.AddTestCoins(tc.sendTokenAmount, tc.sendTokenDenom)
 			msg := types.NewMsgMint(
 				suite.Address.String(),
-				sdk.NewInt(tc.atomAmount).String()+tc.sendTokenDenom,
+				sdk.NewInt(tc.sendTokenAmount).String()+tc.sendTokenDenom,
+				tc.pair.AmountOutMetadata.Base,
 			)
 			ctx := sdk.WrapSDKContext(suite.ctx)
 			_, err := suite.app.StableKeeper.Mint(ctx, msg)
 			suite.Require().NoError(err)
-			uusdSuply := suite.app.BankKeeper.GetBalance(suite.ctx, suite.Address, "uusd")
-			suite.Require().Greater(uusdSuply.Amount.Int64(), int64(0))
+
+			getTokenAmountFromBank := suite.app.BankKeeper.GetBalance(suite.ctx, suite.Address, tc.pair.AmountOutMetadata.Base)
+			suite.Require().Greater(getTokenAmountFromBank.Amount.Int64(), int64(0))
 		})
 	}
 }
 
 func (suite *StableKeeperTestSuite) TestBurnGetPriceFromOracle() {
 	testCases := []struct {
-		name           string
-		baseTokenDenom string
-		sendTokenDenom string
-		uusdAmount     int64
-		err            bool
-		errString      string
+		name            string
+		pair            types.Pair
+		sendTokenDenom  string
+		sendTokenAmount int64
+		err             bool
+		errString       string
 	}{
 		{
-			"ok - burn",
-			"uatom",
+			"ok-burn№1",
+			s.GetNormalPair(0),
 			"uusd",
 			1000,
 			false,
 			"",
 		},
 		{
-			"ok - burn",
-			"uatom",
+			"ok-burn№2",
+			s.GetNormalPair(0),
 			"uusd",
 			300,
 			false,
 			"",
 		},
 		{
-			"ok - burn",
-			"uatom",
+			"ok-burn№3",
+			s.GetNormalPair(0),
 			"uusd",
 			730,
 			false,
@@ -267,28 +266,26 @@ func (suite *StableKeeperTestSuite) TestBurnGetPriceFromOracle() {
 	suite.Setup()
 	suite.Commit()
 
-	suite.app.BankKeeper.MintCoins(suite.ctx, types.ModuleName, sdk.NewCoins(sdk.NewCoin("uatom", sdk.NewInt(10000))))
-	suite.app.BankKeeper.SendCoinsFromModuleToAccount(suite.ctx, types.ModuleName, suite.Address, sdk.NewCoins(sdk.NewCoin("uatom", sdk.NewInt(10000))))
-
-	atomAmount := suite.app.BankKeeper.GetBalance(suite.ctx, suite.Address, "uatom")
-	suite.Require().Equal(atomAmount.Amount, sdk.NewInt(10000))
-	suite.Commit()
-
-	err := suite.MintStable(10000)
-	suite.Require().NoError(err)
-
-	suite.app.StableKeeper.SetBaseTokenDenom(suite.ctx, suite.app.StableKeeper.GetBaseTokenDenom(suite.ctx))
-	suite.app.StableKeeper.SetSendTokenDenom(suite.ctx, "uusd")
 	for _, tc := range testCases {
-		suite.Run(fmt.Sprintf("Case---%s", tc.name), func() {
+
+		suite.app.StableKeeper.AppendPair(suite.ctx, tc.pair)
+
+		suite.AddTestCoins(10000, tc.pair.AmountInMetadata.Base)
+		err := suite.MintStable(10000, s.GetNormalPair(0))
+		suite.Require().NoError(err)
+
+		price, _ := suite.app.StableKeeper.GetAtomPrice(suite.ctx)
+
+		suite.Run(fmt.Sprintf("Case---%s---price---%f", tc.name, float64(float64(price.Int64())/10000)), func() {
 			msg := types.NewMsgBurn(
 				suite.Address.String(),
-				sdk.NewInt(tc.uusdAmount).String()+tc.sendTokenDenom,
+				sdk.NewInt(tc.sendTokenAmount).String()+tc.sendTokenDenom,
+				tc.pair.AmountInMetadata.Base,
 			)
 			ctx := sdk.WrapSDKContext(suite.ctx)
 			_, err := suite.app.StableKeeper.Burn(ctx, msg)
 			suite.Require().NoError(err)
-			uatomSuply := suite.app.BankKeeper.GetBalance(suite.ctx, suite.Address, "uatom")
+			uatomSuply := suite.app.BankKeeper.GetBalance(suite.ctx, suite.Address, tc.pair.AmountInMetadata.Base)
 			suite.Require().Greater(uatomSuply.Amount.Int64(), int64(0))
 		})
 	}
@@ -297,14 +294,14 @@ func (suite *StableKeeperTestSuite) TestBurnGetPriceFromOracle() {
 func (suite *StableKeeperTestSuite) TestExtremeMarketSituations() {
 	user1 := apptesting.CreateRandomAccounts(1)[0]
 	user2 := apptesting.CreateRandomAccounts(1)[0]
+
 	testCases := []struct {
 		name                string
-		baseTokenDenom      string
+		pair                types.Pair
 		sendTokenDenom      string
-		expectedTokenDenom  string
 		sendTokenAmount     int64
 		expectedTokenAmount int64
-		atomPrice           int64
+		price               int64
 		err                 bool
 		errString           string
 		action              string
@@ -312,9 +309,8 @@ func (suite *StableKeeperTestSuite) TestExtremeMarketSituations() {
 	}{
 		{
 			"mint-user1",
+			s.GetNormalPair(0),
 			"uatom",
-			"uatom",
-			"uusd",
 			1000,
 			100,
 			95000, // 9.5 * 10000
@@ -325,9 +321,8 @@ func (suite *StableKeeperTestSuite) TestExtremeMarketSituations() {
 		},
 		{
 			"mint-user2",
+			s.GetNormalPair(0),
 			"uatom",
-			"uatom",
-			"uusd",
 			1000,
 			100,
 			95670,
@@ -338,9 +333,8 @@ func (suite *StableKeeperTestSuite) TestExtremeMarketSituations() {
 		},
 		{
 			"mint№2-user1",
+			s.GetNormalPair(0),
 			"uatom",
-			"uatom",
-			"uusd",
 			1000,
 			50,
 			98530,
@@ -351,9 +345,8 @@ func (suite *StableKeeperTestSuite) TestExtremeMarketSituations() {
 		},
 		{
 			"mint№2-user2",
+			s.GetNormalPair(0),
 			"uatom",
-			"uatom",
-			"uusd",
 			700,
 			50,
 			99410,
@@ -364,9 +357,8 @@ func (suite *StableKeeperTestSuite) TestExtremeMarketSituations() {
 		},
 		{
 			"burn-user1",
-			"uatom",
+			s.GetNormalPair(0),
 			"uusd",
-			"uatom",
 			9000,
 			50,
 			92133,
@@ -377,9 +369,8 @@ func (suite *StableKeeperTestSuite) TestExtremeMarketSituations() {
 		},
 		{
 			"burn-user1",
-			"uatom",
+			s.GetNormalPair(0),
 			"uusd",
-			"uatom",
 			9000,
 			50,
 			90312,
@@ -395,35 +386,35 @@ func (suite *StableKeeperTestSuite) TestExtremeMarketSituations() {
 	suite.app.StableKeeper.SetTestingMode(true)
 	for _, tc := range testCases {
 		if tc.action == "mint" {
-			suite.IncreaseBalance(tc.address, tc.baseTokenDenom, sdk.NewInt(tc.sendTokenAmount))
-			suite.app.StableKeeper.SetBaseTokenDenom(suite.ctx, tc.baseTokenDenom)
-			suite.app.StableKeeper.SetSendTokenDenom(suite.ctx, "uusd")
+			suite.AddTestCoinsToAccount(tc.sendTokenAmount, tc.sendTokenDenom, tc.address)
 		}
 	}
-
 	for _, tc := range testCases {
+		suite.app.StableKeeper.AppendPair(suite.ctx, tc.pair)
 		suite.Run(fmt.Sprintf("Case---%s", tc.name), func() {
-			suite.app.StableKeeper.UpdateAtomPriceTesting(suite.ctx, sdk.NewInt(tc.atomPrice))
+			suite.app.StableKeeper.UpdateAtomPriceTesting(suite.ctx, sdk.NewInt(tc.price))
 			switch tc.action {
 			case "mint":
 				msg := types.NewMsgMint(
 					tc.address.String(),
 					sdk.NewInt(tc.sendTokenAmount).String()+tc.sendTokenDenom,
+					tc.pair.AmountOutMetadata.Base,
 				)
 				ctx := sdk.WrapSDKContext(suite.ctx)
 				_, err := suite.app.StableKeeper.Mint(ctx, msg)
 				suite.Require().NoError(err)
-				balance := suite.app.BankKeeper.GetBalance(suite.ctx, tc.address, tc.expectedTokenDenom)
+				balance := suite.app.BankKeeper.GetBalance(suite.ctx, tc.address, tc.pair.AmountOutMetadata.Base)
 				suite.Require().Greater(balance.Amount.Int64(), int64(0))
 			case "burn":
 				msg := types.NewMsgBurn(
 					tc.address.String(),
 					sdk.NewInt(tc.sendTokenAmount).String()+tc.sendTokenDenom,
+					tc.pair.AmountInMetadata.Base,
 				)
 				ctx := sdk.WrapSDKContext(suite.ctx)
 				_, err := suite.app.StableKeeper.Burn(ctx, msg)
 				suite.Require().NoError(err)
-				balance := suite.app.BankKeeper.GetBalance(suite.ctx, tc.address, tc.expectedTokenDenom)
+				balance := suite.app.BankKeeper.GetBalance(suite.ctx, tc.address, tc.pair.AmountInMetadata.Base)
 				suite.Require().Greater(balance.Amount.Int64(), int64(0))
 			default:
 				suite.Error(nil)
@@ -437,12 +428,11 @@ func (suite *StableKeeperTestSuite) TestMarketDropOf40() {
 	actionUser := apptesting.CreateRandomAccounts(1)[0]
 	type testCase struct {
 		name                string
-		baseTokenDenom      string
+		pair                types.Pair
 		sendTokenDenom      string
-		expectedTokenDenom  string
 		sendTokenAmount     int64
 		expectedTokenAmount int64
-		atomPrice           int64
+		price               int64
 		err                 bool
 		errString           string
 		action              string
@@ -453,12 +443,11 @@ func (suite *StableKeeperTestSuite) TestMarketDropOf40() {
 	for i := 0; i < 10; i++ {
 		newTestCase := testCase{
 			name:                fmt.Sprintf("mint-user%d", i),
-			baseTokenDenom:      "uatom",
+			pair:                suite.GetNormalPair(0),
 			sendTokenDenom:      "uatom",
-			expectedTokenDenom:  "uusd",
 			sendTokenAmount:     1000,
 			expectedTokenAmount: 100,
-			atomPrice:           int64(rand.Intn(96000-90000) + 90000),
+			price:               int64(rand.Intn(96000-90000) + 90000),
 			err:                 false,
 			errString:           "",
 			action:              "mint",
@@ -469,12 +458,11 @@ func (suite *StableKeeperTestSuite) TestMarketDropOf40() {
 
 	burnTestCaseFail := testCase{
 		name:                fmt.Sprintf("burn"),
-		baseTokenDenom:      "uatom",
+		pair:                suite.GetNormalPair(0),
 		sendTokenDenom:      "uusd",
-		expectedTokenDenom:  "uatom",
 		sendTokenAmount:     8000,
 		expectedTokenAmount: 50,
-		atomPrice:           int64(57000),
+		price:               int64(57000),
 		err:                 true,
 		errString:           "Backing Ration < 85%",
 		action:              "burn",
@@ -482,12 +470,11 @@ func (suite *StableKeeperTestSuite) TestMarketDropOf40() {
 	}
 	mintForTest := testCase{
 		name:                fmt.Sprintf("mint"),
-		baseTokenDenom:      "uatom",
+		pair:                suite.GetNormalPair(0),
 		sendTokenDenom:      "uatom",
-		expectedTokenDenom:  "uusd",
 		sendTokenAmount:     1000,
 		expectedTokenAmount: 100,
-		atomPrice:           int64(rand.Intn(96000-90000) + 90000),
+		price:               int64(rand.Intn(96000-90000) + 90000),
 		err:                 false,
 		errString:           "",
 		action:              "mint",
@@ -495,12 +482,11 @@ func (suite *StableKeeperTestSuite) TestMarketDropOf40() {
 	}
 	burnTestCase1Succses := testCase{
 		name:                fmt.Sprintf("burn"),
-		baseTokenDenom:      "uatom",
+		pair:                suite.GetNormalPair(0),
 		sendTokenDenom:      "uusd",
-		expectedTokenDenom:  "uatom",
 		sendTokenAmount:     8000,
 		expectedTokenAmount: 50,
-		atomPrice:           int64(84000),
+		price:               int64(84000),
 		err:                 false,
 		errString:           "Backing Ration < 85%",
 		action:              "burn",
@@ -515,20 +501,20 @@ func (suite *StableKeeperTestSuite) TestMarketDropOf40() {
 	suite.app.StableKeeper.SetTestingMode(true)
 	for _, tc := range testCases {
 		if tc.action == "mint" {
-			suite.IncreaseBalance(tc.address, tc.baseTokenDenom, sdk.NewInt(tc.sendTokenAmount))
-			suite.app.StableKeeper.SetBaseTokenDenom(suite.ctx, tc.baseTokenDenom)
-			suite.app.StableKeeper.SetSendTokenDenom(suite.ctx, "uusd")
+			suite.AddTestCoinsToAccount(tc.sendTokenAmount, tc.sendTokenDenom, tc.address)
 		}
 	}
 
 	for _, tc := range testCases {
-		suite.Run(fmt.Sprintf("Case---%s--Price---%f", tc.name, float64(float64(tc.atomPrice)/10000)), func() {
-			suite.app.StableKeeper.UpdateAtomPriceTesting(suite.ctx, sdk.NewInt(tc.atomPrice))
+		suite.app.StableKeeper.AppendPair(suite.ctx, tc.pair)
+		suite.Run(fmt.Sprintf("Case---%s--Price---%f", tc.name, float64(float64(tc.price)/10000)), func() {
+			suite.app.StableKeeper.UpdateAtomPriceTesting(suite.ctx, sdk.NewInt(tc.price))
 			switch tc.action {
 			case "mint":
 				msg := types.NewMsgMint(
 					tc.address.String(),
 					sdk.NewInt(tc.sendTokenAmount).String()+tc.sendTokenDenom,
+					tc.pair.AmountOutMetadata.Base,
 				)
 				ctx := sdk.WrapSDKContext(suite.ctx)
 				_, err := suite.app.StableKeeper.Mint(ctx, msg)
@@ -536,13 +522,14 @@ func (suite *StableKeeperTestSuite) TestMarketDropOf40() {
 					suite.Require().Error(err, tc.errString)
 				} else {
 					suite.Require().NoError(err)
-					balance := suite.app.BankKeeper.GetBalance(suite.ctx, tc.address, tc.expectedTokenDenom)
+					balance := suite.app.BankKeeper.GetBalance(suite.ctx, tc.address, tc.pair.AmountOutMetadata.Base)
 					suite.Require().Greater(balance.Amount.Int64(), int64(0))
 				}
 			case "burn":
 				msg := types.NewMsgBurn(
 					tc.address.String(),
 					sdk.NewInt(tc.sendTokenAmount).String()+tc.sendTokenDenom,
+					tc.pair.AmountInMetadata.Base,
 				)
 				ctx := sdk.WrapSDKContext(suite.ctx)
 				_, err := suite.app.StableKeeper.Burn(ctx, msg)
@@ -550,7 +537,7 @@ func (suite *StableKeeperTestSuite) TestMarketDropOf40() {
 					suite.Require().Error(err, tc.errString)
 				} else {
 					suite.Require().NoError(err)
-					balance := suite.app.BankKeeper.GetBalance(suite.ctx, tc.address, tc.expectedTokenDenom)
+					balance := suite.app.BankKeeper.GetBalance(suite.ctx, tc.address, tc.pair.AmountInMetadata.Base)
 					suite.Require().Greater(balance.Amount.Int64(), int64(0))
 				}
 			default:

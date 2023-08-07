@@ -1,26 +1,33 @@
 syntax = "proto3";
 package core.stable.v1beta1;
-
-import "cosmos/bank/v1beta1/bank.proto";
 import "gogoproto/gogo.proto";
+import "cosmos/bank/v1beta1/bank.proto";
 option go_package = "github.com/QuadrateOrg/core/x/stable/types";
 
-message ChangeBaseTokenDenom {
+message RegisterPairProposal {
   option (gogoproto.equal) = false;
   // title of the proposal
   string title = 1;
   // description of the proposal
   string description = 2;
   // metadata slice of the native Cosmos coins
-  repeated cosmos.bank.v1beta1.Metadata metadata = 3 [(gogoproto.nullable) = false];
+  cosmos.bank.v1beta1.Metadata amountInMetadata = 3 [ (gogoproto.moretags) = "yaml:\"amountInMetadata\"", (gogoproto.nullable)   = false ];
+  cosmos.bank.v1beta1.Metadata amountOutMetadata = 4 [ (gogoproto.moretags) = "yaml:\"amountOutMetadata\"", (gogoproto.nullable)   = false ];
+  string minAmountIn = 5;
 }
 
-message ChangeSendTokenDenom {
+message ProposalMetadata {
+  cosmos.bank.v1beta1.Metadata amountInMetadata = 1 [ (gogoproto.moretags) = "yaml:\"amountInMetadata\"", (gogoproto.nullable)   = false ];
+  cosmos.bank.v1beta1.Metadata amountOutMetadata = 2 [ (gogoproto.moretags) = "yaml:\"amountOutMetadata\"", (gogoproto.nullable)   = false ];
+  string minAmountIn = 3;
+}
+
+message RegisterChangeBurningFundAddressProposal {
   option (gogoproto.equal) = false;
   // title of the proposal
   string title = 1;
   // description of the proposal
   string description = 2;
-  // metadata slice of the native Cosmos coins
-  repeated cosmos.bank.v1beta1.Metadata metadata = 3 [(gogoproto.nullable) = false];
+
+  string address = 3;
 }

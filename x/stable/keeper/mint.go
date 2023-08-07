@@ -11,14 +11,14 @@ var (
 	err           error
 )
 
-func (k Keeper) ExecuteMint(ctx sdk.Context, msg *types.MsgMint) (error, sdk.Coin) {
+func (k Keeper) ExecuteMint(ctx sdk.Context, msg *types.MsgMint, pair types.Pair) (error, sdk.Coin) {
 
 	atomPrice, err := k.GetAtomPrice(ctx)
 	if err != nil {
 		return err, sdk.Coin{}
 	}
 
-	qm, ar := k.GetReserve(ctx)
+	qm, ar := pair.Qm, pair.Ar
 
 	backing_ratio, err = CalculateBackingRatio(qm, ar, atomPrice)
 	if err != nil {
@@ -35,17 +35,17 @@ func (k Keeper) ExecuteMint(ctx sdk.Context, msg *types.MsgMint) (error, sdk.Coi
 		return err, sdk.Coin{}
 	}
 
-	amountIntCoins, err := sdk.ParseCoinsNormalized(msg.Amount)
+	amountIntCoins, err := sdk.ParseCoinsNormalized(msg.AmountIn)
 	if err != nil {
 		return err, sdk.Coin{}
 	}
 
-	err = VerificationBaseDenomCoins(amountIntCoins)
+	err = VerificationMintDenomCoins(amountIntCoins, pair)
 	if err != nil {
 		return err, sdk.Coin{}
 	}
 
-	amountInt := amountIntCoins.AmountOf(BaseTokenDenom)
+	amountInt := amountIntCoins.AmountOf(pair.AmountInMetadata.DenomUnits[0].Denom)
 	err = k.bankKeeper.SendCoinsFromAccountToModule(ctx, sender, types.ModuleName, amountIntCoins)
 	if err != nil {
 		return err, sdk.Coin{}
@@ -56,24 +56,24 @@ func (k Keeper) ExecuteMint(ctx sdk.Context, msg *types.MsgMint) (error, sdk.Coi
 		return types.ErrSdkIntError, sdk.Coin{}
 	}
 
-	err = k.IncreaseReserve(ctx, amountInt, amountOutToMint)
+	pair = k.IncreaseReserve(ctx, amountInt, amountOutToMint, pair)
 	if err != nil {
 		return err, sdk.Coin{}
 	}
 
-	amountOut := sdk.NewCoin(SendTokenDenom, amountOutToMint)
+	amountOut := sdk.NewCoin(pair.AmountOutMetadata.DenomUnits[0].Denom, amountOutToMint)
 	err = k.bankKeeper.MintCoins(ctx, types.ModuleName, sdk.NewCoins(amountOut))
 	if err != nil {
 		return err, sdk.Coin{}
 	}
 
 	if !mintingFee.IsZero() {
-		feeForStabilityFund := k.CalculateMintingFeeForStabilityFund(amountInt, atomPrice, mintingFee)
-		err = k.bankKeeper.MintCoins(ctx, types.ModuleName, types.CreateCoins(BaseTokenDenom, feeForStabilityFund))
+		feeForBurningFund := k.CalculateMintingFeeForBurningFund(amountInt, atomPrice, mintingFee)
+		err = k.bankKeeper.MintCoins(ctx, types.ModuleName, types.CreateCoins(pair.AmountInMetadata.DenomUnits[0].Denom, feeForBurningFund))
 		if err != nil {
 			return err, sdk.Coin{}
 		}
-		err = k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, StabilityFundAddress, types.CreateCoins(BaseTokenDenom, feeForStabilityFund))
+		err = k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, BurningFundAddress, types.CreateCoins(pair.AmountInMetadata.DenomUnits[0].Denom, feeForBurningFund))
 		if err != nil {
 			return err, sdk.Coin{}
 		}
@@ -83,6 +83,8 @@ func (k Keeper) ExecuteMint(ctx sdk.Context, msg *types.MsgMint) (error, sdk.Coi
 	if err != nil {
 		return err, sdk.Coin{}
 	}
+
+	k.SetPair(ctx, pair)
 
 	return nil, amountOut
 }

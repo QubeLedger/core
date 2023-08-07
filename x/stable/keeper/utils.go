@@ -21,26 +21,43 @@ func CalculateBackingRatio(qm sdk.Int, ar sdk.Int, atomPrice sdk.Int) (sdk.Int, 
 	return backing_ratio, nil
 }
 
-func VerificationBaseDenomCoins(coins sdk.Coins) error {
+func VerificationMintDenomCoins(coins sdk.Coins, pair types.Pair) error {
 	// TODO
 	// Verification of denom and number of coins
 	if coins.Len() != 1 {
 		return types.ErrMultipleCoinsLockupNotSupported
 	}
-	if coins.GetDenomByIndex(0) != BaseTokenDenom {
+	if coins.GetDenomByIndex(0) != pair.AmountInMetadata.DenomUnits[0].Denom {
 		return types.ErrSendBaseTokenDenom
 	}
 	return nil
 }
 
-func VerificationSendDenomCoins(coins sdk.Coins) error {
+func VerificationBurnDenomCoins(coins sdk.Coins, pair types.Pair) error {
 	// TODO
 	// Verification of denom and number of coins
 	if coins.Len() != 1 {
 		return types.ErrMultipleCoinsLockupNotSupported
 	}
-	if coins.GetDenomByIndex(0) != SendTokenDenom {
-		return types.ErrSendSendTokenDenom
+	if coins.GetDenomByIndex(0) != pair.AmountOutMetadata.DenomUnits[0].Denom {
+		return types.ErrSendBaseTokenDenom
 	}
+	return nil
+}
+
+func (k Keeper) CheckMinAmount(msgAmountIn string, pair types.Pair) error {
+	msgAmountInCoins, err := sdk.ParseCoinsNormalized(msgAmountIn)
+	if err != nil {
+		return err
+	}
+
+	pairMinAmountInCoins, err := sdk.ParseCoinsNormalized(pair.MinAmountIn)
+	if err != nil {
+		return err
+	}
+	if !msgAmountInCoins.AmountOf(pair.AmountInMetadata.Base).GT(pairMinAmountInCoins.AmountOf(pair.AmountInMetadata.Base)) {
+		return types.ErrAmountInGTEminAmountIn
+	}
+
 	return nil
 }

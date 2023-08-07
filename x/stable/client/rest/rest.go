@@ -14,32 +14,34 @@ import (
 	"github.com/QuadrateOrg/core/x/stable/types"
 )
 
-type ChangeBaseTokenDenom struct {
-	BaseReq     rest.BaseReq       `json:"base_req" yaml:"base_req"`
-	Title       string             `json:"title" yaml:"title"`
-	Description string             `json:"description" yaml:"description"`
-	Deposit     sdk.Coins          `json:"deposit" yaml:"deposit"`
-	Metadata    banktypes.Metadata `json:"metadata" yaml:"metadata"`
+type RegisterPairProposal struct {
+	BaseReq           rest.BaseReq       `json:"base_req" yaml:"base_req"`
+	Title             string             `json:"title" yaml:"title"`
+	Description       string             `json:"description" yaml:"description"`
+	Deposit           sdk.Coins          `json:"deposit" yaml:"deposit"`
+	AmountInMetadata  banktypes.Metadata `json:"amountInMetadata" yaml:"amountInMetadata"`
+	AmountOutMetadata banktypes.Metadata `json:"amountOutMetadata" yaml:"amountOutMetadata"`
+	MinAmountIn       string             `json:"minAmountIn" yaml:"minAmountIn"`
 }
 
-type ChangeSendTokenDenom struct {
-	BaseReq     rest.BaseReq       `json:"base_req" yaml:"base_req"`
-	Title       string             `json:"title" yaml:"title"`
-	Description string             `json:"description" yaml:"description"`
-	Deposit     sdk.Coins          `json:"deposit" yaml:"deposit"`
-	Metadata    banktypes.Metadata `json:"metadata" yaml:"metadata"`
+type RegisterChangeBurningFundAddressProposal struct {
+	BaseReq     rest.BaseReq `json:"base_req" yaml:"base_req"`
+	Title       string       `json:"title" yaml:"title"`
+	Description string       `json:"description" yaml:"description"`
+	Deposit     sdk.Coins    `json:"deposit" yaml:"deposit"`
+	Address     string       `json:"address" yaml:"address"`
 }
 
-func RegisterChangeBaseTokenDenomRESTHandler(clientCtx client.Context) govrest.ProposalRESTHandler {
+func RegisterPairRESTHandler(clientCtx client.Context) govrest.ProposalRESTHandler {
 	return govrest.ProposalRESTHandler{
 		SubRoute: types.ModuleName,
-		Handler:  newRegisterChangeBaseTokenDenom(clientCtx),
+		Handler:  newRegisterPair(clientCtx),
 	}
 }
 
-func newRegisterChangeBaseTokenDenom(clientCtx client.Context) http.HandlerFunc {
+func newRegisterPair(clientCtx client.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var req ChangeBaseTokenDenom
+		var req RegisterPairProposal
 
 		if !rest.ReadRESTReq(w, r, clientCtx.LegacyAmino, &req) {
 			return
@@ -55,7 +57,7 @@ func newRegisterChangeBaseTokenDenom(clientCtx client.Context) http.HandlerFunc 
 			return
 		}
 
-		content := types.NewRegisterChangeBaseTokenDenomProposal(req.Title, req.Description, req.Metadata)
+		content := types.NewRegisterPairProposal(req.Title, req.Description, req.AmountInMetadata, req.AmountOutMetadata, req.MinAmountIn)
 		msg, err := govtypes.NewMsgSubmitProposal(content, req.Deposit, fromAddr)
 		if rest.CheckBadRequestError(w, err) {
 			return
@@ -69,16 +71,16 @@ func newRegisterChangeBaseTokenDenom(clientCtx client.Context) http.HandlerFunc 
 	}
 }
 
-func RegisterChangeSendTokenDenomRESTHandler(clientCtx client.Context) govrest.ProposalRESTHandler {
+func RegisterChangeBurningFundAddressProposalRESTHandler(clientCtx client.Context) govrest.ProposalRESTHandler {
 	return govrest.ProposalRESTHandler{
 		SubRoute: types.ModuleName,
-		Handler:  newRegisterChangeSendTokenDenom(clientCtx),
+		Handler:  newRegisterChangeBurningFundAddressProposal(clientCtx),
 	}
 }
 
-func newRegisterChangeSendTokenDenom(clientCtx client.Context) http.HandlerFunc {
+func newRegisterChangeBurningFundAddressProposal(clientCtx client.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var req ChangeBaseTokenDenom
+		var req RegisterChangeBurningFundAddressProposal
 
 		if !rest.ReadRESTReq(w, r, clientCtx.LegacyAmino, &req) {
 			return
@@ -94,7 +96,7 @@ func newRegisterChangeSendTokenDenom(clientCtx client.Context) http.HandlerFunc 
 			return
 		}
 
-		content := types.NewRegisterChangeSendTokenDenomProposal(req.Title, req.Description, req.Metadata)
+		content := types.NewRegisterChangeBurningFundAddressProposal(req.Title, req.Description, req.Address)
 		msg, err := govtypes.NewMsgSubmitProposal(content, req.Deposit, fromAddr)
 		if rest.CheckBadRequestError(w, err) {
 			return

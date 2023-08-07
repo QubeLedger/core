@@ -14,23 +14,26 @@ func TestMsgMintUsq(t *testing.T) {
 	}
 	tests := []struct {
 		addr        sdk.AccAddress
-		amount      sdk.Coin
+		amountInt   sdk.Coin
+		denomOut    string
 		expectedErr string
 	}{
 		{
 			addrs[0],
 			sdk.NewCoin("uatom", sdk.OneInt()),
+			"uusd",
 			"",
 		},
 		{
 			sdk.AccAddress{},
 			sdk.NewCoin("uatom", sdk.OneInt()),
+			"uusd",
 			"invalid creator address (empty address string is not allowed): invalid address",
 		},
 	}
 
 	for _, tc := range tests {
-		msg := types.NewMsgMint(tc.addr.String(), tc.amount.String())
+		msg := types.NewMsgMint(tc.addr.String(), tc.amountInt.String(), tc.denomOut)
 		if tc.expectedErr == "" {
 			require.Nil(t, msg.ValidateBasic())
 		} else {
@@ -46,22 +49,25 @@ func TestMsgBurnUsq(t *testing.T) {
 	tests := []struct {
 		addr        sdk.AccAddress
 		amount      sdk.Coin
+		denomOut    string
 		expectedErr string
 	}{
 		{
 			addrs[0],
 			sdk.NewCoin("uusd", sdk.OneInt()),
+			"uatom",
 			"",
 		},
 		{
 			sdk.AccAddress{},
 			sdk.NewCoin("uusd", sdk.OneInt()),
+			"uatom",
 			"invalid creator address (empty address string is not allowed): invalid address",
 		},
 	}
 
 	for _, tc := range tests {
-		msg := types.NewMsgBurn(tc.addr.String(), tc.amount.String())
+		msg := types.NewMsgBurn(tc.addr.String(), tc.amount.String(), tc.denomOut)
 		if tc.expectedErr == "" {
 			require.Nil(t, msg.ValidateBasic())
 		} else {
