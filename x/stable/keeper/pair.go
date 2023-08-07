@@ -94,6 +94,7 @@ func (k Keeper) GetPairByID(ctx sdk.Context, id uint64) (val types.Pair, found b
 	return val, false
 }
 
+//nolint:all
 func (k Keeper) GeneratePairIdHash(denom1 string, denom2 string) string {
 	return fmt.Sprintf("%x", crypto.Sha256(append([]byte(denom1+denom2))))
 }

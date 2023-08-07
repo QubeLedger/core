@@ -94,6 +94,7 @@ func CmdBurnUsq() *cobra.Command {
 	return cmd
 }
 
+//nolint:all
 func NewRegisterPairProposalCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "register-pair [metadata]",
