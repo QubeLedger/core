@@ -103,3 +103,16 @@ func (k Keeper) GetPairIdBurn(amountInt string, denom2 string) (string, error) {
 	}
 	return k.GeneratePairIdHash(denom2, amountIntCoins.GetDenomByIndex(0)), nil
 }
+
+func (k Keeper) RegisterPair(ctx sdk.Context, p types.Pair) error {
+	pair := types.Pair{
+		PairId:            k.GeneratePairIdHash(p.AmountInMetadata.Base, p.AmountOutMetadata.Base),
+		AmountInMetadata:  p.AmountInMetadata,
+		AmountOutMetadata: p.AmountOutMetadata,
+		Qm:                sdk.NewInt(0),
+		Ar:                sdk.NewInt(0),
+		MinAmountInt:      p.MinAmountInt,
+	}
+	_ = k.AppendPair(ctx, pair)
+	return nil
+}

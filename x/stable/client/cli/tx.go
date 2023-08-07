@@ -94,12 +94,55 @@ func CmdBurnUsq() *cobra.Command {
 	return cmd
 }
 
-func NewRegisterChangeBaseTokenDenomProposalCmd() *cobra.Command {
+func NewRegisterPairProposalCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "change-base-token-denom [metadata]",
+		Use:   "register-pair [metadata]",
 		Args:  cobra.ExactArgs(1),
-		Short: "Submit a register change BaseTokenDenom proposal",
+		Short: "Submit a register pair proposal",
+		Long:  `Submit a proposal for couple's registration to x/stable along with the down payment. The offer data should be submitted as a JSON file.`,
+		Example: fmt.Sprintf(`qubed tx gov submit-proposal register-pair metadata.json --from=<key_or_address>
 
+		Where metadata.json contains (example):
+		{
+			"amountInMetadata": {
+				"description": "The native staking and governance token of the Cosmos chain",
+				"denom_units": [
+					{
+						"denom": "ibc/<HASH>",
+						"exponent": 0,
+						"aliases": ["ibcuatom"]
+					},
+					{
+						"denom": "ATOM",
+						"exponent": 6
+					}
+				],
+				"base": "ibc/<HASH>",
+				"display": "ATOM",
+				"name": "Atom",
+				"symbol": "ATOM"
+			},
+			"amountOutMetadata": {
+				"description": "First algorithmic stablecoin backed by ATOM",
+				"denom_units": [
+					{
+						"denom": "uusd",
+						"exponent": 0,
+						"aliases": ["uusd"]
+					},
+					{
+						"denom": "USQ",
+						"exponent": 6
+					}
+				],
+				"base": "uusd",
+				"display": "USQ",
+				"name": "USQ",
+				"symbol": "USQ"
+			},
+			"minAmountIn": "20ibc/<HASH>"
+		}`,
+		),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
@@ -124,13 +167,13 @@ func NewRegisterChangeBaseTokenDenomProposalCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			metadata, err := ParseMetadata(clientCtx.Codec, args[0])
+			amountInMetadata, amountoutMetadata, minAmount, err := ParseMetadata(clientCtx.Codec, args[0])
 			if err != nil {
 				return err
 			}
 			from := clientCtx.GetFromAddress()
 
-			content := types.NewRegisterChangeBaseTokenDenomProposal(title, description, metadata)
+			content := types.NewRegisterPairProposal(title, description, amountInMetadata, amountoutMetadata, minAmount)
 
 			msg, err := govtypes.NewMsgSubmitProposal(content, deposit, from)
 			if err != nil {
@@ -142,68 +185,7 @@ func NewRegisterChangeBaseTokenDenomProposalCmd() *cobra.Command {
 	}
 	cmd.Flags().String(cli.FlagTitle, "", "title of proposal")
 	cmd.Flags().String(cli.FlagDescription, "", "description of proposal")
-	cmd.Flags().String(cli.FlagDeposit, "1aevmos", "deposit of proposal")
-	if err := cmd.MarkFlagRequired(cli.FlagTitle); err != nil {
-		panic(err)
-	}
-	if err := cmd.MarkFlagRequired(cli.FlagDescription); err != nil {
-		panic(err)
-	}
-	if err := cmd.MarkFlagRequired(cli.FlagDeposit); err != nil {
-		panic(err)
-	}
-
-	return cmd
-}
-
-func NewRegisterChangeSendTokenDenomProposalCmd() *cobra.Command {
-	cmd := &cobra.Command{
-		Use:   "change-send-token-denom [metadata]",
-		Args:  cobra.ExactArgs(1),
-		Short: "Submit a register change SendTokenDenom proposal",
-
-		RunE: func(cmd *cobra.Command, args []string) (err error) {
-			clientCtx, err := client.GetClientTxContext(cmd)
-			if err != nil {
-				return err
-			}
-			title, err := cmd.Flags().GetString(cli.FlagTitle)
-			if err != nil {
-				return err
-			}
-
-			description, err := cmd.Flags().GetString(cli.FlagDescription)
-			if err != nil {
-				return err
-			}
-
-			depositStr, err := cmd.Flags().GetString(cli.FlagDeposit)
-			if err != nil {
-				return err
-			}
-
-			deposit, err := sdk.ParseCoinsNormalized(depositStr)
-			if err != nil {
-				return err
-			}
-			metadata, err := ParseMetadata(clientCtx.Codec, args[0])
-			if err != nil {
-				return err
-			}
-			from := clientCtx.GetFromAddress()
-
-			content := types.NewRegisterChangeSendTokenDenomProposal(title, description, metadata)
-
-			msg, err := govtypes.NewMsgSubmitProposal(content, deposit, from)
-			if err != nil {
-				return err
-			}
-			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
-		},
-	}
-	cmd.Flags().String(cli.FlagTitle, "", "title of proposal")
-	cmd.Flags().String(cli.FlagDescription, "", "description of proposal")
-	cmd.Flags().String(cli.FlagDeposit, "1aevmos", "deposit of proposal")
+	cmd.Flags().String(cli.FlagDeposit, "1uqube", "deposit of proposal")
 	if err := cmd.MarkFlagRequired(cli.FlagTitle); err != nil {
 		panic(err)
 	}
