@@ -1,5 +1,5 @@
 <div align="center">
-  <h1> Qube </h1>
+  <h1> Qube 🧊 </h1>
   <p> Cosmos SDK L1 blockchain, built for decentralized, trust-free, stable economy </p>
   <br/>
   
