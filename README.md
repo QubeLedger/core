@@ -16,10 +16,10 @@
 ``` ./init.sh ```
 ## Start Developing
 
-- [Tesseract](https://github.com/QuadrateOrg/tesseract): Quadrate’s development environment, providing front-end and smart contract scaffolding for your dApp.
+- [Tesseract](https://github.com/QuadrateOrg/tesseract): Qube’s development environment, providing front-end and smart contract scaffolding for your dApp.
 
 ## Contributing
-The contributing guide for Quadrate explains the branching structure, how to use the SDK fork, and how to make / test updates to SDK branches.
+The contributing guide for Qube explains the branching structure, how to use the SDK fork, and how to make / test updates to SDK branches.
 
 ## Supporters
 
