@@ -51,11 +51,13 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
     sed -i '' 's/prometheus = false/prometheus = true/' $HOME/.quadrate/config/config.toml
     sed -i '' 's/prometheus-retention-time = 0/prometheus-retention-time  = 1000000000000/g' $HOME/.quadrate/config/app.toml
     sed -i '' 's/enabled = false/enabled = true/g' $HOME/.quadrate/config/app.toml
+    sed -i '' 's/enable = false/enable = true/g' $HOME/.quadrate/config/app.toml
 else
     sed -i 's/create_empty_blocks = true/create_empty_blocks = false/g' $HOME/.quadrate/config/config.toml
     sed -i 's/prometheus = false/prometheus = true/' $HOME/.quadrate/config/config.toml
     sed -i 's/prometheus-retention-time  = "0"/prometheus-retention-time  = "1000000000000"/g' $HOME/.quadrate/config/app.toml
     sed -i 's/enabled = false/enabled = true/g' $HOME/.quadrate/config/app.toml
+    sed -i 's/enable = false/enable = true/g' $HOME/.quadrate/config/app.toml
 fi
 
 if [[ $1 == "pending" ]]; then
