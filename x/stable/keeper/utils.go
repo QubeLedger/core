@@ -72,8 +72,8 @@ func (k Keeper) CheckBurnAmount(msgAmountIn string, pair types.Pair) error {
 	if err != nil {
 		return err
 	}
-	if !msgAmountOutCoins.AmountOf(pair.AmountInMetadata.Base).GT(pairMinAmountoutCoins.AmountOf(pair.AmountOutMetadata.Base)) {
-		return types.ErrAmountInGTEminAmountIn
+	if !msgAmountOutCoins.AmountOf(pair.AmountOutMetadata.Base).GT(pairMinAmountoutCoins.AmountOf(pair.AmountOutMetadata.Base)) {
+		return types.ErrAmountOutGTEminAmountOut
 	}
 
 	return nil
