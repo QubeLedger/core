@@ -11,9 +11,17 @@ const DefaultIndex uint64 = 1
 // DefaultGenesis returns the default genesis state
 func DefaultGenesis() *GenesisState {
 	return &GenesisState{
-		PortId: PortID,
-		// this line is used by starport scaffolding # genesis/types/default
 		Params: DefaultParams(),
+		PortId: PortID,
+		Pairs:  []Pair{},
+	}
+}
+
+func NewGenesisState(params Params, portID string, pairs []Pair) GenesisState {
+	return GenesisState{
+		Params: params,
+		PortId: portID,
+		Pairs:  pairs,
 	}
 }
 
