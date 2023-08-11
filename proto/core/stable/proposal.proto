@@ -14,12 +14,14 @@ message RegisterPairProposal {
   cosmos.bank.v1beta1.Metadata amountInMetadata = 3 [ (gogoproto.moretags) = "yaml:\"amountInMetadata\"", (gogoproto.nullable)   = false ];
   cosmos.bank.v1beta1.Metadata amountOutMetadata = 4 [ (gogoproto.moretags) = "yaml:\"amountOutMetadata\"", (gogoproto.nullable)   = false ];
   string minAmountIn = 5;
+  string minAmountOut = 6;
 }
 
 message ProposalMetadata {
   cosmos.bank.v1beta1.Metadata amountInMetadata = 1 [ (gogoproto.moretags) = "yaml:\"amountInMetadata\"", (gogoproto.nullable)   = false ];
   cosmos.bank.v1beta1.Metadata amountOutMetadata = 2 [ (gogoproto.moretags) = "yaml:\"amountOutMetadata\"", (gogoproto.nullable)   = false ];
   string minAmountIn = 3;
+  string minAmountOut = 4;
 }
 
 message RegisterChangeBurningFundAddressProposal {
