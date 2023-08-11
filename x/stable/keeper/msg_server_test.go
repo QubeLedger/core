@@ -136,6 +136,16 @@ func (suite *StableKeeperTestSuite) TestBurn() {
 			true,
 			"Backing Ration < 85%",
 		},
+		{
+			"fail-amountOut less minAnountOut",
+			s.GetNormalPair(0),
+			"uusd",
+			19,
+			0,
+			int64(93000),
+			true,
+			"ErrAmountOutGTEminAmountOut err",
+		},
 	}
 	for _, tc := range testCases {
 		suite.Setup()

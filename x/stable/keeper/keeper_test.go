@@ -87,7 +87,7 @@ func (s *StableKeeperTestSuite) GetNormalPair(id uint64) types.Pair {
 		Qm:           sdk.NewInt(0),
 		Ar:           sdk.NewInt(0),
 		MinAmountIn:  "20uatom",
-		MinAmountOut: "20uuusd",
+		MinAmountOut: "20uusd",
 	}
 
 	return pair
