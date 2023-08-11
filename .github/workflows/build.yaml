@@ -1,4 +1,4 @@
-name: Quadrate Build
+name: Qube Build
 on: push
 
 jobs:
