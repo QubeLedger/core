@@ -39,6 +39,12 @@ message PairByIdRequest {
   uint64 id = 1;
 }
 
+message GetAmountOutByAmountIn {
+  string pairId = 1;
+  uint64 amountIn = 2;
+  string action = 3;
+}
+
 message PairRequestResponse {
   string pairId = 1;
   cosmos.bank.v1beta1.Metadata amountInMetadata = 2 [ (gogoproto.moretags) = "yaml:\"amountInMetadata\"", (gogoproto.nullable)   = false ];
@@ -54,5 +60,11 @@ message PairRequestResponse {
           (gogoproto.nullable) = false
   ];
   string minAmountIn = 6;
+  string minAmountOut = 7;
 }
 
+message AmountOutResponse {
+  string pairId = 1;
+  uint64 amountOut = 2;
+  string denom = 3;
+}
