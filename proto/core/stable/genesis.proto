@@ -3,7 +3,7 @@ package core.stable.v1beta1;
 
 import "gogoproto/gogo.proto";
 import "core/stable/params.proto";
-
+import "core/stable/pair.proto";
 option go_package = "github.com/QuadrateOrg/core/x/stable/types";
 
 // GenesisState defines the stable module's genesis state.
@@ -11,4 +11,6 @@ message GenesisState {
   Params params = 1 [(gogoproto.nullable) = false];
 
   string port_id = 2; 
+
+  repeated Pair pairs = 3 [(gogoproto.nullable) = false];
 }

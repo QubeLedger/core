@@ -73,13 +73,6 @@ func Setup(t *testing.T, chainId string, isCheckTx bool, invCheckPeriod uint) *q
 	)
 
 	if !isCheckTx {
-		// InitChain must be called to stop deliverState from being nil
-		//stateBytes, err := json.MarshalIndent(genesisState, "", " ")
-		//require.NoError(t, err)
-
-		//stateBytes := getDefaultGenesisStateBytes()
-
-		// Initialize the chain
 		app.InitChain(
 			abci.RequestInitChain{
 				ChainId:         chainId,
@@ -92,24 +85,3 @@ func Setup(t *testing.T, chainId string, isCheckTx bool, invCheckPeriod uint) *q
 
 	return app
 }
-
-/*func setup(withGenesis bool, invCheckPeriod uint) (*quadrateapp.QuadrateApp, quadrateapp.GenesisState) {
-	db := dbm.NewMemDB()
-	encCdc := quadrateapp.MakeEncodingConfig()
-	app := quadrateapp.NewQuadrateApp(
-		log.NewNopLogger(),
-		db,
-		nil,
-		true,
-		map[int64]bool{},
-		quadrateapp.DefaultNodeHome,
-		invCheckPeriod,
-		encCdc,
-		EmptyAppOptions{},
-	)
-	if withGenesis {
-		return app, quadrateapp.NewDefaultGenesisState()
-	}
-
-	return app, quadrateapp.NewDefaultGenesisState()
-}*/

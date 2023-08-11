@@ -41,7 +41,6 @@ func TestStableKeeperTestSuite(t *testing.T) {
 
 func (suite *StableKeeperTestSuite) Commit() {
 	header := suite.ctx.BlockHeader()
-	// update ctx
 	suite.ctx = suite.app.BaseApp.NewContext(false, header)
 }
 
