@@ -54,6 +54,12 @@ func (k Keeper) Burn(goCtx context.Context, msg *types.MsgBurn) (*types.MsgBurnR
 	if !found {
 		return nil, types.ErrPairNotFound
 	}
+
+	err = k.CheckBurnAmount(msg.AmountIn, pair)
+	if err != nil {
+		return nil, err
+	}
+
 	err, amountOut := k.ExecuteBurn(ctx, msg, pair)
 
 	if err != nil {

@@ -10,17 +10,17 @@ import (
 )
 
 // ParseRegisterCoinProposal reads and parses a ParseRegisterCoinProposal from a file.
-func ParseMetadata(cdc codec.JSONCodec, metadataFile string) (banktypes.Metadata, banktypes.Metadata, string, error) {
+func ParseMetadata(cdc codec.JSONCodec, metadataFile string) (banktypes.Metadata, banktypes.Metadata, string, string, error) {
 	proposalMetadata := types.ProposalMetadata{}
 
 	contents, err := os.ReadFile(filepath.Clean(metadataFile))
 	if err != nil {
-		return banktypes.Metadata{}, banktypes.Metadata{}, "", err
+		return banktypes.Metadata{}, banktypes.Metadata{}, "", "", err
 	}
 
 	if err = cdc.UnmarshalJSON(contents, &proposalMetadata); err != nil {
-		return banktypes.Metadata{}, banktypes.Metadata{}, "", err
+		return banktypes.Metadata{}, banktypes.Metadata{}, "", "", err
 	}
 
-	return proposalMetadata.AmountInMetadata, proposalMetadata.AmountOutMetadata, proposalMetadata.MinAmountIn, nil
+	return proposalMetadata.AmountInMetadata, proposalMetadata.AmountOutMetadata, proposalMetadata.MinAmountIn, proposalMetadata.MinAmountOut, nil
 }

@@ -61,3 +61,20 @@ func (k Keeper) CheckMinAmount(msgAmountIn string, pair types.Pair) error {
 
 	return nil
 }
+
+func (k Keeper) CheckBurnAmount(msgAmountIn string, pair types.Pair) error {
+	msgAmountOutCoins, err := sdk.ParseCoinsNormalized(msgAmountIn)
+	if err != nil {
+		return err
+	}
+
+	pairMinAmountoutCoins, err := sdk.ParseCoinsNormalized(pair.MinAmountOut)
+	if err != nil {
+		return err
+	}
+	if !msgAmountOutCoins.AmountOf(pair.AmountInMetadata.Base).GT(pairMinAmountoutCoins.AmountOf(pair.AmountOutMetadata.Base)) {
+		return types.ErrAmountInGTEminAmountIn
+	}
+
+	return nil
+}

@@ -30,13 +30,14 @@ func init() {
 	govtypes.RegisterProposalTypeCodec(&RegisterChangeBurningFundAddressProposal{}, "stable/RegisterChangeBurningFundAddressProposal")
 }
 
-func NewRegisterPairProposal(title, description string, amountInDenom banktypes.Metadata, amountOutDenom banktypes.Metadata, minAmount string) govtypes.Content {
+func NewRegisterPairProposal(title, description string, amountInDenom banktypes.Metadata, amountOutDenom banktypes.Metadata, minAmountIn string, minAmountOut string) govtypes.Content {
 	return &RegisterPairProposal{
 		Title:             title,
 		Description:       description,
 		AmountInMetadata:  amountInDenom,
 		AmountOutMetadata: amountOutDenom,
-		MinAmountIn:       minAmount,
+		MinAmountIn:       minAmountIn,
+		MinAmountOut:      minAmountOut,
 	}
 }
 

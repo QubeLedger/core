@@ -14,7 +14,8 @@ func TestRegisterPairProposal(t *testing.T) {
 		description       string
 		amountInMetadata  banktypes.Metadata
 		amountOutMetadata banktypes.Metadata
-		minAmount         string
+		minAmountInt      string
+		minAmountOut      string
 		expectedErr       bool
 	}{
 		{
@@ -41,6 +42,7 @@ func TestRegisterPairProposal(t *testing.T) {
 				Symbol:  "USQ",
 			},
 			"20uatom",
+			"20uusd",
 			false,
 		},
 		{
@@ -53,6 +55,7 @@ func TestRegisterPairProposal(t *testing.T) {
 				Name: "",
 			},
 			"",
+			"",
 			true,
 		},
 		{
@@ -66,6 +69,7 @@ func TestRegisterPairProposal(t *testing.T) {
 				Name:   "Cosmos Hub Atom",
 				Symbol: "",
 			},
+			"",
 			"",
 			true,
 		},
@@ -82,6 +86,7 @@ func TestRegisterPairProposal(t *testing.T) {
 				Symbol: "ATOM",
 				Base:   "",
 			},
+			"",
 			"",
 			true,
 		},
@@ -100,13 +105,14 @@ func TestRegisterPairProposal(t *testing.T) {
 				Base:    "uatom",
 				Display: "",
 			},
+			"",
 			"",
 			true,
 		},
 	}
 
 	for _, tc := range tests {
-		msg := types.NewRegisterPairProposal(tc.title, tc.description, tc.amountInMetadata, tc.amountOutMetadata, tc.minAmount)
+		msg := types.NewRegisterPairProposal(tc.title, tc.description, tc.amountInMetadata, tc.amountOutMetadata, tc.minAmountInt, tc.minAmountOut)
 		err := msg.ValidateBasic()
 		if tc.expectedErr {
 			require.Error(t, err)

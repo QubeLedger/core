@@ -22,6 +22,7 @@ type RegisterPairProposal struct {
 	AmountInMetadata  banktypes.Metadata `json:"amountInMetadata" yaml:"amountInMetadata"`
 	AmountOutMetadata banktypes.Metadata `json:"amountOutMetadata" yaml:"amountOutMetadata"`
 	MinAmountIn       string             `json:"minAmountIn" yaml:"minAmountIn"`
+	MinAmountOut      string             `json:"minAmountOut" yaml:"minAmountOut"`
 }
 
 type RegisterChangeBurningFundAddressProposal struct {
@@ -57,7 +58,7 @@ func newRegisterPair(clientCtx client.Context) http.HandlerFunc {
 			return
 		}
 
-		content := types.NewRegisterPairProposal(req.Title, req.Description, req.AmountInMetadata, req.AmountOutMetadata, req.MinAmountIn)
+		content := types.NewRegisterPairProposal(req.Title, req.Description, req.AmountInMetadata, req.AmountOutMetadata, req.MinAmountIn, req.MinAmountOut)
 		msg, err := govtypes.NewMsgSubmitProposal(content, req.Deposit, fromAddr)
 		if rest.CheckBadRequestError(w, err) {
 			return

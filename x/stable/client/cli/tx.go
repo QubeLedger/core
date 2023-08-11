@@ -141,7 +141,8 @@ func NewRegisterPairProposalCmd() *cobra.Command {
 				"name": "USQ",
 				"symbol": "USQ"
 			},
-			"minAmountIn": "20ibc/<HASH>"
+			"minAmountIn": "20ibc/<HASH>",
+			"minAmountOut": "2uusd",
 		}`,
 		),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
@@ -168,13 +169,13 @@ func NewRegisterPairProposalCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			amountInMetadata, amountoutMetadata, minAmount, err := ParseMetadata(clientCtx.Codec, args[0])
+			amountInMetadata, amountoutMetadata, minAmountIn, minAmountOut, err := ParseMetadata(clientCtx.Codec, args[0])
 			if err != nil {
 				return err
 			}
 			from := clientCtx.GetFromAddress()
 
-			content := types.NewRegisterPairProposal(title, description, amountInMetadata, amountoutMetadata, minAmount)
+			content := types.NewRegisterPairProposal(title, description, amountInMetadata, amountoutMetadata, minAmountIn, minAmountOut)
 
 			msg, err := govtypes.NewMsgSubmitProposal(content, deposit, from)
 			if err != nil {

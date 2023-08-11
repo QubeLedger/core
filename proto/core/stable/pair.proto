@@ -21,5 +21,6 @@ message Pair {
                 (gogoproto.moretags) = "yaml:\"ar\"",
                 (gogoproto.nullable) = false
         ];
-        string minAmountInt = 7;
+        string minAmountIn = 7;
+        string minAmountOut = 8;
 }
