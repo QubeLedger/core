@@ -3,7 +3,7 @@ package keeper_test
 import (
 	"fmt"
 
-	"github.com/QuadrateOrg/core/x/stable/types"
+	"github.com/QubeLedger/core/x/stable/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 

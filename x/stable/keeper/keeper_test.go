@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/QuadrateOrg/core/app"
-	apptesting "github.com/QuadrateOrg/core/app/apptesting"
-	quadrateapptest "github.com/QuadrateOrg/core/app/helpers"
-	"github.com/QuadrateOrg/core/x/stable/types"
+	"github.com/QubeLedger/core/app"
+	apptesting "github.com/QubeLedger/core/app/apptesting"
+	qubeapptest "github.com/QubeLedger/core/app/helpers"
+	"github.com/QubeLedger/core/x/stable/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	. "github.com/onsi/ginkgo/v2"
@@ -19,7 +19,7 @@ import (
 type StableKeeperTestSuite struct {
 	suite.Suite
 	ctx     sdk.Context
-	app     *app.QuadrateApp
+	app     *app.QubeApp
 	genesis types.GenesisState
 	Address sdk.AccAddress
 }
@@ -27,7 +27,7 @@ type StableKeeperTestSuite struct {
 var s *StableKeeperTestSuite
 
 func (s *StableKeeperTestSuite) Setup() {
-	s.app = quadrateapptest.Setup(s.T(), "qube-1", false, 1)
+	s.app = qubeapptest.Setup(s.T(), "qube-1", false, 1)
 	s.Address = apptesting.CreateRandomAccounts(1)[0]
 }
 

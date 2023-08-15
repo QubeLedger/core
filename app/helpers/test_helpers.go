@@ -11,12 +11,12 @@ import (
 	tmtypes "github.com/tendermint/tendermint/types"
 	dbm "github.com/tendermint/tm-db"
 
-	quadrateapp "github.com/QuadrateOrg/core/app"
+	Qubeapp "github.com/QubeLedger/core/app"
 )
 
 // SimAppChainID hardcoded chainID for simulation
 const (
-	SimAppChainID = "quadrate_5120-1"
+	SimAppChainID = "Qube_5120-1"
 )
 
 // DefaultConsensusParams defines the default Tendermint consensus params used
@@ -45,7 +45,7 @@ var defaultGenesisBz []byte
 
 func getDefaultGenesisStateBytes() []byte {
 	if len(defaultGenesisBz) == 0 {
-		genesisState := quadrateapp.NewDefaultGenesisState()
+		genesisState := Qubeapp.NewDefaultGenesisState()
 		stateBytes, _ := json.MarshalIndent(genesisState, "", " ")
 		/*if err != nil {
 			panic(err)
@@ -55,18 +55,18 @@ func getDefaultGenesisStateBytes() []byte {
 	return defaultGenesisBz
 }
 
-func Setup(t *testing.T, chainId string, isCheckTx bool, invCheckPeriod uint) *quadrateapp.QuadrateApp {
+func Setup(t *testing.T, chainId string, isCheckTx bool, invCheckPeriod uint) *Qubeapp.QubeApp {
 	//t.Helper()
 
 	db := dbm.NewMemDB()
-	encCdc := quadrateapp.MakeEncodingConfig()
-	app := quadrateapp.NewQuadrateApp(
+	encCdc := Qubeapp.MakeEncodingConfig()
+	app := Qubeapp.NewQubeApp(
 		log.NewNopLogger(),
 		db,
 		nil,
 		true,
 		map[int64]bool{},
-		quadrateapp.DefaultNodeHome,
+		Qubeapp.DefaultNodeHome,
 		invCheckPeriod,
 		encCdc,
 		EmptyAppOptions{},

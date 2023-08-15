@@ -1,7 +1,7 @@
 package keeper
 
 import (
-	"github.com/QuadrateOrg/core/x/oracle/types"
+	"github.com/QubeLedger/core/x/oracle/types"
 )
 
 type msgServer struct {

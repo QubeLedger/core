@@ -3,7 +3,7 @@ package keeper
 import (
 	"context"
 
-	"github.com/QuadrateOrg/core/x/oracle/types"
+	"github.com/QubeLedger/core/x/oracle/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"

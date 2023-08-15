@@ -30,9 +30,9 @@ import (
 	"github.com/tendermint/tendermint/libs/log"
 	dbm "github.com/tendermint/tm-db"
 
-	quadrate "github.com/QuadrateOrg/core/app"
+	qube "github.com/QubeLedger/core/app"
 
-	"github.com/QuadrateOrg/core/app/params"
+	"github.com/QubeLedger/core/app/params"
 	serverconfig "github.com/cosmos/cosmos-sdk/server/config"
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
 )
@@ -40,7 +40,7 @@ import (
 // NewRootCmd creates a new root command for simd. It is called once in the
 // main function.
 func NewRootCmd() (*cobra.Command, params.EncodingConfig) {
-	encodingConfig := quadrate.MakeEncodingConfig()
+	encodingConfig := qube.MakeEncodingConfig()
 	initClientCtx := client.Context{}.
 		WithCodec(encodingConfig.Marshaler).
 		WithInterfaceRegistry(encodingConfig.InterfaceRegistry).
@@ -48,12 +48,13 @@ func NewRootCmd() (*cobra.Command, params.EncodingConfig) {
 		WithLegacyAmino(encodingConfig.Amino).
 		WithInput(os.Stdin).
 		WithAccountRetriever(types.AccountRetriever{}).
-		WithHomeDir(quadrate.DefaultNodeHome).
-		WithViper("quadrate")
+		WithHomeDir(qube.DefaultNodeHome).
+		WithViper("qube")
 
 	rootCmd := &cobra.Command{
 		Use:   "qubed",
-		Short: "quadrate App",
+		Short: "Start qube app",
+		Long:  "",
 		PersistentPreRunE: func(cmd *cobra.Command, _ []string) error {
 			cmd.SetOut(cmd.OutOrStdout())
 			cmd.SetErr(cmd.ErrOrStderr())
@@ -74,8 +75,8 @@ func NewRootCmd() (*cobra.Command, params.EncodingConfig) {
 
 			viper.Set(tmcli.HomeFlag, initClientCtx.HomeDir)
 
-			quadrateTemplate, quadrateAppConfig := initAppConfig()
-			return server.InterceptConfigsPreRunHandler(cmd, quadrateTemplate, quadrateAppConfig)
+			qubeTemplate, qubeAppConfig := initAppConfig()
+			return server.InterceptConfigsPreRunHandler(cmd, qubeTemplate, qubeAppConfig)
 		},
 	}
 
@@ -105,27 +106,27 @@ func initRootCmd(rootCmd *cobra.Command, encodingConfig params.EncodingConfig) {
 	cfg.Seal()
 
 	rootCmd.AddCommand(
-		genutilcli.InitCmd(quadrate.ModuleBasics, quadrate.DefaultNodeHome),
-		genutilcli.CollectGenTxsCmd(banktypes.GenesisBalancesIterator{}, quadrate.DefaultNodeHome),
-		genutilcli.GenTxCmd(quadrate.ModuleBasics, encodingConfig.TxConfig, banktypes.GenesisBalancesIterator{}, quadrate.DefaultNodeHome),
-		genutilcli.ValidateGenesisCmd(quadrate.ModuleBasics),
-		AddGenesisAccountCmd(quadrate.DefaultNodeHome),
+		genutilcli.InitCmd(qube.ModuleBasics, qube.DefaultNodeHome),
+		genutilcli.CollectGenTxsCmd(banktypes.GenesisBalancesIterator{}, qube.DefaultNodeHome),
+		genutilcli.GenTxCmd(qube.ModuleBasics, encodingConfig.TxConfig, banktypes.GenesisBalancesIterator{}, qube.DefaultNodeHome),
+		genutilcli.ValidateGenesisCmd(qube.ModuleBasics),
+		AddGenesisAccountCmd(qube.DefaultNodeHome),
 		tmcli.NewCompletionCmd(rootCmd, true),
-		testnetCmd(quadrate.ModuleBasics, banktypes.GenesisBalancesIterator{}),
+		testnetCmd(qube.ModuleBasics, banktypes.GenesisBalancesIterator{}),
 		config.Cmd(),
 	)
 
 	ac := appCreator{
 		encCfg: encodingConfig,
 	}
-	server.AddCommands(rootCmd, quadrate.DefaultNodeHome, ac.newApp, ac.appExport, addModuleInitFlags)
+	server.AddCommands(rootCmd, qube.DefaultNodeHome, ac.newApp, ac.appExport, addModuleInitFlags)
 
 	// add keybase, auxiliary RPC, query, and tx child commands
 	rootCmd.AddCommand(
 		rpc.StatusCommand(),
 		queryCommand(),
 		txCommand(),
-		keys.Commands(quadrate.DefaultNodeHome),
+		keys.Commands(qube.DefaultNodeHome),
 	)
 }
 
@@ -151,7 +152,7 @@ func queryCommand() *cobra.Command {
 		authcmd.QueryTxCmd(),
 	)
 
-	quadrate.ModuleBasics.AddQueryCommands(cmd)
+	qube.ModuleBasics.AddQueryCommands(cmd)
 	cmd.PersistentFlags().String(flags.FlagChainID, "", "The network chain ID")
 
 	return cmd
@@ -178,7 +179,7 @@ func txCommand() *cobra.Command {
 		authcmd.GetDecodeCommand(),
 	)
 
-	quadrate.ModuleBasics.AddTxCommands(cmd)
+	qube.ModuleBasics.AddTxCommands(cmd)
 	cmd.PersistentFlags().String(flags.FlagChainID, "", "The network chain ID")
 
 	return cmd
@@ -221,7 +222,7 @@ func (ac appCreator) newApp(
 		panic(err)
 	}
 
-	return quadrate.NewQuadrateApp(
+	return qube.NewQubeApp(
 		logger, db, traceStore, true, skipUpgradeHeights,
 		cast.ToString(appOpts.Get(flags.FlagHome)),
 		cast.ToUint(appOpts.Get(server.FlagInvCheckPeriod)),
@@ -261,7 +262,7 @@ func (ac appCreator) appExport(
 		loadLatest = true
 	}
 
-	quadrateApp := quadrate.NewQuadrateApp(
+	qubeApp := qube.NewQubeApp(
 		logger,
 		db,
 		traceStore,
@@ -274,10 +275,10 @@ func (ac appCreator) appExport(
 	)
 
 	if height != -1 {
-		if err := quadrateApp.LoadHeight(height); err != nil {
+		if err := qubeApp.LoadHeight(height); err != nil {
 			return servertypes.ExportedApp{}, err
 		}
 	}
 
-	return quadrateApp.ExportAppStateAndValidators(forZeroHeight, jailAllowedAddrs)
+	return qubeApp.ExportAppStateAndValidators(forZeroHeight, jailAllowedAddrs)
 }

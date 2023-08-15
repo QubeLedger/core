@@ -6,10 +6,10 @@ import (
 	"github.com/stretchr/testify/require"
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 
-	quadrateapptest "github.com/QuadrateOrg/core/app/helpers"
-	apptypes "github.com/QuadrateOrg/core/types"
+	qubeapptest "github.com/QubeLedger/core/app/helpers"
+	apptypes "github.com/QubeLedger/core/types"
 
-	"github.com/QuadrateOrg/core/x/tokenfactory/types"
+	"github.com/QubeLedger/core/x/tokenfactory/types"
 )
 
 func TestGenesis(t *testing.T) {
@@ -31,7 +31,7 @@ func TestGenesis(t *testing.T) {
 			},
 		},
 	}
-	app := quadrateapptest.Setup(t, "quadrate_5120-1", false, 1)
+	app := qubeapptest.Setup(t, "Qube_5120-1", false, 1)
 	ctx := app.BaseApp.NewContext(false, tmproto.Header{})
 
 	app.TokenFactoryKeeper.InitGenesis(ctx, genesisState)

@@ -3,8 +3,8 @@ package upgrades
 import (
 	"encoding/json"
 
-	tokenfactorykeeper "github.com/QuadrateOrg/core/x/tokenfactory/keeper"
-	tokenfactorytypes "github.com/QuadrateOrg/core/x/tokenfactory/types"
+	tokenfactorykeeper "github.com/QubeLedger/core/x/tokenfactory/keeper"
+	tokenfactorytypes "github.com/QubeLedger/core/x/tokenfactory/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"

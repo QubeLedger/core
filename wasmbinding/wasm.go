@@ -7,9 +7,9 @@ import (
 
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 
-	tokenfactorykeeper "github.com/QuadrateOrg/core/x/tokenfactory/keeper"
+	tokenfactorykeeper "github.com/QubeLedger/core/x/tokenfactory/keeper"
 
-	oraclekeeper "github.com/QuadrateOrg/core/x/oracle/keeper"
+	oraclekeeper "github.com/QubeLedger/core/x/oracle/keeper"
 )
 
 func RegisterCustomPlugins(

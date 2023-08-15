@@ -14,14 +14,14 @@ import (
 	"github.com/stretchr/testify/suite"
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 
-	quadrateapp "github.com/QuadrateOrg/core/app"
-	quadratehelpers "github.com/QuadrateOrg/core/app/helpers"
+	Qubeapp "github.com/QubeLedger/core/app"
+	Qubehelpers "github.com/QubeLedger/core/app/helpers"
 )
 
 type IntegrationTestSuite struct {
 	suite.Suite
 
-	app       *quadrateapp.QuadrateApp
+	app       *Qubeapp.QubeApp
 	_         sdk.AnteHandler
 	ctx       sdk.Context
 	clientCtx client.Context
@@ -34,9 +34,9 @@ func TestIntegrationTestSuite(t *testing.T) {
 
 func (s *IntegrationTestSuite) SetupTestAnte() {
 
-	app := quadratehelpers.Setup(s.T(), "quadrate_5120-1", false, 1)
+	app := Qubehelpers.Setup(s.T(), "qube-1", false, 1)
 	ctx := app.BaseApp.NewContext(false, tmproto.Header{
-		ChainID: "quadrate_5120-1",
+		ChainID: "qube-1",
 		Height:  1,
 	})
 

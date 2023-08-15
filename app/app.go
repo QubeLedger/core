@@ -109,25 +109,25 @@ import (
 	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
 	"github.com/prometheus/client_golang/prometheus"
 
-	quadrateante "github.com/QuadrateOrg/core/ante"
-	quadrateappparams "github.com/QuadrateOrg/core/app/params"
+	Qubeante "github.com/QubeLedger/core/ante"
+	Qubeappparams "github.com/QubeLedger/core/app/params"
 
-	wasmbinding "github.com/QuadrateOrg/core/wasmbinding"
+	wasmbinding "github.com/QubeLedger/core/wasmbinding"
 
-	tokenfactory "github.com/QuadrateOrg/core/x/tokenfactory"
-	tokenfactorykeeper "github.com/QuadrateOrg/core/x/tokenfactory/keeper"
-	tokenfactorytypes "github.com/QuadrateOrg/core/x/tokenfactory/types"
+	tokenfactory "github.com/QubeLedger/core/x/tokenfactory"
+	tokenfactorykeeper "github.com/QubeLedger/core/x/tokenfactory/keeper"
+	tokenfactorytypes "github.com/QubeLedger/core/x/tokenfactory/types"
 
-	etupgrade "github.com/QuadrateOrg/core/app/upgrades"
+	etupgrade "github.com/QubeLedger/core/app/upgrades"
 
-	oraclemodule "github.com/QuadrateOrg/core/x/oracle"
-	oraclemodulekeeper "github.com/QuadrateOrg/core/x/oracle/keeper"
-	oraclemoduletypes "github.com/QuadrateOrg/core/x/oracle/types"
+	oraclemodule "github.com/QubeLedger/core/x/oracle"
+	oraclemodulekeeper "github.com/QubeLedger/core/x/oracle/keeper"
+	oraclemoduletypes "github.com/QubeLedger/core/x/oracle/types"
 
-	stablemodule "github.com/QuadrateOrg/core/x/stable"
-	stableclient "github.com/QuadrateOrg/core/x/stable/client"
-	stablemodulekeeper "github.com/QuadrateOrg/core/x/stable/keeper"
-	stablemoduletypes "github.com/QuadrateOrg/core/x/stable/types"
+	stablemodule "github.com/QubeLedger/core/x/stable"
+	stableclient "github.com/QubeLedger/core/x/stable/client"
+	stablemodulekeeper "github.com/QubeLedger/core/x/stable/keeper"
+	stablemoduletypes "github.com/QubeLedger/core/x/stable/types"
 
 	// unnamed import of statik for swagger UI support
 	_ "github.com/cosmos/cosmos-sdk/client/docs/statik"
@@ -238,13 +238,13 @@ var (
 )
 
 var (
-	_ servertypes.Application = (*QuadrateApp)(nil)
+	_ servertypes.Application = (*QubeApp)(nil)
 )
 
-// QuadrateApp extends an ABCI application, but with most of its parameters exported.
+// QubeApp extends an ABCI application, but with most of its parameters exported.
 // They are exported for convenience in creating helper functions, as object
 // capabilities aren't needed for testing.
-type QuadrateApp struct { // nolint: golint
+type QubeApp struct { // nolint: golint
 	*baseapp.BaseApp
 	legacyAmino       *codec.LegacyAmino
 	appCodec          codec.Codec
@@ -302,12 +302,12 @@ func init() {
 		stdlog.Println("Failed to get home dir %2", err)
 	}
 
-	DefaultNodeHome = filepath.Join(userHomeDir, ".quadrate")
+	DefaultNodeHome = filepath.Join(userHomeDir, ".qube")
 	// apply custom power reduction for 'a' base denom unit 10^18
 	sdk.DefaultPowerReduction = sdk.NewIntFromBigInt(new(big.Int).Exp(big.NewInt(10), big.NewInt(18), nil))
 }
 
-func NewQuadrateApp(
+func NewQubeApp(
 	logger log.Logger,
 	db dbm.DB,
 	traceStore io.Writer,
@@ -315,10 +315,10 @@ func NewQuadrateApp(
 	skipUpgradeHeights map[int64]bool,
 	homePath string,
 	invCheckPeriod uint,
-	encodingConfig quadrateappparams.EncodingConfig,
+	encodingConfig Qubeappparams.EncodingConfig,
 	appOpts servertypes.AppOptions,
 	baseAppOptions ...func(*baseapp.BaseApp),
-) *QuadrateApp {
+) *QubeApp {
 
 	appCodec := encodingConfig.Marshaler
 	legacyAmino := encodingConfig.Amino
@@ -341,7 +341,7 @@ func NewQuadrateApp(
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
 	memKeys := sdk.NewMemoryStoreKeys(capabilitytypes.MemStoreKey)
 
-	app := &QuadrateApp{
+	app := &QubeApp{
 		BaseApp:           bApp,
 		legacyAmino:       legacyAmino,
 		appCodec:          appCodec,
@@ -734,13 +734,13 @@ func NewQuadrateApp(
 	app.MountTransientStores(tkeys)
 	app.MountMemoryStores(memKeys)
 
-	anteHandler, err := quadrateante.NewAnteHandler(
-		quadrateante.HandlerOptions{
+	anteHandler, err := Qubeante.NewAnteHandler(
+		Qubeante.HandlerOptions{
 			AccountKeeper:     app.AccountKeeper,
 			BankKeeper:        app.BankKeeper,
 			FeegrantKeeper:    app.FeeGrantKeeper,
 			SignModeHandler:   encodingConfig.TxConfig.SignModeHandler(),
-			SigGasConsumer:    quadrateante.SigVerificationGasConsumer,
+			SigGasConsumer:    Qubeante.SigVerificationGasConsumer,
 			IBCKeeper:         app.IBCKeeper,
 			TxCounterStoreKey: keys[wasm.StoreKey],
 			WasmConfig:        wasmConfig,
@@ -779,20 +779,20 @@ func NewQuadrateApp(
 }
 
 // Name returns the name of the App
-func (app *QuadrateApp) Name() string { return app.BaseApp.Name() }
+func (app *QubeApp) Name() string { return app.BaseApp.Name() }
 
 // BeginBlocker application updates every begin block
-func (app *QuadrateApp) BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock) abci.ResponseBeginBlock {
+func (app *QubeApp) BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock) abci.ResponseBeginBlock {
 	return app.mm.BeginBlock(ctx, req)
 }
 
 // EndBlocker application updates every end block
-func (app *QuadrateApp) EndBlocker(ctx sdk.Context, req abci.RequestEndBlock) abci.ResponseEndBlock {
+func (app *QubeApp) EndBlocker(ctx sdk.Context, req abci.RequestEndBlock) abci.ResponseEndBlock {
 	return app.mm.EndBlock(ctx, req)
 }
 
 // InitChainer application update at chain initialization
-func (app *QuadrateApp) InitChainer(ctx sdk.Context, req abci.RequestInitChain) abci.ResponseInitChain {
+func (app *QubeApp) InitChainer(ctx sdk.Context, req abci.RequestInitChain) abci.ResponseInitChain {
 	var genesisState GenesisState
 	if err := tmjson.Unmarshal(req.AppStateBytes, &genesisState); err != nil {
 		panic(err)
@@ -804,13 +804,13 @@ func (app *QuadrateApp) InitChainer(ctx sdk.Context, req abci.RequestInitChain) 
 }
 
 // LoadHeight loads a particular height
-func (app *QuadrateApp) LoadHeight(height int64) error {
+func (app *QubeApp) LoadHeight(height int64) error {
 	return app.LoadVersion(height)
 }
 
 // ModuleAccountAddrs returns all the app's module account addresses.
 /* #nosec */
-func (app *QuadrateApp) ModuleAccountAddrs() map[string]bool {
+func (app *QubeApp) ModuleAccountAddrs() map[string]bool {
 	modAccAddrs := make(map[string]bool)
 	for acc := range maccPerms {
 		modAccAddrs[authtypes.NewModuleAddress(acc).String()] = true
@@ -819,56 +819,56 @@ func (app *QuadrateApp) ModuleAccountAddrs() map[string]bool {
 	return modAccAddrs
 }
 
-// LegacyAmino returns QuadrateApp's amino codec.
+// LegacyAmino returns QubeApp's amino codec.
 //
 // NOTE: This is solely to be used for testing purposes as it may be desirable
 // for modules to register their own custom testing types.
-func (app *QuadrateApp) LegacyAmino() *codec.LegacyAmino {
+func (app *QubeApp) LegacyAmino() *codec.LegacyAmino {
 	return app.legacyAmino
 }
 
 // NOTE: This is solely to be used for testing purposes as it may be desirable
 // for modules to register their own custom testing types.
-func (app *QuadrateApp) AppCodec() codec.Codec {
+func (app *QubeApp) AppCodec() codec.Codec {
 	return app.appCodec
 }
 
-func (app *QuadrateApp) InterfaceRegistry() types.InterfaceRegistry {
+func (app *QubeApp) InterfaceRegistry() types.InterfaceRegistry {
 	return app.interfaceRegistry
 }
 
 // GetKey returns the KVStoreKey for the provided store key.
 //
 // NOTE: This is solely to be used for testing purposes.
-func (app *QuadrateApp) GetKey(storeKey string) *sdk.KVStoreKey {
+func (app *QubeApp) GetKey(storeKey string) *sdk.KVStoreKey {
 	return app.keys[storeKey]
 }
 
 // GetTKey returns the TransientStoreKey for the provided store key.
 //
 // NOTE: This is solely to be used for testing purposes.
-func (app *QuadrateApp) GetTKey(storeKey string) *sdk.TransientStoreKey {
+func (app *QubeApp) GetTKey(storeKey string) *sdk.TransientStoreKey {
 	return app.tkeys[storeKey]
 }
 
 // GetMemKey returns the MemStoreKey for the provided mem key.
 //
 // NOTE: This is solely used for testing purposes.
-func (app *QuadrateApp) GetMemKey(storeKey string) *sdk.MemoryStoreKey {
+func (app *QubeApp) GetMemKey(storeKey string) *sdk.MemoryStoreKey {
 	return app.memKeys[storeKey]
 }
 
 // GetSubspace returns a param subspace for a given module name.
 //
 // NOTE: This is solely to be used for testing purposes.
-func (app *QuadrateApp) GetSubspace(moduleName string) paramstypes.Subspace {
+func (app *QubeApp) GetSubspace(moduleName string) paramstypes.Subspace {
 	subspace, _ := app.ParamsKeeper.GetSubspace(moduleName)
 	return subspace
 }
 
 // RegisterAPIRoutes registers all application module routes with the provided
 // API server.
-func (app *QuadrateApp) RegisterAPIRoutes(apiSvr *api.Server, apiConfig config.APIConfig) {
+func (app *QubeApp) RegisterAPIRoutes(apiSvr *api.Server, apiConfig config.APIConfig) {
 	clientCtx := apiSvr.ClientCtx
 	rpc.RegisterRoutes(clientCtx, apiSvr.Router)
 	// Register legacy tx routes.
@@ -888,12 +888,12 @@ func (app *QuadrateApp) RegisterAPIRoutes(apiSvr *api.Server, apiConfig config.A
 }
 
 // RegisterTxService implements the Application.RegisterTxService method.
-func (app *QuadrateApp) RegisterTxService(clientCtx client.Context) {
+func (app *QubeApp) RegisterTxService(clientCtx client.Context) {
 	authtx.RegisterTxService(app.BaseApp.GRPCQueryRouter(), clientCtx, app.BaseApp.Simulate, app.interfaceRegistry)
 }
 
 // RegisterTendermintService implements the Application.RegisterTendermintService method.
-func (app *QuadrateApp) RegisterTendermintService(clientCtx client.Context) {
+func (app *QubeApp) RegisterTendermintService(clientCtx client.Context) {
 	tmservice.RegisterTendermintService(app.BaseApp.GRPCQueryRouter(), clientCtx, app.interfaceRegistry)
 }
 
@@ -932,7 +932,7 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	return paramsKeeper
 }
 
-func (app *QuadrateApp) setUpgradeHandlers() {
+func (app *QubeApp) setUpgradeHandlers() {
 	app.UpgradeKeeper.SetUpgradeHandler(
 		etupgrade.UpgradeName,
 		etupgrade.CreateUpgradeHandler(

@@ -10,7 +10,7 @@ import (
 	// "github.com/cosmos/cosmos-sdk/client/flags"
 	// sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/QuadrateOrg/core/x/oracle/types"
+	"github.com/QubeLedger/core/x/oracle/types"
 )
 
 // GetQueryCmd returns the cli query commands for this module

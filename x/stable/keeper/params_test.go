@@ -1,7 +1,7 @@
 package keeper_test
 
 import (
-	"github.com/QuadrateOrg/core/x/stable/types"
+	"github.com/QubeLedger/core/x/stable/types"
 )
 
 func (s *StableKeeperTestSuite) TestGetParams() {

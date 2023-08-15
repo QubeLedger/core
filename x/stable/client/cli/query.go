@@ -15,7 +15,7 @@ import (
 	// "github.com/cosmos/cosmos-sdk/client/flags"
 	// sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/QuadrateOrg/core/x/stable/types"
+	"github.com/QubeLedger/core/x/stable/types"
 )
 
 // GetQueryCmd returns the cli query commands for this module

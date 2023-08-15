@@ -7,9 +7,9 @@ import (
 	svrcmd "github.com/cosmos/cosmos-sdk/server/cmd"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	app "github.com/QuadrateOrg/core/app"
-	"github.com/QuadrateOrg/core/cmd/qubed/cmd"
-	"github.com/QuadrateOrg/core/types"
+	app "github.com/QubeLedger/core/app"
+	"github.com/QubeLedger/core/cmd/qubed/cmd"
+	"github.com/QubeLedger/core/types"
 )
 
 func main() {

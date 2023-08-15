@@ -13,9 +13,9 @@ import (
 
 	abci "github.com/tendermint/tendermint/abci/types"
 
-	"github.com/QuadrateOrg/core/x/oracle/client/cli"
-	"github.com/QuadrateOrg/core/x/oracle/keeper"
-	"github.com/QuadrateOrg/core/x/oracle/types"
+	"github.com/QubeLedger/core/x/oracle/client/cli"
+	"github.com/QubeLedger/core/x/oracle/keeper"
+	"github.com/QubeLedger/core/x/oracle/types"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/codec"
 	cdctypes "github.com/cosmos/cosmos-sdk/codec/types"

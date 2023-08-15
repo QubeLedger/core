@@ -23,4 +23,4 @@ The contributing guide for Qube explains the branching structure, how to use the
 
 ## Supporters
 
-[![Stargazers repo roster for @QuadrateOrg/core](https://reporoster.com/stars/QuadrateOrg/core)](https://github.com/QuadrateOrg/core)
+[![Stargazers repo roster for @QuadrateOrg/core](https://reporoster.com/stars/QuadrateOrg/core)](https://github.com/QubeLedger/core)

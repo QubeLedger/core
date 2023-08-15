@@ -5,9 +5,9 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/QuadrateOrg/core/wasmbinding/bindings"
-	oraclekeeper "github.com/QuadrateOrg/core/x/oracle/keeper"
-	tokenfactorykeeper "github.com/QuadrateOrg/core/x/tokenfactory/keeper"
+	"github.com/QubeLedger/core/wasmbinding/bindings"
+	oraclekeeper "github.com/QubeLedger/core/x/oracle/keeper"
+	tokenfactorykeeper "github.com/QubeLedger/core/x/tokenfactory/keeper"
 )
 
 type QueryPlugin struct {

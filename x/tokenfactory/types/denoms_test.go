@@ -5,8 +5,8 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	apptypes "github.com/QuadrateOrg/core/types"
-	"github.com/QuadrateOrg/core/x/tokenfactory/types"
+	apptypes "github.com/QubeLedger/core/types"
+	"github.com/QubeLedger/core/x/tokenfactory/types"
 )
 
 func TestDecomposeDenoms(t *testing.T) {

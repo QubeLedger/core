@@ -3,8 +3,8 @@ package apptesting
 import (
 	"time"
 
-	"github.com/QuadrateOrg/core/app"
-	quadrateapptest "github.com/QuadrateOrg/core/app/helpers"
+	"github.com/QubeLedger/core/app"
+	qubeapptest "github.com/QubeLedger/core/app/helpers"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/simapp"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -16,14 +16,14 @@ import (
 type KeeperTestHelper struct {
 	suite.Suite
 
-	App         *app.QuadrateApp
+	App         *app.QubeApp
 	Ctx         sdk.Context
 	QueryHelper *baseapp.QueryServiceTestHelper
 	TestAccs    []sdk.AccAddress
 }
 
 func (s *KeeperTestHelper) Setup() {
-	s.App = quadrateapptest.Setup(s.T(), "qube-1", false, 1)
+	s.App = qubeapptest.Setup(s.T(), "qube-1", false, 1)
 	s.Ctx = s.App.BaseApp.NewContext(false, tmproto.Header{Height: 1, ChainID: "qube-1", Time: time.Now().UTC()})
 	s.QueryHelper = &baseapp.QueryServiceTestHelper{
 		GRPCQueryRouter: s.App.GRPCQueryRouter(),

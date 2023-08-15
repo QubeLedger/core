@@ -5,8 +5,8 @@ import (
 	"math/rand"
 	"time"
 
-	apptesting "github.com/QuadrateOrg/core/app/apptesting"
-	"github.com/QuadrateOrg/core/x/stable/types"
+	apptesting "github.com/QubeLedger/core/app/apptesting"
+	"github.com/QubeLedger/core/x/stable/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )

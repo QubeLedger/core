@@ -3,7 +3,7 @@ package keeper
 import (
 	"context"
 
-	"github.com/QuadrateOrg/core/x/oracle/types"
+	"github.com/QubeLedger/core/x/oracle/types"
 	"github.com/cosmos/cosmos-sdk/store/prefix"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"

@@ -9,10 +9,10 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 
-	"github.com/QuadrateOrg/core/wasmbinding/bindings"
+	"github.com/QubeLedger/core/wasmbinding/bindings"
 
-	tokenfactorykeeper "github.com/QuadrateOrg/core/x/tokenfactory/keeper"
-	tokenfactorytypes "github.com/QuadrateOrg/core/x/tokenfactory/types"
+	tokenfactorykeeper "github.com/QubeLedger/core/x/tokenfactory/keeper"
+	tokenfactorytypes "github.com/QubeLedger/core/x/tokenfactory/types"
 )
 
 // CustomMessageDecorator returns decorator for custom CosmWasm bindings messages

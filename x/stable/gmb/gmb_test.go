@@ -3,7 +3,7 @@ package gmb_test
 import (
 	"testing"
 
-	"github.com/QuadrateOrg/core/x/stable/gmb"
+	"github.com/QubeLedger/core/x/stable/gmb"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/require"
 )

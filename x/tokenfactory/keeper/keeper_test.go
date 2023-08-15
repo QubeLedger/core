@@ -5,8 +5,8 @@ import (
 
 	"github.com/stretchr/testify/suite"
 
-	apptesting "github.com/QuadrateOrg/core/app/apptesting"
-	"github.com/QuadrateOrg/core/x/tokenfactory/types"
+	apptesting "github.com/QubeLedger/core/app/apptesting"
+	"github.com/QubeLedger/core/x/tokenfactory/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 

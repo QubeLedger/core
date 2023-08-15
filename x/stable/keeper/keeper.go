@@ -14,7 +14,7 @@ import (
 	host "github.com/cosmos/ibc-go/v4/modules/core/24-host"
 	"github.com/tendermint/tendermint/libs/log"
 
-	"github.com/QuadrateOrg/core/x/stable/types"
+	"github.com/QubeLedger/core/x/stable/types"
 )
 
 type (

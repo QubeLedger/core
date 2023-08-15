@@ -1,8 +1,8 @@
 package keeper
 
 import (
-	gmd "github.com/QuadrateOrg/core/x/stable/gmb"
-	"github.com/QuadrateOrg/core/x/stable/types"
+	gmd "github.com/QubeLedger/core/x/stable/gmb"
+	"github.com/QubeLedger/core/x/stable/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 

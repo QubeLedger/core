@@ -9,7 +9,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
-	"github.com/QuadrateOrg/core/wasmbinding/bindings"
+	"github.com/QubeLedger/core/wasmbinding/bindings"
 )
 
 // CustomQuerier dispatches custom CosmWasm bindings queries.

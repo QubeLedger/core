@@ -3,7 +3,7 @@ package types
 import (
 	fmt "fmt"
 
-	apptypes "github.com/QuadrateOrg/core/types"
+	apptypes "github.com/QubeLedger/core/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
 )

@@ -1,4 +1,4 @@
-module github.com/QuadrateOrg/core
+module github.com/QubeLedger/core
 
 go 1.18
 

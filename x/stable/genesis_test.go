@@ -4,21 +4,21 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/QuadrateOrg/core/x/stable"
-	"github.com/QuadrateOrg/core/x/stable/types"
+	"github.com/QubeLedger/core/x/stable"
+	"github.com/QubeLedger/core/x/stable/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	"github.com/stretchr/testify/suite"
 	"github.com/tendermint/tendermint/crypto"
 
-	"github.com/QuadrateOrg/core/app"
-	quadrateapptest "github.com/QuadrateOrg/core/app/helpers"
+	"github.com/QubeLedger/core/app"
+	qubeapptest "github.com/QubeLedger/core/app/helpers"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 type StableGenesisTestSuite struct {
 	suite.Suite
 	ctx     sdk.Context
-	app     *app.QuadrateApp
+	app     *app.QubeApp
 	genesis types.GenesisState
 }
 
@@ -28,7 +28,7 @@ func (suite *StableGenesisTestSuite) Commit() {
 }
 
 func (s *StableGenesisTestSuite) Setup() {
-	s.app = quadrateapptest.Setup(s.T(), "qube-1", false, 1)
+	s.app = qubeapptest.Setup(s.T(), "qube-1", false, 1)
 
 }
 

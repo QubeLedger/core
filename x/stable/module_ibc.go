@@ -3,8 +3,8 @@ package stable
 import (
 	"fmt"
 
-	"github.com/QuadrateOrg/core/x/stable/keeper"
-	"github.com/QuadrateOrg/core/x/stable/types"
+	"github.com/QubeLedger/core/x/stable/keeper"
+	"github.com/QubeLedger/core/x/stable/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"

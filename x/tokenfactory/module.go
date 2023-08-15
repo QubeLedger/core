@@ -17,9 +17,9 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 
-	"github.com/QuadrateOrg/core/x/tokenfactory/client/cli"
-	"github.com/QuadrateOrg/core/x/tokenfactory/keeper"
-	"github.com/QuadrateOrg/core/x/tokenfactory/types"
+	"github.com/QubeLedger/core/x/tokenfactory/client/cli"
+	"github.com/QubeLedger/core/x/tokenfactory/keeper"
+	"github.com/QubeLedger/core/x/tokenfactory/types"
 )
 
 var (

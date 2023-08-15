@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package core.stable.v1beta1;
 
-option go_package = "github.com/QuadrateOrg/core/x/stable/types";
+option go_package = "github.com/QubeLedger/core/x/stable/types";
 
 // Msg defines the Msg service.
 service Msg {

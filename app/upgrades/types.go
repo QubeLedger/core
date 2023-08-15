@@ -1,7 +1,7 @@
 package upgrades
 
 import (
-	tokenfactorytypes "github.com/QuadrateOrg/core/x/tokenfactory/types"
+	tokenfactorytypes "github.com/QubeLedger/core/x/tokenfactory/types"
 )
 
 type TfUpgradeParams struct {

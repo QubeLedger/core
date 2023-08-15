@@ -8,7 +8,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/QuadrateOrg/core/x/oracle/types"
+	"github.com/QubeLedger/core/x/oracle/types"
 	jsonparser "github.com/buger/jsonparser"
 	"github.com/cosmos/cosmos-sdk/store/prefix"
 	sdk "github.com/cosmos/cosmos-sdk/types"

@@ -1,7 +1,7 @@
 package keeper
 
 import (
-	"github.com/QuadrateOrg/core/x/tokenfactory/types"
+	"github.com/QubeLedger/core/x/tokenfactory/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )

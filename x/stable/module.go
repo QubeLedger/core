@@ -13,9 +13,9 @@ import (
 
 	abci "github.com/tendermint/tendermint/abci/types"
 
-	"github.com/QuadrateOrg/core/x/stable/client/cli"
-	"github.com/QuadrateOrg/core/x/stable/keeper"
-	"github.com/QuadrateOrg/core/x/stable/types"
+	"github.com/QubeLedger/core/x/stable/client/cli"
+	"github.com/QubeLedger/core/x/stable/keeper"
+	"github.com/QubeLedger/core/x/stable/types"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/codec"

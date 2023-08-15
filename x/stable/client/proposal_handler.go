@@ -3,8 +3,8 @@ package client
 import (
 	govclient "github.com/cosmos/cosmos-sdk/x/gov/client"
 
-	"github.com/QuadrateOrg/core/x/stable/client/cli"
-	"github.com/QuadrateOrg/core/x/stable/client/rest"
+	"github.com/QubeLedger/core/x/stable/client/cli"
+	"github.com/QubeLedger/core/x/stable/client/rest"
 )
 
 var (

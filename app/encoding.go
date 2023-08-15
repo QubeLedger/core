@@ -1,7 +1,7 @@
 package app
 
 import (
-	"github.com/QuadrateOrg/core/app/params"
+	"github.com/QubeLedger/core/app/params"
 	"github.com/cosmos/cosmos-sdk/std"
 )
 

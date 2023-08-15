@@ -3,8 +3,8 @@ package keeper_test
 import (
 	"strings"
 
-	"github.com/QuadrateOrg/core/x/tokenfactory/keeper"
-	"github.com/QuadrateOrg/core/x/tokenfactory/types"
+	"github.com/QubeLedger/core/x/tokenfactory/keeper"
+	"github.com/QubeLedger/core/x/tokenfactory/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
