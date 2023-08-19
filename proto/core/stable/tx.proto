@@ -11,25 +11,25 @@ service Msg {
 }
 message MsgMint {
   string creator = 1;
-  string amountInt = 2;
+  string amountIn = 2;
   string denomOut = 3;
 }
 
 message MsgMintResponse {
   string creator = 1;
-  string amountInt = 2;
+  string amountIn = 2;
   string amountOut = 3;
 }
 
 message MsgBurn {
   string creator = 1;
-  string amountInt = 2;
+  string amountIn = 2;
   string denomOut = 3;
 }
 
 message MsgBurnResponse {
   string creator = 1;
-  string amountInt = 2;
+  string amountIn = 2;
   string amountOut = 3;
 }
 
