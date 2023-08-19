@@ -62,7 +62,7 @@ func (k Keeper) PairById(goCtx context.Context, req *types.PairByIdRequest) (*ty
 	}, nil
 }
 
-func (k Keeper) GetAmountOutByAmountIn(goCtx context.Context, req *types.GetAmountOutByAmountIn) (*types.AmountOutResponse, error) {
+func (k Keeper) GetAmountOutByAmountIn(goCtx context.Context, req *types.GetAmountOutByAmountInRequest) (*types.GetAmountOutByAmountInResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
@@ -89,10 +89,10 @@ func (k Keeper) GetAmountOutByAmountIn(goCtx context.Context, req *types.GetAmou
 			return nil, err
 		}
 		amountOutToMint := k.CalculateAmountToMint(sdk.NewIntFromUint64(req.AmountIn), atomPrice, mintingFee)
-		return &types.AmountOutResponse{
+		return &types.GetAmountOutByAmountInResponse{
 			PairId:    req.PairId,
 			AmountOut: amountOutToMint.Uint64(),
-			Denom:     pair.AmountOutMetadata.Base,
+			Action:    req.Action,
 		}, nil
 	case "burn":
 		burningFee, err := gmd.CalculateBurningFee(backing_ratio)
@@ -100,10 +100,10 @@ func (k Keeper) GetAmountOutByAmountIn(goCtx context.Context, req *types.GetAmou
 			return nil, err
 		}
 		amountOutToSend := k.CalculateAmountToSend(sdk.NewIntFromUint64(req.AmountIn), atomPrice, burningFee)
-		return &types.AmountOutResponse{
+		return &types.GetAmountOutByAmountInResponse{
 			PairId:    req.PairId,
 			AmountOut: amountOutToSend.Uint64(),
-			Denom:     pair.AmountInMetadata.Base,
+			Action:    req.Action,
 		}, nil
 	default:
 		return nil, status.Error(codes.NotFound, "action not found")

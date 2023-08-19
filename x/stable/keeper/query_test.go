@@ -143,7 +143,7 @@ func (suite *StableKeeperTestSuite) TestGetAmountOutByAmountIn() {
 			suite.app.StableKeeper.AppendPair(suite.ctx, suite.GetNormalPair(0))
 			suite.MintStable(10000000000, s.GetNormalPair(0))
 
-			req := types.GetAmountOutByAmountIn{
+			req := types.GetAmountOutByAmountInRequest{
 				PairId:   tc.pair.PairId,
 				AmountIn: tc.amount,
 				Action:   tc.action,

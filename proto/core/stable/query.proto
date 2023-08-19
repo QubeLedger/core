@@ -20,14 +20,14 @@ service Query {
   rpc PairById(PairByIdRequest) returns (PairRequestResponse) {
     option (google.api.http).get = "/core/stable/v1beta1/pair/{id}";
   }
+  rpc GetAmountOutByAmountIn(GetAmountOutByAmountInRequest) returns (GetAmountOutByAmountInResponse) {
+    option (google.api.http).get = "/core/stable/v1beta1/getAmountOutByAmountIn/{pairId}/{amountIn}/{action}";
+  }
 }
 
-// QueryParamsRequest is request type for the Query/Params RPC method.
 message QueryParamsRequest {}
 
-// QueryParamsResponse is response type for the Query/Params RPC method.
 message QueryParamsResponse {
-  // params holds all the parameters of this module.
   Params params = 1;
 }
 
@@ -39,9 +39,15 @@ message PairByIdRequest {
   uint64 id = 1;
 }
 
-message GetAmountOutByAmountIn {
+message GetAmountOutByAmountInRequest {
   string pairId = 1;
   uint64 amountIn = 2;
+  string action = 3;
+}
+
+message GetAmountOutByAmountInResponse {
+  string pairId = 1;
+  uint64 amountOut = 2;
   string action = 3;
 }
 
