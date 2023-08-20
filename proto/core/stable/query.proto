@@ -67,6 +67,9 @@ message PairRequestResponse {
   ];
   string minAmountIn = 6;
   string minAmountOut = 7;
+  uint64 backing_ratio = 9;
+  uint64 minting_fee = 10;
+  uint64 burning_fee = 11;
 }
 
 message AmountOutResponse {

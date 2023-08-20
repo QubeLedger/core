@@ -31,6 +31,28 @@ func (k Keeper) PairByPairId(goCtx context.Context, req *types.PairByPairIdReque
 	if !found {
 		return nil, status.Error(codes.NotFound, "not found")
 	}
+
+	atomPrice, err := k.GetAtomPrice(ctx)
+	if err != nil {
+		return nil, err
+	}
+	qm, ar := pair.Qm, pair.Ar
+
+	backing_ratio, err = CalculateBackingRatio(qm, ar, atomPrice)
+	if err != nil {
+		return nil, err
+	}
+
+	mintingFee, err := gmd.CalculateMintingFee(backing_ratio)
+	if err != nil {
+		return nil, err
+	}
+
+	burning_fee, err := gmd.CalculateBurningFee(backing_ratio)
+	if err != nil {
+		return nil, err
+	}
+
 	return &types.PairRequestResponse{
 		PairId:            pair.PairId,
 		AmountInMetadata:  pair.AmountInMetadata,
@@ -39,6 +61,9 @@ func (k Keeper) PairByPairId(goCtx context.Context, req *types.PairByPairIdReque
 		Ar:                pair.Ar,
 		MinAmountIn:       pair.MinAmountIn,
 		MinAmountOut:      pair.MinAmountOut,
+		BackingRatio:      backing_ratio.Uint64(),
+		MintingFee:        mintingFee.Uint64(),
+		BurningFee:        burning_fee.Uint64(),
 	}, nil
 }
 
@@ -51,6 +76,28 @@ func (k Keeper) PairById(goCtx context.Context, req *types.PairByIdRequest) (*ty
 	if !found {
 		return nil, status.Error(codes.NotFound, "not found")
 	}
+
+	atomPrice, err := k.GetAtomPrice(ctx)
+	if err != nil {
+		return nil, err
+	}
+	qm, ar := pair.Qm, pair.Ar
+
+	backing_ratio, err = CalculateBackingRatio(qm, ar, atomPrice)
+	if err != nil {
+		return nil, err
+	}
+
+	mintingFee, err := gmd.CalculateMintingFee(backing_ratio)
+	if err != nil {
+		return nil, err
+	}
+
+	burning_fee, err := gmd.CalculateBurningFee(backing_ratio)
+	if err != nil {
+		return nil, err
+	}
+
 	return &types.PairRequestResponse{
 		PairId:            pair.PairId,
 		AmountInMetadata:  pair.AmountInMetadata,
@@ -59,6 +106,9 @@ func (k Keeper) PairById(goCtx context.Context, req *types.PairByIdRequest) (*ty
 		Ar:                pair.Ar,
 		MinAmountIn:       pair.MinAmountIn,
 		MinAmountOut:      pair.MinAmountOut,
+		BackingRatio:      backing_ratio.Uint64(),
+		MintingFee:        mintingFee.Uint64(),
+		BurningFee:        burning_fee.Uint64(),
 	}, nil
 }
 
