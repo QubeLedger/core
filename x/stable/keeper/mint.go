@@ -66,17 +66,17 @@ func (k Keeper) ExecuteMint(ctx sdk.Context, msg *types.MsgMint, pair types.Pair
 	if err != nil {
 		return err, sdk.Coin{}
 	}
-
+	fee := sdk.NewInt(0)
 	if !mintingFee.IsZero() {
-		feeForBurningFund := k.CalculateMintingFeeForBurningFund(amountInt, atomPrice, mintingFee)
-		err = k.bankKeeper.MintCoins(ctx, types.ModuleName, types.CreateCoins(pair.AmountInMetadata.DenomUnits[0].Denom, feeForBurningFund))
+		fee = k.CalculateMintingFeeForBurningFund(amountInt, atomPrice, mintingFee)
+		err = k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, BurningFundAddress, types.CreateCoins(pair.AmountInMetadata.DenomUnits[0].Denom, fee))
 		if err != nil {
 			return err, sdk.Coin{}
 		}
-		err = k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, BurningFundAddress, types.CreateCoins(pair.AmountInMetadata.DenomUnits[0].Denom, feeForBurningFund))
-		if err != nil {
-			return err, sdk.Coin{}
-		}
+	}
+	err = k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, ReserveFundAddress, types.CreateCoins(pair.AmountInMetadata.DenomUnits[0].Denom, (amountInt.Sub(fee))))
+	if err != nil {
+		return err, sdk.Coin{}
 	}
 
 	err = k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, sender, sdk.NewCoins(amountOut))

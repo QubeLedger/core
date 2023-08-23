@@ -56,14 +56,25 @@ func (k Keeper) ExecuteBurn(ctx sdk.Context, msg *types.MsgBurn, pair types.Pair
 	}
 
 	amountOut := sdk.NewCoin(pair.AmountInMetadata.DenomUnits[0].Denom, amountOutToSend)
+
+	err = k.bankKeeper.SendCoinsFromAccountToModule(ctx, ReserveFundAddress, types.ModuleName, sdk.NewCoins(amountOut))
+	if err != nil {
+		return err, sdk.Coin{}
+	}
+
 	err = k.bankKeeper.BurnCoins(ctx, types.ModuleName, amountIntCoins)
 	if err != nil {
 		return err, sdk.Coin{}
 	}
 
+	fee := sdk.NewInt(0)
 	if !burningFee.IsZero() {
-		feeForBurningFund := k.CalculateBurningFeeForBurningFund(amountInt, atomPrice, burningFee)
-		err = k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, BurningFundAddress, types.CreateCoins(pair.AmountInMetadata.DenomUnits[0].Denom, feeForBurningFund))
+		fee = k.CalculateBurningFeeForBurningFund(amountInt, atomPrice, burningFee)
+		err = k.bankKeeper.SendCoinsFromAccountToModule(ctx, ReserveFundAddress, types.ModuleName, types.CreateCoins(pair.AmountInMetadata.DenomUnits[0].Denom, fee))
+		if err != nil {
+			return err, sdk.Coin{}
+		}
+		err = k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, BurningFundAddress, types.CreateCoins(pair.AmountInMetadata.DenomUnits[0].Denom, fee))
 		if err != nil {
 			return err, sdk.Coin{}
 		}

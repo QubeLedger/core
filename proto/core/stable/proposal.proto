@@ -33,3 +33,13 @@ message RegisterChangeBurningFundAddressProposal {
 
   string address = 3;
 }
+
+message RegisterChangeReserveFundAddressProposal {
+  option (gogoproto.equal) = false;
+  // title of the proposal
+  string title = 1;
+  // description of the proposal
+  string description = 2;
+
+  string address = 3;
+}
