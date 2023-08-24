@@ -13,4 +13,7 @@ message GenesisState {
   string port_id = 2; 
 
   repeated Pair pairs = 3 [(gogoproto.nullable) = false];
+
+  string reserveFundAddress = 4;
+  string burningFundAddress = 5;
 }

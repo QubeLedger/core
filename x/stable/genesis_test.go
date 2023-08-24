@@ -76,6 +76,8 @@ func (s *StableGenesisTestSuite) TestInitGenesis() {
 						MinAmountOut: "20uusd",
 					},
 				},
+				"qube18arvwu0pg5u3wm5me627u9y7pyty5ddsc9q4sa",
+				"qube140qfltq2hgy4vppex3ker64y9vvyvvch6tacsf",
 			),
 		},
 	}
@@ -95,6 +97,12 @@ func (s *StableGenesisTestSuite) TestInitGenesis() {
 			} else {
 				s.Require().Len(tc.genesisState.Pairs, 0)
 			}
+
+			reserveFundAddress := s.app.StableKeeper.GetReserveFundAddress(s.ctx)
+			s.Require().Equal(sdk.AccAddress(tc.genesisState.ReserveFundAddress), reserveFundAddress)
+
+			burningFundBalance := s.app.StableKeeper.GetBurningFundAddress(s.ctx)
+			s.Require().Equal(sdk.AccAddress(tc.genesisState.BurningFundAddress), burningFundBalance)
 		})
 	}
 
