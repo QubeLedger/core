@@ -67,9 +67,8 @@ func (k Keeper) ExecuteBurn(ctx sdk.Context, msg *types.MsgBurn, pair types.Pair
 		return err, sdk.Coin{}
 	}
 
-	fee := sdk.NewInt(0)
 	if !burningFee.IsZero() {
-		fee = k.CalculateBurningFeeForBurningFund(amountInt, atomPrice, burningFee)
+		fee := k.CalculateBurningFeeForBurningFund(amountInt, atomPrice, burningFee)
 		err = k.bankKeeper.SendCoinsFromAccountToModule(ctx, ReserveFundAddress, types.ModuleName, types.CreateCoins(pair.AmountInMetadata.DenomUnits[0].Denom, fee))
 		if err != nil {
 			return err, sdk.Coin{}
