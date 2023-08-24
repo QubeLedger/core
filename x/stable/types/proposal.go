@@ -14,12 +14,14 @@ import (
 const (
 	ProposalTypeRegisterPairProposal                     string = "RegisterPairProposal"
 	ProposalTypeRegisterChangeBurningFundAddressProposal string = "RegisterChangeBurningFundAddressProposal"
+	ProposalTypeRegisterChangeReserveFundAddressProposal string = "RegisterChangeReserveFundAddressProposal"
 )
 
 // Implements Proposal Interface
 var (
 	_ govtypes.Content = &RegisterPairProposal{}
 	_ govtypes.Content = &RegisterChangeBurningFundAddressProposal{}
+	_ govtypes.Content = &RegisterChangeReserveFundAddressProposal{}
 )
 
 func init() {
@@ -28,7 +30,14 @@ func init() {
 
 	govtypes.RegisterProposalType(ProposalTypeRegisterChangeBurningFundAddressProposal)
 	govtypes.RegisterProposalTypeCodec(&RegisterChangeBurningFundAddressProposal{}, "stable/RegisterChangeBurningFundAddressProposal")
+
+	govtypes.RegisterProposalType(ProposalTypeRegisterChangeReserveFundAddressProposal)
+	govtypes.RegisterProposalTypeCodec(&RegisterChangeReserveFundAddressProposal{}, "stable/RegisterChangeReserveFundAddressProposal")
 }
+
+/*
+PairProposal
+*/
 
 func NewRegisterPairProposal(title, description string, amountInDenom banktypes.Metadata, amountOutDenom banktypes.Metadata, minAmountIn string, minAmountOut string) govtypes.Content {
 	return &RegisterPairProposal{
@@ -39,31 +48,6 @@ func NewRegisterPairProposal(title, description string, amountInDenom banktypes.
 		MinAmountIn:       minAmountIn,
 		MinAmountOut:      minAmountOut,
 	}
-}
-
-func NewRegisterChangeBurningFundAddressProposal(title, description string, address string) govtypes.Content {
-	return &RegisterChangeBurningFundAddressProposal{
-		Title:       title,
-		Description: description,
-		Address:     address,
-	}
-}
-
-func (*RegisterChangeBurningFundAddressProposal) ProposalRoute() string { return RouterKey }
-
-func (*RegisterChangeBurningFundAddressProposal) ProposalType() string {
-	return ProposalTypeRegisterChangeBurningFundAddressProposal
-}
-
-func (rtbp *RegisterChangeBurningFundAddressProposal) ValidateBasic() error {
-	if len(rtbp.Address) == 0 {
-		return ErrInvalidLength
-	}
-	_, err := sdk.AccAddressFromBech32(rtbp.Address)
-	if err != nil {
-		return nil
-	}
-	return nil
 }
 
 func (*RegisterPairProposal) ProposalRoute() string { return RouterKey }
@@ -139,5 +123,63 @@ func validateIBCVoucherMetadata(metadata banktypes.Metadata) error {
 		return fmt.Errorf("invalid metadata. %s denomination should be prefixed with the format 'ibc/", metadata.Base)
 	}
 
+	return nil
+}
+
+/*
+ChangeBurningFundAddressProposal
+*/
+
+func NewRegisterChangeBurningFundAddressProposal(title, description string, address string) govtypes.Content {
+	return &RegisterChangeBurningFundAddressProposal{
+		Title:       title,
+		Description: description,
+		Address:     address,
+	}
+}
+
+func (*RegisterChangeBurningFundAddressProposal) ProposalRoute() string { return RouterKey }
+
+func (*RegisterChangeBurningFundAddressProposal) ProposalType() string {
+	return ProposalTypeRegisterChangeBurningFundAddressProposal
+}
+
+func (rtbp *RegisterChangeBurningFundAddressProposal) ValidateBasic() error {
+	if len(rtbp.Address) == 0 {
+		return ErrInvalidLength
+	}
+	_, err := sdk.AccAddressFromBech32(rtbp.Address)
+	if err != nil {
+		return nil
+	}
+	return nil
+}
+
+/*
+ChangeReserveFundAddressProposal
+*/
+
+func NewRegisterChangeReserveFundAddressProposal(title, description string, address string) govtypes.Content {
+	return &RegisterChangeReserveFundAddressProposal{
+		Title:       title,
+		Description: description,
+		Address:     address,
+	}
+}
+
+func (*RegisterChangeReserveFundAddressProposal) ProposalRoute() string { return RouterKey }
+
+func (*RegisterChangeReserveFundAddressProposal) ProposalType() string {
+	return ProposalTypeRegisterChangeReserveFundAddressProposal
+}
+
+func (rtbp *RegisterChangeReserveFundAddressProposal) ValidateBasic() error {
+	if len(rtbp.Address) == 0 {
+		return ErrInvalidLength
+	}
+	_, err := sdk.AccAddressFromBech32(rtbp.Address)
+	if err != nil {
+		return nil
+	}
 	return nil
 }

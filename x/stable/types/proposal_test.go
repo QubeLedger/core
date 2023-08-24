@@ -153,3 +153,35 @@ func TestRegisterChangeBurningFundAddressProposal(t *testing.T) {
 		}
 	}
 }
+
+func TestRegisterChangeReserveFundAddressProposal(t *testing.T) {
+	tests := []struct {
+		title       string
+		description string
+		address     string
+		expectedErr bool
+	}{
+		{
+			"test",
+			"test",
+			"qube17ca7p2gvf6qcg0n6ucnkjpe3estscfdhaj9ep9",
+			false,
+		},
+		{
+			"test",
+			"test",
+			"",
+			true,
+		},
+	}
+
+	for _, tc := range tests {
+		msg := types.NewRegisterChangeReserveFundAddressProposal(tc.title, tc.description, tc.address)
+		err := msg.ValidateBasic()
+		if tc.expectedErr {
+			require.Error(t, err)
+		} else {
+			require.NoError(t, err)
+		}
+	}
+}

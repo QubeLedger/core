@@ -69,6 +69,8 @@ func (suite *StableKeeperTestSuite) TestMint() {
 
 	for _, tc := range testCases {
 		suite.app.StableKeeper.SetTestingMode(true)
+		suite.app.StableKeeper.SetBurningFundAddress(suite.ctx, apptesting.CreateRandomAccounts(1)[0])
+		suite.app.StableKeeper.SetReserveFundAddress(suite.ctx, apptesting.CreateRandomAccounts(1)[0])
 		suite.Run(fmt.Sprintf("Case---%s", tc.name), func() {
 			suite.app.StableKeeper.AppendPair(suite.ctx, tc.pair)
 			suite.app.StableKeeper.UpdateAtomPriceTesting(suite.ctx, sdk.NewInt(tc.price))
@@ -85,9 +87,13 @@ func (suite *StableKeeperTestSuite) TestMint() {
 				suite.Require().NoError(err, tc.name)
 				getTokenAmountFromBank := suite.app.BankKeeper.GetBalance(suite.ctx, suite.Address, tc.pair.AmountOutMetadata.Base)
 				suite.Require().Equal(getTokenAmountFromBank.Amount, sdk.NewInt(int64(tc.getTokenAmount)))
-				BurningFundBalance := suite.app.BankKeeper.GetBalance(suite.ctx, suite.app.StableKeeper.GetBurningFundAddress(suite.ctx), tc.pair.AmountInMetadata.Base)
+
+				burningFundBalance := suite.app.BankKeeper.GetBalance(suite.ctx, suite.app.StableKeeper.GetBurningFundAddress(suite.ctx), tc.pair.AmountInMetadata.Base)
 				feeForBurningFund := suite.app.StableKeeper.CalculateMintingFeeForBurningFund(sdk.NewInt(tc.sendTokenAmount), sdk.NewInt(tc.price), sdk.NewInt(3))
-				suite.Require().Equal(BurningFundBalance.Amount, feeForBurningFund)
+				suite.Require().Equal(burningFundBalance.Amount, feeForBurningFund)
+
+				reserveFundBalance := suite.app.BankKeeper.GetBalance(suite.ctx, suite.app.StableKeeper.GetReserveFundAddress(suite.ctx), tc.pair.AmountInMetadata.Base)
+				suite.Require().Equal(reserveFundBalance.Amount, (sdk.NewInt(tc.sendTokenAmount).Sub(feeForBurningFund)))
 			} else {
 				suite.Require().Error(err, tc.errString)
 			}
@@ -147,15 +153,19 @@ func (suite *StableKeeperTestSuite) TestBurn() {
 			"ErrAmountOutGTEminAmountOut err",
 		},
 	}
+	suite.Setup()
+	suite.Commit()
+
 	for _, tc := range testCases {
-		suite.Setup()
-		suite.Commit()
 		suite.app.StableKeeper.SetTestingMode(true)
+		suite.app.StableKeeper.SetBurningFundAddress(suite.ctx, apptesting.CreateRandomAccounts(1)[0])
+		suite.app.StableKeeper.SetReserveFundAddress(suite.ctx, apptesting.CreateRandomAccounts(1)[0])
 		suite.app.StableKeeper.AppendPair(suite.ctx, tc.pair)
 
-		suite.AddTestCoins(1000000, tc.pair.AmountInMetadata.Base)
-		suite.MintStable(1000000, tc.pair)
+		suite.AddTestCoins(100000000, tc.pair.AmountInMetadata.Base)
+		suite.MintStable(100000000, tc.pair)
 		BurningFundBalanceBeforeBurn := suite.app.BankKeeper.GetBalance(suite.ctx, suite.app.StableKeeper.GetBurningFundAddress(suite.ctx), tc.pair.AmountInMetadata.Base)
+		ReserveFundBalanceBeforeBurn := suite.app.BankKeeper.GetBalance(suite.ctx, suite.app.StableKeeper.GetReserveFundAddress(suite.ctx), tc.pair.AmountInMetadata.Base)
 		suite.Run(fmt.Sprintf("Case---%s", tc.name), func() {
 			suite.app.StableKeeper.UpdateAtomPriceTesting(suite.ctx, sdk.NewInt(tc.price))
 
@@ -165,16 +175,20 @@ func (suite *StableKeeperTestSuite) TestBurn() {
 				tc.pair.AmountInMetadata.Base,
 			)
 			ctx := sdk.WrapSDKContext(suite.ctx)
-			_, err := suite.app.StableKeeper.Burn(ctx, msg)
+			msgBurnResponse, err := suite.app.StableKeeper.Burn(ctx, msg)
 
 			if !tc.err {
 				suite.Require().NoError(err, tc.name)
 				getTokenAmountFromBank := suite.app.BankKeeper.GetBalance(suite.ctx, suite.Address, tc.pair.AmountInMetadata.Base)
 				suite.Require().Equal(getTokenAmountFromBank.Amount, sdk.NewInt(int64(tc.getTokenAmount)))
 
-				BurningFundBalance := suite.app.BankKeeper.GetBalance(suite.ctx, suite.app.StableKeeper.GetBurningFundAddress(suite.ctx), tc.pair.AmountInMetadata.Base)
+				burningFundBalance := suite.app.BankKeeper.GetBalance(suite.ctx, suite.app.StableKeeper.GetBurningFundAddress(suite.ctx), tc.pair.AmountInMetadata.Base)
 				feeForBurningFund := suite.app.StableKeeper.CalculateBurningFeeForBurningFund(sdk.NewInt(tc.sendTokenAmount), sdk.NewInt(tc.price), sdk.NewInt(3))
-				suite.Require().Equal(BurningFundBalance.Amount.Sub(BurningFundBalanceBeforeBurn.Amount), feeForBurningFund)
+				suite.Require().Equal(burningFundBalance.Amount.Sub(BurningFundBalanceBeforeBurn.Amount), feeForBurningFund)
+
+				reserveFundBalance := suite.app.BankKeeper.GetBalance(suite.ctx, suite.app.StableKeeper.GetReserveFundAddress(suite.ctx), tc.pair.AmountInMetadata.Base)
+				msgBurnResponseAmountOutCoins, _ := sdk.ParseCoinsNormalized(msgBurnResponse.AmountOut)
+				suite.Require().Equal(ReserveFundBalanceBeforeBurn.Amount.Sub(reserveFundBalance.Amount), (msgBurnResponseAmountOutCoins.AmountOf(tc.pair.AmountInMetadata.Base)).Add(feeForBurningFund))
 			} else {
 				suite.Require().Error(err, tc.errString)
 			}
