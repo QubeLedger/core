@@ -34,14 +34,13 @@ func (qp QueryPlugin) GetDenomAdmin(ctx sdk.Context, denom string) (*bindings.De
 }
 
 // GetActualProce is a query to get denom admin.
-func (qp QueryPlugin) GetActualPrice(ctx sdk.Context) (*bindings.ActualPriceResponse, error) {
-	price, err := qp.oracleKeeper.GetPrice(ctx, 0)
-	if !err {
+func (qp QueryPlugin) GetActualPrice(ctx sdk.Context, denom string) (*bindings.ExchangeRateQueryResponse, error) {
+	rate, err := qp.oracleKeeper.GetExchangeRate(ctx, denom)
+	if err != nil {
 		return nil, fmt.Errorf("oracle error")
 	}
 
-	return &bindings.ActualPriceResponse{
-		Atom:   price.AtomPrice,
-		StAtom: price.StatomPrice,
+	return &bindings.ExchangeRateQueryResponse{
+		Rate: rate.String(),
 	}, nil
 }

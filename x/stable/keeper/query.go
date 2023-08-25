@@ -32,7 +32,7 @@ func (k Keeper) PairByPairId(goCtx context.Context, req *types.PairByPairIdReque
 		return nil, status.Error(codes.NotFound, "not found")
 	}
 
-	atomPrice, err := k.GetAtomPrice(ctx)
+	atomPrice, err := k.GetAtomPrice(ctx, pair)
 	if err != nil {
 		return nil, err
 	}
@@ -77,7 +77,7 @@ func (k Keeper) PairById(goCtx context.Context, req *types.PairByIdRequest) (*ty
 		return nil, status.Error(codes.NotFound, "not found")
 	}
 
-	atomPrice, err := k.GetAtomPrice(ctx)
+	atomPrice, err := k.GetAtomPrice(ctx, pair)
 	if err != nil {
 		return nil, err
 	}
@@ -122,7 +122,7 @@ func (k Keeper) GetAmountOutByAmountIn(goCtx context.Context, req *types.GetAmou
 		return nil, status.Error(codes.NotFound, "not found")
 	}
 
-	atomPrice, err := k.GetAtomPrice(ctx)
+	atomPrice, err := k.GetAtomPrice(ctx, pair)
 	if err != nil {
 		return nil, err
 	}

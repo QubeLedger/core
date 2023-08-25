@@ -1,37 +1,51 @@
 package types
 
 import (
-	"fmt"
+	"encoding/json"
+
+	"github.com/cosmos/cosmos-sdk/codec"
 )
 
-// DefaultIndex is the default global index
-const DefaultIndex uint64 = 1
-
-// DefaultGenesis returns the default genesis state
-func DefaultGenesis() *GenesisState {
+// NewGenesisState creates a new GenesisState object
+func NewGenesisState(
+	params Params, rates []ExchangeRateTuple,
+	feederDelegations []FeederDelegation, missCounters []MissCounter,
+	aggregateExchangeRatePrevotes []AggregateExchangeRatePrevote,
+	aggregateExchangeRateVotes []AggregateExchangeRateVote,
+) *GenesisState {
 	return &GenesisState{
-		PriceList: []Price{},
-		// this line is used by starport scaffolding # genesis/types/default
-		Params: DefaultParams(),
+		Params:                        params,
+		ExchangeRates:                 rates,
+		FeederDelegations:             feederDelegations,
+		MissCounters:                  missCounters,
+		AggregateExchangeRatePrevotes: aggregateExchangeRatePrevotes,
+		AggregateExchangeRateVotes:    aggregateExchangeRateVotes,
 	}
 }
 
-// Validate performs basic genesis state validation returning an error upon any
-// failure.
-func (gs GenesisState) Validate() error {
-	// Check for duplicated ID in price
-	priceIdMap := make(map[uint64]bool)
-	priceCount := gs.GetPriceCount()
-	for _, elem := range gs.PriceList {
-		if _, ok := priceIdMap[elem.Id]; ok {
-			return fmt.Errorf("duplicated id for price")
-		}
-		if elem.Id >= priceCount {
-			return fmt.Errorf("price id should be lower or equal than the last id")
-		}
-		priceIdMap[elem.Id] = true
-	}
-	// this line is used by starport scaffolding # genesis/types/validate
+// DefaultGenesisState - default GenesisState used by columbus-2
+func DefaultGenesisState() *GenesisState {
+	return NewGenesisState(DefaultParams(),
+		[]ExchangeRateTuple{},
+		[]FeederDelegation{},
+		[]MissCounter{},
+		[]AggregateExchangeRatePrevote{},
+		[]AggregateExchangeRateVote{})
+}
 
-	return gs.Params.Validate()
+// ValidateGenesis validates the oracle genesis state
+func ValidateGenesis(data *GenesisState) error {
+	return data.Params.Validate()
+}
+
+// GetGenesisStateFromAppState returns x/oracle GenesisState given raw application
+// genesis state.
+func GetGenesisStateFromAppState(cdc codec.JSONCodec, appState map[string]json.RawMessage) *GenesisState {
+	var genesisState GenesisState
+
+	if appState[ModuleName] != nil {
+		cdc.MustUnmarshalJSON(appState[ModuleName], &genesisState)
+	}
+
+	return &genesisState
 }

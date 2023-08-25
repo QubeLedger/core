@@ -7,7 +7,7 @@ import (
 )
 
 func (k Keeper) ExecuteBurn(ctx sdk.Context, msg *types.MsgBurn, pair types.Pair) (error, sdk.Coin) {
-	atomPrice, err := k.GetAtomPrice(ctx)
+	atomPrice, err := k.GetAtomPrice(ctx, pair)
 
 	if err != nil {
 		return err, sdk.Coin{}

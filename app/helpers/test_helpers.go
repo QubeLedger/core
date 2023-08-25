@@ -5,18 +5,17 @@ import (
 	"testing"
 	"time"
 
+	quadrateapp "github.com/QuadrateOrg/core/app"
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/libs/log"
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 	tmtypes "github.com/tendermint/tendermint/types"
 	dbm "github.com/tendermint/tm-db"
-
-	quadrateapp "github.com/QuadrateOrg/core/app"
 )
 
 // SimAppChainID hardcoded chainID for simulation
 const (
-	SimAppChainID = "quadrate_5120-1"
+	SimAppChainID = "qube-1"
 )
 
 // DefaultConsensusParams defines the default Tendermint consensus params used
