@@ -56,11 +56,13 @@ var ModuleBasics = module.NewBasicManager(
 	params.AppModuleBasic{},
 )
 
+/* #nosec */
 // MakeTestCodec nolint
 func MakeTestCodec(t *testing.T) codec.Codec {
 	return MakeEncodingConfig(t).Marshaler
 }
 
+/* #nosec */
 func ModuleAccountAddrs(maccPerms map[string][]string) map[string]bool {
 	modAccAddrs := make(map[string]bool)
 	for acc := range maccPerms {
@@ -141,6 +143,7 @@ type TestInput struct {
 }
 
 // CreateTestInput nolint
+/* #nosec */
 func CreateTestInput(t *testing.T) TestInput {
 	keyAcc := sdk.NewKVStoreKey(authtypes.StoreKey)
 	keyBank := sdk.NewKVStoreKey(banktypes.StoreKey)

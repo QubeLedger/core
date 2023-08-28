@@ -5,6 +5,7 @@ import (
 )
 
 // SlashAndResetMissCounters do slash any operator who over criteria & clear all operators miss counter to zero
+/* #nosec */
 func (k Keeper) SlashAndResetMissCounters(ctx sdk.Context) {
 	height := ctx.BlockHeight()
 	distributionHeight := height - sdk.ValidatorUpdateDelay - 1

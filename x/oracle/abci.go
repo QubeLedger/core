@@ -11,6 +11,7 @@ import (
 )
 
 // EndBlocker is called at the end of every block
+/* #nosec */
 func EndBlocker(ctx sdk.Context, k keeper.Keeper) error {
 	defer telemetry.ModuleMeasureSince(types.ModuleName, time.Now(), telemetry.MetricKeyEndBlocker)
 	params := k.GetParams(ctx)

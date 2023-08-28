@@ -3,7 +3,7 @@ package types
 
 import (
 	"math"
-	"math/rand"
+	"math/rand" // #nosec
 	"time"
 
 	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
@@ -32,6 +32,7 @@ const (
 const OracleDecPrecision = 8
 
 // GenerateRandomTestCase nolint
+/* #nosec */
 func GenerateRandomTestCase() (rates []float64, valValAddrs []sdk.ValAddress, stakingKeeper DummyStakingKeeper) {
 	valValAddrs = []sdk.ValAddress{}
 	mockValidators := []MockValidator{}

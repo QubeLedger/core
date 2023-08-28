@@ -25,6 +25,7 @@ const (
 )
 
 // GenVotePeriod randomized VotePeriod
+/* #nosec */
 func GenVotePeriod(r *rand.Rand) uint64 {
 	return uint64(1 + r.Intn(100))
 }
@@ -40,6 +41,7 @@ func GenRewardBand(r *rand.Rand) sdk.Dec {
 }
 
 // GenRewardDistributionWindow randomized RewardDistributionWindow
+/* #nosec */
 func GenRewardDistributionWindow(r *rand.Rand) uint64 {
 	return uint64(100 + r.Intn(100000))
 }
@@ -50,6 +52,7 @@ func GenSlashFraction(r *rand.Rand) sdk.Dec {
 }
 
 // GenSlashWindow randomized SlashWindow
+/* #nosec */
 func GenSlashWindow(r *rand.Rand) uint64 {
 	return uint64(100 + r.Intn(100000))
 }

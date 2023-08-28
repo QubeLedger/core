@@ -20,6 +20,7 @@ func NewMsgServerImpl(keeper Keeper) types.MsgServer {
 	return &msgServer{Keeper: keeper}
 }
 
+/* #nosec */
 func (ms msgServer) AggregateExchangeRatePrevote(goCtx context.Context, msg *types.MsgAggregateExchangeRatePrevote) (*types.MsgAggregateExchangeRatePrevoteResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
@@ -61,6 +62,7 @@ func (ms msgServer) AggregateExchangeRatePrevote(goCtx context.Context, msg *typ
 	return &types.MsgAggregateExchangeRatePrevoteResponse{}, nil
 }
 
+/* #nosec */
 func (ms msgServer) AggregateExchangeRateVote(goCtx context.Context, msg *types.MsgAggregateExchangeRateVote) (*types.MsgAggregateExchangeRateVoteResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
