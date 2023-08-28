@@ -105,6 +105,7 @@ func EndBlocker(ctx sdk.Context, k keeper.Keeper) error {
 	return nil
 }
 
+/* #nosec */
 func IsPeriodLastBlock(ctx sdk.Context, blocksPerPeriod uint64) bool {
 	return (uint64(ctx.BlockHeight())+1)%blocksPerPeriod == 0
 }
