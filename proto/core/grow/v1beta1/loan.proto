@@ -1,0 +1,11 @@
+syntax = "proto3";
+package core.grow.v1beta1;
+
+option go_package = "github.com/QuadrateOrg/core/x/grow/types";
+
+message Loan {
+  uint64 id = 1;
+  string cAmountpairId = 2; 
+  string borrower = 3; 
+  
+}

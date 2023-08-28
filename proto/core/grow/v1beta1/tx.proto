@@ -1,0 +1,53 @@
+syntax = "proto3";
+
+package core.grow.v1beta1;
+
+option go_package = "github.com/QuadrateOrg/core/x/grow/types";
+
+// Msg defines the Msg service.
+service Msg {
+  rpc Deposit    (MsgDeposit   ) returns (MsgDepositResponse   );
+  rpc Withdrawal (MsgWithdrawal) returns (MsgWithdrawalResponse);
+  rpc CreateLend (MsgCreateLend) returns (MsgCreateLendResponse);
+  rpc DeleteLend (MsgDeleteLend) returns (MsgDeleteLendResponse);
+}
+message MsgDeposit {
+  string creator = 1;
+  string amountIn = 2;
+  string denomOut = 3;
+}
+
+message MsgDepositResponse {
+  string creator = 1;
+  string amountIn = 2;
+  string amountOut = 3;
+}
+
+message MsgWithdrawal {
+  string creator = 1;
+  string amountIn = 2;
+  string denomOut = 3;
+}
+
+message MsgWithdrawalResponse {
+  string creator = 1;
+  string amountIn = 2;
+  string amountOut = 3;
+}
+
+message MsgCreateLend {
+  string creator = 1;
+  string amount  = 2;
+  string pairId  = 3;
+}
+
+message MsgCreateLendResponse {}
+
+message MsgDeleteLend {
+  string creator = 1;
+  string amount  = 2;
+  string pairId  = 3;
+}
+
+message MsgDeleteLendResponse {}
+

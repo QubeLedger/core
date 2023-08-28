@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package core.grow.v1beta1;
+
+import "gogoproto/gogo.proto";
+import "github.com/QuadrateOrg/core/grow/params.proto";
+import "github.com/QuadrateOrg/core/grow/loan.proto";
+
+option go_package = "github.com/QuadrateOrg/core/x/grow/types";
+
+// GenesisState defines the grow module's genesis state.
+message GenesisState {
+           Params params    = 1 [(gogoproto.nullable) = false];
+  repeated Loan   loanList  = 2 [(gogoproto.nullable) = false];
+           uint64 loanCount = 3;
+}
+

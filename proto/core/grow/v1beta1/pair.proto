@@ -1,0 +1,16 @@
+syntax = "proto3";
+package core.grow.v1beta1;
+import "gogoproto/gogo.proto";
+
+
+import "cosmos/bank/v1beta1/bank.proto";
+option go_package = "github.com/QuadrateOrg/core/x/grow/types";
+
+message Pair {
+        uint64 id = 1;
+        string pairId = 2;
+        cosmos.bank.v1beta1.Metadata amountInMetadata = 3 [ (gogoproto.moretags) = "yaml:\"amountInMetadata\"", (gogoproto.nullable)   = false ];
+        cosmos.bank.v1beta1.Metadata amountOutMetadata = 4 [ (gogoproto.moretags) = "yaml:\"amountOutMetadata\"", (gogoproto.nullable)   = false ];
+        string minAmountIn = 7;
+        string minAmountOut = 8;
+}
