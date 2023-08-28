@@ -13,7 +13,7 @@ var (
 
 func (k Keeper) ExecuteMint(ctx sdk.Context, msg *types.MsgMint, pair types.Pair) (error, sdk.Coin) {
 
-	atomPrice, err := k.GetAtomPrice(ctx)
+	atomPrice, err := k.GetAtomPrice(ctx, pair)
 	if err != nil {
 		return err, sdk.Coin{}
 	}

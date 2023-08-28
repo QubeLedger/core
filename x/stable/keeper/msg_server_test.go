@@ -35,7 +35,7 @@ func (suite *StableKeeperTestSuite) TestMint() {
 		{
 			"fail-pair not found",
 			s.GetNormalPair(0),
-			"ukuji",
+			"uqube",
 			1000,
 			9272,
 			int64(93000),
@@ -125,7 +125,7 @@ func (suite *StableKeeperTestSuite) TestBurn() {
 		{
 			"fail - wrong denom",
 			s.GetNormalPair(0),
-			"ukuji",
+			"uqube",
 			1000,
 			104,
 			int64(95000),
@@ -233,9 +233,12 @@ func (suite *StableKeeperTestSuite) TestMintGetPriceFromOracle() {
 	suite.Setup()
 	suite.Commit()
 	suite.app.StableKeeper.SetTestingMode(false)
+	suite.SetupOracleKeeper()
+	suite.RegisterValidator()
 	for _, tc := range testCases {
 		suite.app.StableKeeper.AppendPair(s.ctx, tc.pair)
-		price, _ := suite.app.StableKeeper.GetAtomPrice(suite.ctx)
+		suite.OracleAggregateExchangeRateFromNet()
+		price, _ := suite.app.StableKeeper.GetAtomPrice(suite.ctx, tc.pair)
 		suite.Run(fmt.Sprintf("Case---%s---price---%f", tc.name, float64(float64(price.Int64())/10000)), func() {
 			suite.AddTestCoins(tc.sendTokenAmount, tc.sendTokenDenom)
 			msg := types.NewMsgMint(
@@ -289,17 +292,16 @@ func (suite *StableKeeperTestSuite) TestBurnGetPriceFromOracle() {
 	}
 	suite.Setup()
 	suite.Commit()
-
+	suite.app.StableKeeper.SetTestingMode(false)
+	suite.SetupOracleKeeper()
+	suite.RegisterValidator()
 	for _, tc := range testCases {
-
+		suite.OracleAggregateExchangeRateFromNet()
 		suite.app.StableKeeper.AppendPair(suite.ctx, tc.pair)
-
 		suite.AddTestCoins(10000, tc.pair.AmountInMetadata.Base)
 		err := suite.MintStable(10000, s.GetNormalPair(0))
 		suite.Require().NoError(err)
-
-		price, _ := suite.app.StableKeeper.GetAtomPrice(suite.ctx)
-
+		price, _ := suite.app.StableKeeper.GetAtomPrice(suite.ctx, tc.pair)
 		suite.Run(fmt.Sprintf("Case---%s---price---%f", tc.name, float64(float64(price.Int64())/10000)), func() {
 			msg := types.NewMsgBurn(
 				suite.Address.String(),
@@ -410,7 +412,7 @@ func (suite *StableKeeperTestSuite) TestExtremeMarketSituations() {
 	suite.app.StableKeeper.SetTestingMode(true)
 	for _, tc := range testCases {
 		if tc.action == "mint" {
-			suite.AddTestCoinsToAccount(tc.sendTokenAmount, tc.sendTokenDenom, tc.address)
+			suite.AddTestCoinsToCustomAccount(sdk.NewInt(tc.sendTokenAmount), tc.sendTokenDenom, tc.address)
 		}
 	}
 	for _, tc := range testCases {
@@ -525,7 +527,7 @@ func (suite *StableKeeperTestSuite) TestMarketDropOf40() {
 	suite.app.StableKeeper.SetTestingMode(true)
 	for _, tc := range testCases {
 		if tc.action == "mint" {
-			suite.AddTestCoinsToAccount(tc.sendTokenAmount, tc.sendTokenDenom, tc.address)
+			suite.AddTestCoinsToCustomAccount(sdk.NewInt(tc.sendTokenAmount), tc.sendTokenDenom, tc.address)
 		}
 	}
 

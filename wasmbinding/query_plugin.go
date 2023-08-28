@@ -54,8 +54,8 @@ func CustomQuerier(qp *QueryPlugin) func(ctx sdk.Context, request json.RawMessag
 
 			return bz, nil
 
-		case contractQuery.ActualPrice != nil:
-			res, err := qp.GetActualPrice(ctx)
+		case contractQuery.ExchangeRate != nil:
+			res, err := qp.GetActualPrice(ctx, contractQuery.ExchangeRate.Denom)
 			if err != nil {
 				return nil, err
 			}

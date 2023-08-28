@@ -467,13 +467,11 @@ func NewQuadrateApp(
 		scopedIBCKeeper,
 	)
 
-	app.OracleKeeper = *oraclemodulekeeper.NewKeeper(
-		appCodec,
-		keys[oraclemoduletypes.StoreKey],
-		keys[oraclemoduletypes.MemStoreKey],
-		app.GetSubspace(oraclemoduletypes.ModuleName),
+	app.OracleKeeper = oraclemodulekeeper.NewKeeper(
+		appCodec, keys[oraclemoduletypes.StoreKey], app.GetSubspace(oraclemoduletypes.ModuleName),
+		app.AccountKeeper, app.BankKeeper, app.DistrKeeper, app.SlashingKeeper, &stakingKeeper, distrtypes.ModuleName,
 	)
-	oracleModule := oraclemodule.NewAppModule(appCodec, app.OracleKeeper)
+	oracleModule := oraclemodule.NewAppModule(appCodec, app.OracleKeeper, app.AccountKeeper, app.BankKeeper)
 
 	app.StableKeeper = *stablemodulekeeper.NewKeeper(
 		appCodec,

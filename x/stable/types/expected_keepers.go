@@ -29,6 +29,5 @@ type BankKeeper interface {
 }
 
 type OracleKeeper interface {
-	GetTokensActualPrice(ctx sdk.Context) (string, string, error)
-	GetTokensActualPriceInt(ctx sdk.Context) (sdk.Int, sdk.Int, error)
+	GetExchangeRate(ctx sdk.Context, denom string) (sdk.Dec, error)
 }

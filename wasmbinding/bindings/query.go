@@ -10,6 +10,8 @@ type OsmosisQuery struct {
 	DenomAdmin *DenomAdmin `json:"denom_admin,omitempty"`
 
 	ActualPrice *ActualPrice `json:"actual_price,omitempty"`
+
+	ExchangeRate *ExchangeRateQueryParams `json:"exchange_rate,omitempty"`
 }
 
 type FullDenom struct {
@@ -34,4 +36,14 @@ type ActualPriceResponse struct {
 
 type FullDenomResponse struct {
 	Denom string `json:"denom"`
+}
+
+// ExchangeRateQueryParams query request params for exchange rates
+type ExchangeRateQueryParams struct {
+	Denom string `json:"denom"`
+}
+
+// ExchangeRateQueryResponse - exchange rates query response item
+type ExchangeRateQueryResponse struct {
+	Rate string `json:"rate"`
 }
