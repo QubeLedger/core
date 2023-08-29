@@ -45,3 +45,23 @@ func (k Keeper) CheckWithdrawalAmount(msgAmountIn string, pair types.GTokenPair)
 
 	return nil
 }
+
+func (k Keeper) SendCoinsFromModuleToAccount(ctx sdk.Context, senderModule string, recipientAddr sdk.AccAddress, amt sdk.Coins) error {
+	err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, senderModule, recipientAddr, amt)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (k Keeper) SendCoinsFromAccountToModule(ctx sdk.Context, senderAddr sdk.AccAddress, recipientModule string, amt sdk.Coins) error {
+	err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, senderAddr, recipientModule, amt)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (k Keeper) GetPairByPairID(ctx sdk.Context, id string) (stabletypes.Pair, bool) {
+	return k.stableKeeper.GetPairByPairID(ctx, id)
+}

@@ -19,7 +19,7 @@ message gTokenPair {
                 (gogoproto.nullable) = false
         ];
         uint64 gTokenLatestPriceUpdateTime = 9;
-        string st = 7 [
+        string st = 10 [
                 (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
                 (gogoproto.moretags) = "yaml:\"st\"",
                 (gogoproto.nullable) = false
