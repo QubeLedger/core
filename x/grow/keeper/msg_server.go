@@ -12,18 +12,21 @@ var _ types.MsgServer = Keeper{}
 func (k Keeper) Deposit(goCtx context.Context, msg *types.MsgDeposit) (*types.MsgDepositResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	pairId, err := k.GetPairIdDeposit(msg.AmountIn, msg.DenomOut)
-	pair, found := k.GetPairByPairID(ctx, pairId)
+	denomID, err := k.GetDenomIdDeposit(msg.DenomOut)
+	gTokenPair, found := k.GetPairByDenomID(ctx, denomID)
 	if !found {
 		return nil, types.ErrPairNotFound
 	}
 
-	err = k.CheckDepositAmount(msg.AmountIn, pair)
+	err = k.CheckDepositAmount(ctx, msg.AmountIn, gTokenPair)
 	if err != nil {
 		return nil, err
 	}
 
-	err, amountOut := k.ExecuteDeposit(ctx, msg, pair)
+	err, amountOut := k.ExecuteDeposit(ctx, msg, gTokenPair)
+	if err != nil {
+		return nil, err
+	}
 
 	ctx.EventManager().EmitEvents(sdk.Events{
 		sdk.NewEvent(
@@ -44,18 +47,21 @@ func (k Keeper) Deposit(goCtx context.Context, msg *types.MsgDeposit) (*types.Ms
 func (k Keeper) Withdrawal(goCtx context.Context, msg *types.MsgWithdrawal) (*types.MsgWithdrawalResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	pairId, err := k.GetPairIdWithdrawal(msg.AmountIn, msg.DenomOut)
-	pair, found := k.GetPairByPairID(ctx, pairId)
+	denomID, err := k.GetDenomIdWithdrawal(msg.AmountIn)
+	gTokenPair, found := k.GetPairByDenomID(ctx, denomID)
 	if !found {
 		return nil, types.ErrPairNotFound
 	}
 
-	err = k.CheckDepositAmount(msg.AmountIn, pair)
+	err = k.CheckWithdrawalAmount(msg.AmountIn, gTokenPair)
 	if err != nil {
 		return nil, err
 	}
 
-	err, amountOut := k.ExecuteWithdrawal(ctx, msg, pair)
+	err, amountOut := k.ExecuteWithdrawal(ctx, msg, gTokenPair)
+	if err != nil {
+		return nil, err
+	}
 
 	ctx.EventManager().EmitEvents(sdk.Events{
 		sdk.NewEvent(

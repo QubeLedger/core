@@ -6,11 +6,22 @@ import "gogoproto/gogo.proto";
 import "cosmos/bank/v1beta1/bank.proto";
 option go_package = "github.com/QuadrateOrg/core/x/grow/types";
 
-message Pair {
+message gTokenPair {
         uint64 id = 1;
-        string pairId = 2;
-        cosmos.bank.v1beta1.Metadata amountInMetadata = 3 [ (gogoproto.moretags) = "yaml:\"amountInMetadata\"", (gogoproto.nullable)   = false ];
-        cosmos.bank.v1beta1.Metadata amountOutMetadata = 4 [ (gogoproto.moretags) = "yaml:\"amountOutMetadata\"", (gogoproto.nullable)   = false ];
-        string minAmountIn = 7;
-        string minAmountOut = 8;
+        string denomID = 2;
+        string qStablePairId = 3;
+        cosmos.bank.v1beta1.Metadata gTokenMetadata = 4 [ (gogoproto.moretags) = "yaml:\"gTokenMetadata\"", (gogoproto.nullable)   = false ];
+        string minAmountIn = 5;
+        string minAmountOut = 6;
+        string gTokenLastPrice = 7 [
+                (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
+                (gogoproto.moretags) = "yaml:\"gTokenLastPrice\"",
+                (gogoproto.nullable) = false
+        ];
+        uint64 gTokenLatestPriceUpdateTime = 9;
+        string st = 7 [
+                (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
+                (gogoproto.moretags) = "yaml:\"st\"",
+                (gogoproto.nullable) = false
+        ];
 }

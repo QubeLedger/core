@@ -11,4 +11,5 @@ var (
 	ErrPairNotFound             = sdkerrors.Register(ModuleName, 1701, "ErrPairNotFound err")
 	ErrAmountInGTEminAmountIn   = sdkerrors.Register(ModuleName, 1801, "ErrAmountInGTEminAmountIn err")
 	ErrAmountOutGTEminAmountOut = sdkerrors.Register(ModuleName, 1802, "ErrAmountOutGTEminAmountOut err")
+	ErrCalculatGrowRate         = sdkerrors.Register(ModuleName, 1500, "ErrCalculatGrowRate err")
 )
