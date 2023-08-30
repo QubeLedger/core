@@ -28,11 +28,17 @@ func EndBlocker(ctx sdk.Context, k keeper.Keeper) error {
 		value, blocked := k.CalculateAddToReserveValue(ctx, rawValue, gp)
 		if blocked {
 			if action == types.SendToReserveAction {
-				SendToReserveAction(k, ctx, value, gp)
+				err := SendToReserveAction(k, ctx, value, gp)
+				if err != nil {
+					return err
+				}
 			}
 
 			if action == types.SendFromReserveAction {
-				SendFromReserveAction(k, ctx, value, gp)
+				err := SendFromReserveAction(k, ctx, value, gp)
+				if err != nil {
+					return err
+				}
 			}
 		}
 		err = k.UpdateGTokenPrice(ctx, gp)

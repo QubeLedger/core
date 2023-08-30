@@ -118,7 +118,7 @@ func (s *GrowAbciTestSuite) GetNormalGTokenPair(id uint64) types.GTokenPair {
 }
 
 func (s *GrowAbciTestSuite) NewBlock_IncreaseBlockTime10Sec() {
-	s.ctx = s.ctx.WithBlockHeight(2)
+	s.ctx = s.ctx.WithBlockHeight(s.ctx.BlockHeight() + 1)
 	s.ctx = s.ctx.WithBlockTime(time.Unix((s.ctx.BlockTime().Unix() + 10), 0))
 }
 
@@ -230,6 +230,12 @@ func (s *GrowAbciTestSuite) OracleAggregateExchangeRateFromNet() {
 	price, err := GetTokensActualPrice()
 	s.Require().NoError(err)
 	err = s.PrevoteVotePrice(price + params.Whitelist[0].Name)
+	s.Require().NoError(err)
+}
+
+func (s *GrowAbciTestSuite) OracleAggregateExchangeRateFromInput(price string) {
+	params := s.app.OracleKeeper.GetParams(s.ctx)
+	err := s.PrevoteVotePrice(price + params.Whitelist[0].Name)
 	s.Require().NoError(err)
 }
 
