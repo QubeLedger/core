@@ -16,23 +16,25 @@ func EndBlocker(ctx sdk.Context, k keeper.Keeper) error {
 	defer telemetry.ModuleMeasureSince(types.ModuleName, time.Now(), telemetry.MetricKeyEndBlocker)
 	allGTokenPair := k.GetAllPair(ctx)
 	for _, gp := range allGTokenPair {
-		action, value, err := k.CheckYieldRate(ctx, gp)
+		action, rawValue, err := k.CheckYieldRate(ctx, gp)
 		if err != nil {
 			return err
 		}
 
-		if value.IsNil() {
+		if rawValue.IsNil() {
 			return types.ErrIntNegativeOrZero
 		}
 
-		if action == types.SendToReserveAction {
-			SendToReserveAction(k, ctx, value, gp)
-		}
+		value, blocked := k.CalculateAddToReserveValue(ctx, rawValue, gp)
+		if blocked {
+			if action == types.SendToReserveAction {
+				SendToReserveAction(k, ctx, value, gp)
+			}
 
-		if action == types.SendFromReserveAction {
-			SendFromReserveAction(k, ctx, value, gp)
+			if action == types.SendFromReserveAction {
+				SendFromReserveAction(k, ctx, value, gp)
+			}
 		}
-
 		err = k.UpdateGTokenPrice(ctx, gp)
 		if err != nil {
 			return err
@@ -50,7 +52,7 @@ func SendToReserveAction(k keeper.Keeper, ctx sdk.Context, value sdk.Int, gToken
 
 	amt := sdk.NewCoins(sdk.NewCoin(qStablePair.AmountOutMetadata.Base, value))
 
-	err := k.SendCoinsFromAccountToModule(ctx, k.GetUSQStakingReserveAddress(ctx), types.ModuleName, amt)
+	err := k.SendCoinsFromAccountToModule(ctx, k.GetGrowStakingReserveAddress(ctx), types.ModuleName, amt)
 	if err != nil {
 		return err
 	}
@@ -76,7 +78,7 @@ func SendFromReserveAction(k keeper.Keeper, ctx sdk.Context, value sdk.Int, gTok
 		return err
 	}
 
-	err = k.SendCoinsFromModuleToAccount(ctx, types.ModuleName, k.GetUSQStakingReserveAddress(ctx), amt)
+	err = k.SendCoinsFromModuleToAccount(ctx, types.ModuleName, k.GetGrowStakingReserveAddress(ctx), amt)
 	if err != nil {
 		return err
 	}

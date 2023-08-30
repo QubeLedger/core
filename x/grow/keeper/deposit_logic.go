@@ -25,15 +25,6 @@ func (k Keeper) ExecuteDeposit(ctx sdk.Context, msg *types.MsgDeposit, gTokenPai
 
 	amountInInt := amountInCoins.AmountOf(qStablePair.AmountOutMetadata.Base)
 
-	/*
-		TODO:
-		Add update price to EndBlock
-	*/
-	err = k.UpdateGTokenPrice(ctx, gTokenPair)
-	if err != nil {
-		return err, sdk.Coin{}
-	}
-
 	gTokenPrice, err := k.GetGTokenPrice(ctx, gTokenPair.DenomID)
 	if err != nil {
 		return err, sdk.Coin{}
@@ -44,7 +35,7 @@ func (k Keeper) ExecuteDeposit(ctx sdk.Context, msg *types.MsgDeposit, gTokenPai
 		return err, sdk.Coin{}
 	}
 
-	err = k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, k.GetUSQStakingReserveAddress(ctx), amountInCoins)
+	gTokenPair, err = k.IncreaseGrowStakingReserve(ctx, amountInCoins, gTokenPair, qStablePair)
 	if err != nil {
 		return err, sdk.Coin{}
 	}
@@ -61,6 +52,8 @@ func (k Keeper) ExecuteDeposit(ctx sdk.Context, msg *types.MsgDeposit, gTokenPai
 	if err != nil {
 		return err, sdk.Coin{}
 	}
+
+	k.SetPair(ctx, gTokenPair)
 
 	return nil, amountOut
 }
@@ -84,15 +77,6 @@ func (k Keeper) ExecuteWithdrawal(ctx sdk.Context, msg *types.MsgWithdrawal, gTo
 		return stabletypes.ErrPairNotFound, sdk.Coin{}
 	}
 
-	/*
-		TODO:
-		Add update price to EndBlock
-	*/
-	err = k.UpdateGTokenPrice(ctx, gTokenPair)
-	if err != nil {
-		return err, sdk.Coin{}
-	}
-
 	gTokenPrice, err := k.GetGTokenPrice(ctx, gTokenPair.DenomID)
 	if err != nil {
 		return err, sdk.Coin{}
@@ -111,7 +95,7 @@ func (k Keeper) ExecuteWithdrawal(ctx sdk.Context, msg *types.MsgWithdrawal, gTo
 	amountOutInt := k.CalculateReturnQubeStableAmountOut(amountInInt, gTokenPrice)
 	amountOut := sdk.NewCoin(qStablePair.AmountOutMetadata.Base, amountOutInt)
 
-	err = k.bankKeeper.SendCoinsFromAccountToModule(ctx, k.GetUSQStakingReserveAddress(ctx), types.ModuleName, sdk.NewCoins(amountOut))
+	gTokenPair, err = k.ReduceGrowStakingReserve(ctx, sdk.NewCoins(amountOut), gTokenPair)
 	if err != nil {
 		return err, sdk.Coin{}
 	}
@@ -120,6 +104,8 @@ func (k Keeper) ExecuteWithdrawal(ctx sdk.Context, msg *types.MsgWithdrawal, gTo
 	if err != nil {
 		return err, sdk.Coin{}
 	}
+
+	k.SetPair(ctx, gTokenPair)
 
 	return nil, amountOut
 

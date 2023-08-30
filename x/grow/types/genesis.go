@@ -16,6 +16,14 @@ func DefaultGenesis() *GenesisState {
 	}
 }
 
+func NewGenesisState(params Params, portID string, LoanList []Loan, loanCount uint64) GenesisState {
+	return GenesisState{
+		Params:    params,
+		LoanList:  LoanList,
+		LoanCount: loanCount,
+	}
+}
+
 // Validate performs basic genesis state validation returning an error upon any
 // failure.
 func (gs GenesisState) Validate() error {

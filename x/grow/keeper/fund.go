@@ -5,9 +5,9 @@ import (
 )
 
 var (
-	USQReserveAddress        sdk.AccAddress
-	GrowYieldReserveAddress  sdk.AccAddress
-	USQStakingReserveAddress sdk.AccAddress
+	USQReserveAddress         sdk.AccAddress
+	GrowYieldReserveAddress   sdk.AccAddress
+	GrowStakingReserveAddress sdk.AccAddress
 )
 
 // USQReserveAddress
@@ -38,16 +38,16 @@ func (k Keeper) GetGrowYieldReserveAddress(ctx sdk.Context) sdk.AccAddress {
 	return GrowYieldReserveAddress
 }
 
-// USQStakingReserveAddress
-func (k Keeper) ChangeUSQStakingReserveAddress(ctx sdk.Context, address sdk.AccAddress) error {
-	k.SetUSQStakingReserveAddress(ctx, address)
+// GrowStakingReserveAddress
+func (k Keeper) ChangeGrowStakingReserveAddress(ctx sdk.Context, address sdk.AccAddress) error {
+	k.SetGrowStakingReserveAddress(ctx, address)
 	return nil
 }
 
-func (k Keeper) SetUSQStakingReserveAddress(ctx sdk.Context, newUSQStakingReserveAddress sdk.AccAddress) {
-	USQStakingReserveAddress = newUSQStakingReserveAddress
+func (k Keeper) SetGrowStakingReserveAddress(ctx sdk.Context, newUSQStakingReserveAddress sdk.AccAddress) {
+	GrowStakingReserveAddress = newUSQStakingReserveAddress
 }
 
-func (k Keeper) GetUSQStakingReserveAddress(ctx sdk.Context) sdk.AccAddress {
-	return USQStakingReserveAddress
+func (k Keeper) GetGrowStakingReserveAddress(ctx sdk.Context) sdk.AccAddress {
+	return GrowStakingReserveAddress
 }

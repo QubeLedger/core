@@ -6,6 +6,27 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
+var (
+	realRate              sdk.Int
+	lastTimeUpdateReserve sdk.Int
+)
+
+func (k Keeper) SetLastTimeUpdateReserve(ctx sdk.Context, val sdk.Int) error {
+	if val.IsNil() || val.IsZero() || val.IsNegative() {
+		return types.ErrIntNegativeOrZero
+	}
+	lastTimeUpdateReserve = val
+	return nil
+}
+
+func (k Keeper) SetRealRate(ctx sdk.Context, val sdk.Int) error {
+	if val.IsNil() || val.IsZero() || val.IsNegative() {
+		return types.ErrIntNegativeOrZero
+	}
+	realRate = val
+	return nil
+}
+
 func CalculatGrowRatePercent(backing_ratio sdk.Int) (sdk.Int, error) {
 	if backing_ratio.IsNil() {
 		return sdk.Int{}, types.ErrCalculatGrowRate
@@ -59,7 +80,7 @@ func (k Keeper) CalculateGrowYield(ctx sdk.Context, gTokenPair types.GTokenPair)
 		return sdk.Int{}, types.ErrIntNegativeOrZero
 	}
 
-	return (gTokenPair.St.Mul(growRate)).QuoRaw(100), nil
+	return (gTokenPair.St.Mul(growRate)).Quo(sdk.NewInt(1000)), nil
 }
 
 func (k Keeper) CalculateRealYield(ctx sdk.Context, gTokenPair types.GTokenPair) (sdk.Int, error) {
@@ -73,19 +94,15 @@ func (k Keeper) CalculateRealYield(ctx sdk.Context, gTokenPair types.GTokenPair)
 		return sdk.Int{}, err
 	}
 
-	realRate, err := k.oracleKeeper.GetExchangeRate(ctx, "REALRATE")
-	if err != nil {
-		return sdk.Int{}, err
-	}
-
 	br, err := gmb.CalculateBackingRatio(atomPrice.MulInt64(10000).RoundInt(), qStablePair.Ar, qStablePair.Qm)
 	if err != nil {
 		return sdk.Int{}, err
 	}
 
 	qm := qStablePair.Qm
+	res := ((qm.Mul(br)).Mul(realRate)).QuoRaw(10000)
 
-	return ((qm.Mul(br)).Mul(realRate.RoundInt())).QuoRaw(10000), nil
+	return res, nil
 }
 
 func (k Keeper) CheckYieldRate(ctx sdk.Context, gTokenPair types.GTokenPair) (string, sdk.Int, error) {
@@ -93,7 +110,7 @@ func (k Keeper) CheckYieldRate(ctx sdk.Context, gTokenPair types.GTokenPair) (st
 	if err != nil {
 		return "", sdk.Int{}, err
 	}
-	realYield, err := k.CalculateGrowRate(ctx, gTokenPair)
+	realYield, err := k.CalculateRealYield(ctx, gTokenPair)
 	if err != nil {
 		return "", sdk.Int{}, err
 	}
@@ -107,4 +124,16 @@ func (k Keeper) CheckYieldRate(ctx sdk.Context, gTokenPair types.GTokenPair) (st
 	}
 
 	return "", sdk.Int{}, nil
+}
+
+func (k Keeper) CalculateAddToReserveValue(ctx sdk.Context, val sdk.Int, gTokenPair types.GTokenPair) (sdk.Int, bool) {
+	diff := sdk.NewInt(ctx.BlockTime().Unix()).Sub(lastTimeUpdateReserve)
+	if diff.LT(sdk.NewInt(10)) {
+		return sdk.Int{}, false
+	}
+
+	if (sdk.NewInt(31536000).Quo(diff)).IsNil() || (sdk.NewInt(31536000).Quo(diff)).IsZero() {
+		return sdk.Int{}, false
+	}
+	return val.Quo(sdk.NewInt(31536000).Quo(diff)), true
 }

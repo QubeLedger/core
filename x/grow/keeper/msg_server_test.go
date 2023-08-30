@@ -20,7 +20,7 @@ func (suite *GrowKeeperTestSuite) TestExecuteDeposit() {
 		{
 			"ok-mint",
 			s.GetNormalQStablePair(0),
-			s.GetNormalGSTokenPair(0),
+			s.GetNormalGTokenPair(0),
 			"uusd",
 			1000 * 1000000,
 		},
@@ -67,7 +67,7 @@ func (suite *GrowKeeperTestSuite) TestExecuteWithdrawal() {
 		{
 			"ok-mint",
 			s.GetNormalQStablePair(0),
-			s.GetNormalGSTokenPair(0),
+			s.GetNormalGTokenPair(0),
 			"ugusd",
 			1000000,
 		},
@@ -77,7 +77,7 @@ func (suite *GrowKeeperTestSuite) TestExecuteWithdrawal() {
 	suite.Commit()
 	suite.SetupOracleKeeper()
 	suite.RegisterValidator()
-	suite.app.GrowKeeper.SetUSQStakingReserveAddress(s.ctx, apptesting.CreateRandomAccounts(1)[0])
+	suite.app.GrowKeeper.SetGrowStakingReserveAddress(s.ctx, apptesting.CreateRandomAccounts(1)[0])
 	for _, tc := range testCases {
 
 		suite.app.StableKeeper.AppendPair(s.ctx, tc.qStablePair)
@@ -86,7 +86,7 @@ func (suite *GrowKeeperTestSuite) TestExecuteWithdrawal() {
 		suite.OracleAggregateExchangeRateFromNet()
 
 		suite.AddTestCoins(10000, tc.qStablePair.AmountInMetadata.Base)
-		suite.AddTestCoinsToCustomAccount(sdk.NewInt(1000*1000000), tc.qStablePair.AmountOutMetadata.Base, s.app.GrowKeeper.GetUSQStakingReserveAddress(s.ctx))
+		suite.AddTestCoinsToCustomAccount(sdk.NewInt(1000*1000000), tc.qStablePair.AmountOutMetadata.Base, s.app.GrowKeeper.GetGrowStakingReserveAddress(s.ctx))
 
 		err := suite.MintStable(10000, s.GetNormalQStablePair(0))
 		suite.Require().NoError(err)

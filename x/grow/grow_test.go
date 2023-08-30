@@ -1,4 +1,4 @@
-package keeper_test
+package grow_test
 
 import (
 	"fmt"
@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/QuadrateOrg/core/app"
-	apptesting "github.com/QuadrateOrg/core/app/apptesting"
+	"github.com/QuadrateOrg/core/app/apptesting"
 	quadrateapptest "github.com/QuadrateOrg/core/app/helpers"
 	"github.com/QuadrateOrg/core/x/grow/types"
 	"github.com/QuadrateOrg/core/x/oracle"
@@ -29,7 +29,7 @@ import (
 	"github.com/tendermint/tendermint/crypto"
 )
 
-type GrowKeeperTestSuite struct {
+type GrowAbciTestSuite struct {
 	suite.Suite
 	ctx        sdk.Context
 	app        *app.QuadrateApp
@@ -38,43 +38,29 @@ type GrowKeeperTestSuite struct {
 	ValPubKeys []cryptotypes.PubKey
 }
 
-var s *GrowKeeperTestSuite
+var s *GrowAbciTestSuite
 
-func (s *GrowKeeperTestSuite) Setup() {
+func (suite *GrowAbciTestSuite) Commit() {
+	header := suite.ctx.BlockHeader()
+	suite.ctx = suite.app.BaseApp.NewContext(false, header)
+}
+
+func (s *GrowAbciTestSuite) Setup() {
 	s.app = quadrateapptest.Setup(s.T(), "qube-1", false, 1)
 	s.Address = apptesting.CreateRandomAccounts(1)[0]
 	s.ValPubKeys = simapp.CreateTestPubKeys(1)
+	s.ctx = s.ctx.WithBlockTime(time.Now())
 }
 
-func TestStableKeeperTestSuite(t *testing.T) {
-	s = new(GrowKeeperTestSuite)
+func TestGrowAbciTestSuite(t *testing.T) {
+	s = new(GrowAbciTestSuite)
 	suite.Run(t, s)
 	// Run Ginkgo integration tests
 	RegisterFailHandler(Fail)
 	RunSpecs(t, "Keeper Suite")
 }
 
-func (suite *GrowKeeperTestSuite) Commit() {
-	header := suite.ctx.BlockHeader()
-	suite.ctx = suite.app.BaseApp.NewContext(false, header)
-}
-
-func (suite *GrowKeeperTestSuite) MintStable(amount int64, pair stabletypes.Pair) error {
-	suite.app.StableKeeper.UpdateAtomPriceTesting(suite.ctx, sdk.NewInt(95000))
-	msg := stabletypes.NewMsgMint(
-		suite.Address.String(),
-		sdk.NewInt(amount).String()+pair.AmountInMetadata.Base,
-		pair.AmountOutMetadata.Base,
-	)
-	ctx := sdk.WrapSDKContext(suite.ctx)
-	_, err := suite.app.StableKeeper.Mint(ctx, msg)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *GrowKeeperTestSuite) GetNormalQStablePair(id uint64) stabletypes.Pair {
+func (s *GrowAbciTestSuite) GetNormalQStablePair(id uint64) stabletypes.Pair {
 	pair := stabletypes.Pair{
 		Id:     id,
 		PairId: fmt.Sprintf("%x", crypto.Sha256(append([]byte("uatom"+"uusd")))),
@@ -107,7 +93,7 @@ func (s *GrowKeeperTestSuite) GetNormalQStablePair(id uint64) stabletypes.Pair {
 	return pair
 }
 
-func (s *GrowKeeperTestSuite) GetNormalGTokenPair(id uint64) types.GTokenPair {
+func (s *GrowAbciTestSuite) GetNormalGTokenPair(id uint64) types.GTokenPair {
 	pair := types.GTokenPair{
 		Id:            id,
 		DenomID:       fmt.Sprintf("%x", crypto.Sha256(append([]byte("ugusd")))),
@@ -125,24 +111,40 @@ func (s *GrowKeeperTestSuite) GetNormalGTokenPair(id uint64) types.GTokenPair {
 		MinAmountIn:                 "20uusd",
 		MinAmountOut:                "20ugusd",
 		GTokenLastPrice:             sdk.NewInt(1 * 1000000),
-		GTokenLatestPriceUpdateTime: uint64(time.Now().Unix() - (31536000)),
+		GTokenLatestPriceUpdateTime: uint64(time.Now().Unix()),
 	}
 
 	return pair
 }
 
-func (s *GrowKeeperTestSuite) AddTestCoins(amount int64, denom string) {
+func (s *GrowAbciTestSuite) NewBlock_IncreaseBlockTime10Sec() {
+	s.ctx = s.ctx.WithBlockHeight(2)
+	s.ctx = s.ctx.WithBlockTime(time.Unix((s.ctx.BlockTime().Unix() + 10), 0))
+}
+
+func (s *GrowAbciTestSuite) AddTestCoinsToCustomAccount(amount sdk.Int, denom string, acc sdk.AccAddress) {
+	s.app.BankKeeper.MintCoins(s.ctx, types.ModuleName, sdk.NewCoins(sdk.NewCoin(denom, amount)))
+	s.app.BankKeeper.SendCoinsFromModuleToAccount(s.ctx, types.ModuleName, acc, sdk.NewCoins(sdk.NewCoin(denom, amount)))
+}
+
+func (s *GrowAbciTestSuite) AddTestCoins(amount int64, denom string) {
 	s.app.BankKeeper.MintCoins(s.ctx, types.ModuleName, sdk.NewCoins(sdk.NewCoin(denom, sdk.NewInt(amount))))
 	s.app.BankKeeper.SendCoinsFromModuleToAccount(s.ctx, types.ModuleName, s.Address, sdk.NewCoins(sdk.NewCoin(denom, sdk.NewInt(amount))))
 }
 
-func (suite *GrowKeeperTestSuite) IncreaseModuleBalance(amount int64, denom string) {
-	suite.app.BankKeeper.MintCoins(suite.ctx, types.ModuleName, sdk.NewCoins(sdk.NewCoin(denom, sdk.NewInt(amount))))
-}
-
-func (s *GrowKeeperTestSuite) AddTestCoinsToCustomAccount(amount sdk.Int, denom string, acc sdk.AccAddress) {
-	s.app.BankKeeper.MintCoins(s.ctx, types.ModuleName, sdk.NewCoins(sdk.NewCoin(denom, amount)))
-	s.app.BankKeeper.SendCoinsFromModuleToAccount(s.ctx, types.ModuleName, acc, sdk.NewCoins(sdk.NewCoin(denom, amount)))
+func (suite *GrowAbciTestSuite) MintStable(amount int64, pair stabletypes.Pair) error {
+	suite.app.StableKeeper.UpdateAtomPriceTesting(suite.ctx, sdk.NewInt(95000))
+	msg := stabletypes.NewMsgMint(
+		suite.Address.String(),
+		sdk.NewInt(amount).String()+pair.AmountInMetadata.Base,
+		pair.AmountOutMetadata.Base,
+	)
+	ctx := sdk.WrapSDKContext(suite.ctx)
+	_, err := suite.app.StableKeeper.Mint(ctx, msg)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 // NewTestMsgCreateValidator test msg creator
@@ -156,7 +158,7 @@ func NewTestMsgCreateValidator(address sdk.ValAddress, pubKey cryptotypes.PubKey
 	return msg
 }
 
-func (s *GrowKeeperTestSuite) RegisterValidator() error {
+func (s *GrowAbciTestSuite) RegisterValidator() error {
 	for _, vp := range s.ValPubKeys {
 		s.AddTestCoinsToCustomAccount(sdk.TokensFromConsensusPower(10, sdk.DefaultPowerReduction), "stake", sdk.AccAddress(vp.Address()))
 	}
@@ -172,7 +174,7 @@ func (s *GrowKeeperTestSuite) RegisterValidator() error {
 	return nil
 }
 
-func (s *GrowKeeperTestSuite) PrevoteVotePrice(exchangeRatesStr string) error {
+func (s *GrowAbciTestSuite) PrevoteVotePrice(exchangeRatesStr string) error {
 	salt := "1"
 	hash := oracletypes.GetAggregateVoteHash(salt, exchangeRatesStr, sdk.ValAddress(s.ValPubKeys[0].Address()))
 
@@ -223,7 +225,7 @@ func GetTokensActualPrice() (string, error) {
 	return atomPriceString, nil
 }
 
-func (s *GrowKeeperTestSuite) OracleAggregateExchangeRateFromNet() {
+func (s *GrowAbciTestSuite) OracleAggregateExchangeRateFromNet() {
 	params := s.app.OracleKeeper.GetParams(s.ctx)
 	price, err := GetTokensActualPrice()
 	s.Require().NoError(err)
@@ -231,7 +233,7 @@ func (s *GrowKeeperTestSuite) OracleAggregateExchangeRateFromNet() {
 	s.Require().NoError(err)
 }
 
-func (s *GrowKeeperTestSuite) SetupOracleKeeper() {
+func (s *GrowAbciTestSuite) SetupOracleKeeper() {
 	params := s.app.OracleKeeper.GetParams(s.ctx)
 	params.Whitelist = oracletypes.DenomList{
 		{
@@ -242,11 +244,4 @@ func (s *GrowKeeperTestSuite) SetupOracleKeeper() {
 	params.SlashWindow = 100
 	params.RewardDistributionWindow = 100
 	s.app.OracleKeeper.SetParams(s.ctx, params)
-}
-
-func (s *GrowKeeperTestSuite) TestTime() {
-	s.Setup()
-	s.Commit()
-	s.ctx = s.ctx.WithBlockTime(time.Now())
-	fmt.Printf("%d\n", s.ctx.BlockTime().Unix())
 }
