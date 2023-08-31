@@ -27,6 +27,10 @@ func (k Keeper) SetRealRate(ctx sdk.Context, val sdk.Int) error {
 	return nil
 }
 
+func (k Keeper) GetRealRate(ctx sdk.Context) sdk.Int {
+	return realRate
+}
+
 func CalculatGrowRatePercent(backing_ratio sdk.Int) (sdk.Int, error) {
 	if backing_ratio.IsNil() {
 		return sdk.Int{}, types.ErrCalculatGrowRate

@@ -5,8 +5,8 @@ package core.grow.v1beta1;
 import "gogoproto/gogo.proto";
 import "google/api/annotations.proto";
 import "cosmos/base/query/v1beta1/pagination.proto";
-import "github.com/QuadrateOrg/core/grow/params.proto";
-import "github.com/QuadrateOrg/core/grow/loan.proto";
+import "core/grow/v1beta1/params.proto";
+import "core/grow/v1beta1/loan.proto";
 
 option go_package = "github.com/QuadrateOrg/core/x/grow/types";
 

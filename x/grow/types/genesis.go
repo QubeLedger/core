@@ -2,44 +2,38 @@ package types
 
 import (
 	"fmt"
+
+	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-// DefaultIndex is the default global index
 const DefaultIndex uint64 = 1
 
-// DefaultGenesis returns the default genesis state
 func DefaultGenesis() *GenesisState {
 	return &GenesisState{
-		LoanList: []Loan{},
-		// this line is used by starport scaffolding # genesis/types/default
 		Params: DefaultParams(),
 	}
 }
 
-func NewGenesisState(params Params, portID string, LoanList []Loan, loanCount uint64) GenesisState {
-	return GenesisState{
-		Params:    params,
-		LoanList:  LoanList,
-		LoanCount: loanCount,
-	}
-}
-
-// Validate performs basic genesis state validation returning an error upon any
-// failure.
 func (gs GenesisState) Validate() error {
-	// Check for duplicated ID in loan
-	loanIdMap := make(map[uint64]bool)
-	loanCount := gs.GetLoanCount()
-	for _, elem := range gs.LoanList {
-		if _, ok := loanIdMap[elem.Id]; ok {
-			return fmt.Errorf("duplicated id for loan")
+	gTokenPairListIdMap := make(map[uint64]bool)
+	for _, elem := range gs.GTokenPairList {
+		if _, ok := gTokenPairListIdMap[elem.Id]; ok {
+			return fmt.Errorf("duplicated id for gTokenPair")
 		}
-		if elem.Id >= loanCount {
-			return fmt.Errorf("loan id should be lower or equal than the last id")
-		}
-		loanIdMap[elem.Id] = true
+		gTokenPairListIdMap[elem.Id] = true
 	}
-	// this line is used by starport scaffolding # genesis/types/validate
+
+	if sdk.AccAddress(gs.GrowStakingReserveAddress).Empty() {
+		return fmt.Errorf("GrowStakingReserveAddress empty")
+	}
+
+	if sdk.AccAddress(gs.USQReserveAddress).Empty() {
+		return fmt.Errorf("GrowStakingReserveAddress empty")
+	}
+
+	if sdk.NewIntFromUint64(gs.RealRate).IsNegative() {
+		return fmt.Errorf("RealRate negative")
+	}
 
 	return gs.Params.Validate()
 }

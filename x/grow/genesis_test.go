@@ -3,13 +3,17 @@ package grow_test
 import (
 	"fmt"
 	"testing"
+	"time"
 
 	"github.com/QuadrateOrg/core/app"
+	"github.com/QuadrateOrg/core/app/apptesting"
 	quadrateapptest "github.com/QuadrateOrg/core/app/helpers"
 	"github.com/QuadrateOrg/core/x/grow"
 	"github.com/QuadrateOrg/core/x/grow/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	"github.com/stretchr/testify/suite"
+	"github.com/tendermint/tendermint/crypto"
 )
 
 type GrowGenesisTestSuite struct {
@@ -43,43 +47,93 @@ func (s *GrowGenesisTestSuite) TestInitGenesis() {
 			name: "valid genesis state",
 			genesisState: types.GenesisState{
 				Params: types.DefaultParams(),
-				LoanList: []types.Loan{
+				GTokenPairList: []types.GTokenPair{
 					{
-						Id: 0,
-					},
-					{
-						Id: 1,
+						Id:            0,
+						DenomID:       fmt.Sprintf("%x", crypto.Sha256(append([]byte("ugusd")))),
+						QStablePairId: fmt.Sprintf("%x", crypto.Sha256(append([]byte("uatom"+"uusd")))),
+						GTokenMetadata: banktypes.Metadata{
+							Description: "",
+							DenomUnits: []*banktypes.DenomUnit{
+								{Denom: "ugusd", Exponent: uint32(0), Aliases: []string{"microgusd"}},
+							},
+							Base:    "ugusd",
+							Display: "gusd",
+							Name:    "gUSQ",
+							Symbol:  "gUSQ",
+						},
+						MinAmountIn:                 "20uusd",
+						MinAmountOut:                "20ugusd",
+						GTokenLastPrice:             sdk.NewInt(0),
+						GTokenLatestPriceUpdateTime: 0,
+						St:                          sdk.NewInt(0),
 					},
 				},
-				LoanCount: 2,
+				RealRate:                  15,
+				GrowStakingReserveAddress: apptesting.CreateRandomAccounts(1)[0].String(),
+				USQReserveAddress:         apptesting.CreateRandomAccounts(1)[0].String(),
 			},
 			valid: true,
 		},
 		{
-			name: "duplicated loan",
+			name: "address null",
 			genesisState: types.GenesisState{
 				Params: types.DefaultParams(),
-				LoanList: []types.Loan{
+				GTokenPairList: []types.GTokenPair{
 					{
-						Id: 0,
-					},
-					{
-						Id: 0,
+						Id:            0,
+						DenomID:       fmt.Sprintf("%x", crypto.Sha256(append([]byte("ugusd")))),
+						QStablePairId: fmt.Sprintf("%x", crypto.Sha256(append([]byte("uatom"+"uusd")))),
+						GTokenMetadata: banktypes.Metadata{
+							Description: "",
+							DenomUnits: []*banktypes.DenomUnit{
+								{Denom: "ugusd", Exponent: uint32(0), Aliases: []string{"microgusd"}},
+							},
+							Base:    "ugusd",
+							Display: "gusd",
+							Name:    "gUSQ",
+							Symbol:  "gUSQ",
+						},
+						MinAmountIn:                 "20uusd",
+						MinAmountOut:                "20ugusd",
+						GTokenLastPrice:             sdk.NewInt(1 * 1000000),
+						GTokenLatestPriceUpdateTime: uint64(time.Now().Unix()),
 					},
 				},
+				RealRate:                  15,
+				GrowStakingReserveAddress: "",
+				USQReserveAddress:         "",
 			},
 			valid: false,
 		},
 		{
-			name: "invalid loan count",
+			name: "address null",
 			genesisState: types.GenesisState{
 				Params: types.DefaultParams(),
-				LoanList: []types.Loan{
+				GTokenPairList: []types.GTokenPair{
 					{
-						Id: 1,
+						Id:            0,
+						DenomID:       fmt.Sprintf("%x", crypto.Sha256(append([]byte("ugusd")))),
+						QStablePairId: fmt.Sprintf("%x", crypto.Sha256(append([]byte("uatom"+"uusd")))),
+						GTokenMetadata: banktypes.Metadata{
+							Description: "",
+							DenomUnits: []*banktypes.DenomUnit{
+								{Denom: "ugusd", Exponent: uint32(0), Aliases: []string{"microgusd"}},
+							},
+							Base:    "ugusd",
+							Display: "gusd",
+							Name:    "gUSQ",
+							Symbol:  "gUSQ",
+						},
+						MinAmountIn:                 "20uusd",
+						MinAmountOut:                "20ugusd",
+						GTokenLastPrice:             sdk.NewInt(1 * 1000000),
+						GTokenLatestPriceUpdateTime: uint64(time.Now().Unix()),
 					},
 				},
-				LoanCount: 0,
+				RealRate:                  0,
+				GrowStakingReserveAddress: "",
+				USQReserveAddress:         "",
 			},
 			valid: false,
 		},
@@ -94,13 +148,16 @@ func (s *GrowGenesisTestSuite) TestInitGenesis() {
 				})
 				params := s.app.GrowKeeper.GetParams(s.ctx)
 
-				loans := s.app.GrowKeeper.GetAllLoan(s.ctx)
+				pairs := s.app.GrowKeeper.GetAllPair(s.ctx)
 				s.Require().Equal(tc.genesisState.Params, params)
-				if len(loans) > 0 {
-					s.Require().Equal(tc.genesisState.LoanList, loans)
+				if len(pairs) > 0 {
+					s.Require().Equal(tc.genesisState.GTokenPairList, pairs)
 				} else {
-					s.Require().Len(tc.genesisState.LoanList, 0)
+					s.Require().Len(tc.genesisState.GTokenPairList, 0)
 				}
+
+				s.Require().Equal(sdk.AccAddress(tc.genesisState.USQReserveAddress), s.app.GrowKeeper.GetUSQReserveAddress(s.ctx))
+				s.Require().Equal(sdk.AccAddress(tc.genesisState.GrowStakingReserveAddress), s.app.GrowKeeper.GetGrowStakingReserveAddress(s.ctx))
 			}
 		})
 	}
