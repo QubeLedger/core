@@ -11,11 +11,11 @@ import (
 Deposit Helpers
 */
 func (k Keeper) CalculateGTokenAmountOut(amount sdk.Int, price sdk.Int) sdk.Int {
-	return ((amount.Mul(types.Multiplier)).Quo(price))
+	return ((amount.Mul(types.DepositMultiplier)).Quo(price))
 }
 
 func (k Keeper) CalculateReturnQubeStableAmountOut(amount sdk.Int, price sdk.Int) sdk.Int {
-	return ((amount.Mul(price)).Quo(types.Multiplier))
+	return ((amount.Mul(price)).Quo(types.DepositMultiplier))
 }
 
 func (k Keeper) CalculateGTokenAPY(lastAmount sdk.Int, growRate sdk.Int, day sdk.Int) sdk.Int {

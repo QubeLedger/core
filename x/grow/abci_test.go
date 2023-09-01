@@ -11,9 +11,12 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-func (s *GrowAbciTestSuite) TestGrowPriceChangeWhenBlockEnd() {
+var (
+	amt  = 1000 * int64(1000000)
+	amt2 = 5000 * int64(1000000)
+)
 
-	amt := 1000 * (types.Multiplier).Int64()
+func (s *GrowAbciTestSuite) TestGrowPriceChangeWhenBlockEnd() {
 
 	{
 		s.Setup()
@@ -75,8 +78,6 @@ func (s *GrowAbciTestSuite) TestGrowPriceChangeWhenBlockEnd() {
 }
 
 func (s *GrowAbciTestSuite) TestGrowReserveMath() {
-
-	amt := 1000 * (types.Multiplier).Int64()
 
 	{
 		s.Setup()
@@ -144,8 +145,6 @@ func (s *GrowAbciTestSuite) TestGrowReserveMath() {
 
 func (s *GrowAbciTestSuite) TestGrowIncreaseUSQReserve() {
 
-	amt := 1000 * (types.Multiplier).Int64()
-
 	{
 		s.Setup()
 		s.Commit()
@@ -201,8 +200,6 @@ func (s *GrowAbciTestSuite) TestGrowIncreaseUSQReserve() {
 
 func (s *GrowAbciTestSuite) TestGrowReduceUSQReserve() {
 
-	amt := 1000 * (types.Multiplier).Int64()
-	amt2 := 5000 * (types.Multiplier).Int64()
 	{
 		s.Setup()
 		s.Commit()

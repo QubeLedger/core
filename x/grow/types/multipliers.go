@@ -5,5 +5,6 @@ import (
 )
 
 var (
-	Multiplier sdk.Int = sdk.NewInt(10000)
+	Multiplier        sdk.Int = sdk.NewInt(10000)
+	DepositMultiplier sdk.Int = sdk.NewInt(1000000)
 )
