@@ -88,6 +88,11 @@ func (k Keeper) CreateLend(goCtx context.Context, msg *types.MsgCreateLend) (*ty
 		return nil, types.ErrPairNotFound
 	}
 
+	err = k.CheckOracleAssetId(ctx, borrowAsset)
+	if err != nil {
+		return nil, err
+	}
+
 	err, amountOut, loanId := k.ExecuteLend(ctx, msg, borrowAsset)
 	if err != nil {
 		return nil, err
@@ -117,6 +122,11 @@ func (k Keeper) DeleteLend(goCtx context.Context, msg *types.MsgDeleteLend) (*ty
 	borrowAsset, found := k.GetBorrowAssetByBorrowAssetId(ctx, borrowAssetId)
 	if !found {
 		return nil, types.ErrPairNotFound
+	}
+
+	err = k.CheckOracleAssetId(ctx, borrowAsset)
+	if err != nil {
+		return nil, err
 	}
 
 	err, amountOut, loanId := k.ExecuteDeleteLend(ctx, msg, borrowAsset)

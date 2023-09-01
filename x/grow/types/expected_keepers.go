@@ -1,6 +1,7 @@
 package types
 
 import (
+	oracletypes "github.com/QuadrateOrg/core/x/oracle/types"
 	stabletypes "github.com/QuadrateOrg/core/x/stable/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/auth/types"
@@ -30,6 +31,7 @@ type BankKeeper interface {
 
 type OracleKeeper interface {
 	GetExchangeRate(ctx sdk.Context, denom string) (sdk.Dec, error)
+	Whitelist(ctx sdk.Context) (res oracletypes.DenomList)
 }
 
 type StableKeeper interface {

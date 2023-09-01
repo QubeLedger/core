@@ -6,6 +6,9 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
+/*
+Deposit Helpers
+*/
 func (k Keeper) CheckDepositAmount(ctx sdk.Context, msgAmountIn string, pair types.GTokenPair) error {
 	msgAmountInCoins, err := sdk.ParseCoinsNormalized(msgAmountIn)
 	if err != nil {
@@ -46,6 +49,19 @@ func (k Keeper) CheckWithdrawalAmount(msgAmountIn string, pair types.GTokenPair)
 	return nil
 }
 
+func (k Keeper) CheckOracleAssetId(ctx sdk.Context, borrowAsset types.BorrowAsset) error {
+	denomList := k.oracleKeeper.Whitelist(ctx)
+	for _, dl := range denomList {
+		if dl.Name == borrowAsset.OracleAssetId {
+			return nil
+		}
+	}
+	return types.ErrOracleAssetIdNotFound
+}
+
+/*
+EndBlocker Helpers
+*/
 func (k Keeper) SendCoinsFromModuleToAccount(ctx sdk.Context, senderModule string, recipientAddr sdk.AccAddress, amt sdk.Coins) error {
 	err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, senderModule, recipientAddr, amt)
 	if err != nil {
