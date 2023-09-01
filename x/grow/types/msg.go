@@ -18,11 +18,11 @@ var _ sdk.Msg = &MsgWithdrawal{}
 /*
 create_lend
 */
-func NewMsgCreateLend(creator string, amount string, pairId string) *MsgCreateLend {
+func NewMsgCreateLend(creator string, amount string, denomOut string) *MsgCreateLend {
 	return &MsgCreateLend{
-		Creator: creator,
-		Amount:  amount,
-		PairId:  pairId,
+		Borrower: creator,
+		AmountIn: amount,
+		DenomOut: denomOut,
 	}
 }
 
@@ -35,7 +35,7 @@ func (msg *MsgCreateLend) Type() string {
 }
 
 func (msg *MsgCreateLend) GetSigners() []sdk.AccAddress {
-	creator, err := sdk.AccAddressFromBech32(msg.Creator)
+	creator, err := sdk.AccAddressFromBech32(msg.Borrower)
 	if err != nil {
 		panic(err)
 	}
@@ -48,7 +48,7 @@ func (msg *MsgCreateLend) GetSignBytes() []byte {
 }
 
 func (msg *MsgCreateLend) ValidateBasic() error {
-	_, err := sdk.AccAddressFromBech32(msg.Creator)
+	_, err := sdk.AccAddressFromBech32(msg.Borrower)
 	if err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
 	}
@@ -61,11 +61,11 @@ delete_lend
 
 */
 
-func NewMsgDeleteLend(creator string, amount string, pairId string) *MsgDeleteLend {
+func NewMsgDeleteLend(creator string, amount string, denomOut string) *MsgDeleteLend {
 	return &MsgDeleteLend{
-		Creator: creator,
-		Amount:  amount,
-		PairId:  pairId,
+		Borrower: creator,
+		AmountIn: amount,
+		DenomOut: denomOut,
 	}
 }
 
@@ -78,7 +78,7 @@ func (msg *MsgDeleteLend) Type() string {
 }
 
 func (msg *MsgDeleteLend) GetSigners() []sdk.AccAddress {
-	creator, err := sdk.AccAddressFromBech32(msg.Creator)
+	creator, err := sdk.AccAddressFromBech32(msg.Borrower)
 	if err != nil {
 		panic(err)
 	}
@@ -91,7 +91,7 @@ func (msg *MsgDeleteLend) GetSignBytes() []byte {
 }
 
 func (msg *MsgDeleteLend) ValidateBasic() error {
-	_, err := sdk.AccAddressFromBech32(msg.Creator)
+	_, err := sdk.AccAddressFromBech32(msg.Borrower)
 	if err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
 	}

@@ -82,29 +82,61 @@ func (k Keeper) Withdrawal(goCtx context.Context, msg *types.MsgWithdrawal) (*ty
 func (k Keeper) CreateLend(goCtx context.Context, msg *types.MsgCreateLend) (*types.MsgCreateLendResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
+	borrowAssetId, err := k.GetBorrowAssetIdCreateLend(msg.AmountIn, msg.DenomOut)
+	borrowAsset, found := k.GetBorrowAssetByBorrowAssetId(ctx, borrowAssetId)
+	if !found {
+		return nil, types.ErrPairNotFound
+	}
+
+	err, amountOut, loanId := k.ExecuteLend(ctx, msg, borrowAsset)
+	if err != nil {
+		return nil, err
+	}
+
 	ctx.EventManager().EmitEvents(sdk.Events{
 		sdk.NewEvent(
 			sdk.EventTypeMessage,
 			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
-			sdk.NewAttribute(sdk.AttributeKeySender, msg.Creator),
+			sdk.NewAttribute(sdk.AttributeKeySender, msg.Borrower),
 			sdk.NewAttribute(sdk.AttributeKeyAction, types.AttributeKeyActionCreateLend),
 		),
 	})
 
-	return &types.MsgCreateLendResponse{}, nil
+	return &types.MsgCreateLendResponse{
+		Borrower:  msg.Borrower,
+		AmountIn:  msg.AmountIn,
+		AmountOut: amountOut.String(),
+		LoanId:    loanId,
+	}, nil
 }
 
 func (k Keeper) DeleteLend(goCtx context.Context, msg *types.MsgDeleteLend) (*types.MsgDeleteLendResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
+	borrowAssetId, err := k.GetBorrowAssetIdDeleteLend(msg.AmountIn, msg.DenomOut)
+	borrowAsset, found := k.GetBorrowAssetByBorrowAssetId(ctx, borrowAssetId)
+	if !found {
+		return nil, types.ErrPairNotFound
+	}
+
+	err, amountOut, loanId := k.ExecuteDeleteLend(ctx, msg, borrowAsset)
+	if err != nil {
+		return nil, err
+	}
+
 	ctx.EventManager().EmitEvents(sdk.Events{
 		sdk.NewEvent(
 			sdk.EventTypeMessage,
 			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
-			sdk.NewAttribute(sdk.AttributeKeySender, msg.Creator),
+			sdk.NewAttribute(sdk.AttributeKeySender, msg.Borrower),
 			sdk.NewAttribute(sdk.AttributeKeyAction, types.AttributeKeyActionDeleteLend),
 		),
 	})
 
-	return &types.MsgDeleteLendResponse{}, nil
+	return &types.MsgDeleteLendResponse{
+		Borrower:  msg.Borrower,
+		AmountIn:  msg.AmountIn,
+		AmountOut: amountOut.String(),
+		LoanId:    loanId,
+	}, nil
 }

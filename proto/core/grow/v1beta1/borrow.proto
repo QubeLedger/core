@@ -1,0 +1,14 @@
+syntax = "proto3";
+package core.grow.v1beta1;
+import "gogoproto/gogo.proto";
+
+import "cosmos/bank/v1beta1/bank.proto";
+option go_package = "github.com/QuadrateOrg/core/x/grow/types";
+
+message BorrowAsset {
+        uint64 id = 1;
+        string borrowAssetId = 2;
+        cosmos.bank.v1beta1.Metadata amountInAssetMetadata = 3 [ (gogoproto.moretags) = "yaml:\"amountInAssetMetadata\"", (gogoproto.nullable)   = false ];
+        cosmos.bank.v1beta1.Metadata amountOutAssetMetadata = 4 [ (gogoproto.moretags) = "yaml:\"amountOutAssetMetadata\"", (gogoproto.nullable)   = false ];
+        string oracleAssetId = 5;
+}

@@ -36,18 +36,28 @@ message MsgWithdrawalResponse {
 }
 
 message MsgCreateLend {
-  string creator = 1;
-  string amount  = 2;
-  string pairId  = 3;
+  string borrower = 1;
+  string amountIn  = 2;
+  string denomOut = 3;
 }
 
-message MsgCreateLendResponse {}
+message MsgCreateLendResponse {
+  string borrower = 1;
+  string amountIn = 2;
+  string amountOut = 3;
+  string loanId = 4;
+}
 
 message MsgDeleteLend {
-  string creator = 1;
-  string amount  = 2;
-  string pairId  = 3;
+  string borrower = 1;
+  string amountIn  = 2;
+  string denomOut = 3;
 }
 
-message MsgDeleteLendResponse {}
+message MsgDeleteLendResponse {
+  string borrower = 1;
+  string amountIn = 2;
+  string amountOut = 3;
+  string loanId = 4;
+}
 

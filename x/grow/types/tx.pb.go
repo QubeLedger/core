@@ -8,7 +8,7 @@ import (
 	fmt "fmt"
 	proto "github.com/gogo/protobuf/proto"
 	grpc "google.golang.org/grpc"
-	grpc1 "github.com/gogo/protobuf/grpc" 
+	grpc1 "github.com/gogo/protobuf/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
 	io "io"
@@ -268,9 +268,9 @@ func (m *MsgWithdrawalResponse) GetAmountOut() string {
 }
 
 type MsgCreateLend struct {
-	Creator string `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
-	Amount  string `protobuf:"bytes,2,opt,name=amount,proto3" json:"amount,omitempty"`
-	PairId  string `protobuf:"bytes,3,opt,name=pairId,proto3" json:"pairId,omitempty"`
+	Borrower string `protobuf:"bytes,1,opt,name=borrower,proto3" json:"borrower,omitempty"`
+	AmountIn string `protobuf:"bytes,2,opt,name=amountIn,proto3" json:"amountIn,omitempty"`
+	DenomOut string `protobuf:"bytes,3,opt,name=denomOut,proto3" json:"denomOut,omitempty"`
 }
 
 func (m *MsgCreateLend) Reset()         { *m = MsgCreateLend{} }
@@ -306,28 +306,32 @@ func (m *MsgCreateLend) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgCreateLend proto.InternalMessageInfo
 
-func (m *MsgCreateLend) GetCreator() string {
+func (m *MsgCreateLend) GetBorrower() string {
 	if m != nil {
-		return m.Creator
+		return m.Borrower
 	}
 	return ""
 }
 
-func (m *MsgCreateLend) GetAmount() string {
+func (m *MsgCreateLend) GetAmountIn() string {
 	if m != nil {
-		return m.Amount
+		return m.AmountIn
 	}
 	return ""
 }
 
-func (m *MsgCreateLend) GetPairId() string {
+func (m *MsgCreateLend) GetDenomOut() string {
 	if m != nil {
-		return m.PairId
+		return m.DenomOut
 	}
 	return ""
 }
 
 type MsgCreateLendResponse struct {
+	Borrower  string `protobuf:"bytes,1,opt,name=borrower,proto3" json:"borrower,omitempty"`
+	AmountIn  string `protobuf:"bytes,2,opt,name=amountIn,proto3" json:"amountIn,omitempty"`
+	AmountOut string `protobuf:"bytes,3,opt,name=amountOut,proto3" json:"amountOut,omitempty"`
+	LoanId    string `protobuf:"bytes,4,opt,name=loanId,proto3" json:"loanId,omitempty"`
 }
 
 func (m *MsgCreateLendResponse) Reset()         { *m = MsgCreateLendResponse{} }
@@ -363,10 +367,38 @@ func (m *MsgCreateLendResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgCreateLendResponse proto.InternalMessageInfo
 
+func (m *MsgCreateLendResponse) GetBorrower() string {
+	if m != nil {
+		return m.Borrower
+	}
+	return ""
+}
+
+func (m *MsgCreateLendResponse) GetAmountIn() string {
+	if m != nil {
+		return m.AmountIn
+	}
+	return ""
+}
+
+func (m *MsgCreateLendResponse) GetAmountOut() string {
+	if m != nil {
+		return m.AmountOut
+	}
+	return ""
+}
+
+func (m *MsgCreateLendResponse) GetLoanId() string {
+	if m != nil {
+		return m.LoanId
+	}
+	return ""
+}
+
 type MsgDeleteLend struct {
-	Creator string `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
-	Amount  string `protobuf:"bytes,2,opt,name=amount,proto3" json:"amount,omitempty"`
-	PairId  string `protobuf:"bytes,3,opt,name=pairId,proto3" json:"pairId,omitempty"`
+	Borrower string `protobuf:"bytes,1,opt,name=borrower,proto3" json:"borrower,omitempty"`
+	AmountIn string `protobuf:"bytes,2,opt,name=amountIn,proto3" json:"amountIn,omitempty"`
+	DenomOut string `protobuf:"bytes,3,opt,name=denomOut,proto3" json:"denomOut,omitempty"`
 }
 
 func (m *MsgDeleteLend) Reset()         { *m = MsgDeleteLend{} }
@@ -402,28 +434,32 @@ func (m *MsgDeleteLend) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgDeleteLend proto.InternalMessageInfo
 
-func (m *MsgDeleteLend) GetCreator() string {
+func (m *MsgDeleteLend) GetBorrower() string {
 	if m != nil {
-		return m.Creator
+		return m.Borrower
 	}
 	return ""
 }
 
-func (m *MsgDeleteLend) GetAmount() string {
+func (m *MsgDeleteLend) GetAmountIn() string {
 	if m != nil {
-		return m.Amount
+		return m.AmountIn
 	}
 	return ""
 }
 
-func (m *MsgDeleteLend) GetPairId() string {
+func (m *MsgDeleteLend) GetDenomOut() string {
 	if m != nil {
-		return m.PairId
+		return m.DenomOut
 	}
 	return ""
 }
 
 type MsgDeleteLendResponse struct {
+	Borrower  string `protobuf:"bytes,1,opt,name=borrower,proto3" json:"borrower,omitempty"`
+	AmountIn  string `protobuf:"bytes,2,opt,name=amountIn,proto3" json:"amountIn,omitempty"`
+	AmountOut string `protobuf:"bytes,3,opt,name=amountOut,proto3" json:"amountOut,omitempty"`
+	LoanId    string `protobuf:"bytes,4,opt,name=loanId,proto3" json:"loanId,omitempty"`
 }
 
 func (m *MsgDeleteLendResponse) Reset()         { *m = MsgDeleteLendResponse{} }
@@ -459,6 +495,34 @@ func (m *MsgDeleteLendResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgDeleteLendResponse proto.InternalMessageInfo
 
+func (m *MsgDeleteLendResponse) GetBorrower() string {
+	if m != nil {
+		return m.Borrower
+	}
+	return ""
+}
+
+func (m *MsgDeleteLendResponse) GetAmountIn() string {
+	if m != nil {
+		return m.AmountIn
+	}
+	return ""
+}
+
+func (m *MsgDeleteLendResponse) GetAmountOut() string {
+	if m != nil {
+		return m.AmountOut
+	}
+	return ""
+}
+
+func (m *MsgDeleteLendResponse) GetLoanId() string {
+	if m != nil {
+		return m.LoanId
+	}
+	return ""
+}
+
 func init() {
 	proto.RegisterType((*MsgDeposit)(nil), "core.grow.v1beta1.MsgDeposit")
 	proto.RegisterType((*MsgDepositResponse)(nil), "core.grow.v1beta1.MsgDepositResponse")
@@ -473,31 +537,32 @@ func init() {
 func init() { proto.RegisterFile("core/grow/v1beta1/tx.proto", fileDescriptor_69edbfb1be74f513) }
 
 var fileDescriptor_69edbfb1be74f513 = []byte{
-	// 374 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xb4, 0x54, 0x4d, 0x4b, 0xc3, 0x40,
-	0x10, 0x6d, 0x5a, 0x68, 0xed, 0x80, 0x07, 0x03, 0x6a, 0x08, 0x1a, 0x4a, 0x40, 0xe8, 0x29, 0xa1,
-	0xfa, 0x0f, 0x6a, 0x2f, 0x05, 0x4b, 0xb1, 0x17, 0x3f, 0x0e, 0xc2, 0xb6, 0x19, 0xd2, 0x60, 0x9b,
-	0x0d, 0xbb, 0x1b, 0x5b, 0xff, 0x85, 0x3f, 0xcb, 0x63, 0x8f, 0x1e, 0xa5, 0xf5, 0x87, 0x48, 0xbe,
-	0xba, 0x91, 0x9a, 0x0a, 0x42, 0x6e, 0xfb, 0xf6, 0xcd, 0xbe, 0xc7, 0xdb, 0x19, 0x06, 0xf4, 0x09,
-	0x65, 0x68, 0xbb, 0x8c, 0x2e, 0xec, 0x97, 0xce, 0x18, 0x05, 0xe9, 0xd8, 0x62, 0x69, 0x05, 0x8c,
-	0x0a, 0xaa, 0x1e, 0x45, 0x9c, 0x15, 0x71, 0x56, 0xca, 0x99, 0x4f, 0x00, 0x03, 0xee, 0xf6, 0x30,
-	0xa0, 0xdc, 0x13, 0xaa, 0x06, 0x8d, 0x09, 0x43, 0x22, 0x28, 0xd3, 0x94, 0x96, 0xd2, 0x6e, 0x8e,
-	0x32, 0xa8, 0xea, 0x70, 0x40, 0xe6, 0x34, 0xf4, 0x45, 0xdf, 0xd7, 0xaa, 0x31, 0xb5, 0xc5, 0x11,
-	0xe7, 0xa0, 0x4f, 0xe7, 0xc3, 0x50, 0x68, 0xb5, 0x84, 0xcb, 0xb0, 0x39, 0x05, 0x55, 0xea, 0x8f,
-	0x90, 0x07, 0xd4, 0xe7, 0xf8, 0x4f, 0x9f, 0x33, 0x68, 0x26, 0x67, 0x69, 0x24, 0x2f, 0x4c, 0x02,
-	0x87, 0x03, 0xee, 0xde, 0x79, 0x62, 0xea, 0x30, 0xb2, 0x20, 0xb3, 0x12, 0xc2, 0x3c, 0xc3, 0xf1,
-	0x0f, 0x8b, 0x52, 0xf3, 0x3c, 0xc4, 0x79, 0xae, 0x23, 0x1d, 0xbc, 0x41, 0xdf, 0xd9, 0x63, 0x72,
-	0x02, 0xf5, 0xe4, 0x5d, 0x6a, 0x91, 0xa2, 0xe8, 0x3e, 0x20, 0x1e, 0xeb, 0x3b, 0xa9, 0x7a, 0x8a,
-	0xcc, 0xd3, 0x38, 0x87, 0x94, 0xce, 0x72, 0xa4, 0x9e, 0x3d, 0x9c, 0x61, 0x49, 0x9e, 0x52, 0x3a,
-	0xf3, 0xbc, 0xfc, 0xaa, 0x42, 0x6d, 0xc0, 0x5d, 0x75, 0x08, 0x8d, 0x6c, 0x0c, 0xcf, 0xad, 0x9d,
-	0x41, 0xb5, 0xe4, 0x14, 0xe9, 0x17, 0x7b, 0xe9, 0x6d, 0x53, 0xee, 0x01, 0x72, 0xd3, 0xd0, 0xfa,
-	0xfd, 0x91, 0xac, 0xd0, 0xdb, 0x7f, 0x55, 0xe4, 0x95, 0x73, 0x7d, 0x29, 0x50, 0x96, 0x15, 0x45,
-	0xca, 0xbb, 0x0d, 0x88, 0x94, 0x73, 0xbf, 0xdf, 0x2a, 0x0a, 0x9a, 0x55, 0x14, 0x29, 0xef, 0x7e,
-	0x73, 0xb7, 0xfb, 0xbe, 0x36, 0x94, 0xd5, 0xda, 0x50, 0x3e, 0xd7, 0x86, 0xf2, 0xb6, 0x31, 0x2a,
-	0xab, 0x8d, 0x51, 0xf9, 0xd8, 0x18, 0x95, 0xc7, 0xb6, 0xeb, 0x89, 0x69, 0x38, 0xb6, 0x26, 0x74,
-	0x6e, 0xdf, 0x86, 0xc4, 0x61, 0x44, 0xe0, 0x90, 0xb9, 0x76, 0xbc, 0x48, 0x96, 0xc9, 0x2a, 0x11,
-	0xaf, 0x01, 0xf2, 0x71, 0x3d, 0x5e, 0x23, 0x57, 0xdf, 0x01, 0x00, 0x00, 0xff, 0xff, 0x2c, 0x9f,
-	0x48, 0x73, 0x64, 0x04, 0x00, 0x00,
+	// 387 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xc4, 0x94, 0xc1, 0x6a, 0xc2, 0x40,
+	0x10, 0x86, 0x8d, 0x16, 0xad, 0x03, 0x3d, 0x34, 0xd0, 0x12, 0x42, 0x1b, 0x44, 0x28, 0x78, 0x4a,
+	0xb0, 0x7d, 0x03, 0xeb, 0x45, 0xa8, 0x48, 0xbd, 0x54, 0x7a, 0x28, 0x6c, 0x92, 0x21, 0x4a, 0x35,
+	0x1b, 0x76, 0x37, 0xd5, 0x3e, 0x40, 0xef, 0x7d, 0xac, 0x1e, 0x3d, 0xf6, 0x58, 0xb4, 0x0f, 0x52,
+	0x12, 0x4d, 0x36, 0x45, 0x63, 0x41, 0x90, 0xde, 0x1c, 0xff, 0xc9, 0xff, 0xf3, 0xb1, 0x33, 0x03,
+	0xba, 0x43, 0x19, 0x5a, 0x1e, 0xa3, 0x53, 0xeb, 0xa5, 0x69, 0xa3, 0x20, 0x4d, 0x4b, 0xcc, 0xcc,
+	0x80, 0x51, 0x41, 0xd5, 0xd3, 0x48, 0x33, 0x23, 0xcd, 0x5c, 0x6b, 0xf5, 0x27, 0x80, 0x2e, 0xf7,
+	0xda, 0x18, 0x50, 0x3e, 0x12, 0xaa, 0x06, 0x15, 0x87, 0x21, 0x11, 0x94, 0x69, 0x4a, 0x4d, 0x69,
+	0x54, 0xfb, 0x49, 0xa9, 0xea, 0x70, 0x4c, 0x26, 0x34, 0xf4, 0x45, 0xc7, 0xd7, 0x8a, 0xb1, 0x94,
+	0xd6, 0x91, 0xe6, 0xa2, 0x4f, 0x27, 0xbd, 0x50, 0x68, 0xa5, 0x95, 0x96, 0xd4, 0xf5, 0x21, 0xa8,
+	0xd2, 0xbf, 0x8f, 0x3c, 0xa0, 0x3e, 0xc7, 0x3d, 0x73, 0x2e, 0xa0, 0xba, 0xfa, 0x2d, 0x83, 0xe4,
+	0x1f, 0x75, 0x02, 0x27, 0x5d, 0xee, 0x3d, 0x8c, 0xc4, 0xd0, 0x65, 0x64, 0x4a, 0xc6, 0x07, 0x80,
+	0x79, 0x86, 0xb3, 0x5f, 0x11, 0x07, 0xe5, 0x71, 0x62, 0x9e, 0xdb, 0xc8, 0x07, 0xef, 0xd0, 0x77,
+	0x23, 0x2b, 0x9b, 0x32, 0x46, 0xa7, 0x98, 0xa4, 0xa4, 0xf5, 0xde, 0x44, 0x6f, 0x4a, 0x8c, 0x24,
+	0x53, 0x52, 0xa4, 0x7d, 0xd3, 0x76, 0x42, 0xa9, 0xe7, 0x50, 0x1e, 0x53, 0xe2, 0x77, 0x5c, 0xed,
+	0x28, 0x96, 0xd6, 0xd5, 0x1a, 0xb6, 0x8d, 0x63, 0x3c, 0x3c, 0xac, 0x4c, 0xf9, 0x1f, 0xd8, 0xeb,
+	0xef, 0x22, 0x94, 0xba, 0xdc, 0x53, 0x7b, 0x50, 0x49, 0x16, 0xef, 0xd2, 0xdc, 0x58, 0x4d, 0x53,
+	0xee, 0x8d, 0x7e, 0xb5, 0x53, 0x4e, 0x31, 0x06, 0x00, 0x99, 0xf9, 0xaf, 0x6d, 0xff, 0x48, 0x76,
+	0xe8, 0x8d, 0xbf, 0x3a, 0xb2, 0xce, 0x99, 0x49, 0xcc, 0x71, 0x96, 0x1d, 0x79, 0xce, 0x5b, 0xe6,
+	0x6c, 0x00, 0x90, 0x79, 0xf6, 0x5a, 0x1e, 0x68, 0xd2, 0x91, 0xe7, 0xbc, 0xf9, 0xa8, 0xad, 0xd6,
+	0xc7, 0xc2, 0x50, 0xe6, 0x0b, 0x43, 0xf9, 0x5a, 0x18, 0xca, 0xfb, 0xd2, 0x28, 0xcc, 0x97, 0x46,
+	0xe1, 0x73, 0x69, 0x14, 0x1e, 0x1b, 0xde, 0x48, 0x0c, 0x43, 0xdb, 0x74, 0xe8, 0xc4, 0xba, 0x0f,
+	0x89, 0xcb, 0x88, 0xc0, 0x1e, 0xf3, 0xac, 0xf8, 0x74, 0xce, 0x56, 0xc7, 0x53, 0xbc, 0x06, 0xc8,
+	0xed, 0x72, 0x7c, 0x38, 0x6f, 0x7e, 0x02, 0x00, 0x00, 0xff, 0xff, 0x08, 0x4b, 0x0b, 0x24, 0x56,
+	0x05, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -884,24 +949,24 @@ func (m *MsgCreateLend) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if len(m.PairId) > 0 {
-		i -= len(m.PairId)
-		copy(dAtA[i:], m.PairId)
-		i = encodeVarintTx(dAtA, i, uint64(len(m.PairId)))
+	if len(m.DenomOut) > 0 {
+		i -= len(m.DenomOut)
+		copy(dAtA[i:], m.DenomOut)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.DenomOut)))
 		i--
 		dAtA[i] = 0x1a
 	}
-	if len(m.Amount) > 0 {
-		i -= len(m.Amount)
-		copy(dAtA[i:], m.Amount)
-		i = encodeVarintTx(dAtA, i, uint64(len(m.Amount)))
+	if len(m.AmountIn) > 0 {
+		i -= len(m.AmountIn)
+		copy(dAtA[i:], m.AmountIn)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.AmountIn)))
 		i--
 		dAtA[i] = 0x12
 	}
-	if len(m.Creator) > 0 {
-		i -= len(m.Creator)
-		copy(dAtA[i:], m.Creator)
-		i = encodeVarintTx(dAtA, i, uint64(len(m.Creator)))
+	if len(m.Borrower) > 0 {
+		i -= len(m.Borrower)
+		copy(dAtA[i:], m.Borrower)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Borrower)))
 		i--
 		dAtA[i] = 0xa
 	}
@@ -928,6 +993,34 @@ func (m *MsgCreateLendResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
+	if len(m.LoanId) > 0 {
+		i -= len(m.LoanId)
+		copy(dAtA[i:], m.LoanId)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.LoanId)))
+		i--
+		dAtA[i] = 0x22
+	}
+	if len(m.AmountOut) > 0 {
+		i -= len(m.AmountOut)
+		copy(dAtA[i:], m.AmountOut)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.AmountOut)))
+		i--
+		dAtA[i] = 0x1a
+	}
+	if len(m.AmountIn) > 0 {
+		i -= len(m.AmountIn)
+		copy(dAtA[i:], m.AmountIn)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.AmountIn)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.Borrower) > 0 {
+		i -= len(m.Borrower)
+		copy(dAtA[i:], m.Borrower)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Borrower)))
+		i--
+		dAtA[i] = 0xa
+	}
 	return len(dAtA) - i, nil
 }
 
@@ -951,24 +1044,24 @@ func (m *MsgDeleteLend) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if len(m.PairId) > 0 {
-		i -= len(m.PairId)
-		copy(dAtA[i:], m.PairId)
-		i = encodeVarintTx(dAtA, i, uint64(len(m.PairId)))
+	if len(m.DenomOut) > 0 {
+		i -= len(m.DenomOut)
+		copy(dAtA[i:], m.DenomOut)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.DenomOut)))
 		i--
 		dAtA[i] = 0x1a
 	}
-	if len(m.Amount) > 0 {
-		i -= len(m.Amount)
-		copy(dAtA[i:], m.Amount)
-		i = encodeVarintTx(dAtA, i, uint64(len(m.Amount)))
+	if len(m.AmountIn) > 0 {
+		i -= len(m.AmountIn)
+		copy(dAtA[i:], m.AmountIn)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.AmountIn)))
 		i--
 		dAtA[i] = 0x12
 	}
-	if len(m.Creator) > 0 {
-		i -= len(m.Creator)
-		copy(dAtA[i:], m.Creator)
-		i = encodeVarintTx(dAtA, i, uint64(len(m.Creator)))
+	if len(m.Borrower) > 0 {
+		i -= len(m.Borrower)
+		copy(dAtA[i:], m.Borrower)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Borrower)))
 		i--
 		dAtA[i] = 0xa
 	}
@@ -995,6 +1088,34 @@ func (m *MsgDeleteLendResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
+	if len(m.LoanId) > 0 {
+		i -= len(m.LoanId)
+		copy(dAtA[i:], m.LoanId)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.LoanId)))
+		i--
+		dAtA[i] = 0x22
+	}
+	if len(m.AmountOut) > 0 {
+		i -= len(m.AmountOut)
+		copy(dAtA[i:], m.AmountOut)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.AmountOut)))
+		i--
+		dAtA[i] = 0x1a
+	}
+	if len(m.AmountIn) > 0 {
+		i -= len(m.AmountIn)
+		copy(dAtA[i:], m.AmountIn)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.AmountIn)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.Borrower) > 0 {
+		i -= len(m.Borrower)
+		copy(dAtA[i:], m.Borrower)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Borrower)))
+		i--
+		dAtA[i] = 0xa
+	}
 	return len(dAtA) - i, nil
 }
 
@@ -1099,15 +1220,15 @@ func (m *MsgCreateLend) Size() (n int) {
 	}
 	var l int
 	_ = l
-	l = len(m.Creator)
+	l = len(m.Borrower)
 	if l > 0 {
 		n += 1 + l + sovTx(uint64(l))
 	}
-	l = len(m.Amount)
+	l = len(m.AmountIn)
 	if l > 0 {
 		n += 1 + l + sovTx(uint64(l))
 	}
-	l = len(m.PairId)
+	l = len(m.DenomOut)
 	if l > 0 {
 		n += 1 + l + sovTx(uint64(l))
 	}
@@ -1120,6 +1241,22 @@ func (m *MsgCreateLendResponse) Size() (n int) {
 	}
 	var l int
 	_ = l
+	l = len(m.Borrower)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.AmountIn)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.AmountOut)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.LoanId)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
 	return n
 }
 
@@ -1129,15 +1266,15 @@ func (m *MsgDeleteLend) Size() (n int) {
 	}
 	var l int
 	_ = l
-	l = len(m.Creator)
+	l = len(m.Borrower)
 	if l > 0 {
 		n += 1 + l + sovTx(uint64(l))
 	}
-	l = len(m.Amount)
+	l = len(m.AmountIn)
 	if l > 0 {
 		n += 1 + l + sovTx(uint64(l))
 	}
-	l = len(m.PairId)
+	l = len(m.DenomOut)
 	if l > 0 {
 		n += 1 + l + sovTx(uint64(l))
 	}
@@ -1150,6 +1287,22 @@ func (m *MsgDeleteLendResponse) Size() (n int) {
 	}
 	var l int
 	_ = l
+	l = len(m.Borrower)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.AmountIn)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.AmountOut)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.LoanId)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
 	return n
 }
 
@@ -1774,7 +1927,7 @@ func (m *MsgCreateLend) Unmarshal(dAtA []byte) error {
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Creator", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Borrower", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -1802,11 +1955,11 @@ func (m *MsgCreateLend) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Creator = string(dAtA[iNdEx:postIndex])
+			m.Borrower = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Amount", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field AmountIn", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -1834,11 +1987,11 @@ func (m *MsgCreateLend) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Amount = string(dAtA[iNdEx:postIndex])
+			m.AmountIn = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 3:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field PairId", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field DenomOut", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -1866,7 +2019,7 @@ func (m *MsgCreateLend) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.PairId = string(dAtA[iNdEx:postIndex])
+			m.DenomOut = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
@@ -1918,6 +2071,134 @@ func (m *MsgCreateLendResponse) Unmarshal(dAtA []byte) error {
 			return fmt.Errorf("proto: MsgCreateLendResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Borrower", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Borrower = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field AmountIn", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.AmountIn = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field AmountOut", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.AmountOut = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field LoanId", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.LoanId = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipTx(dAtA[iNdEx:])
@@ -1970,7 +2251,7 @@ func (m *MsgDeleteLend) Unmarshal(dAtA []byte) error {
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Creator", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Borrower", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -1998,11 +2279,11 @@ func (m *MsgDeleteLend) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Creator = string(dAtA[iNdEx:postIndex])
+			m.Borrower = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Amount", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field AmountIn", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -2030,11 +2311,11 @@ func (m *MsgDeleteLend) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Amount = string(dAtA[iNdEx:postIndex])
+			m.AmountIn = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 3:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field PairId", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field DenomOut", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -2062,7 +2343,7 @@ func (m *MsgDeleteLend) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.PairId = string(dAtA[iNdEx:postIndex])
+			m.DenomOut = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
@@ -2114,6 +2395,134 @@ func (m *MsgDeleteLendResponse) Unmarshal(dAtA []byte) error {
 			return fmt.Errorf("proto: MsgDeleteLendResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Borrower", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Borrower = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field AmountIn", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.AmountIn = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field AmountOut", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.AmountOut = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field LoanId", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.LoanId = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipTx(dAtA[iNdEx:])

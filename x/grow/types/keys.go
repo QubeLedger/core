@@ -19,8 +19,10 @@ func KeyPrefix(p string) []byte {
 }
 
 const (
-	LoanKey      = "Loan/value/"
-	LoanCountKey = "Loan/count/"
-	PairKey      = "Pair/value/"
-	PairCountKey = "Pair/count/"
+	LoanKey             = "Loan/value/"
+	LoanCountKey        = "Loan/count/"
+	PairKey             = "Pair/value/"
+	PairCountKey        = "Pair/count/"
+	BorrowAssetKey      = "BorrowAsset/value/"
+	BorrowAssetCountKey = "BorrowAsset/count/"
 )

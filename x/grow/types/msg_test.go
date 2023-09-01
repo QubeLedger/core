@@ -18,13 +18,13 @@ func TestMsgCreateLend_ValidateBasic(t *testing.T) {
 		{
 			name: "invalid address",
 			msg: types.MsgCreateLend{
-				Creator: "invalid_address",
+				Borrower: "invalid_address",
 			},
 			err: sdkerrors.ErrInvalidAddress,
 		}, {
 			name: "valid address",
 			msg: types.MsgCreateLend{
-				Creator: apptesting.CreateRandomAccounts(1)[0].String(),
+				Borrower: apptesting.CreateRandomAccounts(1)[0].String(),
 			},
 		},
 	}
@@ -49,13 +49,13 @@ func TestMsgDeleteLend_ValidateBasic(t *testing.T) {
 		{
 			name: "invalid address",
 			msg: types.MsgDeleteLend{
-				Creator: "invalid_address",
+				Borrower: "invalid_address",
 			},
 			err: sdkerrors.ErrInvalidAddress,
 		}, {
 			name: "valid address",
 			msg: types.MsgDeleteLend{
-				Creator: apptesting.CreateRandomAccounts(1)[0].String(),
+				Borrower: apptesting.CreateRandomAccounts(1)[0].String(),
 			},
 		},
 	}
