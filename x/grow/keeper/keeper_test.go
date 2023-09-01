@@ -131,6 +131,35 @@ func (s *GrowKeeperTestSuite) GetNormalGTokenPair(id uint64) types.GTokenPair {
 	return pair
 }
 
+func (s *GrowKeeperTestSuite) GetNormalBorrowAsset(id uint64) types.BorrowAsset {
+	ba := types.BorrowAsset{
+		Id:            id,
+		BorrowAssetId: fmt.Sprintf("%x", crypto.Sha256(append([]byte("uosmo"+"uusd")))),
+		AmountInAssetMetadata: banktypes.Metadata{
+			Description: "",
+			DenomUnits: []*banktypes.DenomUnit{
+				{Denom: "uosmo", Exponent: uint32(0), Aliases: []string{"microosmo"}},
+			},
+			Base:    "uosmo",
+			Display: "osmo",
+			Name:    "OSMO",
+			Symbol:  "OSMO",
+		},
+		AmountOutAssetMetadata: banktypes.Metadata{
+			Description: "",
+			DenomUnits: []*banktypes.DenomUnit{
+				{Denom: "uusd", Exponent: uint32(0), Aliases: []string{"microusd"}},
+			},
+			Base:    "uusd",
+			Display: "usd",
+			Name:    "USQ",
+			Symbol:  "USQ",
+		},
+		OracleAssetId: "OSMO",
+	}
+	return ba
+}
+
 func (s *GrowKeeperTestSuite) AddTestCoins(amount int64, denom string) {
 	s.app.BankKeeper.MintCoins(s.ctx, types.ModuleName, sdk.NewCoins(sdk.NewCoin(denom, sdk.NewInt(amount))))
 	s.app.BankKeeper.SendCoinsFromModuleToAccount(s.ctx, types.ModuleName, s.Address, sdk.NewCoins(sdk.NewCoin(denom, sdk.NewInt(amount))))
@@ -231,11 +260,16 @@ func (s *GrowKeeperTestSuite) OracleAggregateExchangeRateFromNet() {
 	s.Require().NoError(err)
 }
 
-func (s *GrowKeeperTestSuite) SetupOracleKeeper() {
+func (s *GrowKeeperTestSuite) OracleAggregateExchangeRateFromInput(price string, denom string) {
+	err := s.PrevoteVotePrice(price + denom)
+	s.Require().NoError(err)
+}
+
+func (s *GrowKeeperTestSuite) SetupOracleKeeper(denom string) {
 	params := s.app.OracleKeeper.GetParams(s.ctx)
 	params.Whitelist = oracletypes.DenomList{
 		{
-			Name: "uatom",
+			Name: denom,
 		},
 	}
 	params.VotePeriod = 1

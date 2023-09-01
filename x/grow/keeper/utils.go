@@ -49,6 +49,9 @@ func (k Keeper) CheckWithdrawalAmount(msgAmountIn string, pair types.GTokenPair)
 	return nil
 }
 
+/*
+Lend Helpers
+*/
 func (k Keeper) CheckOracleAssetId(ctx sdk.Context, borrowAsset types.BorrowAsset) error {
 	denomList := k.oracleKeeper.Whitelist(ctx)
 	for _, dl := range denomList {

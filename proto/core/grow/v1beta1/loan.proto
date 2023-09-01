@@ -9,7 +9,7 @@ message Loan {
   string loanId = 2;
   string amount = 3; 
   string borrower = 4; 
-  string startTime = 5; 
+  uint64 startTime = 5; 
   string oracleTicker = 6; 
   string amountOut = 7;
   bool   liquidation = 8;

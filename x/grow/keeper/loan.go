@@ -2,10 +2,12 @@ package keeper
 
 import (
 	"encoding/binary"
+	"fmt"
 
 	"github.com/QuadrateOrg/core/x/grow/types"
 	"github.com/cosmos/cosmos-sdk/store/prefix"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/tendermint/tendermint/crypto"
 )
 
 // GetLoanCount get the total number of loan
@@ -103,4 +105,19 @@ func GetLoanIDBytes(id uint64) []byte {
 // GetLoanIDFromBytes returns ID in uint64 format from a byte array
 func GetLoanIDFromBytes(bz []byte) uint64 {
 	return binary.BigEndian.Uint64(bz)
+}
+
+//nolint:all
+func (k Keeper) GenerateLoadIdHash(denom1 string, denom2 string, amount string, borrower string, time string) string {
+	return fmt.Sprintf("%x", crypto.Sha256(append([]byte(denom1))))
+}
+
+func (k Keeper) GetLoadByLoadId(ctx sdk.Context, loadId string) (val types.Loan, found bool) {
+	allLoan := k.GetAllLoan(ctx)
+	for _, v := range allLoan {
+		if v.LoanId == loadId {
+			return v, true
+		}
+	}
+	return val, false
 }

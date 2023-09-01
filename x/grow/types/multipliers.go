@@ -5,5 +5,5 @@ import (
 )
 
 var (
-	Multiplier sdk.Int = sdk.NewInt(1000000)
+	Multiplier sdk.Int = sdk.NewInt(10000)
 )

@@ -7,6 +7,9 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
+/*
+Deposit Helpers
+*/
 func (k Keeper) CalculateGTokenAmountOut(amount sdk.Int, price sdk.Int) sdk.Int {
 	return ((amount.Mul(types.Multiplier)).Quo(price))
 }
@@ -22,4 +25,16 @@ func (k Keeper) CalculateGTokenAPY(lastAmount sdk.Int, growRate sdk.Int, day sdk
 
 	res := float64(lastAmountInt) * (math.Pow((1 + (float64(growRateInt)/1000)/365), (float64(dayInt) - 1)))
 	return sdk.NewInt(int64(res))
+}
+
+/*
+Lend Helpers
+*/
+
+func (k Keeper) CalculateCreateLendAmountOut(amount sdk.Int, price sdk.Int) sdk.Int {
+	return ((amount.Mul(price)).Quo(types.Multiplier))
+}
+
+func (k Keeper) CalculateDeleteLendAmountOut(amount sdk.Int, price sdk.Int) sdk.Int {
+	return ((amount.Mul(types.Multiplier)).Quo(price))
 }
