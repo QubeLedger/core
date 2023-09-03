@@ -7,12 +7,8 @@ option go_package = "github.com/QuadrateOrg/core/x/grow/types";
 message Loan {
   uint64 id = 1;
   string loanId = 2;
-  string amount = 3; 
-  string borrower = 4; 
-  uint64 startTime = 5; 
-  string oracleTicker = 6; 
-  string amountOut = 7;
-  bool   liquidation = 8;
-  string liquidator = 9; 
-  uint64 hf = 10;
+  string borrower = 3; 
+  string amountOut = 5;
+  uint64 startTime = 6; 
+  string oracleTicker = 7; 
 }

@@ -38,3 +38,37 @@ func (k Keeper) CalculateCreateLendAmountOut(amount sdk.Int, price sdk.Int) sdk.
 func (k Keeper) CalculateDeleteLendAmountOut(amount sdk.Int, price sdk.Int) sdk.Int {
 	return ((amount.Mul(types.Multiplier)).Quo(price))
 }
+
+func (k Keeper) CalculateNeedAmountToGet(borrow_amount sdk.Int, borrow_time sdk.Int) sdk.Int {
+	return (borrow_amount.Add(((borrow_amount.MulRaw(15).Mul(borrow_time)).QuoRaw(100)).QuoRaw(31536000)))
+}
+
+/*
+RR Logic
+*/
+
+func (k Keeper) CalculateRiskRate(collateral sdk.Int, price sdk.Int, borrow sdk.Int) (sdk.Int, error) {
+	amtCollateral := (collateral.Mul(price)).QuoRaw(10000)
+	riskRatio := uint64((float64((borrow.Quo(amtCollateral)).Int64()) * float64(1/60)) * 10000)
+	return sdk.NewIntFromUint64(riskRatio), nil
+}
+
+func (k Keeper) CheckRiskRate(collateral sdk.Int, price sdk.Int, borrow sdk.Int, desiredAmount sdk.Int) error {
+	rr, err := k.CalculateRiskRate(collateral, price, borrow)
+	if err != nil {
+		return err
+	}
+	if rr.GT(sdk.NewInt(95)) {
+		return types.ErrRiskRateIsGreaterThenShouldBe
+	}
+
+	rr, err = k.CalculateRiskRate(collateral, price, borrow.Add(desiredAmount))
+	if err != nil {
+		return err
+	}
+
+	if rr.GT(sdk.NewInt(95)) {
+		return types.ErrRiskRateIsGreaterThenShouldBe
+	}
+	return nil
+}

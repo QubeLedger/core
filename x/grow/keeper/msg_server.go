@@ -79,21 +79,93 @@ func (k Keeper) Withdrawal(goCtx context.Context, msg *types.MsgWithdrawal) (*ty
 	}, nil
 }
 
-func (k Keeper) CreateLend(goCtx context.Context, msg *types.MsgCreateLend) (*types.MsgCreateLendResponse, error) {
+func (k Keeper) DepositCollateral(goCtx context.Context, msg *types.MsgDepositCollateral) (*types.MsgDepositCollateralResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	borrowAssetId, err := k.GetBorrowAssetIdCreateLend(msg.AmountIn, msg.DenomOut)
-	borrowAsset, found := k.GetBorrowAssetByBorrowAssetId(ctx, borrowAssetId)
+	LendAssetId, err := k.GetLendAssetIdByCoins(msg.AmountIn)
+	if err != nil {
+		return nil, err
+	}
+	LendAsset, found := k.GetLendAssetByLendAssetId(ctx, LendAssetId)
 	if !found {
 		return nil, types.ErrPairNotFound
 	}
 
-	err = k.CheckOracleAssetId(ctx, borrowAsset)
+	err = k.CheckOracleAssetId(ctx, LendAsset)
 	if err != nil {
 		return nil, err
 	}
 
-	err, amountOut, loanId := k.ExecuteLend(ctx, msg, borrowAsset)
+	err, depositId := k.ExecuteDepositCollateral(ctx, msg, LendAsset)
+	if err != nil {
+		return nil, err
+	}
+
+	ctx.EventManager().EmitEvents(sdk.Events{
+		sdk.NewEvent(
+			sdk.EventTypeMessage,
+			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
+			sdk.NewAttribute(sdk.AttributeKeySender, msg.Depositor),
+			sdk.NewAttribute(sdk.AttributeKeyAction, types.AttributeKeyActionDepositColletaral),
+		),
+	})
+	return &types.MsgDepositCollateralResponse{
+		Depositor:  msg.Depositor,
+		PositionId: depositId,
+	}, nil
+}
+
+func (k Keeper) WithdrawalCollateral(goCtx context.Context, msg *types.MsgWithdrawalCollateral) (*types.MsgWithdrawalCollateralResponse, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	LendAssetId, err := k.GetLendAssetIdByDenom(msg.Denom)
+	if err != nil {
+		return nil, err
+	}
+	LendAsset, found := k.GetLendAssetByLendAssetId(ctx, LendAssetId)
+	if !found {
+		return nil, types.ErrPairNotFound
+	}
+
+	err = k.CheckOracleAssetId(ctx, LendAsset)
+	if err != nil {
+		return nil, err
+	}
+
+	err, amountOut := k.ExecuteWithdrawalCollateral(ctx, msg, LendAsset)
+	if err != nil {
+		return nil, err
+	}
+
+	ctx.EventManager().EmitEvents(sdk.Events{
+		sdk.NewEvent(
+			sdk.EventTypeMessage,
+			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
+			sdk.NewAttribute(sdk.AttributeKeySender, msg.Depositor),
+			sdk.NewAttribute(sdk.AttributeKeyAction, types.AttributeKeyActionWithdrawalColletaral),
+		),
+	})
+	return &types.MsgWithdrawalCollateralResponse{
+		Depositor: msg.Depositor,
+		AmountOut: amountOut.String(),
+	}, nil
+}
+
+func (k Keeper) CreateLend(goCtx context.Context, msg *types.MsgCreateLend) (*types.MsgCreateLendResponse, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	LendAssetId, err := k.GetLendAssetIdByDenom(msg.DenomIn)
+	LendAsset, found := k.GetLendAssetByLendAssetId(ctx, LendAssetId)
+	if !found {
+		return nil, types.ErrPairNotFound
+	}
+
+	err = k.CheckOracleAssetId(ctx, LendAsset)
+	if err != nil {
+		return nil, err
+	}
+
+	err, amountOut, loanId := k.ExecuteLend(ctx, msg, LendAsset)
 	if err != nil {
 		return nil, err
 	}
@@ -109,7 +181,7 @@ func (k Keeper) CreateLend(goCtx context.Context, msg *types.MsgCreateLend) (*ty
 
 	return &types.MsgCreateLendResponse{
 		Borrower:  msg.Borrower,
-		AmountIn:  msg.AmountIn,
+		DenomIn:   msg.DenomIn,
 		AmountOut: amountOut.String(),
 		LoanId:    loanId,
 	}, nil
@@ -118,18 +190,18 @@ func (k Keeper) CreateLend(goCtx context.Context, msg *types.MsgCreateLend) (*ty
 func (k Keeper) DeleteLend(goCtx context.Context, msg *types.MsgDeleteLend) (*types.MsgDeleteLendResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	borrowAssetId, err := k.GetBorrowAssetIdDeleteLend(msg.AmountIn, msg.DenomOut)
-	borrowAsset, found := k.GetBorrowAssetByBorrowAssetId(ctx, borrowAssetId)
+	LendAssetId, err := k.GetLendAssetIdByDenom(msg.DenomOut)
+	LendAsset, found := k.GetLendAssetByLendAssetId(ctx, LendAssetId)
 	if !found {
 		return nil, types.ErrPairNotFound
 	}
 
-	err = k.CheckOracleAssetId(ctx, borrowAsset)
+	err = k.CheckOracleAssetId(ctx, LendAsset)
 	if err != nil {
 		return nil, err
 	}
 
-	err, amountOut, loanId := k.ExecuteDeleteLend(ctx, msg, borrowAsset)
+	err, loanId := k.ExecuteDeleteLend(ctx, msg, LendAsset)
 	if err != nil {
 		return nil, err
 	}
@@ -144,9 +216,33 @@ func (k Keeper) DeleteLend(goCtx context.Context, msg *types.MsgDeleteLend) (*ty
 	})
 
 	return &types.MsgDeleteLendResponse{
-		Borrower:  msg.Borrower,
-		AmountIn:  msg.AmountIn,
-		AmountOut: amountOut.String(),
-		LoanId:    loanId,
+		Borrower: msg.Borrower,
+		LoanId:   loanId,
 	}, nil
+}
+
+func (k Keeper) CreateLiquidationPosition(goCtx context.Context, msg *types.MsgCreateLiquidationPosition) (*types.MsgCreateLiquidationPositionResponse, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+	ctx.EventManager().EmitEvents(sdk.Events{
+		sdk.NewEvent(
+			sdk.EventTypeMessage,
+			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
+			sdk.NewAttribute(sdk.AttributeKeySender, msg.Creator),
+			sdk.NewAttribute(sdk.AttributeKeyAction, types.AttributeKeyActionCreateLiqPosition),
+		),
+	})
+	return &types.MsgCreateLiquidationPositionResponse{}, nil
+}
+
+func (k Keeper) CloseLiquidationPosition(goCtx context.Context, msg *types.MsgCloseLiquidationPosition) (*types.MsgCloseLiquidationPositionResponse, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+	ctx.EventManager().EmitEvents(sdk.Events{
+		sdk.NewEvent(
+			sdk.EventTypeMessage,
+			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
+			sdk.NewAttribute(sdk.AttributeKeySender, msg.Creator),
+			sdk.NewAttribute(sdk.AttributeKeyAction, types.AttributeKeyActionCloseLiqPosition),
+		),
+	})
+	return &types.MsgCloseLiquidationPositionResponse{}, nil
 }

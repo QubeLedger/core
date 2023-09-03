@@ -6,11 +6,20 @@ option go_package = "github.com/QuadrateOrg/core/x/grow/types";
 
 // Msg defines the Msg service.
 service Msg {
-  rpc Deposit    (MsgDeposit   ) returns (MsgDepositResponse   );
+  rpc Deposit    (MsgDeposit) returns (MsgDepositResponse);
   rpc Withdrawal (MsgWithdrawal) returns (MsgWithdrawalResponse);
+
+  rpc DepositCollateral (MsgDepositCollateral) returns (MsgDepositCollateralResponse);
+  rpc WithdrawalCollateral (MsgWithdrawalCollateral) returns (MsgWithdrawalCollateralResponse);
+
   rpc CreateLend (MsgCreateLend) returns (MsgCreateLendResponse);
   rpc DeleteLend (MsgDeleteLend) returns (MsgDeleteLendResponse);
+
+  rpc CreateLiquidationPosition (MsgCreateLiquidationPosition) returns (MsgCreateLiquidationPositionResponse);
+  rpc CloseLiquidationPosition (MsgCloseLiquidationPosition) returns (MsgCloseLiquidationPositionResponse);
 }
+
+// Grow Logic
 message MsgDeposit {
   string creator = 1;
   string amountIn = 2;
@@ -34,16 +43,20 @@ message MsgWithdrawalResponse {
   string amountIn = 2;
   string amountOut = 3;
 }
+//
+
+// Lend Logic
 
 message MsgCreateLend {
   string borrower = 1;
-  string amountIn  = 2;
-  string denomOut = 3;
+  string denomIn  = 2;
+  string desiredAmount = 3;
+  // string denomOut = 4;
 }
 
 message MsgCreateLendResponse {
   string borrower = 1;
-  string amountIn = 2;
+  string denomIn = 2;
   string amountOut = 3;
   string loanId = 4;
 }
@@ -51,13 +64,54 @@ message MsgCreateLendResponse {
 message MsgDeleteLend {
   string borrower = 1;
   string amountIn  = 2;
-  string denomOut = 3;
+  string LoanId = 3;
+  string denomOut = 4;
 }
 
 message MsgDeleteLendResponse {
   string borrower = 1;
-  string amountIn = 2;
-  string amountOut = 3;
-  string loanId = 4;
+  string amountOut = 2;
+  string LoanId = 3;
 }
 
+message MsgDepositCollateral {
+  string depositor = 1;
+  string amountIn = 2;
+}
+
+message MsgDepositCollateralResponse  {
+  string depositor = 1;
+  string positionId = 2;
+}
+
+message MsgWithdrawalCollateral {
+  string depositor = 1;
+  string denom = 2;
+}
+
+message MsgWithdrawalCollateralResponse {
+  string depositor = 1;
+  string amountOut = 2;
+}
+
+message MsgCreateLiquidationPosition {
+  string creator = 1;
+  string amountIn = 2;
+  string denomOut = 3;
+  string premium = 4;
+}
+
+message MsgCreateLiquidationPositionResponse  {
+  string creator = 1;
+  string liquidatorPositionId = 2;
+}
+
+message MsgCloseLiquidationPosition {
+  string creator = 1;
+  string liquidatorPositionId = 2;
+}
+
+message MsgCloseLiquidationPositionResponse  {
+  string creator = 1;
+  string liquidatorPositionId = 2;
+}

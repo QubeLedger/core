@@ -6,6 +6,13 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
+func CheckCoinsLen(coins sdk.Coins, amt int) error {
+	if coins.Len() != amt {
+		return types.ErrCoinsLen
+	}
+	return nil
+}
+
 /*
 Deposit Helpers
 */
@@ -52,10 +59,10 @@ func (k Keeper) CheckWithdrawalAmount(msgAmountIn string, pair types.GTokenPair)
 /*
 Lend Helpers
 */
-func (k Keeper) CheckOracleAssetId(ctx sdk.Context, borrowAsset types.BorrowAsset) error {
+func (k Keeper) CheckOracleAssetId(ctx sdk.Context, LendAsset types.LendAsset) error {
 	denomList := k.oracleKeeper.Whitelist(ctx)
 	for _, dl := range denomList {
-		if dl.Name == borrowAsset.OracleAssetId {
+		if dl.Name == LendAsset.OracleAssetId {
 			return nil
 		}
 	}

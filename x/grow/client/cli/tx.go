@@ -44,12 +44,12 @@ func GetTxCmd() *cobra.Command {
 
 func CmdCreateLend() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "create-lend [amount] [pair-id]",
+		Use:   "create-lend [amount] [denom-out]",
 		Short: "Broadcast message create-lend",
 		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			argAmount := args[0]
-			argPairId := args[1]
+			argDenomOut := args[1]
 
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
@@ -59,7 +59,7 @@ func CmdCreateLend() *cobra.Command {
 			msg := types.NewMsgCreateLend(
 				clientCtx.GetFromAddress().String(),
 				argAmount,
-				argPairId,
+				argDenomOut,
 			)
 			if err := msg.ValidateBasic(); err != nil {
 				return err
@@ -75,12 +75,12 @@ func CmdCreateLend() *cobra.Command {
 
 func CmdDeleteLend() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "delete-lend [amount] [pair-id]",
+		Use:   "delete-lend [amount] [loan-id] [denom-out]",
 		Short: "Broadcast message delete-lend",
 		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			argAmount := args[0]
-			argPairId := args[1]
+			argLoanId := args[1]
 
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
@@ -90,7 +90,8 @@ func CmdDeleteLend() *cobra.Command {
 			msg := types.NewMsgDeleteLend(
 				clientCtx.GetFromAddress().String(),
 				argAmount,
-				argPairId,
+				argLoanId,
+				args[2],
 			)
 			if err := msg.ValidateBasic(); err != nil {
 				return err
@@ -106,12 +107,12 @@ func CmdDeleteLend() *cobra.Command {
 
 func CmdDeposit() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "deposit [amount] [pair-id]",
+		Use:   "deposit [amountIn] [denomOut]",
 		Short: "Broadcast message deposit",
 		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
-			argAmount := args[0]
-			argPairId := args[1]
+			argAmountIn := args[0]
+			argAmountOut := args[1]
 
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
@@ -120,8 +121,8 @@ func CmdDeposit() *cobra.Command {
 
 			msg := types.NewMsgDeposit(
 				clientCtx.GetFromAddress().String(),
-				argAmount,
-				argPairId,
+				argAmountIn,
+				argAmountOut,
 			)
 			if err := msg.ValidateBasic(); err != nil {
 				return err
@@ -137,12 +138,12 @@ func CmdDeposit() *cobra.Command {
 
 func CmdWithdrawal() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "withdrawal [amount] [pair-id]",
+		Use:   "withdrawal [amountIn] [denomOut]",
 		Short: "Broadcast message withdrawal",
 		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
-			argAmount := args[0]
-			argPairId := args[1]
+			argAmountIn := args[0]
+			argAmountOut := args[1]
 
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
@@ -151,8 +152,124 @@ func CmdWithdrawal() *cobra.Command {
 
 			msg := types.NewMsgWithdrawal(
 				clientCtx.GetFromAddress().String(),
-				argAmount,
-				argPairId,
+				argAmountIn,
+				argAmountOut,
+			)
+			if err := msg.ValidateBasic(); err != nil {
+				return err
+			}
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
+		},
+	}
+
+	flags.AddTxFlagsToCmd(cmd)
+
+	return cmd
+}
+
+func CmdDepositCollateral() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "deposit-collateral [amountIn]",
+		Short: "Broadcast message deposit collateral",
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) (err error) {
+			argAmountIn := args[0]
+
+			clientCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
+
+			msg := types.NewMsgDepositCollateral(
+				clientCtx.GetFromAddress().String(),
+				argAmountIn,
+			)
+			if err := msg.ValidateBasic(); err != nil {
+				return err
+			}
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
+		},
+	}
+
+	flags.AddTxFlagsToCmd(cmd)
+
+	return cmd
+}
+
+func CmdWithdrawalCollateral() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "withdrawal-collateral [denom]",
+		Short: "Broadcast message withdrawal collateral",
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) (err error) {
+			argDenom := args[0]
+
+			clientCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
+
+			msg := types.NewMsgWithdrawalCollateral(
+				clientCtx.GetFromAddress().String(),
+				argDenom,
+			)
+			if err := msg.ValidateBasic(); err != nil {
+				return err
+			}
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
+		},
+	}
+
+	flags.AddTxFlagsToCmd(cmd)
+
+	return cmd
+}
+
+func CmdCreateLiqPosition() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "create-liquidation-position [amountIn] [denom] [premium]",
+		Short: "Broadcast message create liquidation position ",
+		Args:  cobra.ExactArgs(3),
+		RunE: func(cmd *cobra.Command, args []string) (err error) {
+
+			clientCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
+
+			msg := types.NewMsgCreateLiquidationPosition(
+				clientCtx.GetFromAddress().String(),
+				args[0],
+				args[1],
+				args[2],
+			)
+			if err := msg.ValidateBasic(); err != nil {
+				return err
+			}
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
+		},
+	}
+
+	flags.AddTxFlagsToCmd(cmd)
+
+	return cmd
+}
+
+func CmdCloseLiqPosition() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "close-liquidation-position [liquidatorPositionId]",
+		Short: "Broadcast message close liquidation position ",
+		Args:  cobra.ExactArgs(3),
+		RunE: func(cmd *cobra.Command, args []string) (err error) {
+
+			clientCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
+
+			msg := types.NewMsgCloseLiquidationPosition(
+				clientCtx.GetFromAddress().String(),
+				args[0],
 			)
 			if err := msg.ValidateBasic(); err != nil {
 				return err

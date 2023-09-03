@@ -36,4 +36,5 @@ type OracleKeeper interface {
 
 type StableKeeper interface {
 	GetPairByPairID(ctx sdk.Context, pairId string) (val stabletypes.Pair, found bool)
+	GetBurningFundAddress(ctx sdk.Context) sdk.AccAddress
 }

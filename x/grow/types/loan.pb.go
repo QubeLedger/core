@@ -26,14 +26,10 @@ const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 type Loan struct {
 	Id           uint64 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
 	LoanId       string `protobuf:"bytes,2,opt,name=loanId,proto3" json:"loanId,omitempty"`
-	Amount       string `protobuf:"bytes,3,opt,name=amount,proto3" json:"amount,omitempty"`
-	Borrower     string `protobuf:"bytes,4,opt,name=borrower,proto3" json:"borrower,omitempty"`
-	StartTime    uint64 `protobuf:"varint,5,opt,name=startTime,proto3" json:"startTime,omitempty"`
-	OracleTicker string `protobuf:"bytes,6,opt,name=oracleTicker,proto3" json:"oracleTicker,omitempty"`
-	AmountOut    string `protobuf:"bytes,7,opt,name=amountOut,proto3" json:"amountOut,omitempty"`
-	Liquidation  bool   `protobuf:"varint,8,opt,name=liquidation,proto3" json:"liquidation,omitempty"`
-	Liquidator   string `protobuf:"bytes,9,opt,name=liquidator,proto3" json:"liquidator,omitempty"`
-	Hf           uint64 `protobuf:"varint,10,opt,name=hf,proto3" json:"hf,omitempty"`
+	Borrower     string `protobuf:"bytes,3,opt,name=borrower,proto3" json:"borrower,omitempty"`
+	AmountOut    string `protobuf:"bytes,5,opt,name=amountOut,proto3" json:"amountOut,omitempty"`
+	StartTime    uint64 `protobuf:"varint,6,opt,name=startTime,proto3" json:"startTime,omitempty"`
+	OracleTicker string `protobuf:"bytes,7,opt,name=oracleTicker,proto3" json:"oracleTicker,omitempty"`
 }
 
 func (m *Loan) Reset()         { *m = Loan{} }
@@ -83,16 +79,16 @@ func (m *Loan) GetLoanId() string {
 	return ""
 }
 
-func (m *Loan) GetAmount() string {
+func (m *Loan) GetBorrower() string {
 	if m != nil {
-		return m.Amount
+		return m.Borrower
 	}
 	return ""
 }
 
-func (m *Loan) GetBorrower() string {
+func (m *Loan) GetAmountOut() string {
 	if m != nil {
-		return m.Borrower
+		return m.AmountOut
 	}
 	return ""
 }
@@ -111,34 +107,6 @@ func (m *Loan) GetOracleTicker() string {
 	return ""
 }
 
-func (m *Loan) GetAmountOut() string {
-	if m != nil {
-		return m.AmountOut
-	}
-	return ""
-}
-
-func (m *Loan) GetLiquidation() bool {
-	if m != nil {
-		return m.Liquidation
-	}
-	return false
-}
-
-func (m *Loan) GetLiquidator() string {
-	if m != nil {
-		return m.Liquidator
-	}
-	return ""
-}
-
-func (m *Loan) GetHf() uint64 {
-	if m != nil {
-		return m.Hf
-	}
-	return 0
-}
-
 func init() {
 	proto.RegisterType((*Loan)(nil), "core.grow.v1beta1.Loan")
 }
@@ -146,27 +114,24 @@ func init() {
 func init() { proto.RegisterFile("core/grow/v1beta1/loan.proto", fileDescriptor_1fa0483de2887bd5) }
 
 var fileDescriptor_1fa0483de2887bd5 = []byte{
-	// 306 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x54, 0x91, 0xc1, 0x4e, 0x02, 0x31,
-	0x10, 0x86, 0xe9, 0x8a, 0x08, 0xd5, 0x98, 0xd8, 0x18, 0xd3, 0x10, 0xd2, 0x6c, 0x38, 0xed, 0x69,
-	0x1b, 0xe2, 0x1b, 0x70, 0x33, 0x31, 0x21, 0x12, 0x4e, 0xde, 0xba, 0xbb, 0x65, 0x69, 0x84, 0x1d,
-	0x1c, 0xba, 0xa2, 0x6f, 0xe1, 0xc1, 0x87, 0xf2, 0xc8, 0xd1, 0xa3, 0x81, 0x17, 0x31, 0x6d, 0x51,
-	0xf0, 0xd6, 0xff, 0xfb, 0xa7, 0xff, 0x64, 0x66, 0x68, 0x2f, 0x07, 0xd4, 0xb2, 0x44, 0x58, 0xcb,
-	0x97, 0x41, 0xa6, 0xad, 0x1a, 0xc8, 0x39, 0xa8, 0x2a, 0x5d, 0x22, 0x58, 0x60, 0x57, 0xce, 0x4d,
-	0x9d, 0x9b, 0xee, 0xdd, 0xee, 0x75, 0x09, 0x25, 0x78, 0x57, 0xba, 0x57, 0x28, 0xec, 0x7f, 0x44,
-	0xb4, 0x79, 0x0f, 0xaa, 0x62, 0x97, 0x34, 0x32, 0x05, 0x27, 0x31, 0x49, 0x9a, 0xe3, 0xc8, 0x14,
-	0xec, 0x86, 0xb6, 0x5c, 0xde, 0x5d, 0xc1, 0xa3, 0x98, 0x24, 0x9d, 0xf1, 0x5e, 0x39, 0xae, 0x16,
-	0x50, 0x57, 0x96, 0x9f, 0x04, 0x1e, 0x14, 0xeb, 0xd2, 0x76, 0x06, 0x88, 0xb0, 0xd6, 0xc8, 0x9b,
-	0xde, 0xf9, 0xd3, 0xac, 0x47, 0x3b, 0x2b, 0xab, 0xd0, 0x4e, 0xcc, 0x42, 0xf3, 0x53, 0xdf, 0xe2,
-	0x00, 0x58, 0x9f, 0x5e, 0x00, 0xaa, 0x7c, 0xae, 0x27, 0x26, 0x7f, 0xd2, 0xc8, 0x5b, 0xfe, 0xf7,
-	0x3f, 0xe6, 0x12, 0x42, 0x9f, 0x51, 0x6d, 0xf9, 0x99, 0x2f, 0x38, 0x00, 0x16, 0xd3, 0xf3, 0xb9,
-	0x79, 0xae, 0x4d, 0xa1, 0xac, 0x81, 0x8a, 0xb7, 0x63, 0x92, 0xb4, 0xc7, 0xc7, 0x88, 0x09, 0x4a,
-	0x7f, 0x25, 0x20, 0xef, 0xf8, 0x80, 0x23, 0xe2, 0xa6, 0x9f, 0x4d, 0x39, 0x0d, 0xd3, 0xcf, 0xa6,
-	0xc3, 0xe1, 0xe7, 0x56, 0x90, 0xcd, 0x56, 0x90, 0xef, 0xad, 0x20, 0xef, 0x3b, 0xd1, 0xd8, 0xec,
-	0x44, 0xe3, 0x6b, 0x27, 0x1a, 0x8f, 0x49, 0x69, 0xec, 0xac, 0xce, 0xd2, 0x1c, 0x16, 0xf2, 0xa1,
-	0x56, 0x05, 0x2a, 0xab, 0x47, 0x58, 0x4a, 0x7f, 0x8e, 0xd7, 0x70, 0x10, 0xfb, 0xb6, 0xd4, 0xab,
-	0xac, 0xe5, 0x37, 0x7c, 0xfb, 0x13, 0x00, 0x00, 0xff, 0xff, 0x02, 0xa6, 0x7e, 0x89, 0xaa, 0x01,
-	0x00, 0x00,
+	// 260 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x54, 0x90, 0x4f, 0x4a, 0xc3, 0x40,
+	0x14, 0xc6, 0x33, 0xb1, 0x46, 0x3b, 0x88, 0xe0, 0x20, 0x32, 0x94, 0x32, 0x94, 0xae, 0xb2, 0xca,
+	0x50, 0xbc, 0x41, 0x77, 0x82, 0x50, 0x2c, 0x5d, 0xb9, 0x9b, 0x24, 0xc3, 0x38, 0xd8, 0xe4, 0x95,
+	0xd7, 0x89, 0xd5, 0x5b, 0x78, 0x0e, 0x4f, 0xe2, 0xb2, 0x4b, 0x97, 0x92, 0x5c, 0x44, 0x66, 0x5a,
+	0x0c, 0xdd, 0xbd, 0xef, 0xfb, 0xbd, 0x3f, 0xbc, 0x8f, 0x8e, 0x0b, 0x40, 0x2d, 0x0d, 0xc2, 0x4e,
+	0xbe, 0xcd, 0x72, 0xed, 0xd4, 0x4c, 0xae, 0x41, 0xd5, 0xd9, 0x06, 0xc1, 0x01, 0xbb, 0xf1, 0x34,
+	0xf3, 0x34, 0x3b, 0xd2, 0xd1, 0xad, 0x01, 0x03, 0x81, 0x4a, 0x5f, 0x1d, 0x1a, 0xa7, 0x5f, 0x84,
+	0x0e, 0x1e, 0x41, 0xd5, 0xec, 0x9a, 0xc6, 0xb6, 0xe4, 0x64, 0x42, 0xd2, 0xc1, 0x32, 0xb6, 0x25,
+	0xbb, 0xa3, 0x89, 0xdf, 0xf7, 0x50, 0xf2, 0x78, 0x42, 0xd2, 0xe1, 0xf2, 0xa8, 0xd8, 0x88, 0x5e,
+	0xe6, 0x80, 0x08, 0x3b, 0x8d, 0xfc, 0x2c, 0x90, 0x7f, 0xcd, 0xc6, 0x74, 0xa8, 0x2a, 0x68, 0x6a,
+	0xb7, 0x68, 0x1c, 0x3f, 0x0f, 0xb0, 0x37, 0x3c, 0xdd, 0x3a, 0x85, 0x6e, 0x65, 0x2b, 0xcd, 0x93,
+	0x70, 0xa8, 0x37, 0xd8, 0x94, 0x5e, 0x01, 0xaa, 0x62, 0xad, 0x57, 0xb6, 0x78, 0xd5, 0xc8, 0x2f,
+	0xc2, 0xf8, 0x89, 0x37, 0x9f, 0x7f, 0xb7, 0x82, 0xec, 0x5b, 0x41, 0x7e, 0x5b, 0x41, 0x3e, 0x3b,
+	0x11, 0xed, 0x3b, 0x11, 0xfd, 0x74, 0x22, 0x7a, 0x4e, 0x8d, 0x75, 0x2f, 0x4d, 0x9e, 0x15, 0x50,
+	0xc9, 0xa7, 0x46, 0x95, 0xa8, 0x9c, 0x5e, 0xa0, 0x91, 0x21, 0xa4, 0xf7, 0x43, 0x4c, 0xee, 0x63,
+	0xa3, 0xb7, 0x79, 0x12, 0xfe, 0xbe, 0xff, 0x0b, 0x00, 0x00, 0xff, 0xff, 0xff, 0x64, 0x53, 0xdd,
+	0x40, 0x01, 0x00, 0x00,
 }
 
 func (m *Loan) Marshal() (dAtA []byte, err error) {
@@ -189,58 +154,29 @@ func (m *Loan) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if m.Hf != 0 {
-		i = encodeVarintLoan(dAtA, i, uint64(m.Hf))
+	if len(m.OracleTicker) > 0 {
+		i -= len(m.OracleTicker)
+		copy(dAtA[i:], m.OracleTicker)
+		i = encodeVarintLoan(dAtA, i, uint64(len(m.OracleTicker)))
 		i--
-		dAtA[i] = 0x50
+		dAtA[i] = 0x3a
 	}
-	if len(m.Liquidator) > 0 {
-		i -= len(m.Liquidator)
-		copy(dAtA[i:], m.Liquidator)
-		i = encodeVarintLoan(dAtA, i, uint64(len(m.Liquidator)))
+	if m.StartTime != 0 {
+		i = encodeVarintLoan(dAtA, i, uint64(m.StartTime))
 		i--
-		dAtA[i] = 0x4a
-	}
-	if m.Liquidation {
-		i--
-		if m.Liquidation {
-			dAtA[i] = 1
-		} else {
-			dAtA[i] = 0
-		}
-		i--
-		dAtA[i] = 0x40
+		dAtA[i] = 0x30
 	}
 	if len(m.AmountOut) > 0 {
 		i -= len(m.AmountOut)
 		copy(dAtA[i:], m.AmountOut)
 		i = encodeVarintLoan(dAtA, i, uint64(len(m.AmountOut)))
 		i--
-		dAtA[i] = 0x3a
-	}
-	if len(m.OracleTicker) > 0 {
-		i -= len(m.OracleTicker)
-		copy(dAtA[i:], m.OracleTicker)
-		i = encodeVarintLoan(dAtA, i, uint64(len(m.OracleTicker)))
-		i--
-		dAtA[i] = 0x32
-	}
-	if m.StartTime != 0 {
-		i = encodeVarintLoan(dAtA, i, uint64(m.StartTime))
-		i--
-		dAtA[i] = 0x28
+		dAtA[i] = 0x2a
 	}
 	if len(m.Borrower) > 0 {
 		i -= len(m.Borrower)
 		copy(dAtA[i:], m.Borrower)
 		i = encodeVarintLoan(dAtA, i, uint64(len(m.Borrower)))
-		i--
-		dAtA[i] = 0x22
-	}
-	if len(m.Amount) > 0 {
-		i -= len(m.Amount)
-		copy(dAtA[i:], m.Amount)
-		i = encodeVarintLoan(dAtA, i, uint64(len(m.Amount)))
 		i--
 		dAtA[i] = 0x1a
 	}
@@ -283,11 +219,11 @@ func (m *Loan) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovLoan(uint64(l))
 	}
-	l = len(m.Amount)
+	l = len(m.Borrower)
 	if l > 0 {
 		n += 1 + l + sovLoan(uint64(l))
 	}
-	l = len(m.Borrower)
+	l = len(m.AmountOut)
 	if l > 0 {
 		n += 1 + l + sovLoan(uint64(l))
 	}
@@ -297,20 +233,6 @@ func (m *Loan) Size() (n int) {
 	l = len(m.OracleTicker)
 	if l > 0 {
 		n += 1 + l + sovLoan(uint64(l))
-	}
-	l = len(m.AmountOut)
-	if l > 0 {
-		n += 1 + l + sovLoan(uint64(l))
-	}
-	if m.Liquidation {
-		n += 2
-	}
-	l = len(m.Liquidator)
-	if l > 0 {
-		n += 1 + l + sovLoan(uint64(l))
-	}
-	if m.Hf != 0 {
-		n += 1 + sovLoan(uint64(m.Hf))
 	}
 	return n
 }
@@ -403,38 +325,6 @@ func (m *Loan) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 3:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Amount", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowLoan
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthLoan
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthLoan
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Amount = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 4:
-			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Borrower", wireType)
 			}
 			var stringLen uint64
@@ -466,57 +356,6 @@ func (m *Loan) Unmarshal(dAtA []byte) error {
 			m.Borrower = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 5:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field StartTime", wireType)
-			}
-			m.StartTime = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowLoan
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.StartTime |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		case 6:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field OracleTicker", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowLoan
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthLoan
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthLoan
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.OracleTicker = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 7:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field AmountOut", wireType)
 			}
@@ -548,11 +387,11 @@ func (m *Loan) Unmarshal(dAtA []byte) error {
 			}
 			m.AmountOut = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
-		case 8:
+		case 6:
 			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Liquidation", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field StartTime", wireType)
 			}
-			var v int
+			m.StartTime = 0
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowLoan
@@ -562,15 +401,14 @@ func (m *Loan) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				v |= int(b&0x7F) << shift
+				m.StartTime |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-			m.Liquidation = bool(v != 0)
-		case 9:
+		case 7:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Liquidator", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field OracleTicker", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -598,27 +436,8 @@ func (m *Loan) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Liquidator = string(dAtA[iNdEx:postIndex])
+			m.OracleTicker = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
-		case 10:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Hf", wireType)
-			}
-			m.Hf = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowLoan
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.Hf |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
 		default:
 			iNdEx = preIndex
 			skippy, err := skipLoan(dAtA[iNdEx:])
