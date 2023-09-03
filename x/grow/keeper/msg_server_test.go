@@ -305,11 +305,13 @@ func (suite *GrowKeeperTestSuite) TestExecuteCreateLend() {
 			suite.Require().Equal(found, true)
 
 			suite.Require().Equal(len(position.LoanIds), 1)
+			suite.Require().Equal(position.BorrowedAmountInUSD, uint64(tc.expectTokenAmount))
 			loan, found := s.app.GrowKeeper.GetLoadByLoadId(s.ctx, res1.LoanId)
 			suite.Require().Equal(found, true)
 			suite.Require().Equal(loan.AmountOut, res1.AmountOut)
 			suite.Require().Equal(loan.Borrower, s.Address.String())
 			suite.Require().Equal(loan.StartTime, uint64(s.ctx.BlockTime().Unix()))
+
 		})
 	}
 }
@@ -411,10 +413,11 @@ func (suite *GrowKeeperTestSuite) TestExecuteDeleteLend() {
 			_, err2 := suite.app.GrowKeeper.DeleteLend(ctx, msg3)
 			suite.Require().NoError(err2)
 
-			position, found = s.app.GrowKeeper.GetPositionByPositionId(s.ctx, res.PositionId)
+			newPosition, found := s.app.GrowKeeper.GetPositionByPositionId(s.ctx, res.PositionId)
 			suite.Require().Equal(found, true)
 
-			suite.Require().Equal(len(position.LoanIds), 0)
+			suite.Require().Equal(len(newPosition.LoanIds), 0)
+			suite.Require().Equal(newPosition.BorrowedAmountInUSD, position.BorrowedAmountInUSD-uint64(tc.expectTokenAmount))
 		})
 	}
 }

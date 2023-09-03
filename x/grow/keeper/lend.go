@@ -67,8 +67,8 @@ func (k Keeper) ExecuteLend(ctx sdk.Context, msg *types.MsgCreateLend, LendAsset
 
 	k.AppendLoan(ctx, loan)
 	position = k.PushLoanToPosition(ctx, loanId, position)
-	k.IncreaseBorrowedAmountInUSDInPosition(ctx, position, desiredAmountInt)
-	k.AppendPosition(ctx, position)
+	position = k.IncreaseBorrowedAmountInUSDInPosition(ctx, position, desiredAmountInt)
+	k.SetPosition(ctx, position)
 
 	return nil, desiredAmountCoin, loanId
 }
@@ -141,8 +141,8 @@ func (k Keeper) ExecuteDeleteLend(ctx sdk.Context, msg *types.MsgDeleteLend, Len
 
 	k.RemoveLoan(ctx, loan.Id)
 	position = k.RemoveLoanInPosition(ctx, loan.LoanId, position)
-	k.ReduceBorrowedAmountInUSDInPosition(ctx, position, borrowAmountInt)
-	k.AppendPosition(ctx, position)
+	position = k.ReduceBorrowedAmountInUSDInPosition(ctx, position, borrowAmountInt)
+	k.SetPosition(ctx, position)
 
 	return nil, loan.LoanId
 }

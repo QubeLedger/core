@@ -135,12 +135,12 @@ func (k Keeper) RemoveLoanInPosition(ctx sdk.Context, loanId string, position ty
 	return position
 }
 
-func (k Keeper) IncreaseBorrowedAmountInUSDInPosition(ctx sdk.Context, position types.Position, amt sdk.Int) {
+func (k Keeper) IncreaseBorrowedAmountInUSDInPosition(ctx sdk.Context, position types.Position, amt sdk.Int) types.Position {
 	position.BorrowedAmountInUSD = position.BorrowedAmountInUSD + amt.Uint64()
-	k.SetPosition(ctx, position)
+	return position
 }
 
-func (k Keeper) ReduceBorrowedAmountInUSDInPosition(ctx sdk.Context, position types.Position, amt sdk.Int) {
+func (k Keeper) ReduceBorrowedAmountInUSDInPosition(ctx sdk.Context, position types.Position, amt sdk.Int) types.Position {
 	position.BorrowedAmountInUSD = position.BorrowedAmountInUSD - amt.Uint64()
-	k.SetPosition(ctx, position)
+	return position
 }
