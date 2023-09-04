@@ -12,23 +12,27 @@ func (k Keeper) ExecuteLend(ctx sdk.Context, msg *types.MsgCreateLend, LendAsset
 		return err, sdk.Coin{}, ""
 	}
 
-	if err := k.CheckIfPositionAlredyCreate(ctx, borrower.String(), types.DefaultDenom); err == nil {
+	if err := k.CheckIfPositionAlredyCreate(ctx, borrower.String(), msg.DenomIn); err == nil {
 		return err, sdk.Coin{}, ""
 	}
 
-	position, found := k.GetPositionByPositionId(ctx, k.CalculateDepositId(borrower.String(), types.DefaultDenom))
+	position, found := k.GetPositionByPositionId(ctx, k.CalculateDepositId(borrower.String(), msg.DenomIn))
 	if !found {
 		return types.ErrPositionNotFound, sdk.Coin{}, ""
 	}
 
 	amountPositionCoins, err := sdk.ParseCoinsNormalized(position.Amount)
-	amountPositionInt := amountPositionCoins.AmountOf(types.DefaultDenom)
+	if err != nil {
+		return err, sdk.Coin{}, ""
+	}
+	amountPositionInt := amountPositionCoins.AmountOf(msg.DenomIn)
 
 	desiredAmountInt, b := sdk.NewIntFromString(msg.DesiredAmount)
 	if !b {
 		return types.ErrSdkIntError, sdk.Coin{}, ""
 	}
 	desiredAmountCoin := sdk.NewCoin(types.DefaultDenom, desiredAmountInt)
+
 	desiredAmountCoins := sdk.NewCoins(desiredAmountCoin)
 
 	price, err := k.GetPriceByDenom(ctx, position.OracleTicker)
@@ -54,10 +58,10 @@ func (k Keeper) ExecuteLend(ctx sdk.Context, msg *types.MsgCreateLend, LendAsset
 		return err, sdk.Coin{}, ""
 	}
 
-	loanId := k.GenerateLoadIdHash(types.DefaultDenom, types.DefaultDenom, desiredAmountCoins.String(), borrower.String(), ctx.BlockTime().Format(""))
+	loanId := k.GenerateLoadIdHash(msg.DenomIn, types.DefaultDenom, desiredAmountCoins.String(), borrower.String(), ctx.BlockTime().Format(""))
 
 	loan := types.Loan{
-		LoanId:       k.GenerateLoadIdHash(types.DefaultDenom, types.DefaultDenom, desiredAmountCoins.String(), borrower.String(), ctx.BlockTime().Format("")),
+		LoanId:       k.GenerateLoadIdHash(msg.DenomIn, types.DefaultDenom, desiredAmountCoins.String(), borrower.String(), ctx.BlockTime().Format("")),
 		Borrower:     borrower.String(),
 		AmountOut:    desiredAmountCoins.String(),
 		StartTime:    uint64(ctx.BlockTime().Unix()),

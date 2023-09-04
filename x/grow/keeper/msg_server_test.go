@@ -299,6 +299,7 @@ func (suite *GrowKeeperTestSuite) TestExecuteCreateLend() {
 				sdk.NewInt(tc.expectTokenAmount).String(),
 			)
 			res1, err1 := suite.app.GrowKeeper.CreateLend(ctx, msg2)
+
 			suite.Require().NoError(err1)
 			suite.Require().Equal(res1.AmountOut, sdk.NewInt(tc.expectTokenAmount).String()+tc.expectTokenDenom)
 
@@ -469,7 +470,7 @@ func (suite *GrowKeeperTestSuite) TestExecuteCreateLiqPosition() {
 			msg := types.NewMsgCreateLiquidationPosition(
 				suite.Address.String(),
 				sdk.NewInt(tc.sendTokenAmount).String()+tc.sendTokenDenom,
-				tc.expectTokenDenom,
+				tc.LendAsset.AssetMetadata.Name,
 				tc.premium,
 			)
 			ctx := sdk.WrapSDKContext(suite.ctx)
@@ -530,7 +531,7 @@ func (suite *GrowKeeperTestSuite) TestExecuteCloseLiqPosition() {
 			msg := types.NewMsgCreateLiquidationPosition(
 				suite.Address.String(),
 				sdk.NewInt(tc.sendTokenAmount).String()+tc.sendTokenDenom,
-				tc.expectTokenDenom,
+				tc.LendAsset.AssetMetadata.Name,
 				tc.premium,
 			)
 			ctx := sdk.WrapSDKContext(suite.ctx)
