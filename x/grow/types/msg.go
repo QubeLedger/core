@@ -270,11 +270,11 @@ func (msg *MsgWithdrawalCollateral) ValidateBasic() error {
 create liq position
 */
 
-func NewMsgCreateLiquidationPosition(creator string, amountIn string, denom string, premium string) *MsgCreateLiquidationPosition {
+func NewMsgCreateLiquidationPosition(creator string, amountIn string, asset string, premium string) *MsgCreateLiquidationPosition {
 	return &MsgCreateLiquidationPosition{
 		Creator:  creator,
 		AmountIn: amountIn,
-		DenomOut: denom,
+		Asset:    asset,
 		Premium:  premium,
 	}
 }

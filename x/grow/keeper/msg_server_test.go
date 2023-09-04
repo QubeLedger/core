@@ -100,6 +100,8 @@ func (suite *GrowKeeperTestSuite) TestExecuteWithdrawal() {
 
 		suite.Run(fmt.Sprintf("Case---%s", tc.name), func() {
 			suite.AddTestCoins(tc.sendTokenAmount, tc.sendTokenDenom)
+
+			oldBalance := s.app.BankKeeper.GetBalance(s.ctx, s.Address, "uusd")
 			msg := types.NewMsgWithdrawal(
 				suite.Address.String(),
 				sdk.NewInt(tc.sendTokenAmount).String()+tc.sendTokenDenom,
@@ -108,7 +110,9 @@ func (suite *GrowKeeperTestSuite) TestExecuteWithdrawal() {
 			ctx := sdk.WrapSDKContext(suite.ctx)
 			res, err := suite.app.GrowKeeper.Withdrawal(ctx, msg)
 			suite.Require().NoError(err)
-			fmt.Printf("%s", res.AmountOut)
+			newBalance := s.app.BankKeeper.GetBalance(s.ctx, s.Address, "uusd")
+			amountOut, _ := sdk.ParseCoinsNormalized(res.AmountOut)
+			suite.Require().Equal(newBalance.Amount.Sub(oldBalance.Amount), amountOut.AmountOf("uusd"))
 		})
 	}
 }
@@ -418,6 +422,147 @@ func (suite *GrowKeeperTestSuite) TestExecuteDeleteLend() {
 
 			suite.Require().Equal(len(newPosition.LoanIds), 0)
 			suite.Require().Equal(newPosition.BorrowedAmountInUSD, position.BorrowedAmountInUSD-uint64(tc.expectTokenAmount))
+		})
+	}
+}
+
+func (suite *GrowKeeperTestSuite) TestExecuteCreateLiqPosition() {
+	testCases := []struct {
+		name             string
+		qStablePair      stabletypes.Pair
+		gTokenPair       types.GTokenPair
+		LendAsset        types.LendAsset
+		sendTokenDenom   string
+		sendTokenAmount  int64
+		expectTokenDenom string
+		premium          string
+	}{
+		{
+			"ok-create-liq-position",
+			s.GetNormalQStablePair(0),
+			s.GetNormalGTokenPair(0),
+			s.GetNormalLendAsset(0),
+			"uusd",
+			500 * 1000000,
+			"uosmo",
+			"5",
+		},
+	}
+
+	suite.Setup()
+	suite.Commit()
+	suite.SetupOracleKeeper("OSMO")
+	suite.RegisterValidator()
+	s.ctx = s.ctx.WithBlockTime(time.Now())
+	for _, tc := range testCases {
+
+		suite.app.StableKeeper.AppendPair(s.ctx, tc.qStablePair)
+		suite.app.GrowKeeper.AppendPair(s.ctx, tc.gTokenPair)
+		suite.app.GrowKeeper.AppendLendAsset(s.ctx, tc.LendAsset)
+
+		suite.OracleAggregateExchangeRateFromInput("0.5", tc.LendAsset.AssetMetadata.Name)
+
+		suite.AddTestCoinsToCustomAccount(sdk.NewInt(100000*1000000), tc.qStablePair.AmountOutMetadata.Base, s.app.GrowKeeper.GetGrowStakingReserveAddress(s.ctx))
+
+		suite.Run(fmt.Sprintf("Case---%s", tc.name), func() {
+			suite.AddTestCoins(tc.sendTokenAmount, tc.sendTokenDenom)
+			msg := types.NewMsgCreateLiquidationPosition(
+				suite.Address.String(),
+				sdk.NewInt(tc.sendTokenAmount).String()+tc.sendTokenDenom,
+				tc.expectTokenDenom,
+				tc.premium,
+			)
+			ctx := sdk.WrapSDKContext(suite.ctx)
+			res, err := suite.app.GrowKeeper.CreateLiquidationPosition(ctx, msg)
+			suite.Require().NoError(err)
+
+			position, found := s.app.GrowKeeper.GetLiquidatorPositionByLiquidatorPositionId(s.ctx, res.LiquidatorPositionId)
+			suite.Require().Equal(found, true)
+
+			suite.Require().Equal(position.Liquidator, s.Address.String())
+			suite.Require().Equal(position.Amount, sdk.NewInt(tc.sendTokenAmount).String()+tc.sendTokenDenom)
+			premiumInt, _ := s.app.GrowKeeper.ParseAndCheckPremium(tc.premium)
+			suite.Require().Equal(position.Premium, premiumInt.Uint64())
+		})
+	}
+}
+
+func (suite *GrowKeeperTestSuite) TestExecuteCloseLiqPosition() {
+	testCases := []struct {
+		name             string
+		qStablePair      stabletypes.Pair
+		gTokenPair       types.GTokenPair
+		LendAsset        types.LendAsset
+		sendTokenDenom   string
+		sendTokenAmount  int64
+		expectTokenDenom string
+		premium          string
+	}{
+		{
+			"ok-close-liq-position",
+			s.GetNormalQStablePair(0),
+			s.GetNormalGTokenPair(0),
+			s.GetNormalLendAsset(0),
+			"uusd",
+			500 * 1000000,
+			"uosmo",
+			"5",
+		},
+	}
+
+	suite.Setup()
+	suite.Commit()
+	suite.SetupOracleKeeper("OSMO")
+	suite.RegisterValidator()
+	s.ctx = s.ctx.WithBlockTime(time.Now())
+	for _, tc := range testCases {
+
+		suite.app.StableKeeper.AppendPair(s.ctx, tc.qStablePair)
+		suite.app.GrowKeeper.AppendPair(s.ctx, tc.gTokenPair)
+		suite.app.GrowKeeper.AppendLendAsset(s.ctx, tc.LendAsset)
+
+		suite.OracleAggregateExchangeRateFromInput("0.5", tc.LendAsset.AssetMetadata.Name)
+
+		suite.AddTestCoinsToCustomAccount(sdk.NewInt(100000*1000000), tc.qStablePair.AmountOutMetadata.Base, s.app.GrowKeeper.GetGrowStakingReserveAddress(s.ctx))
+
+		suite.Run(fmt.Sprintf("Case---%s", tc.name), func() {
+			suite.AddTestCoins(tc.sendTokenAmount, tc.sendTokenDenom)
+			msg := types.NewMsgCreateLiquidationPosition(
+				suite.Address.String(),
+				sdk.NewInt(tc.sendTokenAmount).String()+tc.sendTokenDenom,
+				tc.expectTokenDenom,
+				tc.premium,
+			)
+			ctx := sdk.WrapSDKContext(suite.ctx)
+			res, err := suite.app.GrowKeeper.CreateLiquidationPosition(ctx, msg)
+			suite.Require().NoError(err)
+
+			position, found := s.app.GrowKeeper.GetLiquidatorPositionByLiquidatorPositionId(s.ctx, res.LiquidatorPositionId)
+			suite.Require().Equal(found, true)
+
+			suite.Require().Equal(position.Liquidator, s.Address.String())
+			suite.Require().Equal(position.Amount, sdk.NewInt(tc.sendTokenAmount).String()+tc.sendTokenDenom)
+			premiumInt, _ := s.app.GrowKeeper.ParseAndCheckPremium(tc.premium)
+			suite.Require().Equal(position.Premium, premiumInt.Uint64())
+
+			oldBalance := s.app.BankKeeper.GetBalance(s.ctx, s.Address, tc.sendTokenDenom)
+
+			msg1 := types.NewMsgCloseLiquidationPosition(
+				suite.Address.String(),
+				res.LiquidatorPositionId,
+			)
+			ctx = sdk.WrapSDKContext(suite.ctx)
+			res1, err1 := suite.app.GrowKeeper.CloseLiquidationPosition(ctx, msg1)
+			suite.Require().NoError(err1)
+
+			_, found = s.app.GrowKeeper.GetLiquidatorPositionByLiquidatorPositionId(s.ctx, res.LiquidatorPositionId)
+			suite.Require().Equal(found, false)
+
+			newBalance := s.app.BankKeeper.GetBalance(s.ctx, s.Address, tc.sendTokenDenom)
+
+			amountOut, _ := sdk.ParseCoinsNormalized(res1.AmountOut)
+
+			suite.Require().Equal(newBalance.Amount.Sub(oldBalance.Amount), amountOut.AmountOf(tc.sendTokenDenom))
 		})
 	}
 }

@@ -8,7 +8,7 @@ import (
 )
 
 /*
-Deposit Helpers
+Deposit Math Helpers
 */
 func (k Keeper) CalculateGTokenAmountOut(amount sdk.Int, price sdk.Int) sdk.Int {
 	return ((amount.Mul(types.DepositMultiplier)).Quo(price))
@@ -28,7 +28,7 @@ func (k Keeper) CalculateGTokenAPY(lastAmount sdk.Int, growRate sdk.Int, day sdk
 }
 
 /*
-Lend Helpers
+Lend Math Helpers
 */
 
 func (k Keeper) CalculateCreateLendAmountOut(amount sdk.Int, price sdk.Int) sdk.Int {
@@ -44,7 +44,7 @@ func (k Keeper) CalculateNeedAmountToGet(borrow_amount sdk.Int, borrow_time sdk.
 }
 
 /*
-RR Logic
+RR Math Logic
 */
 
 func (k Keeper) CalculateRiskRate(collateral sdk.Int, price sdk.Int, borrow sdk.Int) (sdk.Int, error) {
@@ -58,7 +58,7 @@ func (k Keeper) CheckRiskRate(collateral sdk.Int, price sdk.Int, borrow sdk.Int,
 	if err != nil {
 		return err
 	}
-	if rr.GT(sdk.NewInt(95)) {
+	if rr.GT(sdk.NewInt(100)) {
 		return types.ErrRiskRateIsGreaterThenShouldBe
 	}
 
@@ -67,8 +67,19 @@ func (k Keeper) CheckRiskRate(collateral sdk.Int, price sdk.Int, borrow sdk.Int,
 		return err
 	}
 
-	if rr.GT(sdk.NewInt(95)) {
+	if rr.GT(sdk.NewInt(100)) {
 		return types.ErrRiskRateIsGreaterThenShouldBe
 	}
 	return nil
+}
+
+func (k Keeper) CalculateAmountWhichLiquidatorSend(ctx sdk.Context, borrowedAmountInUSD uint64, collateral sdk.Int, price sdk.Int, premium uint64) sdk.Int {
+	amtCollateral := (collateral.Mul(price)).QuoRaw(10000)
+	mul := float64(1 / 60)
+	priceUint64 := price.Uint64()
+	borrow := uint64(((float64(100) / mul) * float64(amtCollateral.Uint64())) / 10000)
+
+	needSend := ((borrowedAmountInUSD - borrow) / (priceUint64 + (priceUint64 * premium))) * priceUint64
+	return sdk.NewIntFromUint64(needSend)
+
 }

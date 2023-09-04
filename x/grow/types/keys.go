@@ -19,12 +19,14 @@ func KeyPrefix(p string) []byte {
 }
 
 const (
-	LoanKey           = "Loan/value/"
-	LoanCountKey      = "Loan/count/"
-	PairKey           = "Pair/value/"
-	PairCountKey      = "Pair/count/"
-	LendAssetKey      = "LendAsset/value/"
-	LendAssetCountKey = "LendAsset/count/"
-	PositionKey       = "Position/value/"
-	PositionCountKey  = "Position/count/"
+	LoanKey                    = "Loan/value/"
+	LoanCountKey               = "Loan/count/"
+	PairKey                    = "Pair/value/"
+	PairCountKey               = "Pair/count/"
+	LendAssetKey               = "LendAsset/value/"
+	LendAssetCountKey          = "LendAsset/count/"
+	PositionKey                = "Position/value/"
+	PositionCountKey           = "Position/count/"
+	LiquidatorPositionKey      = "LiquidatorPosition/value/"
+	LiquidatorPositionCountKey = "LiquidatorPosition/count/"
 )

@@ -104,7 +104,6 @@ func (k Keeper) CalculateRealYield(ctx sdk.Context, gTokenPair types.GTokenPair)
 	}
 
 	qm := qStablePair.Qm
-	//fmt.Printf("qm: %d\nbr:%d\n", qm.Int64(), br.Int64())
 
 	res := ((qm.Mul(br)).Mul(realRate)).QuoRaw(10000)
 
@@ -120,8 +119,6 @@ func (k Keeper) CheckYieldRate(ctx sdk.Context, gTokenPair types.GTokenPair) (st
 	if err != nil {
 		return "", sdk.Int{}, err
 	}
-
-	//fmt.Printf("growYield: %d\nrealYield:%d\n", growYield.Int64(), realYield.Int64())
 
 	if realYield.GT(growYield) {
 		return types.SendToReserveAction, realYield.Sub(growYield), nil

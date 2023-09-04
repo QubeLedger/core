@@ -97,7 +97,7 @@ message MsgWithdrawalCollateralResponse {
 message MsgCreateLiquidationPosition {
   string creator = 1;
   string amountIn = 2;
-  string denomOut = 3;
+  string asset = 3;
   string premium = 4;
 }
 
@@ -113,5 +113,5 @@ message MsgCloseLiquidationPosition {
 
 message MsgCloseLiquidationPositionResponse  {
   string creator = 1;
-  string liquidatorPositionId = 2;
+  string amountOut = 2;
 }

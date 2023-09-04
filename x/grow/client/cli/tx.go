@@ -35,8 +35,12 @@ func GetTxCmd() *cobra.Command {
 
 	cmd.AddCommand(CmdDeposit())
 	cmd.AddCommand(CmdWithdrawal())
+	cmd.AddCommand(CmdDepositCollateral())
+	cmd.AddCommand(CmdWithdrawalCollateral())
 	cmd.AddCommand(CmdCreateLend())
 	cmd.AddCommand(CmdDeleteLend())
+	cmd.AddCommand(CmdCreateLiqPosition())
+	cmd.AddCommand(CmdCloseLiqPosition())
 	// this line is used by starport scaffolding # 1
 
 	return cmd
@@ -227,7 +231,7 @@ func CmdWithdrawalCollateral() *cobra.Command {
 
 func CmdCreateLiqPosition() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "create-liquidation-position [amountIn] [denom] [premium]",
+		Use:   "create-liquidation-position [amountIn] [asset] [premium]",
 		Short: "Broadcast message create liquidation position ",
 		Args:  cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {

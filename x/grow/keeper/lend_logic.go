@@ -6,30 +6,29 @@ import (
 )
 
 func (k Keeper) ExecuteLend(ctx sdk.Context, msg *types.MsgCreateLend, LendAsset types.LendAsset) (error, sdk.Coin, string) {
-	denomIn := msg.DenomIn
 
 	borrower, err := sdk.AccAddressFromBech32(msg.Borrower)
 	if err != nil {
 		return err, sdk.Coin{}, ""
 	}
 
-	if err := k.CheckIfPositionAlredyCreate(ctx, borrower.String(), denomIn); err == nil {
+	if err := k.CheckIfPositionAlredyCreate(ctx, borrower.String(), types.DefaultDenom); err == nil {
 		return err, sdk.Coin{}, ""
 	}
 
-	position, found := k.GetPositionByPositionId(ctx, k.CalculateDepositId(borrower.String(), denomIn))
+	position, found := k.GetPositionByPositionId(ctx, k.CalculateDepositId(borrower.String(), types.DefaultDenom))
 	if !found {
 		return types.ErrPositionNotFound, sdk.Coin{}, ""
 	}
 
 	amountPositionCoins, err := sdk.ParseCoinsNormalized(position.Amount)
-	amountPositionInt := amountPositionCoins.AmountOf(denomIn)
+	amountPositionInt := amountPositionCoins.AmountOf(types.DefaultDenom)
 
 	desiredAmountInt, b := sdk.NewIntFromString(msg.DesiredAmount)
 	if !b {
 		return types.ErrSdkIntError, sdk.Coin{}, ""
 	}
-	desiredAmountCoin := sdk.NewCoin("uusd", desiredAmountInt)
+	desiredAmountCoin := sdk.NewCoin(types.DefaultDenom, desiredAmountInt)
 	desiredAmountCoins := sdk.NewCoins(desiredAmountCoin)
 
 	price, err := k.GetPriceByDenom(ctx, position.OracleTicker)
@@ -55,10 +54,10 @@ func (k Keeper) ExecuteLend(ctx sdk.Context, msg *types.MsgCreateLend, LendAsset
 		return err, sdk.Coin{}, ""
 	}
 
-	loanId := k.GenerateLoadIdHash(denomIn, "uusd", desiredAmountCoins.String(), borrower.String(), ctx.BlockTime().Format(""))
+	loanId := k.GenerateLoadIdHash(types.DefaultDenom, types.DefaultDenom, desiredAmountCoins.String(), borrower.String(), ctx.BlockTime().Format(""))
 
 	loan := types.Loan{
-		LoanId:       k.GenerateLoadIdHash(denomIn, "uusd", desiredAmountCoins.String(), borrower.String(), ctx.BlockTime().Format("")),
+		LoanId:       k.GenerateLoadIdHash(types.DefaultDenom, types.DefaultDenom, desiredAmountCoins.String(), borrower.String(), ctx.BlockTime().Format("")),
 		Borrower:     borrower.String(),
 		AmountOut:    desiredAmountCoins.String(),
 		StartTime:    uint64(ctx.BlockTime().Unix()),
@@ -88,11 +87,11 @@ func (k Keeper) ExecuteDeleteLend(ctx sdk.Context, msg *types.MsgDeleteLend, Len
 		return err, ""
 	}
 
-	if amountInCoins.GetDenomByIndex(0) != "uusd" {
+	if amountInCoins.GetDenomByIndex(0) != types.DefaultDenom {
 		return types.ErrNeedSendUSQ, ""
 	}
 
-	amountInInt := amountInCoins.AmountOf("uusd")
+	amountInInt := amountInCoins.AmountOf(types.DefaultDenom)
 
 	loan, found := k.GetLoadByLoadId(ctx, msg.LoanId)
 	if !found {
@@ -115,7 +114,7 @@ func (k Keeper) ExecuteDeleteLend(ctx sdk.Context, msg *types.MsgDeleteLend, Len
 	}
 
 	borrowTime := sdk.NewInt(ctx.BlockTime().Unix() - int64(loan.StartTime))
-	borrowAmountInt := borrowAmountCoins.AmountOf("uusd")
+	borrowAmountInt := borrowAmountCoins.AmountOf(types.DefaultDenom)
 
 	rightAmount := k.CalculateNeedAmountToGet(borrowAmountInt, borrowTime)
 
@@ -129,12 +128,12 @@ func (k Keeper) ExecuteDeleteLend(ctx sdk.Context, msg *types.MsgDeleteLend, Len
 	}
 
 	amtToReserves := (rightAmount.Sub(borrowAmountInt)).QuoRaw(2)
-	err = k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, k.GetUSQReserveAddress(ctx), sdk.NewCoins(sdk.NewCoin("uusd", amtToReserves)))
+	err = k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, k.GetUSQReserveAddress(ctx), sdk.NewCoins(sdk.NewCoin(types.DefaultDenom, amtToReserves)))
 	if err != nil {
 		return err, ""
 	}
 
-	err = k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, k.stableKeeper.GetBurningFundAddress(ctx), sdk.NewCoins(sdk.NewCoin("uusd", amtToReserves)))
+	err = k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, k.stableKeeper.GetBurningFundAddress(ctx), sdk.NewCoins(sdk.NewCoin(types.DefaultDenom, amtToReserves)))
 	if err != nil {
 		return err, ""
 	}

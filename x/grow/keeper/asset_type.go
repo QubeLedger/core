@@ -123,3 +123,13 @@ func (k Keeper) GetLendAssetIdByCoins(amountIn string) (string, error) {
 func (k Keeper) GetLendAssetIdByDenom(denom string) (string, error) {
 	return k.GenerateLendAssetIdHash(denom), nil
 }
+
+func (k Keeper) GetLendAssetByOracleAssetId(ctx sdk.Context, oracleAssetId string) (val types.LendAsset, err error) {
+	allLendAsset := k.GetAllLendAsset(ctx)
+	for _, v := range allLendAsset {
+		if v.OracleAssetId == oracleAssetId {
+			return v, nil
+		}
+	}
+	return val, types.ErrLendAssetNotFound
+}

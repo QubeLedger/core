@@ -46,7 +46,7 @@ func (s *GrowKeeperTestSuite) Setup() {
 	s.ValPubKeys = simapp.CreateTestPubKeys(1)
 }
 
-func TestStableKeeperTestSuite(t *testing.T) {
+func TestGrowKeeperTestSuite(t *testing.T) {
 	s = new(GrowKeeperTestSuite)
 	suite.Run(t, s)
 	// Run Ginkgo integration tests
@@ -266,11 +266,4 @@ func (s *GrowKeeperTestSuite) SetupOracleKeeper(denom string) {
 	params.SlashWindow = 100
 	params.RewardDistributionWindow = 100
 	s.app.OracleKeeper.SetParams(s.ctx, params)
-}
-
-func (s *GrowKeeperTestSuite) TestTime() {
-	s.Setup()
-	s.Commit()
-	s.ctx = s.ctx.WithBlockTime(time.Now())
-	fmt.Printf("%d\n", s.ctx.BlockTime().Unix())
 }
