@@ -7,7 +7,8 @@ import (
 )
 
 var (
-	realRate              sdk.Int
+	RealRate              sdk.Int
+	BorrowRate            sdk.Int
 	lastTimeUpdateReserve sdk.Int
 )
 
@@ -23,12 +24,12 @@ func (k Keeper) SetRealRate(ctx sdk.Context, val sdk.Int) error {
 	if val.IsNil() || val.IsZero() || val.IsNegative() {
 		return types.ErrIntNegativeOrZero
 	}
-	realRate = val
+	RealRate = val
 	return nil
 }
 
 func (k Keeper) GetRealRate(ctx sdk.Context) sdk.Int {
-	return realRate
+	return RealRate
 }
 
 func CalculatGrowRatePercent(backing_ratio sdk.Int) (sdk.Int, error) {
@@ -105,7 +106,7 @@ func (k Keeper) CalculateRealYield(ctx sdk.Context, gTokenPair types.GTokenPair)
 
 	qm := qStablePair.Qm
 
-	res := ((qm.Mul(br)).Mul(realRate)).QuoRaw(10000)
+	res := ((qm.Mul(br)).Mul(RealRate)).QuoRaw(10000)
 
 	return res, nil
 }
@@ -141,4 +142,16 @@ func (k Keeper) CalculateAddToReserveValue(ctx sdk.Context, val sdk.Int, gTokenP
 		return sdk.Int{}, false
 	}
 	return val.Quo(sdk.NewInt(31536000).Quo(diff)), true
+}
+
+func (k Keeper) SetBorrowRate(ctx sdk.Context, val sdk.Int) error {
+	if val.IsNil() || val.IsZero() || val.IsNegative() {
+		return types.ErrIntNegativeOrZero
+	}
+	BorrowRate = val
+	return nil
+}
+
+func (k Keeper) GetBorrowRate(ctx sdk.Context) sdk.Int {
+	return BorrowRate
 }

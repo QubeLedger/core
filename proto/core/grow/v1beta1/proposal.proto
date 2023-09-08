@@ -80,3 +80,13 @@ message RegisterChangeRealRateProposal {
 
   uint64 rate = 3;
 }
+
+message RegisterChangeBorrowRateProposal {
+  option (gogoproto.equal) = false;
+  // title of the proposal
+  string title = 1;
+  // description of the proposal
+  string description = 2;
+
+  uint64 rate = 3;
+}

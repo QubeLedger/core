@@ -18,6 +18,7 @@ const (
 	ProposalTypeRegisterChangeUSQReserveAddressProposal         string = "RegisterChangeUSQReserveAddressProposal"
 	ProposalTypeRegisterChangeGrowStakingReserveAddressProposal string = "RegisterChangeGrowStakingReserveAddressProposal"
 	ProposalTypeRegisterChangeRealRateProposal                  string = "RegisterChangeRealRateProposal"
+	ProposalTypeRegisterChangeBorrowRateProposal                string = "RegisterChangeBorrowRateProposal"
 )
 
 // Implements Proposal Interface
@@ -28,6 +29,7 @@ var (
 	_ govtypes.Content = &RegisterChangeUSQReserveAddressProposal{}
 	_ govtypes.Content = &RegisterChangeGrowStakingReserveAddressProposal{}
 	_ govtypes.Content = &RegisterChangeRealRateProposal{}
+	_ govtypes.Content = &RegisterChangeBorrowRateProposal{}
 )
 
 func init() {
@@ -48,6 +50,9 @@ func init() {
 
 	govtypes.RegisterProposalType(ProposalTypeRegisterChangeRealRateProposal)
 	govtypes.RegisterProposalTypeCodec(&RegisterChangeRealRateProposal{}, "grow/RegisterChangeRealRateProposal")
+
+	govtypes.RegisterProposalType(ProposalTypeRegisterChangeBorrowRateProposal)
+	govtypes.RegisterProposalTypeCodec(&RegisterChangeBorrowRateProposal{}, "grow/RegisterChangeBorrowRateProposal")
 }
 
 /*
@@ -297,6 +302,37 @@ func (*RegisterChangeRealRateProposal) ProposalType() string {
 }
 
 func (rtbp *RegisterChangeRealRateProposal) ValidateBasic() error {
+	{
+		if rtbp.Rate == uint64(0) {
+			return ErrIntNegativeOrZero
+		}
+		value := sdk.NewInt(int64(rtbp.Rate))
+		if value.IsNegative() || value.IsNil() || value.IsZero() {
+			return ErrIntNegativeOrZero
+		}
+	}
+	return nil
+}
+
+/*
+RegisterChangeBorrowRateProposal
+*/
+
+func NewRegisterChangeBorrowRateProposal(title, description string, rate uint64) govtypes.Content {
+	return &RegisterChangeBorrowRateProposal{
+		Title:       title,
+		Description: description,
+		Rate:        rate,
+	}
+}
+
+func (*RegisterChangeBorrowRateProposal) ProposalRoute() string { return RouterKey }
+
+func (*RegisterChangeBorrowRateProposal) ProposalType() string {
+	return ProposalTypeRegisterChangeBorrowRateProposal
+}
+
+func (rtbp *RegisterChangeBorrowRateProposal) ValidateBasic() error {
 	{
 		if rtbp.Rate == uint64(0) {
 			return ErrIntNegativeOrZero
