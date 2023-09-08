@@ -26,6 +26,19 @@ func CheckCoinDenom(coins sdk.Coins, denom string) error {
 	return nil
 }
 
+func (k Keeper) GetAmountIntFromCoins(coins string) (sdk.Int, string, error) {
+	amountPositionCoins, err := sdk.ParseCoinsNormalized(coins)
+	if err != nil {
+		return sdk.Int{}, "", err
+	}
+	amountPositionInt := amountPositionCoins.AmountOf(amountPositionCoins.GetDenomByIndex(0))
+	return amountPositionInt, amountPositionCoins.GetDenomByIndex(0), nil
+}
+
+func (k Keeper) FastCoins(denom string, amt sdk.Int) sdk.Coins {
+	return sdk.NewCoins(sdk.NewCoin(denom, amt))
+}
+
 /*
 Deposit Helpers
 */

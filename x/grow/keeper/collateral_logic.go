@@ -34,10 +34,9 @@ func (k Keeper) ExecuteDepositCollateral(ctx sdk.Context, msg *types.MsgDepositC
 	position := types.Position{
 		Creator:             depositor.String(),
 		DepositId:           k.CalculateDepositId(depositor.String(), denom),
-		Amount:              msg.AmountIn,
+		Collateral:          msg.AmountIn,
 		OracleTicker:        LendAsset.OracleAssetId,
 		BorrowedAmountInUSD: 0,
-		Liquidation:         false,
 		LoanIds:             []string{},
 	}
 
@@ -63,7 +62,7 @@ func (k Keeper) ExecuteWithdrawalCollateral(ctx sdk.Context, msg *types.MsgWithd
 		return types.ErrRiskRatioMustBeZero, sdk.Coin{}
 	}
 
-	amountOut, err := sdk.ParseCoinsNormalized(position.Amount)
+	amountOut, err := sdk.ParseCoinsNormalized(position.Collateral)
 	if err != nil {
 		return err, sdk.Coin{}
 	}

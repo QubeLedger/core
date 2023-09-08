@@ -36,39 +36,31 @@ func EndBlocker(ctx sdk.Context, k keeper.Keeper) error {
 		}
 	}
 
-	allLiqPosition := k.GetAllLiquidatorPosition(ctx)
-	for _, lp := range allLiqPosition {
-		allPosition := k.GetAllPosition(ctx)
-		for _, pos := range allPosition {
-			if pos.OracleTicker == lp.BorrowAssetId {
-				liquidatorList := []types.LiquidatorPosition{}
-				if !sdk.NewIntFromUint64(pos.BorrowedAmountInUSD).IsZero() {
-					price, err := k.GetPriceByDenom(ctx, lp.BorrowAssetId)
-					if err != nil {
-						return err
-					}
-					amountPositionCoins, err := sdk.ParseCoinsNormalized(pos.Amount)
-					if err != nil {
-						return err
-					}
-					amountPositionInt := amountPositionCoins.AmountOf(types.DefaultDenom)
-					collateral := (amountPositionInt.Mul(price)).QuoRaw(10000)
-					rr, err := k.CalculateRiskRate(collateral, price, sdk.NewIntFromUint64(pos.BorrowedAmountInUSD))
-					if err != nil {
-						return err
-					}
-					if rr.GT(sdk.NewInt(100)) {
-						liquidatorList = append(liquidatorList, lp)
-					}
-
-				}
-				if len(liquidatorList) != 0 {
-					err := k.ExecuteLiquidation(ctx, liquidatorList, pos)
-					if err != nil {
-						return err
-					}
-				}
+	allPosition := k.GetAllPosition(ctx)
+	liquidateLendPositionList := []string{}
+	for _, pos := range allPosition {
+		if !sdk.NewIntFromUint64(pos.BorrowedAmountInUSD).IsZero() {
+			price, err := k.GetPriceByDenom(ctx, pos.OracleTicker)
+			if err != nil {
+				return err
 			}
+			amountPositionInt, _, err := k.GetAmountIntFromCoins(pos.Collateral)
+			if err != nil {
+				return err
+			}
+			rr, err := k.CalculateRiskRate(amountPositionInt, price, sdk.NewIntFromUint64(pos.BorrowedAmountInUSD))
+			if err != nil {
+				return err
+			}
+			if rr.GTE(sdk.NewInt(95)) {
+				liquidateLendPositionList = append(liquidateLendPositionList, pos.DepositId)
+			}
+		}
+	}
+	if len(liquidateLendPositionList) != 0 {
+		err := k.ExecuteLiquidation(ctx, liquidateLendPositionList)
+		if err != nil {
+			return err
 		}
 	}
 

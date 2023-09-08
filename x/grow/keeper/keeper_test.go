@@ -31,11 +31,12 @@ import (
 
 type GrowKeeperTestSuite struct {
 	suite.Suite
-	ctx        sdk.Context
-	app        *app.QuadrateApp
-	genesis    types.GenesisState
-	Address    sdk.AccAddress
-	ValPubKeys []cryptotypes.PubKey
+	ctx               sdk.Context
+	app               *app.QuadrateApp
+	genesis           types.GenesisState
+	Address           sdk.AccAddress
+	LiquidatorAddress sdk.AccAddress
+	ValPubKeys        []cryptotypes.PubKey
 }
 
 var s *GrowKeeperTestSuite
@@ -43,6 +44,7 @@ var s *GrowKeeperTestSuite
 func (s *GrowKeeperTestSuite) Setup() {
 	s.app = quadrateapptest.Setup(s.T(), "qube-1", false, 1)
 	s.Address = apptesting.CreateRandomAccounts(1)[0]
+	s.LiquidatorAddress = apptesting.CreateRandomAccounts(1)[0]
 	s.ValPubKeys = simapp.CreateTestPubKeys(1)
 }
 

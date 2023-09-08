@@ -9,11 +9,10 @@ message Position {
         uint64 id = 1;
         string creator = 2; 
         string depositId = 3;
-        string amount = 4;
+        string collateral = 4;
         string oracleTicker = 5; 
         uint64 borrowedAmountInUSD = 6;
-        bool   liquidation = 7;
-        repeated string loanIds = 8;
+        repeated string loanIds = 7;
 }
 
 message LendAsset {

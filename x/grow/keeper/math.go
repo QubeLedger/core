@@ -49,8 +49,9 @@ RR Math Logic
 
 func (k Keeper) CalculateRiskRate(collateral sdk.Int, price sdk.Int, borrow sdk.Int) (sdk.Int, error) {
 	amtCollateral := (collateral.Mul(price)).QuoRaw(10000)
-	riskRatio := uint64((float64((borrow.Quo(amtCollateral)).Int64()) * float64(1/60)) * 10000)
-	return sdk.NewIntFromUint64(riskRatio), nil
+	mul := float64(1) / float64(60)
+	riskRatio := (((float64(borrow.Int64()) / float64(amtCollateral.Int64())) * mul) * 10000)
+	return sdk.NewInt(int64(riskRatio)), nil
 }
 
 func (k Keeper) CheckRiskRate(collateral sdk.Int, price sdk.Int, borrow sdk.Int, desiredAmount sdk.Int) error {
@@ -58,7 +59,7 @@ func (k Keeper) CheckRiskRate(collateral sdk.Int, price sdk.Int, borrow sdk.Int,
 	if err != nil {
 		return err
 	}
-	if rr.GT(sdk.NewInt(100)) {
+	if rr.GT(sdk.NewInt(95)) {
 		return types.ErrRiskRateIsGreaterThenShouldBe
 	}
 
@@ -67,19 +68,25 @@ func (k Keeper) CheckRiskRate(collateral sdk.Int, price sdk.Int, borrow sdk.Int,
 		return err
 	}
 
-	if rr.GT(sdk.NewInt(100)) {
+	if rr.GT(sdk.NewInt(95)) {
 		return types.ErrRiskRateIsGreaterThenShouldBe
 	}
 	return nil
 }
 
-func (k Keeper) CalculateAmountWhichLiquidatorSend(ctx sdk.Context, borrowedAmountInUSD uint64, collateral sdk.Int, price sdk.Int, premium uint64) sdk.Int {
-	amtCollateral := (collateral.Mul(price)).QuoRaw(10000)
-	mul := float64(1 / 60)
-	priceUint64 := price.Uint64()
-	borrow := uint64(((float64(100) / mul) * float64(amtCollateral.Uint64())) / 10000)
+func (k Keeper) CalculateAmountLiquidate(ctx sdk.Context, collateral sdk.Int, borrow sdk.Int) sdk.Int {
+	collateralInt := collateral.Int64()
+	borrowInt := borrow.Int64()
+	return sdk.NewInt(int64(((2.85 * float64(collateralInt)) - float64(5*borrowInt)) / float64(-2.15)))
 
-	needSend := ((borrowedAmountInUSD - borrow) / (priceUint64 + (priceUint64 * premium))) * priceUint64
-	return sdk.NewIntFromUint64(needSend)
+}
 
+func (k Keeper) CalculatePremiumAmount(ctx sdk.Context, amount sdk.Int, price sdk.Int, premium int64) (sdk.Int, sdk.Int) {
+	amountInt := amount.Int64()
+	priceInt := price.Int64()
+
+	usqValue := amountInt + ((amountInt * premium) / 100)
+	assetValue := (usqValue / priceInt) * 10000
+
+	return sdk.NewInt(usqValue), sdk.NewInt(assetValue)
 }

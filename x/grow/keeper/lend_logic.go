@@ -21,7 +21,7 @@ func (k Keeper) ExecuteLend(ctx sdk.Context, msg *types.MsgCreateLend, LendAsset
 		return types.ErrPositionNotFound, sdk.Coin{}, ""
 	}
 
-	amountPositionCoins, err := sdk.ParseCoinsNormalized(position.Amount)
+	amountPositionCoins, err := sdk.ParseCoinsNormalized(position.Collateral)
 	if err != nil {
 		return err, sdk.Coin{}, ""
 	}
@@ -40,12 +40,9 @@ func (k Keeper) ExecuteLend(ctx sdk.Context, msg *types.MsgCreateLend, LendAsset
 		return err, sdk.Coin{}, ""
 	}
 
-	if !sdk.NewIntFromUint64(position.BorrowedAmountInUSD).IsZero() {
-		collateral := (amountPositionInt.Mul(price)).QuoRaw(10000)
-		err = k.CheckRiskRate(collateral, price, sdk.NewIntFromUint64(position.BorrowedAmountInUSD), desiredAmountInt)
-		if err != nil {
-			return err, sdk.Coin{}, ""
-		}
+	err = k.CheckRiskRate(amountPositionInt, price, sdk.NewIntFromUint64(position.BorrowedAmountInUSD), desiredAmountInt)
+	if err != nil {
+		return err, sdk.Coin{}, ""
 	}
 
 	err = k.bankKeeper.SendCoinsFromAccountToModule(ctx, k.GetGrowStakingReserveAddress(ctx), types.ModuleName, desiredAmountCoins)

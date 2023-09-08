@@ -34,7 +34,7 @@ func (k Keeper) ExecuteCreateLiqPosition(ctx sdk.Context, msg *types.MsgCreateLi
 
 	liqPosition := types.LiquidatorPosition{
 		LiquidatorPositionId: liquidatorPositionId,
-		BorrowAssetId:        LendAsset.AssetMetadata.Display,
+		BorrowAssetId:        LendAsset.AssetMetadata.Name,
 		Liquidator:           creator.String(),
 		Amount:               amountInCoins.String(),
 		Premium:              premium.Uint64(),
