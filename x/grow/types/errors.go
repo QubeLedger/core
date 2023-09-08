@@ -10,6 +10,7 @@ var (
 	ErrSample                        = sdkerrors.Register(ModuleName, 1100, "sample error")
 	ErrSdkIntError                   = sdkerrors.Register(ModuleName, 1101, "sdk.Int error")
 	ErrIntNegativeOrZero             = sdkerrors.Register(ModuleName, 1102, "ErrIntNegativeOrZero error")
+	ErrInvalidLength                 = sdkerrors.Register(ModuleName, 1103, "invalid length")
 	ErrOracleAssetIdNotFound         = sdkerrors.Register(ModuleName, 1200, "ErrOracleAssetIdNotFound err")
 	ErrCoinsLen                      = sdkerrors.Register(ModuleName, 1400, "ErrCoinsLen err")
 	ErrDenomsNotEqual                = sdkerrors.Register(ModuleName, 1401, "ErrDenomsNotEqual err")

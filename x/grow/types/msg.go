@@ -305,6 +305,20 @@ func (msg *MsgCreateLiquidationPosition) ValidateBasic() error {
 	if err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid depositor address (%s)", err)
 	}
+
+	value, err := sdk.ParseCoinsNormalized(msg.AmountIn)
+	if err != nil || value.String() == "" {
+		return sdkerrors.ErrInvalidCoins
+	}
+
+	if len(msg.Asset) == 0 {
+		return ErrInvalidLength
+	}
+
+	if len(msg.Premium) == 0 {
+		return ErrInvalidLength
+	}
+
 	return nil
 }
 
@@ -342,8 +356,13 @@ func (msg *MsgCloseLiquidationPosition) GetSignBytes() []byte {
 
 func (msg *MsgCloseLiquidationPosition) ValidateBasic() error {
 	_, err := sdk.AccAddressFromBech32(msg.Creator)
+
 	if err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid depositor address (%s)", err)
+	}
+
+	if len(msg.LiquidatorPositionId) == 0 {
+		return ErrInvalidLength
 	}
 	return nil
 }

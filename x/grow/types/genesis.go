@@ -10,7 +10,11 @@ const DefaultIndex uint64 = 1
 
 func DefaultGenesis() *GenesisState {
 	return &GenesisState{
-		Params: DefaultParams(),
+		Params:                    DefaultParams(),
+		GTokenPairList:            []GTokenPair{},
+		RealRate:                  1,
+		GrowStakingReserveAddress: "qube1xpurqvpsxqcrqvpsxqcrqvpsxqcrqvpsxqcrqv",
+		USQReserveAddress:         "qube1xpurqvpsxqcrqvpsxqcrqvpsxqcrqvpsxqcrqv",
 	}
 }
 
@@ -31,8 +35,8 @@ func (gs GenesisState) Validate() error {
 		return fmt.Errorf("GrowStakingReserveAddress empty")
 	}
 
-	if sdk.NewIntFromUint64(gs.RealRate).IsNegative() {
-		return fmt.Errorf("RealRate negative")
+	if sdk.NewInt(int64(gs.RealRate)).IsNegative() || sdk.NewInt(int64(gs.RealRate)).IsZero() {
+		return fmt.Errorf("RealRate negative or zero")
 	}
 
 	return gs.Params.Validate()

@@ -12,7 +12,7 @@ func SetConfig() {
 	config.SetBech32PrefixForConsensusNode(Bech32PrefixConsAddr, Bech32PrefixConsPub)
 	config.SetCoinType(CoinType)
 	config.SetFullFundraiserPath(FullFundraiserPath)
-	config.Seal()
+	//config.Seal()
 }
 
 //nolint:all

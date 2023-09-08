@@ -1,0 +1,82 @@
+syntax = "proto3";
+package core.grow.v1beta1;
+import "gogoproto/gogo.proto";
+import "cosmos/bank/v1beta1/bank.proto";
+option go_package = "github.com/QuadrateOrg/core/x/grow/types";
+
+message RegisterLendAssetProposal {
+  option (gogoproto.equal) = false;
+  // title of the proposal
+  string title = 1;
+  // description of the proposal
+  string description = 2;
+  // metadata slice of the native Cosmos coins
+  cosmos.bank.v1beta1.Metadata assetMetadata = 3 [ (gogoproto.moretags) = "yaml:\"assetMetadata\"", (gogoproto.nullable)   = false ];
+  string oracleAssetId = 4;
+}
+
+message RegisterGTokenPairProposal {
+  option (gogoproto.equal) = false;
+  // title of the proposal
+  string title = 1;
+  // description of the proposal
+  string description = 2;
+  // metadata slice of the native Cosmos coins
+  cosmos.bank.v1beta1.Metadata gTokenMetadata = 3 [ (gogoproto.moretags) = "yaml:\"assetMetadata\"", (gogoproto.nullable)   = false ];
+  string qStablePairId = 4;
+  string minAmountIn = 5;
+  string minAmountOut = 6;
+}
+
+message ProposalMetadataForRegisterLendAssetProposal {
+  cosmos.bank.v1beta1.Metadata assetMetadata = 1 [ (gogoproto.moretags) = "yaml:\"assetMetadata\"", (gogoproto.nullable)   = false ];
+  string oracleAssetId = 2;
+}
+
+message ProposalMetadataForRegisterGTokenPairProposal {
+  cosmos.bank.v1beta1.Metadata gTokenMetadata = 1 [ (gogoproto.moretags) = "yaml:\"gTokenMetadata\"", (gogoproto.nullable)   = false ];
+  string qStablePairId = 2;
+  string minAmountIn = 3;
+  string minAmountOut = 4;
+}
+
+
+message RegisterChangeGrowYieldReserveAddressProposal {
+  option (gogoproto.equal) = false;
+  // title of the proposal
+  string title = 1;
+  // description of the proposal
+  string description = 2;
+
+  string address = 3;
+}
+
+message RegisterChangeUSQReserveAddressProposal {
+  option (gogoproto.equal) = false;
+  // title of the proposal
+  string title = 1;
+  // description of the proposal
+  string description = 2;
+
+  string address = 3;
+}
+
+message RegisterChangeGrowStakingReserveAddressProposal {
+  option (gogoproto.equal) = false;
+  // title of the proposal
+  string title = 1;
+  // description of the proposal
+  string description = 2;
+
+  string address = 3;
+}
+
+message RegisterChangeRealRateProposal {
+  option (gogoproto.equal) = false;
+  // title of the proposal
+  string title = 1;
+  // description of the proposal
+  string description = 2;
+
+  uint64 rate = 3;
+}

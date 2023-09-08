@@ -76,7 +76,6 @@ func (k Keeper) LiquidatePosition(ctx sdk.Context, liqPosition types.LiquidatorP
 
 	collateralAmountInUsq := (collateralAmountInt.Mul(price)).QuoRaw(10000)
 	amtLiquidate := k.CalculateAmountLiquidate(ctx, collateralAmountInUsq, sdk.NewIntFromUint64(pos.BorrowedAmountInUSD))
-	fmt.Printf("Amount liquidate: %f USQ\n", float64(amtLiquidate.Int64())/1000000)
 	if amtLiquidate.LTE(liqPositioAmountInt) {
 		usdAmount, assetAmount := k.CalculatePremiumAmount(ctx, amtLiquidate, price, int64(liqPosition.Premium))
 		err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, liquidator, k.FastCoins(collateralDenom, assetAmount))
