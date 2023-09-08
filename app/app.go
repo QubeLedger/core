@@ -130,6 +130,7 @@ import (
 	stablemoduletypes "github.com/QuadrateOrg/core/x/stable/types"
 
 	growmodule "github.com/QuadrateOrg/core/x/grow"
+	growclient "github.com/QuadrateOrg/core/x/grow/client"
 	growmodulekeeper "github.com/QuadrateOrg/core/x/grow/keeper"
 	growmoduletypes "github.com/QuadrateOrg/core/x/grow/types"
 
@@ -183,6 +184,13 @@ func getGovProposalHandlers() []govclient.ProposalHandler {
 		ibcclientclient.UpgradeProposalHandler,
 		stableclient.RegisterPairHandler,
 		stableclient.RegisterChangeBurningFundAddressHandler,
+		growclient.RegisterChangeBorrowRateProposalHandler,
+		growclient.RegisterChangeGrowStakingReserveAddressProposalHandler,
+		growclient.RegisterChangeGrowYieldReserveAddressProposalHandler,
+		growclient.RegisterChangeRealRateProposalHandler,
+		growclient.RegisterChangeUSQReserveAddressProposalHandler,
+		growclient.RegisterGTokenPairProposalHandler,
+		growclient.RegisterLendAssetProposalHandler,
 	)
 
 	return govProposalHandlers

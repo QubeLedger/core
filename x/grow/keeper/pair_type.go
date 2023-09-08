@@ -99,12 +99,12 @@ func (k Keeper) GetPairByID(ctx sdk.Context, id uint64) (val types.GTokenPair, f
 }
 
 //nolint:all
-func (k Keeper) GeneratePairIdHash(denom1 string) string {
+func (k Keeper) GenerateDenomIdHash(denom1 string) string {
 	return fmt.Sprintf("%x", crypto.Sha256(append([]byte(denom1))))
 }
 
 func (k Keeper) GetDenomIdDeposit(denom string) (string, error) {
-	return k.GeneratePairIdHash(denom), nil
+	return k.GenerateDenomIdHash(denom), nil
 }
 
 func (k Keeper) GetDenomIdWithdrawal(amountIn string) (string, error) {
@@ -113,12 +113,12 @@ func (k Keeper) GetDenomIdWithdrawal(amountIn string) (string, error) {
 		return "", err
 	}
 
-	return k.GeneratePairIdHash(msgAmountInCoins.GetDenomByIndex(0)), nil
+	return k.GenerateDenomIdHash(msgAmountInCoins.GetDenomByIndex(0)), nil
 }
 
 func (k Keeper) RegisterPair(ctx sdk.Context, p types.GTokenPair) error {
 	pair := types.GTokenPair{
-		DenomID:                     k.GeneratePairIdHash(p.GTokenMetadata.Base),
+		DenomID:                     k.GenerateDenomIdHash(p.GTokenMetadata.Base),
 		QStablePairId:               p.QStablePairId,
 		GTokenMetadata:              p.GTokenMetadata,
 		MinAmountIn:                 p.MinAmountIn,

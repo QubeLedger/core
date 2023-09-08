@@ -254,7 +254,7 @@ func NewRegisterChangeGrowYieldReserveAddressProposalCmd() *cobra.Command {
 
 func NewRegisterChangeGrowStakingReserveAddressProposalCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "change-grow-straking-reserve [address]",
+		Use:   "change-grow-staking-reserve [address]",
 		Args:  cobra.ExactArgs(1),
 		Short: "Submit a change grow staking reserve address proposal",
 		RunE: func(cmd *cobra.Command, args []string) (err error) {

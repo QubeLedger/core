@@ -133,3 +133,13 @@ func (k Keeper) GetLendAssetByOracleAssetId(ctx sdk.Context, oracleAssetId strin
 	}
 	return val, types.ErrLendAssetNotFound
 }
+
+func (k Keeper) RegisterendAsset(ctx sdk.Context, p types.LendAsset) error {
+	la := types.LendAsset{
+		LendAssetId:   p.LendAssetId,
+		AssetMetadata: p.AssetMetadata,
+		OracleAssetId: p.OracleAssetId,
+	}
+	_ = k.AppendLendAsset(ctx, la)
+	return nil
+}
