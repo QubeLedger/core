@@ -491,13 +491,17 @@ func (suite *GrowKeeperTestSuite) TestExecuteDeleteLend() {
 			suite.Require().Equal(loan.StartTime, uint64(s.ctx.BlockTime().Unix()))
 
 			s.ctx = s.ctx.WithBlockTime(time.Unix((s.ctx.BlockTime().Unix() + 31536000), 0))
-
 			borrowTime := sdk.NewIntFromUint64(uint64(s.ctx.BlockTime().Unix()) - loan.StartTime)
-
 			sendAmountInt := s.app.GrowKeeper.CalculateNeedAmountToGet(sdk.NewInt(tc.expectTokenAmount), borrowTime)
 			sendAmount := sendAmountInt.String() + tc.expectTokenDenom
 
+			config := s.GetNormalConfig()
+
+			oldUsqReserveBalance := s.app.BankKeeper.GetBalance(s.ctx, s.app.GrowKeeper.GetUSQReserveAddress(s.ctx), config.sendTokenDenom)
+			oldBurningFundBalance := s.app.BankKeeper.GetBalance(s.ctx, s.app.StableKeeper.GetBurningFundAddress(s.ctx), config.sendTokenDenom)
+
 			suite.AddTestCoins(sendAmountInt.Int64()-tc.expectTokenAmount, tc.expectTokenDenom)
+
 			msg3 := types.NewMsgDeleteLend(
 				s.Address.String(),
 				sendAmount,
@@ -510,9 +514,21 @@ func (suite *GrowKeeperTestSuite) TestExecuteDeleteLend() {
 
 			newPosition, found := s.app.GrowKeeper.GetPositionByPositionId(s.ctx, res.PositionId)
 			suite.Require().Equal(found, true)
-
 			suite.Require().Equal(len(newPosition.LoanIds), 0)
+
+			loanAmountInt, _, _ := s.app.GrowKeeper.GetAmountIntFromCoins(loan.AmountOut)
+			collateralAmount, collateralDenom, _ := s.app.GrowKeeper.GetAmountIntFromCoins(position.Collateral)
+			price, _ := s.app.GrowKeeper.GetPriceByDenom(s.ctx, position.OracleTicker)
+			collateralReduceValue := s.app.GrowKeeper.CalculateAmountForRemoveFromCollateral(sendAmountInt.Sub(loanAmountInt), price)
+
 			suite.Require().Equal(newPosition.BorrowedAmountInUSD, position.BorrowedAmountInUSD-uint64(tc.expectTokenAmount))
+			suite.Require().Equal(newPosition.Collateral, s.app.GrowKeeper.FastCoins(collateralDenom, collateralAmount.Sub(collateralReduceValue)).String())
+
+			newUsqReserveBalance := s.app.BankKeeper.GetBalance(s.ctx, s.app.GrowKeeper.GetUSQReserveAddress(s.ctx), config.sendTokenDenom)
+			newBurningFundBalance := s.app.BankKeeper.GetBalance(s.ctx, s.app.StableKeeper.GetBurningFundAddress(s.ctx), config.sendTokenDenom)
+
+			suite.Require().Equal(newUsqReserveBalance.Amount.Sub(oldUsqReserveBalance.Amount), sendAmountInt.Sub(loanAmountInt).QuoRaw(2))
+			suite.Require().Equal(newBurningFundBalance.Amount.Sub(oldBurningFundBalance.Amount), sendAmountInt.Sub(loanAmountInt).QuoRaw(2))
 		})
 	}
 }

@@ -144,3 +144,9 @@ func (k Keeper) ReduceBorrowedAmountInUSDInPosition(ctx sdk.Context, position ty
 	position.BorrowedAmountInUSD = position.BorrowedAmountInUSD - amt.Uint64()
 	return position
 }
+
+func (k Keeper) ReduceCollateralInPosition(ctx sdk.Context, position types.Position, amt sdk.Int) types.Position {
+	oldAmt, denom, _ := k.GetAmountIntFromCoins(position.Collateral)
+	position.Collateral = k.FastCoins(denom, oldAmt.Sub(amt)).String()
+	return position
+}

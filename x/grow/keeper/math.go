@@ -43,6 +43,10 @@ func (k Keeper) CalculateNeedAmountToGet(borrow_amount sdk.Int, borrow_time sdk.
 	return (borrow_amount.Add(((borrow_amount.MulRaw(15).Mul(borrow_time)).QuoRaw(100)).QuoRaw(31536000)))
 }
 
+func (k Keeper) CalculateAmountForRemoveFromCollateral(amt sdk.Int, price sdk.Int) sdk.Int {
+	return ((amt.Mul(types.Multiplier)).Quo(price))
+}
+
 /*
 RR Math Logic
 */

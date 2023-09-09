@@ -109,6 +109,11 @@ func (k Keeper) ExecuteDeleteLend(ctx sdk.Context, msg *types.MsgDeleteLend, Len
 		return types.ErrLoanNotFoundInPosition, ""
 	}
 
+	price, err := k.GetPriceByDenom(ctx, position.OracleTicker)
+	if err != nil {
+		return err, ""
+	}
+
 	borrowAmountCoins, err := sdk.ParseCoinsNormalized(loan.AmountOut)
 	if err != nil {
 		return err, ""
@@ -123,18 +128,20 @@ func (k Keeper) ExecuteDeleteLend(ctx sdk.Context, msg *types.MsgDeleteLend, Len
 		return types.ErrNotEnoughAmountIn, ""
 	}
 
-	err = k.bankKeeper.SendCoinsFromAccountToModule(ctx, borrower, types.ModuleName, amountInCoins)
+	rightAmountInCollateral := k.CalculateAmountForRemoveFromCollateral(rightAmount.Sub(borrowAmountInt), price)
+
+	err = k.bankKeeper.SendCoinsFromAccountToModule(ctx, borrower, types.ModuleName, borrowAmountCoins)
 	if err != nil {
 		return err, ""
 	}
 
 	amtToReserves := (rightAmount.Sub(borrowAmountInt)).QuoRaw(2)
-	err = k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, k.GetUSQReserveAddress(ctx), sdk.NewCoins(sdk.NewCoin(types.DefaultDenom, amtToReserves)))
+	err = k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, k.GetUSQReserveAddress(ctx), k.FastCoins(types.DefaultDenom, amtToReserves))
 	if err != nil {
 		return err, ""
 	}
 
-	err = k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, k.stableKeeper.GetBurningFundAddress(ctx), sdk.NewCoins(sdk.NewCoin(types.DefaultDenom, amtToReserves)))
+	err = k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, k.stableKeeper.GetBurningFundAddress(ctx), k.FastCoins(types.DefaultDenom, amtToReserves))
 	if err != nil {
 		return err, ""
 	}
@@ -142,6 +149,7 @@ func (k Keeper) ExecuteDeleteLend(ctx sdk.Context, msg *types.MsgDeleteLend, Len
 	k.RemoveLoan(ctx, loan.Id)
 	position = k.RemoveLoanInPosition(ctx, loan.LoanId, position)
 	position = k.ReduceBorrowedAmountInUSDInPosition(ctx, position, borrowAmountInt)
+	position = k.ReduceCollateralInPosition(ctx, position, rightAmountInCollateral)
 	k.SetPosition(ctx, position)
 
 	return nil, loan.LoanId
