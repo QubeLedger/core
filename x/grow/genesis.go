@@ -13,8 +13,8 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) 
 		k.AppendPair(ctx, elem)
 	}
 	k.SetParams(ctx, genState.Params)
-	k.SetRealRate(ctx, sdk.NewIntFromUint64(genState.RealRate))
-	k.SetBorrowRate(ctx, sdk.NewIntFromUint64(genState.BorrowRate))
+	k.SetRealRate(ctx, sdk.NewIntFromUint64(genState.RealRate))     //nolint:errcheck
+	k.SetBorrowRate(ctx, sdk.NewIntFromUint64(genState.BorrowRate)) //nolint:errcheck
 	k.SetGrowStakingReserveAddress(ctx, sdk.AccAddress(genState.GrowStakingReserveAddress))
 	k.SetUSQReserveAddress(ctx, sdk.AccAddress(genState.USQReserveAddress))
 }

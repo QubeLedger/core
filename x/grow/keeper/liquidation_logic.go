@@ -29,7 +29,7 @@ func (k Keeper) ExecuteLiquidation(ctx sdk.Context, liquidateLendPositionList []
 		for _, data := range liquidatorList {
 			if data.lp.Premium == uint64(i) {
 				res, err := k.LiquidatePosition(ctx, data.lp, data.id)
-				if res == true {
+				if res {
 					return nil
 				}
 				if err != nil {
