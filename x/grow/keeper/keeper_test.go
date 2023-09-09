@@ -44,6 +44,8 @@ type NormalTestConfig struct {
 	collateralDenom  string
 	sendTokenAmount  int64
 	sendTokenDenom   string
+	lendTokenAmount  int64
+	lendTokenDenom   string
 }
 
 var s *GrowKeeperTestSuite
@@ -184,6 +186,8 @@ func (s *GrowKeeperTestSuite) GetNormalConfig() NormalTestConfig {
 		collateralDenom:  "uosmo",
 		sendTokenAmount:  1000 * 1000000,
 		sendTokenDenom:   "uusd",
+		lendTokenAmount:  250 * 1000000,
+		lendTokenDenom:   "uusd",
 	}
 }
 
