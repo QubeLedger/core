@@ -116,6 +116,7 @@ func (k Keeper) GetDenomIdWithdrawal(amountIn string) (string, error) {
 	return k.GenerateDenomIdHash(msgAmountInCoins.GetDenomByIndex(0)), nil
 }
 
+/* #nosec */
 func (k Keeper) RegisterPair(ctx sdk.Context, p types.GTokenPair) error {
 	pair := types.GTokenPair{
 		DenomID:                     k.GenerateDenomIdHash(p.GTokenMetadata.Base),

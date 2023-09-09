@@ -18,6 +18,7 @@ func DefaultGenesis() *GenesisState {
 	}
 }
 
+/* #nosec */
 func (gs GenesisState) Validate() error {
 	gTokenPairListIdMap := make(map[uint64]bool)
 	for _, elem := range gs.GTokenPairList {

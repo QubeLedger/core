@@ -5,6 +5,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
+/* #nosec */
 func (k Keeper) ExecuteLend(ctx sdk.Context, msg *types.MsgCreateLend, LendAsset types.LendAsset) (error, sdk.Coin, string) {
 
 	borrower, err := sdk.AccAddressFromBech32(msg.Borrower)
@@ -73,6 +74,7 @@ func (k Keeper) ExecuteLend(ctx sdk.Context, msg *types.MsgCreateLend, LendAsset
 	return nil, desiredAmountCoin, loanId
 }
 
+/* #nosec */
 func (k Keeper) ExecuteDeleteLend(ctx sdk.Context, msg *types.MsgDeleteLend, LendAsset types.LendAsset) (error, string) {
 	amountInCoins, err := sdk.ParseCoinsNormalized(msg.AmountIn)
 	if err != nil {

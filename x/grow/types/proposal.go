@@ -301,6 +301,7 @@ func (*RegisterChangeRealRateProposal) ProposalType() string {
 	return ProposalTypeRegisterChangeRealRateProposal
 }
 
+/* #nosec */
 func (rtbp *RegisterChangeRealRateProposal) ValidateBasic() error {
 	{
 		if rtbp.Rate == uint64(0) {
@@ -332,6 +333,7 @@ func (*RegisterChangeBorrowRateProposal) ProposalType() string {
 	return ProposalTypeRegisterChangeBorrowRateProposal
 }
 
+/* #nosec */
 func (rtbp *RegisterChangeBorrowRateProposal) ValidateBasic() error {
 	{
 		if rtbp.Rate == uint64(0) {

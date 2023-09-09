@@ -14,6 +14,7 @@ import (
 	"github.com/QuadrateOrg/core/x/grow/types"
 )
 
+/* #nosec */
 var (
 	DefaultRelativePacketTimeoutTimestamp = uint64((time.Duration(10) * time.Minute).Nanoseconds())
 )

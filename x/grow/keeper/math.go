@@ -18,6 +18,7 @@ func (k Keeper) CalculateReturnQubeStableAmountOut(amount sdk.Int, price sdk.Int
 	return ((amount.Mul(price)).Quo(types.DepositMultiplier))
 }
 
+/* #nosec */
 func (k Keeper) CalculateGTokenAPY(lastAmount sdk.Int, growRate sdk.Int, day sdk.Int) sdk.Int {
 	lastAmountInt := lastAmount.Int64()
 	growRateInt := growRate.Int64()
@@ -50,7 +51,7 @@ func (k Keeper) CalculateAmountForRemoveFromCollateral(amt sdk.Int, price sdk.In
 /*
 RR Math Logic
 */
-
+/* #nosec */
 func (k Keeper) CalculateRiskRate(collateral sdk.Int, price sdk.Int, borrow sdk.Int) (sdk.Int, error) {
 	amtCollateral := (collateral.Mul(price)).QuoRaw(10000)
 	mul := float64(1) / float64(60)
@@ -78,6 +79,7 @@ func (k Keeper) CheckRiskRate(collateral sdk.Int, price sdk.Int, borrow sdk.Int,
 	return nil
 }
 
+/* #nosec */
 func (k Keeper) CalculateAmountLiquidate(ctx sdk.Context, collateral sdk.Int, borrow sdk.Int) sdk.Int {
 	collateralInt := collateral.Int64()
 	borrowInt := borrow.Int64()

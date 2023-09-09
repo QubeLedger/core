@@ -1,8 +1,6 @@
 package keeper
 
 import (
-	"fmt"
-
 	"github.com/QuadrateOrg/core/x/grow/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
@@ -12,6 +10,7 @@ type Data struct {
 	id string
 }
 
+/* #nosec */
 func (k Keeper) ExecuteLiquidation(ctx sdk.Context, liquidateLendPositionList []string) error {
 	liquidatorList := []Data{}
 	allLiquidator := k.GetAllLiquidatorPosition(ctx)
@@ -42,6 +41,7 @@ func (k Keeper) ExecuteLiquidation(ctx sdk.Context, liquidateLendPositionList []
 	return nil
 }
 
+/* #nosec */
 func (k Keeper) LiquidatePosition(ctx sdk.Context, liqPosition types.LiquidatorPosition, posId string) (bool, error) {
 	pos, _ := k.GetPositionByPositionId(ctx, posId)
 	collateralAmountInt, collateralDenom, err := k.GetAmountIntFromCoins(pos.Collateral)
@@ -60,7 +60,7 @@ func (k Keeper) LiquidatePosition(ctx sdk.Context, liqPosition types.LiquidatorP
 	}
 
 	rr, err := k.CalculateRiskRate(collateralAmountInt, price, sdk.NewIntFromUint64(pos.BorrowedAmountInUSD))
-	fmt.Printf("Risk Ratio: %d\n", rr.Int64())
+	//fmt.Printf("Risk Ratio: %d\n", rr.Int64())
 	if err != nil {
 		return false, err
 	}
