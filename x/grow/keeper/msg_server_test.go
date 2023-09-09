@@ -923,7 +923,7 @@ func (suite *GrowKeeperTestSuite) TestLiquidatePositionFull() {
 	}
 }
 
-func (suite *GrowKeeperTestSuite) TestManyLiquidator() {
+func (suite *GrowKeeperTestSuite) Test4Liquidator() {
 	testCases := []struct {
 		name              string
 		qStablePair       stabletypes.Pair
@@ -1035,10 +1035,161 @@ func (suite *GrowKeeperTestSuite) TestManyLiquidator() {
 			err2 := grow.EndBlocker(s.ctx, s.app.GrowKeeper)
 			suite.Require().NoError(err2)
 
+			var allBalance float64
+
 			for i, lc := range liquidatorCases {
 				balance := s.app.BankKeeper.GetBalance(s.ctx, lc.address, tc.sendTokenDenom)
+				allBalance += float64(balance.Amount.Int64()) / 1000000
 				fmt.Printf("Balance liquidator %d: %f OSMO\n", i, float64(balance.Amount.Int64())/1000000)
 			}
+
+			fmt.Printf("All liquidate: %f OSMO\n", allBalance)
+		})
+	}
+}
+
+func (suite *GrowKeeperTestSuite) Test7Liquidator() {
+	testCases := []struct {
+		name              string
+		qStablePair       stabletypes.Pair
+		gTokenPair        types.GTokenPair
+		LendAsset         types.LendAsset
+		sendTokenDenom    string
+		sendTokenAmount   int64
+		expectTokenDenom  string
+		expectTokenAmount int64
+	}{
+		{
+			"ok-execute-liquidation-many-liquidators",
+			s.GetNormalQStablePair(0),
+			s.GetNormalGTokenPair(0),
+			s.GetNormalLendAsset(0),
+			"uosmo",
+			100 * 1000000,
+			"uusd",
+			70 * 1000000,
+		},
+	}
+
+	liquidatorCases := []struct {
+		address sdk.AccAddress
+		amount  int64
+		denom   string
+		asset   string
+		premium string
+	}{
+		{
+			apptesting.CreateRandomAccounts(1)[0],
+			1 * 1000000,
+			"uusd",
+			"OSMO",
+			"3",
+		},
+		{
+			apptesting.CreateRandomAccounts(1)[0],
+			4 * 1000000,
+			"uusd",
+			"OSMO",
+			"4",
+		},
+		{
+			apptesting.CreateRandomAccounts(1)[0],
+			2 * 1000000,
+			"uusd",
+			"OSMO",
+			"4",
+		},
+		{
+			apptesting.CreateRandomAccounts(1)[0],
+			9 * 1000000,
+			"uusd",
+			"OSMO",
+			"5",
+		},
+		{
+			apptesting.CreateRandomAccounts(1)[0],
+			10 * 1000000,
+			"uusd",
+			"OSMO",
+			"5",
+		},
+		{
+			apptesting.CreateRandomAccounts(1)[0],
+			10 * 1000000,
+			"uusd",
+			"OSMO",
+			"7",
+		},
+		{
+			apptesting.CreateRandomAccounts(1)[0],
+			10 * 1000000,
+			"uusd",
+			"OSMO",
+			"7",
+		},
+	}
+
+	suite.Setup()
+	suite.Commit()
+	suite.SetupOracleKeeper("OSMO")
+	suite.RegisterValidator()
+	s.ctx = s.ctx.WithBlockTime(time.Now())
+	for _, tc := range testCases {
+
+		suite.app.StableKeeper.AppendPair(s.ctx, tc.qStablePair)
+		suite.app.GrowKeeper.AppendLendAsset(s.ctx, tc.LendAsset)
+
+		suite.OracleAggregateExchangeRateFromInput("1.3", tc.LendAsset.AssetMetadata.Name)
+
+		suite.AddTestCoinsToCustomAccount(sdk.NewInt(100000*1000000), tc.qStablePair.AmountOutMetadata.Base, s.app.GrowKeeper.GetGrowStakingReserveAddress(s.ctx))
+
+		suite.Run(fmt.Sprintf("Case---%s", tc.name), func() {
+			suite.AddTestCoins(tc.sendTokenAmount, tc.sendTokenDenom)
+			msg := types.NewMsgDepositCollateral(
+				suite.Address.String(),
+				sdk.NewInt(tc.sendTokenAmount).String()+tc.sendTokenDenom,
+			)
+			ctx := sdk.WrapSDKContext(suite.ctx)
+			res, err := suite.app.GrowKeeper.DepositCollateral(ctx, msg)
+			suite.Require().NoError(err)
+			suite.Require().NotEmpty(res)
+
+			msg2 := types.NewMsgCreateLend(
+				s.Address.String(),
+				tc.sendTokenDenom,
+				sdk.NewInt(tc.expectTokenAmount).String(),
+			)
+			res1, err1 := suite.app.GrowKeeper.CreateLend(ctx, msg2)
+			suite.Require().NoError(err1)
+			suite.Require().NotEmpty(res1)
+
+			for _, lc := range liquidatorCases {
+				suite.AddTestCoinsToCustomAccount(sdk.NewInt(lc.amount), lc.denom, lc.address)
+				msg := types.NewMsgCreateLiquidationPosition(
+					lc.address.String(),
+					sdk.NewInt(lc.amount).String()+lc.denom,
+					lc.asset,
+					lc.premium,
+				)
+				ctx = sdk.WrapSDKContext(suite.ctx)
+				_, err := suite.app.GrowKeeper.CreateLiquidationPosition(ctx, msg)
+				suite.Require().NoError(err)
+			}
+
+			suite.OracleAggregateExchangeRateFromInput("1", tc.LendAsset.AssetMetadata.Name)
+
+			err2 := grow.EndBlocker(s.ctx, s.app.GrowKeeper)
+			suite.Require().NoError(err2)
+
+			var allBalance float64
+
+			for i, lc := range liquidatorCases {
+				balance := s.app.BankKeeper.GetBalance(s.ctx, lc.address, tc.sendTokenDenom)
+				allBalance += float64(balance.Amount.Int64()) / 1000000
+				fmt.Printf("Balance liquidator %d: %f OSMO\n", i, float64(balance.Amount.Int64())/1000000)
+			}
+
+			fmt.Printf("All liquidate: %f OSMO\n", allBalance)
 		})
 	}
 }
