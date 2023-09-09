@@ -39,6 +39,13 @@ type GrowKeeperTestSuite struct {
 	ValPubKeys        []cryptotypes.PubKey
 }
 
+type NormalTestConfig struct {
+	collateralAmount int64
+	collateralDenom  string
+	sendTokenAmount  int64
+	sendTokenDenom   string
+}
+
 var s *GrowKeeperTestSuite
 
 func (s *GrowKeeperTestSuite) Setup() {
@@ -150,6 +157,34 @@ func (s *GrowKeeperTestSuite) GetNormalLendAsset(id uint64) types.LendAsset {
 		OracleAssetId: "OSMO",
 	}
 	return ba
+}
+
+func (s *GrowKeeperTestSuite) GetWrongLendAsset(id uint64) types.LendAsset {
+	ba := types.LendAsset{
+		Id:          id,
+		LendAssetId: fmt.Sprintf("%x", crypto.Sha256(append([]byte("uosmo")))),
+		AssetMetadata: banktypes.Metadata{
+			Description: "",
+			DenomUnits: []*banktypes.DenomUnit{
+				{Denom: "uosmo", Exponent: uint32(0), Aliases: []string{"microosmo"}},
+			},
+			Base:    "uosmo",
+			Display: "osmo",
+			Name:    "OSMO",
+			Symbol:  "OSMO",
+		},
+		OracleAssetId: "AKT",
+	}
+	return ba
+}
+
+func (s *GrowKeeperTestSuite) GetNormalConfig() NormalTestConfig {
+	return NormalTestConfig{
+		collateralAmount: 1000 * 1000000,
+		collateralDenom:  "uosmo",
+		sendTokenAmount:  1000 * 1000000,
+		sendTokenDenom:   "uusd",
+	}
 }
 
 func (s *GrowKeeperTestSuite) AddTestCoins(amount int64, denom string) {

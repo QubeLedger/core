@@ -1,7 +1,6 @@
 package keeper_test
 
 import (
-	"encoding/json"
 	"fmt"
 	"time"
 
@@ -12,11 +11,6 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-func prettyPrint(i interface{}) string {
-	s, _ := json.MarshalIndent(i, "", "\t")
-	return string(s)
-}
-
 func (suite *GrowKeeperTestSuite) TestExecuteDeposit() {
 	testCases := []struct {
 		name            string
@@ -24,6 +18,8 @@ func (suite *GrowKeeperTestSuite) TestExecuteDeposit() {
 		gTokenPair      types.GTokenPair
 		sendTokenDenom  string
 		sendTokenAmount int64
+		err             bool
+		errString       string
 	}{
 		{
 			"ok-deposit",
@@ -31,6 +27,26 @@ func (suite *GrowKeeperTestSuite) TestExecuteDeposit() {
 			s.GetNormalGTokenPair(0),
 			"uusd",
 			1000 * 1000000,
+			false,
+			"",
+		},
+		{
+			"false-pair not found",
+			s.GetNormalQStablePair(0),
+			s.GetNormalGTokenPair(0),
+			"ueur",
+			1000 * 1000000,
+			true,
+			"ErrPairNotFound err",
+		},
+		{
+			"fail-amountIn less minAmountIn",
+			s.GetNormalQStablePair(0),
+			s.GetNormalGTokenPair(0),
+			"uusd",
+			10,
+			true,
+			"ErrAmountInGTEminAmountIn err",
 		},
 	}
 
@@ -59,7 +75,13 @@ func (suite *GrowKeeperTestSuite) TestExecuteDeposit() {
 			)
 			ctx := sdk.WrapSDKContext(suite.ctx)
 			_, err := suite.app.GrowKeeper.Deposit(ctx, msg)
-			suite.Require().NoError(err)
+			if !tc.err {
+				suite.Require().NoError(err)
+				getTokenAmountFromBank := suite.app.BankKeeper.GetBalance(suite.ctx, suite.Address, tc.gTokenPair.GTokenMetadata.Base)
+				suite.Require().Equal(getTokenAmountFromBank.Amount, sdk.NewInt(tc.sendTokenAmount))
+			} else {
+				suite.Require().Error(err, tc.errString)
+			}
 		})
 	}
 }
@@ -71,6 +93,8 @@ func (suite *GrowKeeperTestSuite) TestExecuteWithdrawal() {
 		gTokenPair      types.GTokenPair
 		sendTokenDenom  string
 		sendTokenAmount int64
+		err             bool
+		errString       string
 	}{
 		{
 			"ok-withdrawal",
@@ -78,6 +102,26 @@ func (suite *GrowKeeperTestSuite) TestExecuteWithdrawal() {
 			s.GetNormalGTokenPair(0),
 			"ugusd",
 			1000000,
+			false,
+			"",
+		},
+		{
+			"false-pair not found",
+			s.GetNormalQStablePair(0),
+			s.GetNormalGTokenPair(0),
+			"ugeur",
+			1000000,
+			true,
+			"ErrPairNotFound err",
+		},
+		{
+			"fail-amountIn less minAmountOut",
+			s.GetNormalQStablePair(0),
+			s.GetNormalGTokenPair(0),
+			"ugusd",
+			10,
+			true,
+			"ErrAmountOutGTEminAmountOut err",
 		},
 	}
 
@@ -86,6 +130,10 @@ func (suite *GrowKeeperTestSuite) TestExecuteWithdrawal() {
 	suite.SetupOracleKeeper("uatom")
 	suite.RegisterValidator()
 	suite.app.GrowKeeper.SetGrowStakingReserveAddress(s.ctx, apptesting.CreateRandomAccounts(1)[0])
+	suite.app.GrowKeeper.SetGrowYieldReserveAddress(s.ctx, apptesting.CreateRandomAccounts(1)[0])
+	suite.app.GrowKeeper.SetUSQReserveAddress(s.ctx, apptesting.CreateRandomAccounts(1)[0])
+	suite.app.GrowKeeper.SetBorrowRate(s.ctx, sdk.NewInt(15))
+	suite.app.GrowKeeper.SetRealRate(s.ctx, sdk.NewInt(15))
 	for _, tc := range testCases {
 
 		suite.app.StableKeeper.AppendPair(s.ctx, tc.qStablePair)
@@ -101,8 +149,9 @@ func (suite *GrowKeeperTestSuite) TestExecuteWithdrawal() {
 
 		suite.Run(fmt.Sprintf("Case---%s", tc.name), func() {
 			suite.AddTestCoins(tc.sendTokenAmount, tc.sendTokenDenom)
+			denom := tc.qStablePair.AmountOutMetadata.Base
 
-			oldBalance := s.app.BankKeeper.GetBalance(s.ctx, s.Address, "uusd")
+			oldBalance := s.app.BankKeeper.GetBalance(s.ctx, s.Address, denom)
 			msg := types.NewMsgWithdrawal(
 				suite.Address.String(),
 				sdk.NewInt(tc.sendTokenAmount).String()+tc.sendTokenDenom,
@@ -110,10 +159,14 @@ func (suite *GrowKeeperTestSuite) TestExecuteWithdrawal() {
 			)
 			ctx := sdk.WrapSDKContext(suite.ctx)
 			res, err := suite.app.GrowKeeper.Withdrawal(ctx, msg)
-			suite.Require().NoError(err)
-			newBalance := s.app.BankKeeper.GetBalance(s.ctx, s.Address, "uusd")
-			amountOut, _ := sdk.ParseCoinsNormalized(res.AmountOut)
-			suite.Require().Equal(newBalance.Amount.Sub(oldBalance.Amount), amountOut.AmountOf("uusd"))
+			if !tc.err {
+				suite.Require().NoError(err)
+				newBalance := s.app.BankKeeper.GetBalance(s.ctx, s.Address, denom)
+				amountOut, _ := sdk.ParseCoinsNormalized(res.AmountOut)
+				suite.Require().Equal(newBalance.Amount.Sub(oldBalance.Amount), amountOut.AmountOf(denom))
+			} else {
+				suite.Require().Error(err, tc.errString)
+			}
 		})
 	}
 }
@@ -126,6 +179,8 @@ func (suite *GrowKeeperTestSuite) TestExecuteDepositCollateral() {
 		LendAsset       types.LendAsset
 		sendTokenDenom  string
 		sendTokenAmount int64
+		err             bool
+		errString       string
 	}{
 		{
 			"ok-deposit-collateral",
@@ -134,6 +189,28 @@ func (suite *GrowKeeperTestSuite) TestExecuteDepositCollateral() {
 			s.GetNormalLendAsset(0),
 			"uosmo",
 			1000 * 1000000,
+			false,
+			"",
+		},
+		{
+			"false-lend asset not found",
+			s.GetNormalQStablePair(0),
+			s.GetNormalGTokenPair(0),
+			s.GetWrongLendAsset(0),
+			"uluna",
+			1000 * 1000000,
+			true,
+			"ErrLendAssetNotFound err",
+		},
+		{
+			"false-oracle id not found",
+			s.GetNormalQStablePair(0),
+			s.GetNormalGTokenPair(0),
+			s.GetWrongLendAsset(0),
+			"uosmo",
+			1000 * 1000000,
+			true,
+			"ErrOracleAssetIdNotFound err",
 		},
 	}
 
@@ -159,25 +236,30 @@ func (suite *GrowKeeperTestSuite) TestExecuteDepositCollateral() {
 			)
 			ctx := sdk.WrapSDKContext(suite.ctx)
 			res, err := suite.app.GrowKeeper.DepositCollateral(ctx, msg)
-			suite.Require().NoError(err)
+			if !tc.err {
+				suite.Require().NoError(err)
 
-			position, found := s.app.GrowKeeper.GetPositionByPositionId(s.ctx, res.PositionId)
-			suite.Require().Equal(found, true)
-			suite.Require().Equal(position.DepositId, res.PositionId)
-			suite.Require().Equal(position.Collateral, sdk.NewInt(tc.sendTokenAmount).String()+tc.sendTokenDenom)
-			suite.Require().Equal(position.OracleTicker, tc.LendAsset.AssetMetadata.Name)
+				position, found := s.app.GrowKeeper.GetPositionByPositionId(s.ctx, res.PositionId)
+				suite.Require().Equal(found, true)
+				suite.Require().Equal(position.DepositId, res.PositionId)
+				suite.Require().Equal(position.Collateral, sdk.NewInt(tc.sendTokenAmount).String()+tc.sendTokenDenom)
+				suite.Require().Equal(position.OracleTicker, tc.LendAsset.AssetMetadata.Name)
+			} else {
+				suite.Require().Error(err, tc.errString)
+			}
 		})
 	}
 }
 
 func (suite *GrowKeeperTestSuite) TestExecuteWithdrawalCollateral() {
 	testCases := []struct {
-		name            string
-		qStablePair     stabletypes.Pair
-		gTokenPair      types.GTokenPair
-		LendAsset       types.LendAsset
-		sendTokenDenom  string
-		sendTokenAmount int64
+		name           string
+		qStablePair    stabletypes.Pair
+		gTokenPair     types.GTokenPair
+		LendAsset      types.LendAsset
+		sendTokenDenom string
+		err            bool
+		errString      string
 	}{
 		{
 			"ok-withdrawl-collateral",
@@ -185,7 +267,17 @@ func (suite *GrowKeeperTestSuite) TestExecuteWithdrawalCollateral() {
 			s.GetNormalGTokenPair(0),
 			s.GetNormalLendAsset(0),
 			"uosmo",
-			1000 * 1000000,
+			false,
+			"",
+		},
+		{
+			"false-lend asstet not found",
+			s.GetNormalQStablePair(0),
+			s.GetNormalGTokenPair(0),
+			s.GetNormalLendAsset(0),
+			"uluna",
+			true,
+			"ErrLendAssetNotFound err",
 		},
 	}
 
@@ -201,41 +293,38 @@ func (suite *GrowKeeperTestSuite) TestExecuteWithdrawalCollateral() {
 		suite.app.GrowKeeper.AppendLendAsset(s.ctx, tc.LendAsset)
 
 		suite.OracleAggregateExchangeRateFromInput("0.5", tc.LendAsset.AssetMetadata.Name)
-		suite.AddTestCoinsToCustomAccount(sdk.NewInt(tc.sendTokenAmount), tc.sendTokenDenom, s.Address)
+
+		config := s.GetNormalConfig()
+
+		suite.AddTestCoins(config.collateralAmount, config.collateralDenom)
+		msg := types.NewMsgDepositCollateral(
+			suite.Address.String(),
+			sdk.NewInt(config.collateralAmount).String()+config.collateralDenom,
+		)
+		ctx := sdk.WrapSDKContext(suite.ctx)
+		_, err := suite.app.GrowKeeper.DepositCollateral(ctx, msg)
+		suite.Require().NoError(err)
 
 		suite.Run(fmt.Sprintf("Case---%s", tc.name), func() {
-			suite.AddTestCoins(tc.sendTokenAmount, tc.sendTokenDenom)
-			msg := types.NewMsgDepositCollateral(
-				suite.Address.String(),
-				sdk.NewInt(tc.sendTokenAmount).String()+tc.sendTokenDenom,
-			)
-			ctx := sdk.WrapSDKContext(suite.ctx)
-			res, err := suite.app.GrowKeeper.DepositCollateral(ctx, msg)
-			suite.Require().NoError(err)
-
-			position, found := s.app.GrowKeeper.GetPositionByPositionId(s.ctx, res.PositionId)
-			suite.Require().Equal(found, true)
-			suite.Require().Equal(position.DepositId, res.PositionId)
-			suite.Require().Equal(position.Collateral, sdk.NewInt(tc.sendTokenAmount).String()+tc.sendTokenDenom)
-			suite.Require().Equal(position.OracleTicker, tc.LendAsset.AssetMetadata.Name)
-
-			oldAccountBalance := s.app.BankKeeper.GetBalance(s.ctx, s.Address, tc.sendTokenDenom)
-
+			oldAccountBalance := s.app.BankKeeper.GetBalance(s.ctx, s.Address, config.collateralDenom)
 			msg1 := types.NewMsgWithdrawalCollateral(
 				suite.Address.String(),
 				tc.sendTokenDenom,
 			)
 			ctx = sdk.WrapSDKContext(suite.ctx)
 			res1, err1 := suite.app.GrowKeeper.WithdrawalCollateral(ctx, msg1)
-			suite.Require().NoError(err1)
-			suite.Require().Equal(res1.AmountOut, sdk.NewInt(tc.sendTokenAmount).String()+tc.sendTokenDenom)
+			if !tc.err {
+				suite.Require().NoError(err1)
+				suite.Require().Equal(res1.AmountOut, sdk.NewInt(config.sendTokenAmount).String()+tc.sendTokenDenom)
 
-			newAccountBalance := s.app.BankKeeper.GetBalance(s.ctx, s.Address, tc.sendTokenDenom)
+				newAccountBalance := s.app.BankKeeper.GetBalance(s.ctx, s.Address, tc.sendTokenDenom)
 
-			suite.Require().Equal(newAccountBalance.Amount.Sub(oldAccountBalance.Amount), sdk.NewInt(tc.sendTokenAmount))
+				suite.Require().Equal(newAccountBalance.Amount.Sub(oldAccountBalance.Amount), sdk.NewInt(config.sendTokenAmount))
+			} else {
+				suite.Require().Error(err1, tc.errString)
+			}
 		})
 	}
-
 }
 
 func (suite *GrowKeeperTestSuite) TestExecuteCreateLend() {

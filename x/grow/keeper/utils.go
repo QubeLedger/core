@@ -58,7 +58,7 @@ func (k Keeper) CheckDepositAmount(ctx sdk.Context, msgAmountIn string, pair typ
 		return err
 	}
 
-	if !msgAmountInCoins.AmountOf(qStablePair.AmountOutMetadata.Base).GT(pairMinAmountInCoins.AmountOf(qStablePair.AmountOutMetadata.Base)) {
+	if msgAmountInCoins.AmountOf(qStablePair.AmountOutMetadata.Base).LT(pairMinAmountInCoins.AmountOf(qStablePair.AmountOutMetadata.Base)) {
 		return types.ErrAmountInGTEminAmountIn
 	}
 
