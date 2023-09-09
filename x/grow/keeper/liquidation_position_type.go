@@ -108,6 +108,6 @@ func (k Keeper) CheckIfLiquidatorPositionAlredyCreate(ctx sdk.Context, depositor
 }
 
 //nolint:all
-func (k Keeper) GenerateLiquidatorPositionId(address string, denom string, amount string) string {
-	return fmt.Sprintf("%x", crypto.Sha256(append([]byte(address+denom+amount))))
+func (k Keeper) GenerateLiquidatorPositionId(address string, denom string, amount string, premium string) string {
+	return fmt.Sprintf("%x", crypto.Sha256(append([]byte(address+denom+amount+premium))))
 }

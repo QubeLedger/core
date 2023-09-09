@@ -30,7 +30,7 @@ func (k Keeper) ExecuteCreateLiqPosition(ctx sdk.Context, msg *types.MsgCreateLi
 		return err, ""
 	}
 
-	liquidatorPositionId := k.GenerateLiquidatorPositionId(creator.String(), types.DefaultDenom, amountInCoins.String())
+	liquidatorPositionId := k.GenerateLiquidatorPositionId(creator.String(), types.DefaultDenom, amountInCoins.String(), msg.Premium)
 
 	liqPosition := types.LiquidatorPosition{
 		LiquidatorPositionId: liquidatorPositionId,

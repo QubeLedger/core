@@ -1,6 +1,8 @@
 package keeper
 
 import (
+	"strconv"
+
 	"github.com/QuadrateOrg/core/x/grow/types"
 	stabletypes "github.com/QuadrateOrg/core/x/stable/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -138,7 +140,7 @@ func (k Keeper) CheckLiquidator(liq sdk.Address, pos types.LiquidatorPosition) e
 	if pos.Liquidator != liq.String() {
 		return types.ErrLiquidatorAddresesNotEqual
 	}
-	liqPosId := k.GenerateLiquidatorPositionId(liq.String(), types.DefaultDenom, pos.Amount)
+	liqPosId := k.GenerateLiquidatorPositionId(liq.String(), types.DefaultDenom, pos.Amount, strconv.FormatUint(pos.Premium, 10))
 	if pos.LiquidatorPositionId != liqPosId {
 		return types.ErrLiquidatorPositionIdNotEqual
 	}
