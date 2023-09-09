@@ -198,7 +198,7 @@ func newRegisterChangeGrowYieldReserveAddressProposal(clientCtx client.Context) 
 func RegisterChangeUSQReserveAddressProposalRESTHandler(clientCtx client.Context) govrest.ProposalRESTHandler {
 	return govrest.ProposalRESTHandler{
 		SubRoute: types.ModuleName,
-		Handler:  newRegisterChangeGrowYieldReserveAddressProposal(clientCtx),
+		Handler:  newRegisterChangeUSQReserveAddressProposal(clientCtx),
 	}
 }
 
