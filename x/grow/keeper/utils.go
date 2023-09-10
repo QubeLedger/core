@@ -127,10 +127,10 @@ Liquidations Helpers
 func (k Keeper) ParseAndCheckPremium(amount string) (sdk.Int, error) {
 	amtInt, suc := sdk.NewIntFromString(amount)
 	if !suc {
-		return sdk.Int{}, types.ErrSdkIntError
+		return sdk.Int{}, types.ErrWrongPremium
 	}
 	if amtInt.IsZero() || amtInt.IsNil() || amtInt.IsNegative() {
-		return sdk.Int{}, types.ErrIntNegativeOrZero
+		return sdk.Int{}, types.ErrWrongPremium
 	}
 	return amtInt, nil
 

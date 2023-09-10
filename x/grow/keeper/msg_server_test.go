@@ -155,7 +155,7 @@ func (suite *GrowKeeperTestSuite) TestExecuteWithdrawal() {
 			msg := types.NewMsgWithdrawal(
 				suite.Address.String(),
 				sdk.NewInt(tc.sendTokenAmount).String()+tc.sendTokenDenom,
-				tc.gTokenPair.GTokenMetadata.Base,
+				"",
 			)
 			ctx := sdk.WrapSDKContext(suite.ctx)
 			res, err := suite.app.GrowKeeper.Withdrawal(ctx, msg)
@@ -286,25 +286,25 @@ func (suite *GrowKeeperTestSuite) TestExecuteWithdrawalCollateral() {
 	suite.SetupOracleKeeper("OSMO")
 	suite.RegisterValidator()
 	s.ctx = s.ctx.WithBlockTime(time.Now())
+
+	suite.app.StableKeeper.AppendPair(s.ctx, s.GetNormalQStablePair(0))
+	suite.app.GrowKeeper.AppendPair(s.ctx, s.GetNormalGTokenPair(0))
+	suite.app.GrowKeeper.AppendLendAsset(s.ctx, s.GetNormalLendAsset(0))
+
+	suite.OracleAggregateExchangeRateFromInput("0.5", s.GetNormalLendAsset(0).AssetMetadata.Name)
+
+	config := s.GetNormalConfig()
+
+	suite.AddTestCoins(config.collateralAmount, config.collateralDenom)
+	msg := types.NewMsgDepositCollateral(
+		suite.Address.String(),
+		sdk.NewInt(config.collateralAmount).String()+config.collateralDenom,
+	)
+	ctx := sdk.WrapSDKContext(suite.ctx)
+	_, err := suite.app.GrowKeeper.DepositCollateral(ctx, msg)
+	suite.Require().NoError(err)
+
 	for _, tc := range testCases {
-
-		suite.app.StableKeeper.AppendPair(s.ctx, tc.qStablePair)
-		suite.app.GrowKeeper.AppendPair(s.ctx, tc.gTokenPair)
-		suite.app.GrowKeeper.AppendLendAsset(s.ctx, tc.LendAsset)
-
-		suite.OracleAggregateExchangeRateFromInput("0.5", tc.LendAsset.AssetMetadata.Name)
-
-		config := s.GetNormalConfig()
-
-		suite.AddTestCoins(config.collateralAmount, config.collateralDenom)
-		msg := types.NewMsgDepositCollateral(
-			suite.Address.String(),
-			sdk.NewInt(config.collateralAmount).String()+config.collateralDenom,
-		)
-		ctx := sdk.WrapSDKContext(suite.ctx)
-		_, err := suite.app.GrowKeeper.DepositCollateral(ctx, msg)
-		suite.Require().NoError(err)
-
 		suite.Run(fmt.Sprintf("Case---%s", tc.name), func() {
 			oldAccountBalance := s.app.BankKeeper.GetBalance(s.ctx, s.Address, config.collateralDenom)
 			msg1 := types.NewMsgWithdrawalCollateral(
@@ -431,6 +431,7 @@ func (suite *GrowKeeperTestSuite) TestExecuteCreateLend() {
 
 				suite.Require().Equal(len(position.LoanIds), 1)
 				suite.Require().Equal(position.BorrowedAmountInUSD, uint64(tc.expectTokenAmount))
+
 				loan, found := s.app.GrowKeeper.GetLoadByLoadId(s.ctx, res1.LoanId)
 				suite.Require().Equal(found, true)
 				suite.Require().Equal(loan.AmountOut, res1.AmountOut)
@@ -588,6 +589,7 @@ func (suite *GrowKeeperTestSuite) TestExecuteDeleteLend() {
 				newBurningFundBalance := s.app.BankKeeper.GetBalance(s.ctx, s.app.StableKeeper.GetBurningFundAddress(s.ctx), config.sendTokenDenom)
 
 				suite.Require().Equal(newUsqReserveBalance.Amount.Sub(oldUsqReserveBalance.Amount), sendAmountInt.Sub(loanAmountInt).QuoRaw(2))
+
 				suite.Require().Equal(newBurningFundBalance.Amount.Sub(oldBurningFundBalance.Amount), sendAmountInt.Sub(loanAmountInt).QuoRaw(2))
 			} else {
 				suite.Require().Error(err2, tc.errString)
@@ -655,7 +657,7 @@ func (suite *GrowKeeperTestSuite) TestExecuteCreateLiqPosition() {
 			"uosmo",
 			"a",
 			true,
-			"ErrSdkIntError err",
+			"ErrWrongPremium err",
 		},
 	}
 
@@ -776,7 +778,7 @@ func (suite *GrowKeeperTestSuite) TestExecuteCloseLiqPosition() {
 		}
 		suite.Run(fmt.Sprintf("Case---%s", tc.name), func() {
 
-			oldBalance := s.app.BankKeeper.GetBalance(s.ctx, s.Address, tc.sendTokenDenom)
+			oldBalance := s.app.BankKeeper.GetBalance(s.ctx, s.Address, config.lendTokenDenom)
 
 			msg := types.NewMsgCloseLiquidationPosition(
 				suite.Address.String(),
@@ -790,11 +792,11 @@ func (suite *GrowKeeperTestSuite) TestExecuteCloseLiqPosition() {
 				_, found := s.app.GrowKeeper.GetLiquidatorPositionByLiquidatorPositionId(s.ctx, tc.LiquidatorPositionId)
 				suite.Require().Equal(found, false)
 
-				newBalance := s.app.BankKeeper.GetBalance(s.ctx, s.Address, tc.sendTokenDenom)
+				newBalance := s.app.BankKeeper.GetBalance(s.ctx, s.Address, config.lendTokenDenom)
 
 				amountOut, _ := sdk.ParseCoinsNormalized(res.AmountOut)
 
-				suite.Require().Equal(newBalance.Amount.Sub(oldBalance.Amount), amountOut.AmountOf(tc.sendTokenDenom))
+				suite.Require().Equal(newBalance.Amount.Sub(oldBalance.Amount), amountOut.AmountOf(config.lendTokenDenom))
 			} else {
 				suite.Require().Error(err, tc.errString)
 			}
@@ -905,7 +907,7 @@ func (suite *GrowKeeperTestSuite) TestLiquidatePositionFull() {
 			fmt.Printf("liqPos Amount msg_server: %s\n", liqPos.Amount)
 
 			liqBalance := s.app.BankKeeper.GetBalance(s.ctx, s.LiquidatorAddress, tc.sendTokenDenom)
-			fmt.Printf("\nliqBalance msg_server: %s\n\n", liqBalance.String())
+			fmt.Printf("liqBalance msg_server: %s\n", liqBalance.String())
 
 			err4 := grow.EndBlocker(s.ctx, s.app.GrowKeeper)
 			suite.Require().NoError(err4)
@@ -918,7 +920,7 @@ func (suite *GrowKeeperTestSuite) TestLiquidatePositionFull() {
 			fmt.Printf("liqPos Amount msg_server: %s\n", liqPos.Amount)
 
 			liqBalance1 := s.app.BankKeeper.GetBalance(s.ctx, s.LiquidatorAddress, tc.sendTokenDenom)
-			fmt.Printf("\nliqBalance msg_server: %s\n\n", liqBalance1.String())
+			fmt.Printf("liqBalance msg_server: %s\n", liqBalance1.String())
 		})
 	}
 }

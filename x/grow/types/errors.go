@@ -16,6 +16,7 @@ var (
 	ErrDenomsNotEqual                = sdkerrors.Register(ModuleName, 1401, "ErrDenomsNotEqual err")
 	ErrLiquidatorAddresesNotEqual    = sdkerrors.Register(ModuleName, 1402, "ErrLiquidatorAddresesNotEqual err")
 	ErrLiquidatorPositionIdNotEqual  = sdkerrors.Register(ModuleName, 1403, "ErrLiquidatorPositionIdNotEqual err")
+	ErrWrongPremium                  = sdkerrors.Register(ModuleName, 1404, "ErrWrongPremium err")
 	ErrCalculatGrowRate              = sdkerrors.Register(ModuleName, 1500, "ErrCalculatGrowRate err")
 	ErrRiskRatioMustBeZero           = sdkerrors.Register(ModuleName, 1501, "ErrRiskRatioMustBeZero err")
 	ErrRiskRateIsGreaterThenShouldBe = sdkerrors.Register(ModuleName, 1502, "ErrRiskRateIsGreaterThenShouldBe err")
