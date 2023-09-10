@@ -8,6 +8,17 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
+var (
+	GrowStatus bool
+)
+
+/*
+Grow Helper
+*/
+func (k Keeper) ChangeGrowStatus() {
+	GrowStatus = !GrowStatus
+}
+
 /*
 Coins Helpers
 */

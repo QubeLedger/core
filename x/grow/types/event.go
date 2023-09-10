@@ -18,4 +18,5 @@ const (
 	EventRegisterChangeGrowStakingReserveAddressProposal = "register_change_grow_staking_reserve_address_proposal"
 	EventRegisterChangeRealRateProposal                  = "register_change_real_rate_proposal"
 	EventRegisterChangeBorrowRateProposal                = "register_change_borrow_rate_proposal"
+	EventRegisterActivateGrowModuleProposal              = "register_activate_grow_module_proposal"
 )

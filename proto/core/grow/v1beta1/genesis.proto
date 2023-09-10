@@ -16,5 +16,6 @@ message GenesisState {
         uint64 BorrowRate = 4;
         string GrowStakingReserveAddress = 5;
         string USQReserveAddress = 6;
+        bool GrowStatus = 7;
 }
 

@@ -19,6 +19,7 @@ const (
 	ProposalTypeRegisterChangeGrowStakingReserveAddressProposal string = "RegisterChangeGrowStakingReserveAddressProposal"
 	ProposalTypeRegisterChangeRealRateProposal                  string = "RegisterChangeRealRateProposal"
 	ProposalTypeRegisterChangeBorrowRateProposal                string = "RegisterChangeBorrowRateProposal"
+	ProposalTypeRegisterActivateGrowModuleProposal              string = "RegisterActivateGrowModuleProposal"
 )
 
 // Implements Proposal Interface
@@ -30,6 +31,7 @@ var (
 	_ govtypes.Content = &RegisterChangeGrowStakingReserveAddressProposal{}
 	_ govtypes.Content = &RegisterChangeRealRateProposal{}
 	_ govtypes.Content = &RegisterChangeBorrowRateProposal{}
+	_ govtypes.Content = &RegisterActivateGrowModuleProposal{}
 )
 
 func init() {
@@ -53,6 +55,9 @@ func init() {
 
 	govtypes.RegisterProposalType(ProposalTypeRegisterChangeBorrowRateProposal)
 	govtypes.RegisterProposalTypeCodec(&RegisterChangeBorrowRateProposal{}, "grow/RegisterChangeBorrowRateProposal")
+
+	govtypes.RegisterProposalType(ProposalTypeRegisterActivateGrowModuleProposal)
+	govtypes.RegisterProposalTypeCodec(&RegisterActivateGrowModuleProposal{}, "grow/RegisterActivateGrowModuleProposal")
 }
 
 /*
@@ -344,5 +349,27 @@ func (rtbp *RegisterChangeBorrowRateProposal) ValidateBasic() error {
 			return ErrIntNegativeOrZero
 		}
 	}
+	return nil
+}
+
+/*
+RegisterActivateGrowModule
+*/
+
+func NewRegisterActivateGrowModuleProposal(title, description string) govtypes.Content {
+	return &RegisterActivateGrowModuleProposal{
+		Title:       title,
+		Description: description,
+	}
+}
+
+func (*RegisterActivateGrowModuleProposal) ProposalRoute() string { return RouterKey }
+
+func (*RegisterActivateGrowModuleProposal) ProposalType() string {
+	return ProposalTypeRegisterActivateGrowModuleProposal
+}
+
+/* #nosec */
+func (rtbp *RegisterActivateGrowModuleProposal) ValidateBasic() error {
 	return nil
 }

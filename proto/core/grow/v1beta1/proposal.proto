@@ -90,3 +90,9 @@ message RegisterChangeBorrowRateProposal {
 
   uint64 rate = 3;
 }
+
+message RegisterActivateGrowModuleProposal {
+  option (gogoproto.equal) = false;
+  string title = 1;
+  string description = 2;
+}

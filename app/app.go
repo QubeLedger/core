@@ -191,6 +191,7 @@ func getGovProposalHandlers() []govclient.ProposalHandler {
 		growclient.RegisterChangeUSQReserveAddressProposalHandler,
 		growclient.RegisterGTokenPairProposalHandler,
 		growclient.RegisterLendAssetProposalHandler,
+		growclient.RegisterActivateGrowModuleProposalHandler,
 	)
 
 	return govProposalHandlers

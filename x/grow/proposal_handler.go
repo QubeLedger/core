@@ -26,6 +26,8 @@ func NewStableProposalHandler(k *keeper.Keeper) govtypes.Handler {
 			return handleRegisterChangeRealRateProposal(ctx, k, c)
 		case *types.RegisterChangeBorrowRateProposal:
 			return handleRegisterChangeBorrowRateProposal(ctx, k, c)
+		case *types.RegisterActivateGrowModuleProposal:
+			return handelRegisterActivateGrowModuleProposal(ctx, k, c)
 		default:
 			return sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "unrecognized %s proposal content type: %T", types.ModuleName, c)
 		}
@@ -138,6 +140,16 @@ func handleRegisterChangeBorrowRateProposal(ctx sdk.Context, k *keeper.Keeper, p
 	if err != nil {
 		return err
 	}
+	ctx.EventManager().EmitEvent(
+		sdk.NewEvent(
+			types.EventRegisterChangeBorrowRateProposal,
+		),
+	)
+	return nil
+}
+
+func handelRegisterActivateGrowModuleProposal(ctx sdk.Context, k *keeper.Keeper, p *types.RegisterActivateGrowModuleProposal) error {
+	k.ChangeGrowStatus()
 	ctx.EventManager().EmitEvent(
 		sdk.NewEvent(
 			types.EventRegisterChangeBorrowRateProposal,
