@@ -75,6 +75,8 @@ func (s *GrowAbciTestSuite) TestGrowPriceChangeWhenBlockEnd() {
 	price, err = s.app.GrowKeeper.GetGTokenPrice(s.ctx, s.GetNormalGTokenPair(0).DenomID)
 	s.Require().NoError(err)
 	s.Require().Equal(price.Int64(), int64(1161321))
+
+	fmt.Printf("gUSQ price after year: %f\n", float64(price.Int64())/1000000)
 }
 
 func (s *GrowAbciTestSuite) TestGrowReserveMath() {
@@ -114,6 +116,8 @@ func (s *GrowAbciTestSuite) TestGrowReserveMath() {
 
 	updatedqStablePair, _ := s.app.StableKeeper.GetPairByPairID(s.ctx, s.GetNormalQStablePair(0).PairId)
 
+	s.OracleAggregateExchangeRateFromNet()
+
 	atomPrice, _ := s.app.OracleKeeper.GetExchangeRate(s.ctx, updatedqStablePair.AmountInMetadata.Base)
 	br, _ := gmb.CalculateBackingRatio(atomPrice.MulInt64(10000).RoundInt(), updatedqStablePair.Ar, updatedqStablePair.Qm)
 
@@ -125,17 +129,19 @@ func (s *GrowAbciTestSuite) TestGrowReserveMath() {
 	ry, err := s.app.GrowKeeper.CalculateRealYield(s.ctx, updatedPair)
 	s.Require().NoError(err)
 
-	fmt.Printf("qm: %d\nst: %d\nBackingRatio: %d\nGrowYield: %d\nRealYield: %d\n", qm.Int64()/1000000, updatedPair.St.Int64()/1000000, br.Int64(), gy.Int64()/1000000, ry.Int64()/1000000)
+	fmt.Printf("\nStablecoin supply: %d\nStaked: %d\nBackingRatio: %d\nGrowYield: %d\nRealYield: %d\n", qm.Int64()/1000000, updatedPair.St.Int64()/1000000, br.Int64(), gy.Int64()/1000000, ry.Int64()/1000000)
 
 	action, value, err := s.app.GrowKeeper.CheckYieldRate(s.ctx, updatedPair)
 	s.Require().NoError(err)
-	fmt.Printf("Action: %s\nDiff between RealYield and GrowYield: %d\n", action, value.Int64()/1000000)
+	fmt.Printf("Action: %s\nDiff between RealYield and GrowYield: %d\n\n", action, value.Int64()/1000000)
 
 	_, found := s.app.GrowKeeper.CalculateAddToReserveValue(s.ctx, value, updatedPair)
 	s.Require().Equal(found, false)
 
 	s.ctx = s.ctx.WithBlockHeight(2)
 	s.ctx = s.ctx.WithBlockTime(time.Unix((s.ctx.BlockTime().Unix() + 10), 0))
+
+	s.OracleAggregateExchangeRateFromNet()
 
 	realValue, found := s.app.GrowKeeper.CalculateAddToReserveValue(s.ctx, value, updatedPair)
 	s.Require().Equal(found, true)
