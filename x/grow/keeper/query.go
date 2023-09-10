@@ -212,7 +212,9 @@ func (k Keeper) YieldPercentage(goCtx context.Context, req *types.QueryYieldPerc
 		return nil, err
 	}
 	action, value, err := k.CheckYieldRate(ctx, gTokenPair)
-
+	if err != nil {
+		return nil, err
+	}
 	return &types.QueryYieldPercentageResponse{
 		RealRate:     RealRate.Int64(),
 		BorrowRate:   BorrowRate.Int64(),
