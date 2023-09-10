@@ -150,11 +150,10 @@ func (msg *MsgDeposit) ValidateBasic() error {
 withdrawal
 */
 
-func NewMsgWithdrawal(creator string, amountIn string, denomOut string) *MsgWithdrawal {
+func NewMsgWithdrawal(creator string, amountIn string) *MsgWithdrawal {
 	return &MsgWithdrawal{
 		Creator:  creator,
 		AmountIn: amountIn,
-		DenomOut: denomOut,
 	}
 }
 

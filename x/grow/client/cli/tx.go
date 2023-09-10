@@ -138,12 +138,11 @@ func CmdDeposit() *cobra.Command {
 
 func CmdWithdrawal() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "withdrawal [amountIn] [denomOut]",
+		Use:   "withdrawal [amountIn]",
 		Short: "Broadcast message withdrawal",
 		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			argAmountIn := args[0]
-			argAmountOut := args[1]
 
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
@@ -153,7 +152,6 @@ func CmdWithdrawal() *cobra.Command {
 			msg := types.NewMsgWithdrawal(
 				clientCtx.GetFromAddress().String(),
 				argAmountIn,
-				argAmountOut,
 			)
 			if err := msg.ValidateBasic(); err != nil {
 				return err

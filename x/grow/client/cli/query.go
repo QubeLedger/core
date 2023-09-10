@@ -3,7 +3,6 @@ package cli
 import (
 	"context"
 	"fmt"
-	"strconv"
 
 	// "strings"
 
@@ -30,9 +29,16 @@ func GetQueryCmd(queryRoute string) *cobra.Command {
 	}
 
 	cmd.AddCommand(CmdQueryParams())
-	cmd.AddCommand(CmdListLoan())
-	cmd.AddCommand(CmdShowLoan())
-	// this line is used by starport scaffolding # 1
+	cmd.AddCommand(CmdQueryLendAssetByLendAssetId())
+	cmd.AddCommand(CmdQueryPositionById())
+	cmd.AddCommand(CmdQueryPositionByCreator())
+	cmd.AddCommand(CmdQueryAllPosition())
+	cmd.AddCommand(CmdQueryAllLiquidatorPosition())
+	cmd.AddCommand(CmdQueryLiquidatorPositionByCreator())
+	cmd.AddCommand(CmdQueryLiquidatorPositionById())
+	cmd.AddCommand(CmdQueryAllFundAddress())
+	cmd.AddCommand(CmdQueryLoanById())
+	cmd.AddCommand(CmdQueryYieldPercentage())
 
 	return cmd
 }
@@ -61,25 +67,17 @@ func CmdQueryParams() *cobra.Command {
 	return cmd
 }
 
-func CmdListLoan() *cobra.Command {
+func CmdQueryLendAssetByLendAssetId() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "list-loan",
-		Short: "list all loan",
+		Use:   "lendAsset-by-lendAssetId [id]",
+		Short: "Get lend asset by ID",
+		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
 
-			pageReq, err := client.ReadPageRequest(cmd.Flags())
-			if err != nil {
-				return err
-			}
-
 			queryClient := types.NewQueryClient(clientCtx)
 
-			params := &types.QueryAllLoanRequest{
-				Pagination: pageReq,
-			}
-
-			res, err := queryClient.LoanAll(context.Background(), params)
+			res, err := queryClient.LendAssetByLendAssetId(context.Background(), &types.QueryLendAssetByLendAssetIdRequest{Id: args[0]})
 			if err != nil {
 				return err
 			}
@@ -88,32 +86,214 @@ func CmdListLoan() *cobra.Command {
 		},
 	}
 
-	flags.AddPaginationFlagsToCmd(cmd, cmd.Use)
 	flags.AddQueryFlagsToCmd(cmd)
 
 	return cmd
 }
 
-func CmdShowLoan() *cobra.Command {
+func CmdQueryPositionById() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "show-loan [id]",
-		Short: "shows a loan",
+		Use:   "position-by-id [id]",
+		Short: "Get position by ID",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
 
 			queryClient := types.NewQueryClient(clientCtx)
 
-			id, err := strconv.ParseUint(args[0], 10, 64)
+			res, err := queryClient.PositionById(context.Background(), &types.QueryPositionByIdRequest{Id: args[0]})
 			if err != nil {
 				return err
 			}
 
-			params := &types.QueryGetLoanRequest{
-				Id: id,
+			return clientCtx.PrintProto(res)
+		},
+	}
+
+	flags.AddQueryFlagsToCmd(cmd)
+
+	return cmd
+}
+
+func CmdQueryPositionByCreator() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "position-by-creator [address]",
+		Short: "Get position by address",
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx := client.GetClientContextFromCmd(cmd)
+
+			queryClient := types.NewQueryClient(clientCtx)
+
+			res, err := queryClient.PositionByCreator(context.Background(), &types.QueryPositionByCreatorRequest{Creator: args[0]})
+			if err != nil {
+				return err
 			}
 
-			res, err := queryClient.Loan(context.Background(), params)
+			return clientCtx.PrintProto(res)
+		},
+	}
+
+	flags.AddQueryFlagsToCmd(cmd)
+
+	return cmd
+}
+
+func CmdQueryAllPosition() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "position",
+		Short: "Get all position",
+		Args:  cobra.NoArgs,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx := client.GetClientContextFromCmd(cmd)
+
+			queryClient := types.NewQueryClient(clientCtx)
+
+			res, err := queryClient.AllPosition(context.Background(), &types.QueryAllPositionRequest{})
+			if err != nil {
+				return err
+			}
+
+			return clientCtx.PrintProto(res)
+		},
+	}
+
+	flags.AddQueryFlagsToCmd(cmd)
+
+	return cmd
+}
+
+func CmdQueryAllLiquidatorPosition() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "liq-position",
+		Short: "Get all Liquidator position",
+		Args:  cobra.NoArgs,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx := client.GetClientContextFromCmd(cmd)
+
+			queryClient := types.NewQueryClient(clientCtx)
+
+			res, err := queryClient.AllLiquidatorPosition(context.Background(), &types.QueryAllLiquidatorPositionRequest{})
+			if err != nil {
+				return err
+			}
+
+			return clientCtx.PrintProto(res)
+		},
+	}
+
+	flags.AddQueryFlagsToCmd(cmd)
+
+	return cmd
+}
+
+func CmdQueryLiquidatorPositionByCreator() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "liq-position-by-creator [address]",
+		Short: "Get liquidator position by address",
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx := client.GetClientContextFromCmd(cmd)
+
+			queryClient := types.NewQueryClient(clientCtx)
+
+			res, err := queryClient.LiquidatorPositionByCreator(context.Background(), &types.QueryLiquidatorPositionByCreatorRequest{Creator: args[0]})
+			if err != nil {
+				return err
+			}
+
+			return clientCtx.PrintProto(res)
+		},
+	}
+
+	flags.AddQueryFlagsToCmd(cmd)
+
+	return cmd
+}
+
+func CmdQueryLiquidatorPositionById() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "liq-position-by-id [id]",
+		Short: "Get liquidator position by id",
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx := client.GetClientContextFromCmd(cmd)
+
+			queryClient := types.NewQueryClient(clientCtx)
+
+			res, err := queryClient.LiquidatorPositionById(context.Background(), &types.QueryLiquidatorPositionByIdRequest{Id: args[0]})
+			if err != nil {
+				return err
+			}
+
+			return clientCtx.PrintProto(res)
+		},
+	}
+
+	flags.AddQueryFlagsToCmd(cmd)
+
+	return cmd
+}
+
+func CmdQueryAllFundAddress() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "fund-address",
+		Short: "Get all fund address",
+		Args:  cobra.NoArgs,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx := client.GetClientContextFromCmd(cmd)
+
+			queryClient := types.NewQueryClient(clientCtx)
+
+			res, err := queryClient.AllFundAddress(context.Background(), &types.QueryAllFundAddressRequest{})
+			if err != nil {
+				return err
+			}
+
+			return clientCtx.PrintProto(res)
+		},
+	}
+
+	flags.AddQueryFlagsToCmd(cmd)
+
+	return cmd
+}
+
+func CmdQueryLoanById() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "loan-by-id [id]",
+		Short: "Get loan by id",
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx := client.GetClientContextFromCmd(cmd)
+
+			queryClient := types.NewQueryClient(clientCtx)
+
+			res, err := queryClient.LoanById(context.Background(), &types.QueryLoanByIdRequest{Id: args[0]})
+			if err != nil {
+				return err
+			}
+
+			return clientCtx.PrintProto(res)
+		},
+	}
+
+	flags.AddQueryFlagsToCmd(cmd)
+
+	return cmd
+}
+
+func CmdQueryYieldPercentage() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "yield-percentage [id]",
+		Short: "Get yield percentage by gTokenPair id",
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx := client.GetClientContextFromCmd(cmd)
+
+			queryClient := types.NewQueryClient(clientCtx)
+
+			res, err := queryClient.YieldPercentage(context.Background(), &types.QueryYieldPercentageRequest{Id: args[0]})
 			if err != nil {
 				return err
 			}

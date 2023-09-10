@@ -35,7 +35,6 @@ message MsgDepositResponse {
 message MsgWithdrawal {
   string creator = 1;
   string amountIn = 2;
-  string denomOut = 3;
 }
 
 message MsgWithdrawalResponse {

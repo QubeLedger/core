@@ -155,7 +155,6 @@ func (suite *GrowKeeperTestSuite) TestExecuteWithdrawal() {
 			msg := types.NewMsgWithdrawal(
 				suite.Address.String(),
 				sdk.NewInt(tc.sendTokenAmount).String()+tc.sendTokenDenom,
-				"",
 			)
 			ctx := sdk.WrapSDKContext(suite.ctx)
 			res, err := suite.app.GrowKeeper.Withdrawal(ctx, msg)

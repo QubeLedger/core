@@ -8,7 +8,7 @@ message Loan {
   uint64 id = 1;
   string loanId = 2;
   string borrower = 3; 
-  string amountOut = 5;
-  uint64 startTime = 6; 
-  string oracleTicker = 7; 
+  string amountOut = 4;
+  uint64 startTime = 5; 
+  string oracleTicker = 6; 
 }
