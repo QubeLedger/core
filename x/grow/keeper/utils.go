@@ -9,14 +9,24 @@ import (
 )
 
 var (
-	GrowStatus bool
+	GrowStatus bool = false
 )
 
 /*
 Grow Helper
 */
 func (k Keeper) ChangeGrowStatus() {
-	GrowStatus = !GrowStatus
+	if !GrowStatus {
+		GrowStatus = true
+	}
+}
+
+func (k Keeper) CheckGrowStatus(ctx sdk.Context) error {
+	if !GrowStatus {
+		return types.ErrGrowNotActivated
+	} else {
+		return nil
+	}
 }
 
 /*

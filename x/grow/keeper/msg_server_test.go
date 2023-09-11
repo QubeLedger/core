@@ -54,6 +54,7 @@ func (suite *GrowKeeperTestSuite) TestExecuteDeposit() {
 	suite.Commit()
 	suite.SetupOracleKeeper("uatom")
 	suite.RegisterValidator()
+	suite.app.GrowKeeper.ChangeGrowStatus()
 	for _, tc := range testCases {
 
 		suite.app.StableKeeper.AppendPair(s.ctx, tc.qStablePair)
@@ -129,6 +130,7 @@ func (suite *GrowKeeperTestSuite) TestExecuteWithdrawal() {
 	suite.Commit()
 	suite.SetupOracleKeeper("uatom")
 	suite.RegisterValidator()
+	suite.app.GrowKeeper.ChangeGrowStatus()
 	suite.app.GrowKeeper.SetGrowStakingReserveAddress(s.ctx, apptesting.CreateRandomAccounts(1)[0])
 	suite.app.GrowKeeper.SetGrowYieldReserveAddress(s.ctx, apptesting.CreateRandomAccounts(1)[0])
 	suite.app.GrowKeeper.SetUSQReserveAddress(s.ctx, apptesting.CreateRandomAccounts(1)[0])
@@ -217,6 +219,7 @@ func (suite *GrowKeeperTestSuite) TestExecuteDepositCollateral() {
 	suite.Commit()
 	suite.SetupOracleKeeper("OSMO")
 	suite.RegisterValidator()
+	suite.app.GrowKeeper.ChangeGrowStatus()
 	s.ctx = s.ctx.WithBlockTime(time.Now())
 	for _, tc := range testCases {
 
@@ -284,6 +287,7 @@ func (suite *GrowKeeperTestSuite) TestExecuteWithdrawalCollateral() {
 	suite.Commit()
 	suite.SetupOracleKeeper("OSMO")
 	suite.RegisterValidator()
+	suite.app.GrowKeeper.ChangeGrowStatus()
 	s.ctx = s.ctx.WithBlockTime(time.Now())
 
 	suite.app.StableKeeper.AppendPair(s.ctx, s.GetNormalQStablePair(0))
@@ -381,6 +385,7 @@ func (suite *GrowKeeperTestSuite) TestExecuteCreateLend() {
 	suite.Commit()
 	suite.SetupOracleKeeper("OSMO")
 	suite.RegisterValidator()
+	suite.app.GrowKeeper.ChangeGrowStatus()
 	s.ctx = s.ctx.WithBlockTime(time.Now())
 
 	suite.app.StableKeeper.AppendPair(s.ctx, s.GetNormalQStablePair(0))
@@ -511,6 +516,7 @@ func (suite *GrowKeeperTestSuite) TestExecuteDeleteLend() {
 	suite.Commit()
 	suite.SetupOracleKeeper("OSMO")
 	suite.RegisterValidator()
+	suite.app.GrowKeeper.ChangeGrowStatus()
 	s.ctx = s.ctx.WithBlockTime(time.Now())
 
 	suite.app.StableKeeper.AppendPair(s.ctx, s.GetNormalQStablePair(0))
@@ -664,6 +670,7 @@ func (suite *GrowKeeperTestSuite) TestExecuteCreateLiqPosition() {
 	suite.Commit()
 	suite.SetupOracleKeeper("OSMO")
 	suite.RegisterValidator()
+	suite.app.GrowKeeper.ChangeGrowStatus()
 	s.ctx = s.ctx.WithBlockTime(time.Now())
 	for _, tc := range testCases {
 
@@ -748,6 +755,7 @@ func (suite *GrowKeeperTestSuite) TestExecuteCloseLiqPosition() {
 	suite.Commit()
 	suite.SetupOracleKeeper("OSMO")
 	suite.RegisterValidator()
+	suite.app.GrowKeeper.ChangeGrowStatus()
 	s.ctx = s.ctx.WithBlockTime(time.Now())
 
 	config := s.GetNormalConfig()
@@ -832,6 +840,7 @@ func (suite *GrowKeeperTestSuite) TestLiquidatePositionFull() {
 	suite.Commit()
 	suite.SetupOracleKeeper("OSMO")
 	suite.RegisterValidator()
+	suite.app.GrowKeeper.ChangeGrowStatus()
 	s.ctx = s.ctx.WithBlockTime(time.Now())
 	for _, tc := range testCases {
 
@@ -988,6 +997,7 @@ func (suite *GrowKeeperTestSuite) Test4Liquidator() {
 	suite.Commit()
 	suite.SetupOracleKeeper("OSMO")
 	suite.RegisterValidator()
+	suite.app.GrowKeeper.ChangeGrowStatus()
 	s.ctx = s.ctx.WithBlockTime(time.Now())
 	for _, tc := range testCases {
 
@@ -1134,6 +1144,7 @@ func (suite *GrowKeeperTestSuite) Test7Liquidator() {
 	suite.Commit()
 	suite.SetupOracleKeeper("OSMO")
 	suite.RegisterValidator()
+	suite.app.GrowKeeper.ChangeGrowStatus()
 	s.ctx = s.ctx.WithBlockTime(time.Now())
 	for _, tc := range testCases {
 
@@ -1193,4 +1204,27 @@ func (suite *GrowKeeperTestSuite) Test7Liquidator() {
 			fmt.Printf("All liquidate: %f OSMO\n", allBalance)
 		})
 	}
+}
+
+func (suite *GrowKeeperTestSuite) TestGrowDeactivate() {
+
+	suite.Setup()
+	suite.Commit()
+	suite.SetupOracleKeeper("uatom")
+	suite.RegisterValidator()
+
+	config := s.GetNormalConfig()
+
+	suite.Run(fmt.Sprintf("Grow Deactivated"), func() {
+		suite.AddTestCoins(config.sendTokenAmount, config.sendTokenDenom)
+		msg := types.NewMsgDeposit(
+			suite.Address.String(),
+			sdk.NewInt(config.sendTokenAmount).String()+config.sendTokenDenom,
+			s.GetNormalGTokenPair(0).GTokenMetadata.Base,
+		)
+		ctx := sdk.WrapSDKContext(suite.ctx)
+		_, err := suite.app.GrowKeeper.Deposit(ctx, msg)
+		suite.Require().Error(err, types.ErrGrowNotActivated)
+	})
+
 }
