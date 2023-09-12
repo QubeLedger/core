@@ -191,6 +191,37 @@ func (s *GrowKeeperTestSuite) GetNormalConfig() NormalTestConfig {
 	}
 }
 
+func (s *GrowKeeperTestSuite) GetNormalPosition() types.Position {
+	return types.Position{
+		Creator:             s.Address.String(),
+		DepositId:           s.app.GrowKeeper.CalculateDepositId(s.Address.String(), "btc"),
+		Collateral:          s.app.GrowKeeper.FastCoins("btc", sdk.NewInt(1)).String(),
+		OracleTicker:        "BTC",
+		BorrowedAmountInUSD: 0,
+		LoanIds:             []string{},
+	}
+}
+
+func (s *GrowKeeperTestSuite) GetNormalLiqPosition() types.LiquidatorPosition {
+	return types.LiquidatorPosition{
+		Liquidator:           s.Address.String(),
+		LiquidatorPositionId: s.app.GrowKeeper.GenerateLiquidatorPositionId(s.Address.String(), "btc", s.app.GrowKeeper.FastCoins("btc", sdk.NewInt(1)).String(), "5"),
+		Amount:               s.app.GrowKeeper.FastCoins("btc", sdk.NewInt(1)).String(),
+		BorrowAssetId:        "BTC",
+		Premium:              5,
+	}
+}
+
+func (s *GrowKeeperTestSuite) GetNormalLoan() types.Loan {
+	return types.Loan{
+		LoanId:       s.app.GrowKeeper.GenerateLoadIdHash("uusd", "btc", s.app.GrowKeeper.FastCoins("btc", sdk.NewInt(1)).String(), s.Address.String(), "test"),
+		Borrower:     s.Address.String(),
+		AmountOut:    s.app.GrowKeeper.FastCoins("btc", sdk.NewInt(1)).String(),
+		StartTime:    uint64(s.ctx.BlockTime().Unix()),
+		OracleTicker: "BTC",
+	}
+}
+
 func (s *GrowKeeperTestSuite) AddTestCoins(amount int64, denom string) {
 	s.app.BankKeeper.MintCoins(s.ctx, types.ModuleName, sdk.NewCoins(sdk.NewCoin(denom, sdk.NewInt(amount))))
 	s.app.BankKeeper.SendCoinsFromModuleToAccount(s.ctx, types.ModuleName, s.Address, sdk.NewCoins(sdk.NewCoin(denom, sdk.NewInt(amount))))

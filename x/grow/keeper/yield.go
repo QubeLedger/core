@@ -34,7 +34,7 @@ func (k Keeper) GetRealRate(ctx sdk.Context) sdk.Int {
 
 func CalculatGrowRatePercent(backing_ratio sdk.Int) (sdk.Int, error) {
 	if backing_ratio.IsNil() {
-		return sdk.Int{}, types.ErrCalculatGrowRate
+		return sdk.Int{}, types.ErrCalculateGrowRate
 	}
 	switch {
 	case backing_ratio.GT(sdk.NewInt(int64(110))):
@@ -50,7 +50,7 @@ func CalculatGrowRatePercent(backing_ratio sdk.Int) (sdk.Int, error) {
 		return sdk.NewInt(250), nil
 
 	default:
-		return sdk.Int{}, types.ErrCalculatGrowRate
+		return sdk.Int{}, types.ErrCalculateGrowRate
 	}
 }
 

@@ -68,10 +68,16 @@ func (k Keeper) PositionByCreator(goCtx context.Context, req *types.QueryPositio
 
 	allPos := k.GetAllPosition(ctx)
 	var pos types.Position
+	var found = false
 	for _, ps := range allPos {
 		if ps.Creator == req.Creator {
 			pos = ps
+			found = true
 		}
+	}
+
+	if !found {
+		return nil, status.Error(codes.NotFound, "not found")
 	}
 
 	return &types.QueryPositionResponse{
@@ -91,6 +97,10 @@ func (k Keeper) AllPosition(goCtx context.Context, req *types.QueryAllPositionRe
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	allPos := k.GetAllPosition(ctx)
+
+	if len(allPos) == 0 {
+		return nil, status.Error(codes.NotFound, "not found")
+	}
 
 	return &types.QueryAllPositionResponse{
 		Positions: allPos,
@@ -118,10 +128,16 @@ func (k Keeper) LiquidatorPositionByCreator(goCtx context.Context, req *types.Qu
 
 	allPos := k.GetAllLiquidatorPosition(ctx)
 	var pos types.LiquidatorPosition
+	var found = false
 	for _, ps := range allPos {
 		if ps.Liquidator == req.Creator {
 			pos = ps
+			found = true
 		}
+	}
+
+	if !found {
+		return nil, status.Error(codes.NotFound, "not found")
 	}
 
 	return &types.QueryLiquidatorPositionByCreatorResponse{
