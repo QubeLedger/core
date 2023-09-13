@@ -13,6 +13,7 @@ func DefaultGenesis() *GenesisState {
 		Params:                    DefaultParams(),
 		GTokenPairList:            []GTokenPair{},
 		RealRate:                  1,
+		BorrowRate:                1,
 		GrowStakingReserveAddress: "qube1xpurqvpsxqcrqvpsxqcrqvpsxqcrqvpsxqcrqv",
 		USQReserveAddress:         "qube1xpurqvpsxqcrqvpsxqcrqvpsxqcrqvpsxqcrqv",
 	}
@@ -38,6 +39,10 @@ func (gs GenesisState) Validate() error {
 
 	if sdk.NewInt(int64(gs.RealRate)).IsNegative() || sdk.NewInt(int64(gs.RealRate)).IsZero() {
 		return fmt.Errorf("RealRate negative or zero")
+	}
+
+	if sdk.NewInt(int64(gs.BorrowRate)).IsNegative() || sdk.NewInt(int64(gs.BorrowRate)).IsZero() {
+		return fmt.Errorf("BorrowRate negative or zero")
 	}
 
 	return gs.Params.Validate()

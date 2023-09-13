@@ -23,6 +23,7 @@ func TestGenesisState_Validate(t *testing.T) {
 			genState: &types.GenesisState{
 				GTokenPairList:            []types.GTokenPair{},
 				RealRate:                  10,
+				BorrowRate:                10,
 				GrowStakingReserveAddress: "qube17ca7p2gvf6qcg0n6ucnkjpe3estscfdhaj9ep9",
 				USQReserveAddress:         "qube17ca7p2gvf6qcg0n6ucnkjpe3estscfdhaj9ep9",
 			},
@@ -33,6 +34,18 @@ func TestGenesisState_Validate(t *testing.T) {
 			genState: &types.GenesisState{
 				GTokenPairList:            []types.GTokenPair{},
 				RealRate:                  0,
+				BorrowRate:                10,
+				GrowStakingReserveAddress: "qube17ca7p2gvf6qcg0n6ucnkjpe3estscfdhaj9ep9",
+				USQReserveAddress:         "qube17ca7p2gvf6qcg0n6ucnkjpe3estscfdhaj9ep9",
+			},
+			valid: false,
+		},
+		{
+			desc: "invalid genesis state - zero Borrow Rate",
+			genState: &types.GenesisState{
+				GTokenPairList:            []types.GTokenPair{},
+				RealRate:                  10,
+				BorrowRate:                0,
 				GrowStakingReserveAddress: "qube17ca7p2gvf6qcg0n6ucnkjpe3estscfdhaj9ep9",
 				USQReserveAddress:         "qube17ca7p2gvf6qcg0n6ucnkjpe3estscfdhaj9ep9",
 			},
@@ -43,6 +56,7 @@ func TestGenesisState_Validate(t *testing.T) {
 			genState: &types.GenesisState{
 				GTokenPairList:            []types.GTokenPair{},
 				RealRate:                  10,
+				BorrowRate:                10,
 				GrowStakingReserveAddress: "",
 				USQReserveAddress:         "qube17ca7p2gvf6qcg0n6ucnkjpe3estscfdhaj9ep9",
 			},
@@ -53,6 +67,7 @@ func TestGenesisState_Validate(t *testing.T) {
 			genState: &types.GenesisState{
 				GTokenPairList:            []types.GTokenPair{},
 				RealRate:                  10,
+				BorrowRate:                10,
 				GrowStakingReserveAddress: "qube17ca7p2gvf6qcg0n6ucnkjpe3estscfdhaj9ep9",
 				USQReserveAddress:         "",
 			},
