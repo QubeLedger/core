@@ -19,4 +19,6 @@ const (
 	EventRegisterChangeRealRateProposal                  = "register_change_real_rate_proposal"
 	EventRegisterChangeBorrowRateProposal                = "register_change_borrow_rate_proposal"
 	EventRegisterActivateGrowModuleProposal              = "register_activate_grow_module_proposal"
+	EventRegisterRemoveLendAssetProposal                 = "register_remove_lend_asset_proposal"
+	EventRegisterRemoveGTokenPairProposal                = "register_remove_gToken_pair_proposal"
 )

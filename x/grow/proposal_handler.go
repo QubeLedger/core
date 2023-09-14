@@ -28,6 +28,10 @@ func NewStableProposalHandler(k *keeper.Keeper) govtypes.Handler {
 			return handleRegisterChangeBorrowRateProposal(ctx, k, c)
 		case *types.RegisterActivateGrowModuleProposal:
 			return handelRegisterActivateGrowModuleProposal(ctx, k, c)
+		case *types.RegisterRemoveLendAssetProposal:
+			return handleRegisterRemoveLendAssetProposal(ctx, k, c)
+		case *types.RegisterRemoveGTokenPairProposal:
+			return handleRegisterRemoveGTokenPairProposal(ctx, k, c)
 		default:
 			return sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "unrecognized %s proposal content type: %T", types.ModuleName, c)
 		}
@@ -153,6 +157,34 @@ func handelRegisterActivateGrowModuleProposal(ctx sdk.Context, k *keeper.Keeper,
 	ctx.EventManager().EmitEvent(
 		sdk.NewEvent(
 			types.EventRegisterChangeBorrowRateProposal,
+		),
+	)
+	return nil
+}
+
+func handleRegisterRemoveLendAssetProposal(ctx sdk.Context, k *keeper.Keeper, p *types.RegisterRemoveLendAssetProposal) error {
+	asset, found := k.GetLendAssetByLendAssetId(ctx, p.LendAssetId)
+	if !found {
+		return types.ErrLendAssetNotFound
+	}
+	k.RemoveLendAsset(ctx, asset.Id)
+	ctx.EventManager().EmitEvent(
+		sdk.NewEvent(
+			types.EventRegisterRemoveLendAssetProposal,
+		),
+	)
+	return nil
+}
+
+func handleRegisterRemoveGTokenPairProposal(ctx sdk.Context, k *keeper.Keeper, p *types.RegisterRemoveGTokenPairProposal) error {
+	pair, found := k.GetPairByDenomID(ctx, p.GTokenPairID)
+	if !found {
+		return types.ErrPairNotFound
+	}
+	k.RemovePair(ctx, pair.Id)
+	ctx.EventManager().EmitEvent(
+		sdk.NewEvent(
+			types.EventRegisterRemoveGTokenPairProposal,
 		),
 	)
 	return nil

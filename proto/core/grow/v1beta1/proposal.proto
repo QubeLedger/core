@@ -40,7 +40,6 @@ message ProposalMetadataForRegisterGTokenPairProposal {
   string minAmountOut = 4;
 }
 
-
 message RegisterChangeGrowYieldReserveAddressProposal {
   option (gogoproto.equal) = false;
   // title of the proposal
@@ -95,4 +94,18 @@ message RegisterActivateGrowModuleProposal {
   option (gogoproto.equal) = false;
   string title = 1;
   string description = 2;
+}
+
+message RegisterRemoveLendAssetProposal {
+  option (gogoproto.equal) = false;
+  string title = 1;
+  string description = 2;
+  string lendAssetId = 3;
+}
+
+message RegisterRemoveGTokenPairProposal {
+  option (gogoproto.equal) = false;
+  string title = 1;
+  string description = 2;
+  string gTokenPairID = 3;
 }

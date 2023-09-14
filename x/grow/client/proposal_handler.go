@@ -15,4 +15,6 @@ var (
 	RegisterChangeRealRateProposalHandler                  = govclient.NewProposalHandler(cli.NewRegisterChangeRealRateProposalCmd, rest.RegisterChangeRealRateProposalRESTHandler)
 	RegisterChangeBorrowRateProposalHandler                = govclient.NewProposalHandler(cli.NewRegisterChangeBorrowRateProposalCmd, rest.RegisterChangeBorrowRateProposalRESTHandler)
 	RegisterActivateGrowModuleProposalHandler              = govclient.NewProposalHandler(cli.NewRegisterActivateGrowModuleProposalCmd, rest.RegisterActivateGrowModuleProposalRESTHandler)
+	RegisterRemoveLendAssetProposalHandler                 = govclient.NewProposalHandler(cli.NewRegisterRemoveLendAssetProposalCmd, rest.RegisterRemoveLendAssetProposalRESTHandler)
+	RegisterRemoveGTokenPairProposalHandler                = govclient.NewProposalHandler(cli.NewRegisterRemoveGTokenPairProposalCmd, rest.RegisterRemoveGTokenPairProposalRESTHandler)
 )

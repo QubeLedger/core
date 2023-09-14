@@ -20,6 +20,8 @@ const (
 	ProposalTypeRegisterChangeRealRateProposal                  string = "RegisterChangeRealRateProposal"
 	ProposalTypeRegisterChangeBorrowRateProposal                string = "RegisterChangeBorrowRateProposal"
 	ProposalTypeRegisterActivateGrowModuleProposal              string = "RegisterActivateGrowModuleProposal"
+	ProposalTypeRegisterRemoveLendAssetProposal                 string = "RegisterRemoveLendAssetProposal"
+	ProposalTypeRegisterRemoveGTokenPairProposal                string = "RegisterRemoveGTokenPairProposal"
 )
 
 // Implements Proposal Interface
@@ -32,6 +34,8 @@ var (
 	_ govtypes.Content = &RegisterChangeRealRateProposal{}
 	_ govtypes.Content = &RegisterChangeBorrowRateProposal{}
 	_ govtypes.Content = &RegisterActivateGrowModuleProposal{}
+	_ govtypes.Content = &RegisterRemoveLendAssetProposal{}
+	_ govtypes.Content = &RegisterRemoveGTokenPairProposal{}
 )
 
 func init() {
@@ -58,6 +62,12 @@ func init() {
 
 	govtypes.RegisterProposalType(ProposalTypeRegisterActivateGrowModuleProposal)
 	govtypes.RegisterProposalTypeCodec(&RegisterActivateGrowModuleProposal{}, "grow/RegisterActivateGrowModuleProposal")
+
+	govtypes.RegisterProposalType(ProposalTypeRegisterRemoveLendAssetProposal)
+	govtypes.RegisterProposalTypeCodec(&RegisterRemoveLendAssetProposal{}, "grow/RegisterRemoveLendAssetProposal")
+
+	govtypes.RegisterProposalType(ProposalTypeRegisterRemoveGTokenPairProposal)
+	govtypes.RegisterProposalTypeCodec(&RegisterRemoveGTokenPairProposal{}, "grow/RegisterRemoveGTokenPairProposal")
 }
 
 /*
@@ -371,5 +381,57 @@ func (*RegisterActivateGrowModuleProposal) ProposalType() string {
 
 /* #nosec */
 func (rtbp *RegisterActivateGrowModuleProposal) ValidateBasic() error {
+	return nil
+}
+
+/*
+RegisterRemoveLendAssetProposal
+*/
+
+func NewRegisterRemoveLendAssetProposal(title, description string, id string) govtypes.Content {
+	return &RegisterRemoveLendAssetProposal{
+		Title:       title,
+		Description: description,
+		LendAssetId: id,
+	}
+}
+
+func (*RegisterRemoveLendAssetProposal) ProposalRoute() string { return RouterKey }
+
+func (*RegisterRemoveLendAssetProposal) ProposalType() string {
+	return ProposalTypeRegisterRemoveLendAssetProposal
+}
+
+/* #nosec */
+func (rtbp *RegisterRemoveLendAssetProposal) ValidateBasic() error {
+	if len(rtbp.LendAssetId) == 0 {
+		return ErrInvalidLength
+	}
+	return nil
+}
+
+/*
+RegisterRemoveGTokenPairProposal
+*/
+
+func NewRegisterRemoveGTokenPairProposal(title, description string, id string) govtypes.Content {
+	return &RegisterRemoveGTokenPairProposal{
+		Title:        title,
+		Description:  description,
+		GTokenPairID: id,
+	}
+}
+
+func (*RegisterRemoveGTokenPairProposal) ProposalRoute() string { return RouterKey }
+
+func (*RegisterRemoveGTokenPairProposal) ProposalType() string {
+	return ProposalTypeRegisterRemoveGTokenPairProposal
+}
+
+/* #nosec */
+func (rtbp *RegisterRemoveGTokenPairProposal) ValidateBasic() error {
+	if len(rtbp.GTokenPairID) == 0 {
+		return ErrInvalidLength
+	}
 	return nil
 }

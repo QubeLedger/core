@@ -309,6 +309,7 @@ func NewRegisterChangeGrowStakingReserveAddressProposalCmd() *cobra.Command {
 
 	return cmd
 }
+
 func NewRegisterChangeUSQReserveAddressProposalCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "change-usq-reserve [address]",
@@ -366,6 +367,7 @@ func NewRegisterChangeUSQReserveAddressProposalCmd() *cobra.Command {
 
 	return cmd
 }
+
 func NewRegisterChangeRealRateProposalCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "change-real-rate [rate]",
@@ -525,6 +527,122 @@ func NewRegisterActivateGrowModuleProposalCmd() *cobra.Command {
 			from := clientCtx.GetFromAddress()
 
 			content := types.NewRegisterActivateGrowModuleProposal(title, description)
+
+			msg, err := govtypes.NewMsgSubmitProposal(content, deposit, from)
+			if err != nil {
+				return err
+			}
+
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
+		},
+	}
+	cmd.Flags().String(cli.FlagTitle, "", "title of proposal")
+	cmd.Flags().String(cli.FlagDescription, "", "description of proposal")
+	cmd.Flags().String(cli.FlagDeposit, "1uqube", "deposit of proposal")
+	if err := cmd.MarkFlagRequired(cli.FlagTitle); err != nil {
+		panic(err)
+	}
+	if err := cmd.MarkFlagRequired(cli.FlagDescription); err != nil {
+		panic(err)
+	}
+	if err := cmd.MarkFlagRequired(cli.FlagDeposit); err != nil {
+		panic(err)
+	}
+
+	return cmd
+}
+
+func NewRegisterRemoveLendAssetProposalCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "remove-lend-asset [id]",
+		Args:  cobra.ExactArgs(1),
+		Short: "Submit a remove lend asset proposal",
+		RunE: func(cmd *cobra.Command, args []string) (err error) {
+			clientCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
+			title, err := cmd.Flags().GetString(cli.FlagTitle)
+			if err != nil {
+				return err
+			}
+
+			description, err := cmd.Flags().GetString(cli.FlagDescription)
+			if err != nil {
+				return err
+			}
+
+			depositStr, err := cmd.Flags().GetString(cli.FlagDeposit)
+			if err != nil {
+				return err
+			}
+
+			deposit, err := sdk.ParseCoinsNormalized(depositStr)
+			if err != nil {
+				return err
+			}
+
+			from := clientCtx.GetFromAddress()
+
+			content := types.NewRegisterRemoveLendAssetProposal(title, description, args[0])
+
+			msg, err := govtypes.NewMsgSubmitProposal(content, deposit, from)
+			if err != nil {
+				return err
+			}
+
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
+		},
+	}
+	cmd.Flags().String(cli.FlagTitle, "", "title of proposal")
+	cmd.Flags().String(cli.FlagDescription, "", "description of proposal")
+	cmd.Flags().String(cli.FlagDeposit, "1uqube", "deposit of proposal")
+	if err := cmd.MarkFlagRequired(cli.FlagTitle); err != nil {
+		panic(err)
+	}
+	if err := cmd.MarkFlagRequired(cli.FlagDescription); err != nil {
+		panic(err)
+	}
+	if err := cmd.MarkFlagRequired(cli.FlagDeposit); err != nil {
+		panic(err)
+	}
+
+	return cmd
+}
+
+func NewRegisterRemoveGTokenPairProposalCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "remove-gToken-pair [id]",
+		Args:  cobra.ExactArgs(1),
+		Short: "Submit a remove gToken pair proposal",
+		RunE: func(cmd *cobra.Command, args []string) (err error) {
+			clientCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
+			title, err := cmd.Flags().GetString(cli.FlagTitle)
+			if err != nil {
+				return err
+			}
+
+			description, err := cmd.Flags().GetString(cli.FlagDescription)
+			if err != nil {
+				return err
+			}
+
+			depositStr, err := cmd.Flags().GetString(cli.FlagDeposit)
+			if err != nil {
+				return err
+			}
+
+			deposit, err := sdk.ParseCoinsNormalized(depositStr)
+			if err != nil {
+				return err
+			}
+
+			from := clientCtx.GetFromAddress()
+
+			content := types.NewRegisterRemoveGTokenPairProposal(title, description, args[0])
 
 			msg, err := govtypes.NewMsgSubmitProposal(content, deposit, from)
 			if err != nil {

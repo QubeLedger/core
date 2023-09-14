@@ -81,9 +81,21 @@ type RegisterActivateGrowModuleProposal struct {
 	Deposit     sdk.Coins    `json:"deposit" yaml:"deposit"`
 }
 
-/*
-RegisterLendAssetProposal
-*/
+type RegisterRemoveLendAssetProposal struct {
+	BaseReq     rest.BaseReq `json:"base_req" yaml:"base_req"`
+	Title       string       `json:"title" yaml:"title"`
+	Description string       `json:"description" yaml:"description"`
+	Deposit     sdk.Coins    `json:"deposit" yaml:"deposit"`
+	LendAssetId string       `json:"lendAssetId" yaml:"lendAssetId"`
+}
+
+type RegisterRemoveGTokenPairProposal struct {
+	BaseReq      rest.BaseReq `json:"base_req" yaml:"base_req"`
+	Title        string       `json:"title" yaml:"title"`
+	Description  string       `json:"description" yaml:"description"`
+	Deposit      sdk.Coins    `json:"deposit" yaml:"deposit"`
+	GTokenPairID string       `json:"lendAssetId" yaml:"lendAssetId"`
+}
 
 func RegisterLendAssetProposalRESTHandler(clientCtx client.Context) govrest.ProposalRESTHandler {
 	return govrest.ProposalRESTHandler{
@@ -384,6 +396,84 @@ func newRegisterActivateGrowModuleProposal(clientCtx client.Context) http.Handle
 		}
 
 		content := types.NewRegisterActivateGrowModuleProposal(req.Title, req.Description)
+		msg, err := govtypes.NewMsgSubmitProposal(content, req.Deposit, fromAddr)
+		if rest.CheckBadRequestError(w, err) {
+			return
+		}
+
+		if rest.CheckBadRequestError(w, msg.ValidateBasic()) {
+			return
+		}
+
+		tx.WriteGeneratedTxResponse(clientCtx, w, req.BaseReq, msg)
+	}
+}
+
+func RegisterRemoveLendAssetProposalRESTHandler(clientCtx client.Context) govrest.ProposalRESTHandler {
+	return govrest.ProposalRESTHandler{
+		SubRoute: types.ModuleName,
+		Handler:  newRegisterRemoveLendAssetProposal(clientCtx),
+	}
+}
+
+func newRegisterRemoveLendAssetProposal(clientCtx client.Context) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		var req RegisterRemoveLendAssetProposal
+
+		if !rest.ReadRESTReq(w, r, clientCtx.LegacyAmino, &req) {
+			return
+		}
+
+		req.BaseReq = req.BaseReq.Sanitize()
+		if !req.BaseReq.ValidateBasic(w) {
+			return
+		}
+
+		fromAddr, err := sdk.AccAddressFromBech32(req.BaseReq.From)
+		if rest.CheckBadRequestError(w, err) {
+			return
+		}
+
+		content := types.NewRegisterRemoveLendAssetProposal(req.Title, req.Description, req.LendAssetId)
+		msg, err := govtypes.NewMsgSubmitProposal(content, req.Deposit, fromAddr)
+		if rest.CheckBadRequestError(w, err) {
+			return
+		}
+
+		if rest.CheckBadRequestError(w, msg.ValidateBasic()) {
+			return
+		}
+
+		tx.WriteGeneratedTxResponse(clientCtx, w, req.BaseReq, msg)
+	}
+}
+
+func RegisterRemoveGTokenPairProposalRESTHandler(clientCtx client.Context) govrest.ProposalRESTHandler {
+	return govrest.ProposalRESTHandler{
+		SubRoute: types.ModuleName,
+		Handler:  newRegisterRemoveGTokenPairProposal(clientCtx),
+	}
+}
+
+func newRegisterRemoveGTokenPairProposal(clientCtx client.Context) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		var req RegisterRemoveGTokenPairProposal
+
+		if !rest.ReadRESTReq(w, r, clientCtx.LegacyAmino, &req) {
+			return
+		}
+
+		req.BaseReq = req.BaseReq.Sanitize()
+		if !req.BaseReq.ValidateBasic(w) {
+			return
+		}
+
+		fromAddr, err := sdk.AccAddressFromBech32(req.BaseReq.From)
+		if rest.CheckBadRequestError(w, err) {
+			return
+		}
+
+		content := types.NewRegisterRemoveGTokenPairProposal(req.Title, req.Description, req.GTokenPairID)
 		msg, err := govtypes.NewMsgSubmitProposal(content, req.Deposit, fromAddr)
 		if rest.CheckBadRequestError(w, err) {
 			return

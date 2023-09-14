@@ -427,3 +427,69 @@ func TestRegisterChangeRealBorrowProposal(t *testing.T) {
 		}
 	}
 }
+
+func TestRegisterRemoveLendAssetProposal(t *testing.T) {
+	apptypes.SetConfig()
+	tests := []struct {
+		title       string
+		description string
+		value       string
+		expectedErr bool
+	}{
+		{
+			"test",
+			"test",
+			"testid",
+			false,
+		},
+		{
+			"test",
+			"test",
+			"",
+			true,
+		},
+	}
+
+	for _, tc := range tests {
+		msg := types.NewRegisterRemoveLendAssetProposal(tc.title, tc.description, tc.value)
+		err := msg.ValidateBasic()
+		if tc.expectedErr {
+			require.Error(t, err)
+		} else {
+			require.NoError(t, err)
+		}
+	}
+}
+
+func TestRegisterRemoveGTokenPairProposal(t *testing.T) {
+	apptypes.SetConfig()
+	tests := []struct {
+		title       string
+		description string
+		value       string
+		expectedErr bool
+	}{
+		{
+			"test",
+			"test",
+			"testid",
+			false,
+		},
+		{
+			"test",
+			"test",
+			"",
+			true,
+		},
+	}
+
+	for _, tc := range tests {
+		msg := types.NewRegisterRemoveGTokenPairProposal(tc.title, tc.description, tc.value)
+		err := msg.ValidateBasic()
+		if tc.expectedErr {
+			require.Error(t, err)
+		} else {
+			require.NoError(t, err)
+		}
+	}
+}
