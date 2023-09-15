@@ -26,7 +26,7 @@ func EndBlocker(ctx sdk.Context, k keeper.Keeper) error {
 		}
 
 		value, blocked := k.CalculateAddToReserveValue(ctx, rawValue, gp)
-		if blocked == false && value.IsNil() {
+		if !blocked && value.IsNil() {
 			return types.ErrIntNegativeOrZero
 		}
 
