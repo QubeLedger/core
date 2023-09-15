@@ -49,14 +49,27 @@ func EndBlocker(ctx sdk.Context, k keeper.Keeper) error {
 			if err != nil {
 				return err
 			}
+			if err != nil && price.IsNil() {
+				return types.ErrIntNegativeOrZero
+			}
+
 			amountPositionInt, _, err := k.GetAmountIntFromCoins(pos.Collateral)
 			if err != nil {
 				return err
 			}
+			if err != nil && amountPositionInt.IsNil() {
+				return types.ErrIntNegativeOrZero
+			}
+
 			rr, err := k.CalculateRiskRate(amountPositionInt, price, sdk.NewIntFromUint64(pos.BorrowedAmountInUSD))
 			if err != nil {
 				return err
 			}
+
+			if err != nil && rr.IsNil() {
+				return types.ErrIntNegativeOrZero
+			}
+
 			if rr.GTE(sdk.NewInt(95)) {
 				liquidateLendPositionList = append(liquidateLendPositionList, pos.DepositId)
 			}

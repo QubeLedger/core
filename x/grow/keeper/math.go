@@ -10,12 +10,13 @@ import (
 /*
 Deposit Math Helpers
 */
+
 func (k Keeper) CalculateGTokenAmountOut(amount sdk.Int, price sdk.Int) sdk.Int {
-	return ((amount.Mul(types.DepositMultiplier)).Quo(price))
+	return ((amount.Mul(types.CoinMultiplier)).Quo(price))
 }
 
 func (k Keeper) CalculateReturnQubeStableAmountOut(amount sdk.Int, price sdk.Int) sdk.Int {
-	return ((amount.Mul(price)).Quo(types.DepositMultiplier))
+	return ((amount.Mul(price)).Quo(types.CoinMultiplier))
 }
 
 /* #nosec */
@@ -51,6 +52,7 @@ func (k Keeper) CalculateAmountForRemoveFromCollateral(amt sdk.Int, price sdk.In
 /*
 RR Math Logic
 */
+
 /* #nosec */
 func (k Keeper) CalculateRiskRate(collateral sdk.Int, price sdk.Int, borrow sdk.Int) (sdk.Int, error) {
 	amtCollateral := (collateral.Mul(price)).QuoRaw(10000)
@@ -78,6 +80,10 @@ func (k Keeper) CheckRiskRate(collateral sdk.Int, price sdk.Int, borrow sdk.Int,
 	}
 	return nil
 }
+
+/*
+Liquidator Math Logic
+*/
 
 /* #nosec */
 func (k Keeper) CalculateAmountLiquidate(ctx sdk.Context, collateral sdk.Int, borrow sdk.Int) sdk.Int {

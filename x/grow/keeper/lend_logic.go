@@ -122,15 +122,25 @@ func (k Keeper) ExecuteDeleteLend(ctx sdk.Context, msg *types.MsgDeleteLend, Len
 	}
 
 	borrowTime := sdk.NewInt(ctx.BlockTime().Unix() - int64(loan.StartTime))
+	if borrowTime.IsNil() || borrowTime.IsZero() {
+		return types.ErrIntNegativeOrZero, ""
+	}
+
 	borrowAmountInt := borrowAmountCoins.AmountOf(types.DefaultDenom)
 
 	rightAmount := k.CalculateNeedAmountToGet(borrowAmountInt, borrowTime)
+	if rightAmount.IsNil() || rightAmount.IsZero() {
+		return types.ErrIntNegativeOrZero, ""
+	}
 
 	if !amountInInt.GTE(rightAmount) {
 		return types.ErrNotEnoughAmountIn, ""
 	}
 
 	rightAmountInCollateral := k.CalculateAmountForRemoveFromCollateral(rightAmount.Sub(borrowAmountInt), price)
+	if rightAmountInCollateral.IsNil() || rightAmountInCollateral.IsZero() {
+		return types.ErrIntNegativeOrZero, ""
+	}
 
 	err = k.bankKeeper.SendCoinsFromAccountToModule(ctx, borrower, types.ModuleName, borrowAmountCoins)
 	if err != nil {
@@ -138,6 +148,10 @@ func (k Keeper) ExecuteDeleteLend(ctx sdk.Context, msg *types.MsgDeleteLend, Len
 	}
 
 	amtToReserves := (rightAmount.Sub(borrowAmountInt)).QuoRaw(2)
+	if amtToReserves.IsNil() || amtToReserves.IsZero() {
+		return types.ErrIntNegativeOrZero, ""
+	}
+
 	err = k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, k.GetUSQReserveAddress(ctx), k.FastCoins(types.DefaultDenom, amtToReserves))
 	if err != nil {
 		return err, ""

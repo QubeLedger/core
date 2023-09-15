@@ -9,6 +9,7 @@ import (
 
 var _ types.MsgServer = Keeper{}
 
+// Msg for USQ deposit
 func (k Keeper) Deposit(goCtx context.Context, msg *types.MsgDeposit) (*types.MsgDepositResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
@@ -17,10 +18,8 @@ func (k Keeper) Deposit(goCtx context.Context, msg *types.MsgDeposit) (*types.Ms
 		return nil, err
 	}
 
-	denomID, err := k.GetDenomIdDeposit(msg.DenomOut)
-	if err != nil {
-		return nil, err
-	}
+	denomID := k.GenerateDenomIdHash(msg.DenomOut)
+
 	gTokenPair, found := k.GetPairByDenomID(ctx, denomID)
 	if !found {
 		return nil, types.ErrPairNotFound
@@ -52,6 +51,7 @@ func (k Keeper) Deposit(goCtx context.Context, msg *types.MsgDeposit) (*types.Ms
 	}, nil
 }
 
+// Msg for USQ withdrawal
 func (k Keeper) Withdrawal(goCtx context.Context, msg *types.MsgWithdrawal) (*types.MsgWithdrawalResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
@@ -95,6 +95,7 @@ func (k Keeper) Withdrawal(goCtx context.Context, msg *types.MsgWithdrawal) (*ty
 	}, nil
 }
 
+// Msg of deposit collateral for borrowing money from x/grow
 func (k Keeper) DepositCollateral(goCtx context.Context, msg *types.MsgDepositCollateral) (*types.MsgDepositCollateralResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
@@ -136,6 +137,7 @@ func (k Keeper) DepositCollateral(goCtx context.Context, msg *types.MsgDepositCo
 	}, nil
 }
 
+// Msg of withdrawal collateral from x/grow
 func (k Keeper) WithdrawalCollateral(goCtx context.Context, msg *types.MsgWithdrawalCollateral) (*types.MsgWithdrawalCollateralResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
@@ -144,7 +146,7 @@ func (k Keeper) WithdrawalCollateral(goCtx context.Context, msg *types.MsgWithdr
 		return nil, err
 	}
 
-	LendAssetId, err := k.GetLendAssetIdByDenom(msg.Denom)
+	LendAssetId := k.GenerateLendAssetIdHash(msg.Denom)
 	if err != nil {
 		return nil, err
 	}
@@ -177,6 +179,7 @@ func (k Keeper) WithdrawalCollateral(goCtx context.Context, msg *types.MsgWithdr
 	}, nil
 }
 
+// Msg for lend asset
 func (k Keeper) CreateLend(goCtx context.Context, msg *types.MsgCreateLend) (*types.MsgCreateLendResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
@@ -185,10 +188,11 @@ func (k Keeper) CreateLend(goCtx context.Context, msg *types.MsgCreateLend) (*ty
 		return nil, err
 	}
 
-	LendAssetId, err := k.GetLendAssetIdByDenom(msg.DenomIn)
+	LendAssetId := k.GenerateLendAssetIdHash(msg.DenomIn)
 	if err != nil {
 		return nil, err
 	}
+
 	LendAsset, found := k.GetLendAssetByLendAssetId(ctx, LendAssetId)
 	if !found {
 		return nil, types.ErrLendAssetNotFound
@@ -221,6 +225,7 @@ func (k Keeper) CreateLend(goCtx context.Context, msg *types.MsgCreateLend) (*ty
 	}, nil
 }
 
+// Msg for delete lend
 func (k Keeper) DeleteLend(goCtx context.Context, msg *types.MsgDeleteLend) (*types.MsgDeleteLendResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
@@ -229,10 +234,11 @@ func (k Keeper) DeleteLend(goCtx context.Context, msg *types.MsgDeleteLend) (*ty
 		return nil, err
 	}
 
-	LendAssetId, err := k.GetLendAssetIdByDenom(msg.DenomOut)
+	LendAssetId := k.GenerateLendAssetIdHash(msg.DenomOut)
 	if err != nil {
 		return nil, err
 	}
+
 	LendAsset, found := k.GetLendAssetByLendAssetId(ctx, LendAssetId)
 	if !found {
 		return nil, types.ErrLendAssetNotFound
@@ -263,6 +269,7 @@ func (k Keeper) DeleteLend(goCtx context.Context, msg *types.MsgDeleteLend) (*ty
 	}, nil
 }
 
+// Msg for open liquidation postion
 func (k Keeper) CreateLiquidationPosition(goCtx context.Context, msg *types.MsgCreateLiquidationPosition) (*types.MsgCreateLiquidationPositionResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
@@ -300,6 +307,7 @@ func (k Keeper) CreateLiquidationPosition(goCtx context.Context, msg *types.MsgC
 	}, nil
 }
 
+// Msg for close liquidation postion
 func (k Keeper) CloseLiquidationPosition(goCtx context.Context, msg *types.MsgCloseLiquidationPosition) (*types.MsgCloseLiquidationPositionResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 

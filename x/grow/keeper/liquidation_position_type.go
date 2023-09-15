@@ -77,6 +77,11 @@ func GetLiquidatorPositionIDFromBytes(bz []byte) uint64 {
 	return binary.BigEndian.Uint64(bz)
 }
 
+//nolint:all
+func (k Keeper) GenerateLiquidatorPositionId(address string, denom string, amount string, premium string) string {
+	return fmt.Sprintf("%x", crypto.Sha256(append([]byte(address+denom+amount+premium))))
+}
+
 func (k Keeper) GetLiquidatorPositionByLiquidatorPositionId(ctx sdk.Context, LiquidatorPositionId string) (val types.LiquidatorPosition, found bool) {
 	allLiquidatorPosition := k.GetAllLiquidatorPosition(ctx)
 	for _, v := range allLiquidatorPosition {
@@ -105,9 +110,4 @@ func (k Keeper) CheckIfLiquidatorPositionAlredyCreate(ctx sdk.Context, depositor
 		}
 	}
 	return nil
-}
-
-//nolint:all
-func (k Keeper) GenerateLiquidatorPositionId(address string, denom string, amount string, premium string) string {
-	return fmt.Sprintf("%x", crypto.Sha256(append([]byte(address+denom+amount+premium))))
 }

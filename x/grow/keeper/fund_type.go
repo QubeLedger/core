@@ -10,7 +10,10 @@ var (
 	GrowStakingReserveAddress sdk.AccAddress
 )
 
-// USQReserveAddress
+/*
+USQReserveAddress
+*/
+
 func (k Keeper) ChangeUSQReserveAddress(ctx sdk.Context, address sdk.AccAddress) error {
 	k.SetUSQReserveAddress(ctx, address)
 	return nil
@@ -24,7 +27,10 @@ func (k Keeper) GetUSQReserveAddress(ctx sdk.Context) sdk.AccAddress {
 	return USQReserveAddress
 }
 
-// GrowYieldReserveAddress
+/*
+GrowYieldReserveAddress
+*/
+
 func (k Keeper) ChangeGrowYieldReserveAddress(ctx sdk.Context, address sdk.AccAddress) error {
 	k.SetGrowYieldReserveAddress(ctx, address)
 	return nil
@@ -38,7 +44,10 @@ func (k Keeper) GetGrowYieldReserveAddress(ctx sdk.Context) sdk.AccAddress {
 	return GrowYieldReserveAddress
 }
 
-// GrowStakingReserveAddress
+/*
+GrowStakingReserveAddress
+*/
+
 func (k Keeper) ChangeGrowStakingReserveAddress(ctx sdk.Context, address sdk.AccAddress) error {
 	k.SetGrowStakingReserveAddress(ctx, address)
 	return nil

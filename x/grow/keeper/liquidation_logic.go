@@ -60,7 +60,6 @@ func (k Keeper) LiquidatePosition(ctx sdk.Context, liqPosition types.LiquidatorP
 	}
 
 	rr, err := k.CalculateRiskRate(collateralAmountInt, price, sdk.NewIntFromUint64(pos.BorrowedAmountInUSD))
-	//fmt.Printf("Risk Ratio: %d\n", rr.Int64())
 	if err != nil {
 		return false, err
 	}
@@ -74,8 +73,12 @@ func (k Keeper) LiquidatePosition(ctx sdk.Context, liqPosition types.LiquidatorP
 		return false, err
 	}
 
-	collateralAmountInUsq := (collateralAmountInt.Mul(price)).QuoRaw(10000)
-	amtLiquidate := k.CalculateAmountLiquidate(ctx, collateralAmountInUsq, sdk.NewIntFromUint64(pos.BorrowedAmountInUSD))
+	collateralAmountInQubeStable := (collateralAmountInt.Mul(price)).QuoRaw(10000)
+	if collateralAmountInQubeStable.IsNil() || collateralAmountInQubeStable.IsZero() {
+		return false, types.ErrIntNegativeOrZero
+	}
+
+	amtLiquidate := k.CalculateAmountLiquidate(ctx, collateralAmountInQubeStable, sdk.NewIntFromUint64(pos.BorrowedAmountInUSD))
 	if amtLiquidate.LTE(liqPositioAmountInt) {
 		usdAmount, assetAmount := k.CalculatePremiumAmount(ctx, amtLiquidate, price, int64(liqPosition.Premium))
 		err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, liquidator, k.FastCoins(collateralDenom, assetAmount))

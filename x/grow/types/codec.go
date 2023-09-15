@@ -12,7 +12,11 @@ func RegisterCodec(cdc *codec.LegacyAmino) {
 	cdc.RegisterConcrete(&MsgWithdrawal{}, "grow/Withdrawal", nil)
 	cdc.RegisterConcrete(&MsgCreateLend{}, "grow/CreateLend", nil)
 	cdc.RegisterConcrete(&MsgDeleteLend{}, "grow/DeleteLend", nil)
-	// this line is used by starport scaffolding # 2
+	cdc.RegisterConcrete(&MsgDepositCollateral{}, "grow/DepositCollateral", nil)
+	cdc.RegisterConcrete(&MsgWithdrawalCollateral{}, "grow/WithdrawalCollateral", nil)
+	cdc.RegisterConcrete(&MsgCreateLiquidationPosition{}, "grow/CreateLiquidationPosition", nil)
+	cdc.RegisterConcrete(&MsgCloseLiquidationPosition{}, "grow/CloseLiquidationPosition", nil)
+
 }
 
 func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
@@ -28,7 +32,18 @@ func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
 	registry.RegisterImplementations((*sdk.Msg)(nil),
 		&MsgDeleteLend{},
 	)
-	// this line is used by starport scaffolding # 3
+	registry.RegisterImplementations((*sdk.Msg)(nil),
+		&MsgDepositCollateral{},
+	)
+	registry.RegisterImplementations((*sdk.Msg)(nil),
+		&MsgWithdrawalCollateral{},
+	)
+	registry.RegisterImplementations((*sdk.Msg)(nil),
+		&MsgCreateLiquidationPosition{},
+	)
+	registry.RegisterImplementations((*sdk.Msg)(nil),
+		&MsgCloseLiquidationPosition{},
+	)
 
 	msgservice.RegisterMsgServiceDesc(registry, &_Msg_serviceDesc)
 }

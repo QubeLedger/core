@@ -103,10 +103,6 @@ func (k Keeper) GenerateDenomIdHash(denom1 string) string {
 	return fmt.Sprintf("%x", crypto.Sha256(append([]byte(denom1))))
 }
 
-func (k Keeper) GetDenomIdDeposit(denom string) (string, error) {
-	return k.GenerateDenomIdHash(denom), nil
-}
-
 func (k Keeper) GetDenomIdWithdrawal(amountIn string) (string, error) {
 	msgAmountInCoins, err := sdk.ParseCoinsNormalized(amountIn)
 	if err != nil {

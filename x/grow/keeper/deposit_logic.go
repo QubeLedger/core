@@ -41,6 +41,10 @@ func (k Keeper) ExecuteDeposit(ctx sdk.Context, msg *types.MsgDeposit, gTokenPai
 	}
 
 	amountOutInt := k.CalculateGTokenAmountOut(amountInInt, gTokenPrice)
+	if amountOutInt.IsNil() || amountOutInt.IsZero() {
+		return types.ErrIntNegativeOrZero, sdk.Coin{}
+	}
+
 	amountOut := sdk.NewCoin(gTokenPair.GTokenMetadata.Base, amountOutInt)
 
 	err = k.bankKeeper.MintCoins(ctx, types.ModuleName, sdk.NewCoins(amountOut))
@@ -93,6 +97,10 @@ func (k Keeper) ExecuteWithdrawal(ctx sdk.Context, msg *types.MsgWithdrawal, gTo
 	}
 
 	amountOutInt := k.CalculateReturnQubeStableAmountOut(amountInInt, gTokenPrice)
+	if amountOutInt.IsNil() || amountOutInt.IsZero() {
+		return types.ErrIntNegativeOrZero, sdk.Coin{}
+	}
+
 	amountOut := sdk.NewCoin(qStablePair.AmountOutMetadata.Base, amountOutInt)
 
 	gTokenPair, err = k.ReduceGrowStakingReserve(ctx, sdk.NewCoins(amountOut), gTokenPair)

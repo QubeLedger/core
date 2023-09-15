@@ -77,6 +77,44 @@ func GetLendAssetIDFromBytes(bz []byte) uint64 {
 	return binary.BigEndian.Uint64(bz)
 }
 
+//nolint:all
+func (k Keeper) GenerateLendAssetIdHash(denom1 string) string {
+	return fmt.Sprintf("%x", crypto.Sha256(append([]byte(denom1))))
+}
+
+// func for gov proposal
+func (k Keeper) RegisterLendAsset(ctx sdk.Context, p types.LendAsset) error {
+	LendAsset := types.LendAsset{
+		LendAssetId:   k.GenerateLendAssetIdHash(p.AssetMetadata.Base),
+		AssetMetadata: p.AssetMetadata,
+		OracleAssetId: p.OracleAssetId,
+	}
+	_ = k.AppendLendAsset(ctx, LendAsset)
+	return nil
+}
+
+/*
+functions for get lend asset
+*/
+
+func (k Keeper) GetLendAssetIdByCoins(amountIn string) (string, error) {
+	amountInCoins, err := sdk.ParseCoinsNormalized(amountIn)
+	if err != nil {
+		return "", err
+	}
+	return k.GenerateLendAssetIdHash(amountInCoins.GetDenomByIndex(0)), nil
+}
+
+func (k Keeper) GetLendAssetByOracleAssetId(ctx sdk.Context, oracleAssetId string) (val types.LendAsset, err error) {
+	allLendAsset := k.GetAllLendAsset(ctx)
+	for _, v := range allLendAsset {
+		if v.OracleAssetId == oracleAssetId {
+			return v, nil
+		}
+	}
+	return val, types.ErrLendAssetNotFound
+}
+
 func (k Keeper) GetLendAssetByLendAssetId(ctx sdk.Context, LendAssetId string) (val types.LendAsset, found bool) {
 	allLendAsset := k.GetAllLendAsset(ctx)
 	for _, v := range allLendAsset {
@@ -95,51 +133,4 @@ func (k Keeper) GetLendAssetByID(ctx sdk.Context, id uint64) (val types.LendAsse
 		}
 	}
 	return val, false
-}
-
-//nolint:all
-func (k Keeper) GenerateLendAssetIdHash(denom1 string) string {
-	return fmt.Sprintf("%x", crypto.Sha256(append([]byte(denom1))))
-}
-
-func (k Keeper) RegisterLendAsset(ctx sdk.Context, p types.LendAsset) error {
-	LendAsset := types.LendAsset{
-		LendAssetId:   k.GenerateLendAssetIdHash(p.AssetMetadata.Base),
-		AssetMetadata: p.AssetMetadata,
-		OracleAssetId: p.OracleAssetId,
-	}
-	_ = k.AppendLendAsset(ctx, LendAsset)
-	return nil
-}
-
-func (k Keeper) GetLendAssetIdByCoins(amountIn string) (string, error) {
-	amountInCoins, err := sdk.ParseCoinsNormalized(amountIn)
-	if err != nil {
-		return "", err
-	}
-	return k.GenerateLendAssetIdHash(amountInCoins.GetDenomByIndex(0)), nil
-}
-
-func (k Keeper) GetLendAssetIdByDenom(denom string) (string, error) {
-	return k.GenerateLendAssetIdHash(denom), nil
-}
-
-func (k Keeper) GetLendAssetByOracleAssetId(ctx sdk.Context, oracleAssetId string) (val types.LendAsset, err error) {
-	allLendAsset := k.GetAllLendAsset(ctx)
-	for _, v := range allLendAsset {
-		if v.OracleAssetId == oracleAssetId {
-			return v, nil
-		}
-	}
-	return val, types.ErrLendAssetNotFound
-}
-
-func (k Keeper) RegisterendAsset(ctx sdk.Context, p types.LendAsset) error {
-	la := types.LendAsset{
-		LendAssetId:   p.LendAssetId,
-		AssetMetadata: p.AssetMetadata,
-		OracleAssetId: p.OracleAssetId,
-	}
-	_ = k.AppendLendAsset(ctx, la)
-	return nil
 }
