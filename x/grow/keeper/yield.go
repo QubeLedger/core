@@ -135,13 +135,13 @@ func (k Keeper) CheckYieldRate(ctx sdk.Context, gTokenPair types.GTokenPair) (st
 func (k Keeper) CalculateAddToReserveValue(ctx sdk.Context, val sdk.Int, gTokenPair types.GTokenPair) (sdk.Int, bool) {
 	diff := sdk.NewInt(ctx.BlockTime().Unix()).Sub(lastTimeUpdateReserve)
 	if diff.LT(sdk.NewInt(10)) {
-		return sdk.Int{}, false
+		return sdk.Int{}, true
 	}
 
 	if (sdk.NewInt(31536000).Quo(diff)).IsNil() || (sdk.NewInt(31536000).Quo(diff)).IsZero() {
-		return sdk.Int{}, false
+		return sdk.Int{}, true
 	}
-	return val.Quo(sdk.NewInt(31536000).Quo(diff)), true
+	return val.Quo(sdk.NewInt(31536000).Quo(diff)), false
 }
 
 func (k Keeper) SetBorrowRate(ctx sdk.Context, val sdk.Int) error {

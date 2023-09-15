@@ -379,8 +379,8 @@ func (suite *GrowKeeperTestSuite) TestYieldPercentage() {
 		s.app.GrowKeeper.SetLastTimeUpdateReserve(s.ctx, sdk.NewInt(s.ctx.BlockTime().Unix()))
 		s.ctx = s.ctx.WithBlockTime(time.Unix((s.ctx.BlockTime().Unix() + 10), 0))
 
-		realValue, found := s.app.GrowKeeper.CalculateAddToReserveValue(s.ctx, sdk.NewInt(res.Difference), gTokenPair)
-		s.Require().Equal(found, true)
+		realValue, blocked := s.app.GrowKeeper.CalculateAddToReserveValue(s.ctx, sdk.NewInt(res.Difference), gTokenPair)
+		s.Require().Equal(blocked, false)
 
 		fmt.Printf("Real send to/from reserve: %f\n", float64(realValue.Int64())/1000000)
 	})

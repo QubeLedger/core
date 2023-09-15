@@ -21,15 +21,20 @@ func EndBlocker(ctx sdk.Context, k keeper.Keeper) error {
 			return err
 		}
 
-		if rawValue.IsNil() {
+		if rawValue.IsNil() || rawValue.IsZero() {
 			return types.ErrIntNegativeOrZero
 		}
 
 		value, blocked := k.CalculateAddToReserveValue(ctx, rawValue, gp)
+		if blocked == false && value.IsNil() {
+			return types.ErrIntNegativeOrZero
+		}
+
 		err = ExecuteReserveAction(k, ctx, value, gp, action, blocked)
 		if err != nil {
 			return err
 		}
+
 		err = k.UpdateGTokenPrice(ctx, gp)
 		if err != nil {
 			return err
@@ -68,19 +73,17 @@ func EndBlocker(ctx sdk.Context, k keeper.Keeper) error {
 }
 
 func ExecuteReserveAction(k keeper.Keeper, ctx sdk.Context, value sdk.Int, gp types.GTokenPair, action string, blocked bool) error {
-	if blocked {
-		if action == types.SendToReserveAction {
-			err := SendToReserveAction(k, ctx, value, gp)
-			if err != nil {
+	if !blocked {
+		switch action {
+		case types.SendToReserveAction:
+			if err := SendToReserveAction(k, ctx, value, gp); err != nil {
 				return err
 			}
-		}
+		case types.SendFromReserveAction:
+			if err := SendFromReserveAction(k, ctx, value, gp); err != nil {
+				return err
+			}
 
-		if action == types.SendFromReserveAction {
-			err := SendFromReserveAction(k, ctx, value, gp)
-			if err != nil {
-				return err
-			}
 		}
 	}
 	return nil

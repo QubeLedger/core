@@ -137,16 +137,16 @@ func (s *GrowAbciTestSuite) TestGrowReserveMath() {
 	s.Require().NoError(err)
 	fmt.Printf("Action: %s\nDiff between RealYield and GrowYield: %d\n\n", action, value.Int64()/1000000)
 
-	_, found := s.app.GrowKeeper.CalculateAddToReserveValue(s.ctx, value, updatedPair)
-	s.Require().Equal(found, false)
+	_, blocked := s.app.GrowKeeper.CalculateAddToReserveValue(s.ctx, value, updatedPair)
+	s.Require().Equal(blocked, true)
 
 	s.ctx = s.ctx.WithBlockHeight(2)
 	s.ctx = s.ctx.WithBlockTime(time.Unix((s.ctx.BlockTime().Unix() + 10), 0))
 
 	s.OracleAggregateExchangeRateFromNet()
 
-	realValue, found := s.app.GrowKeeper.CalculateAddToReserveValue(s.ctx, value, updatedPair)
-	s.Require().Equal(found, true)
+	realValue, blocked := s.app.GrowKeeper.CalculateAddToReserveValue(s.ctx, value, updatedPair)
+	s.Require().Equal(blocked, false)
 
 	fmt.Printf("Real send to/from reserve: %f\n", float64(realValue.Int64())/1000000)
 }
@@ -196,8 +196,8 @@ func (s *GrowAbciTestSuite) TestGrowIncreaseUSQReserve() {
 	_, value, err := s.app.GrowKeeper.CheckYieldRate(s.ctx, updatedPair)
 	s.Require().NoError(err)
 
-	realValue, found := s.app.GrowKeeper.CalculateAddToReserveValue(s.ctx, value, updatedPair)
-	s.Require().Equal(found, true)
+	realValue, blocked := s.app.GrowKeeper.CalculateAddToReserveValue(s.ctx, value, updatedPair)
+	s.Require().Equal(blocked, false)
 
 	balanceGrowStakingReserve := s.app.BankKeeper.GetBalance(s.ctx, s.app.GrowKeeper.GetGrowStakingReserveAddress(s.ctx), s.GetNormalQStablePair(0).AmountOutMetadata.Base)
 	s.Require().Equal((balanceGrowStakingReserveOld.Amount).Sub(balanceGrowStakingReserve.Amount), realValue)
@@ -253,8 +253,8 @@ func (s *GrowAbciTestSuite) TestGrowReduceUSQReserve() {
 	_, value, err := s.app.GrowKeeper.CheckYieldRate(s.ctx, updatedPair)
 	s.Require().NoError(err)
 
-	realValue, found := s.app.GrowKeeper.CalculateAddToReserveValue(s.ctx, value, updatedPair)
-	s.Require().Equal(found, true)
+	realValue, blocked := s.app.GrowKeeper.CalculateAddToReserveValue(s.ctx, value, updatedPair)
+	s.Require().Equal(blocked, false)
 
 	balanceGrowStakingReserve := s.app.BankKeeper.GetBalance(s.ctx, s.app.GrowKeeper.GetGrowStakingReserveAddress(s.ctx), s.GetNormalQStablePair(0).AmountOutMetadata.Base)
 	s.Require().Equal((balanceGrowStakingReserve.Amount).Sub(balanceGrowStakingReserveOld.Amount), realValue)
