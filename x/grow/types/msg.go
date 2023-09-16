@@ -11,14 +11,14 @@ const TypeMsgDeposit = "deposit"
 const TypeMsgWithdrawal = "withdrawal"
 const TypeMsgDepositCollateral = "deposit_collateral"
 const TypeMsgWithdrawalCollateral = "withdrawal_collateral"
-const TypeMsgCreateLiquidationPosition = "create_liquidation_position"
+const TypeMsgOpenLiquidationPosition = "create_liquidation_position"
 const TypeMsgCloseLiquidationPosition = "close_liquidation_position"
 
 var _ sdk.Msg = &MsgCreateLend{}
 var _ sdk.Msg = &MsgDeleteLend{}
 var _ sdk.Msg = &MsgDeposit{}
 var _ sdk.Msg = &MsgWithdrawal{}
-var _ sdk.Msg = &MsgCreateLiquidationPosition{}
+var _ sdk.Msg = &MsgOpenLiquidationPosition{}
 var _ sdk.Msg = &MsgCloseLiquidationPosition{}
 var _ sdk.Msg = &MsgDepositCollateral{}
 var _ sdk.Msg = &MsgWithdrawalCollateral{}
@@ -266,11 +266,11 @@ func (msg *MsgWithdrawalCollateral) ValidateBasic() error {
 }
 
 /*
-create liq position
+Open liq position
 */
 
-func NewMsgCreateLiquidationPosition(creator string, amountIn string, asset string, premium string) *MsgCreateLiquidationPosition {
-	return &MsgCreateLiquidationPosition{
+func NewMsgOpenLiquidationPosition(creator string, amountIn string, asset string, premium string) *MsgOpenLiquidationPosition {
+	return &MsgOpenLiquidationPosition{
 		Creator:  creator,
 		AmountIn: amountIn,
 		Asset:    asset,
@@ -278,15 +278,15 @@ func NewMsgCreateLiquidationPosition(creator string, amountIn string, asset stri
 	}
 }
 
-func (msg *MsgCreateLiquidationPosition) Route() string {
+func (msg *MsgOpenLiquidationPosition) Route() string {
 	return RouterKey
 }
 
-func (msg *MsgCreateLiquidationPosition) Type() string {
-	return TypeMsgCreateLiquidationPosition
+func (msg *MsgOpenLiquidationPosition) Type() string {
+	return TypeMsgOpenLiquidationPosition
 }
 
-func (msg *MsgCreateLiquidationPosition) GetSigners() []sdk.AccAddress {
+func (msg *MsgOpenLiquidationPosition) GetSigners() []sdk.AccAddress {
 	creator, err := sdk.AccAddressFromBech32(msg.Creator)
 	if err != nil {
 		panic(err)
@@ -294,12 +294,12 @@ func (msg *MsgCreateLiquidationPosition) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{creator}
 }
 
-func (msg *MsgCreateLiquidationPosition) GetSignBytes() []byte {
+func (msg *MsgOpenLiquidationPosition) GetSignBytes() []byte {
 	bz := ModuleCdc.MustMarshalJSON(msg)
 	return sdk.MustSortJSON(bz)
 }
 
-func (msg *MsgCreateLiquidationPosition) ValidateBasic() error {
+func (msg *MsgOpenLiquidationPosition) ValidateBasic() error {
 	_, err := sdk.AccAddressFromBech32(msg.Creator)
 	if err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid depositor address (%s)", err)

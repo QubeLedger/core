@@ -15,7 +15,7 @@ service Msg {
   rpc CreateLend (MsgCreateLend) returns (MsgCreateLendResponse);
   rpc DeleteLend (MsgDeleteLend) returns (MsgDeleteLendResponse);
 
-  rpc CreateLiquidationPosition (MsgCreateLiquidationPosition) returns (MsgCreateLiquidationPositionResponse);
+  rpc OpenLiquidationPosition (MsgOpenLiquidationPosition) returns (MsgOpenLiquidationPositionResponse);
   rpc CloseLiquidationPosition (MsgCloseLiquidationPosition) returns (MsgCloseLiquidationPositionResponse);
 }
 
@@ -93,14 +93,14 @@ message MsgWithdrawalCollateralResponse {
   string amountOut = 2;
 }
 
-message MsgCreateLiquidationPosition {
+message MsgOpenLiquidationPosition {
   string creator = 1;
   string amountIn = 2;
   string asset = 3;
   string premium = 4;
 }
 
-message MsgCreateLiquidationPositionResponse  {
+message MsgOpenLiquidationPositionResponse  {
   string creator = 1;
   string liquidatorPositionId = 2;
 }

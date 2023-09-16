@@ -5,7 +5,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-func (k Keeper) ExecuteCreateLiqPosition(ctx sdk.Context, msg *types.MsgCreateLiquidationPosition, LendAsset types.LendAsset) (error, string) {
+func (k Keeper) ExecuteCreateLiqPosition(ctx sdk.Context, msg *types.MsgOpenLiquidationPosition, LendAsset types.LendAsset) (error, string) {
 	amountInCoins, err := sdk.ParseCoinsNormalized(msg.AmountIn)
 	if err != nil {
 		return err, ""

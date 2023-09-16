@@ -235,7 +235,7 @@ func CmdCreateLiqPosition() *cobra.Command {
 				return err
 			}
 
-			msg := types.NewMsgCreateLiquidationPosition(
+			msg := types.NewMsgOpenLiquidationPosition(
 				clientCtx.GetFromAddress().String(),
 				args[0],
 				args[1],

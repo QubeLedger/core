@@ -270,7 +270,7 @@ func (k Keeper) DeleteLend(goCtx context.Context, msg *types.MsgDeleteLend) (*ty
 }
 
 // Msg for open liquidation postion
-func (k Keeper) CreateLiquidationPosition(goCtx context.Context, msg *types.MsgCreateLiquidationPosition) (*types.MsgCreateLiquidationPositionResponse, error) {
+func (k Keeper) OpenLiquidationPosition(goCtx context.Context, msg *types.MsgOpenLiquidationPosition) (*types.MsgOpenLiquidationPositionResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	err := k.CheckGrowStatus(ctx)
@@ -301,7 +301,7 @@ func (k Keeper) CreateLiquidationPosition(goCtx context.Context, msg *types.MsgC
 			sdk.NewAttribute(sdk.AttributeKeyAction, types.AttributeKeyActionCreateLiqPosition),
 		),
 	})
-	return &types.MsgCreateLiquidationPositionResponse{
+	return &types.MsgOpenLiquidationPositionResponse{
 		Creator:              msg.Creator,
 		LiquidatorPositionId: id,
 	}, nil

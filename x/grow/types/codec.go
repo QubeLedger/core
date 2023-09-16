@@ -14,7 +14,7 @@ func RegisterCodec(cdc *codec.LegacyAmino) {
 	cdc.RegisterConcrete(&MsgDeleteLend{}, "grow/DeleteLend", nil)
 	cdc.RegisterConcrete(&MsgDepositCollateral{}, "grow/DepositCollateral", nil)
 	cdc.RegisterConcrete(&MsgWithdrawalCollateral{}, "grow/WithdrawalCollateral", nil)
-	cdc.RegisterConcrete(&MsgCreateLiquidationPosition{}, "grow/CreateLiquidationPosition", nil)
+	cdc.RegisterConcrete(&MsgOpenLiquidationPosition{}, "grow/CreateLiquidationPosition", nil)
 	cdc.RegisterConcrete(&MsgCloseLiquidationPosition{}, "grow/CloseLiquidationPosition", nil)
 
 }
@@ -39,7 +39,7 @@ func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
 		&MsgWithdrawalCollateral{},
 	)
 	registry.RegisterImplementations((*sdk.Msg)(nil),
-		&MsgCreateLiquidationPosition{},
+		&MsgOpenLiquidationPosition{},
 	)
 	registry.RegisterImplementations((*sdk.Msg)(nil),
 		&MsgCloseLiquidationPosition{},

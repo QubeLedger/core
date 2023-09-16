@@ -199,15 +199,15 @@ func TestMsgWithdrawalCollateral_ValidateBasic(t *testing.T) {
 	}
 }
 
-func TestMsgCreateLiquidationPosition_ValidateBasic(t *testing.T) {
+func TestMsgOpenLiquidationPosition_ValidateBasic(t *testing.T) {
 	tests := []struct {
 		name string
-		msg  types.MsgCreateLiquidationPosition
+		msg  types.MsgOpenLiquidationPosition
 		err  error
 	}{
 		{
 			name: "invalid address",
-			msg: types.MsgCreateLiquidationPosition{
+			msg: types.MsgOpenLiquidationPosition{
 				Creator:  "invalid_address",
 				AmountIn: "20uosmo",
 			},
@@ -215,7 +215,7 @@ func TestMsgCreateLiquidationPosition_ValidateBasic(t *testing.T) {
 		},
 		{
 			name: "valid",
-			msg: types.MsgCreateLiquidationPosition{
+			msg: types.MsgOpenLiquidationPosition{
 				Creator:  apptesting.CreateRandomAccounts(1)[0].String(),
 				AmountIn: "20uosmo",
 				Asset:    "OSMO",
@@ -224,7 +224,7 @@ func TestMsgCreateLiquidationPosition_ValidateBasic(t *testing.T) {
 		},
 		{
 			name: "invalid amountIn",
-			msg: types.MsgCreateLiquidationPosition{
+			msg: types.MsgOpenLiquidationPosition{
 				Creator:  apptesting.CreateRandomAccounts(1)[0].String(),
 				AmountIn: "",
 				Asset:    "OSMO",
@@ -234,7 +234,7 @@ func TestMsgCreateLiquidationPosition_ValidateBasic(t *testing.T) {
 		},
 		{
 			name: "invalid asset",
-			msg: types.MsgCreateLiquidationPosition{
+			msg: types.MsgOpenLiquidationPosition{
 				Creator:  apptesting.CreateRandomAccounts(1)[0].String(),
 				AmountIn: "20uosmo",
 				Asset:    "",
@@ -244,7 +244,7 @@ func TestMsgCreateLiquidationPosition_ValidateBasic(t *testing.T) {
 		},
 		{
 			name: "invalid Premium",
-			msg: types.MsgCreateLiquidationPosition{
+			msg: types.MsgOpenLiquidationPosition{
 				Creator:  apptesting.CreateRandomAccounts(1)[0].String(),
 				AmountIn: "20uosmo",
 				Asset:    "OSMO",
