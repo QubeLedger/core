@@ -10,10 +10,11 @@ import (
 	"github.com/QuadrateOrg/core/app"
 	apptesting "github.com/QuadrateOrg/core/app/apptesting"
 	quadrateapptest "github.com/QuadrateOrg/core/app/helpers"
+	"github.com/QuadrateOrg/core/x/grow/types"
 	"github.com/QuadrateOrg/core/x/oracle"
 	oraclekeeper "github.com/QuadrateOrg/core/x/oracle/keeper"
 	oracletypes "github.com/QuadrateOrg/core/x/oracle/types"
-	"github.com/QuadrateOrg/core/x/stable/types"
+	stabletypes "github.com/QuadrateOrg/core/x/stable/types"
 	"github.com/buger/jsonparser"
 	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 	"github.com/cosmos/cosmos-sdk/simapp"
@@ -28,40 +29,50 @@ import (
 	"github.com/tendermint/tendermint/crypto"
 )
 
-type StableKeeperTestSuite struct {
+type GrowKeeperTestSuite struct {
 	suite.Suite
-	ctx        sdk.Context
-	app        *app.QuadrateApp
-	genesis    types.GenesisState
-	Address    sdk.AccAddress
-	ValPubKeys []cryptotypes.PubKey
+	ctx               sdk.Context
+	app               *app.QuadrateApp
+	genesis           types.GenesisState
+	Address           sdk.AccAddress
+	LiquidatorAddress sdk.AccAddress
+	ValPubKeys        []cryptotypes.PubKey
 }
 
-var s *StableKeeperTestSuite
+type NormalTestConfig struct {
+	collateralAmount int64
+	collateralDenom  string
+	sendTokenAmount  int64
+	sendTokenDenom   string
+	lendTokenAmount  int64
+	lendTokenDenom   string
+}
 
-func (s *StableKeeperTestSuite) Setup() {
+var s *GrowKeeperTestSuite
+
+func (s *GrowKeeperTestSuite) Setup() {
 	s.app = quadrateapptest.Setup(s.T(), "qube-1", false, 1)
 	s.Address = apptesting.CreateRandomAccounts(1)[0]
+	s.LiquidatorAddress = apptesting.CreateRandomAccounts(1)[0]
 	s.ValPubKeys = simapp.CreateTestPubKeys(1)
-	s.app.GrowKeeper.SetBorrowRate(s.ctx, sdk.NewInt(15))
 }
 
-func TestStableKeeperTestSuite(t *testing.T) {
-	s = new(StableKeeperTestSuite)
+func TestGrowKeeperTestSuite(t *testing.T) {
+	s = new(GrowKeeperTestSuite)
 	suite.Run(t, s)
 	// Run Ginkgo integration tests
 	RegisterFailHandler(Fail)
 	RunSpecs(t, "Keeper Suite")
 }
 
-func (suite *StableKeeperTestSuite) Commit() {
+func (suite *GrowKeeperTestSuite) Commit() {
 	header := suite.ctx.BlockHeader()
 	suite.ctx = suite.app.BaseApp.NewContext(false, header)
 }
 
-func (suite *StableKeeperTestSuite) MintStable(amount int64, pair types.Pair) error {
+func (suite *GrowKeeperTestSuite) MintStable(amount int64, pair stabletypes.Pair) error {
 	suite.app.StableKeeper.UpdateAtomPriceTesting(suite.ctx, sdk.NewInt(95000))
-	msg := types.NewMsgMint(
+	msg := stabletypes.NewMsgMint(
 		suite.Address.String(),
 		sdk.NewInt(amount).String()+pair.AmountInMetadata.Base,
 		pair.AmountOutMetadata.Base,
@@ -74,8 +85,8 @@ func (suite *StableKeeperTestSuite) MintStable(amount int64, pair types.Pair) er
 	return nil
 }
 
-func (s *StableKeeperTestSuite) GetNormalPair(id uint64) types.Pair {
-	pair := types.Pair{
+func (s *GrowKeeperTestSuite) GetNormalQStablePair(id uint64) stabletypes.Pair {
+	pair := stabletypes.Pair{
 		Id:     id,
 		PairId: fmt.Sprintf("%x", crypto.Sha256(append([]byte("uatom"+"uusd")))),
 		AmountInMetadata: banktypes.Metadata{
@@ -107,16 +118,116 @@ func (s *StableKeeperTestSuite) GetNormalPair(id uint64) types.Pair {
 	return pair
 }
 
-func (s *StableKeeperTestSuite) AddTestCoins(amount int64, denom string) {
+func (s *GrowKeeperTestSuite) GetNormalGTokenPair(id uint64) types.GTokenPair {
+	pair := types.GTokenPair{
+		Id:            id,
+		DenomID:       fmt.Sprintf("%x", crypto.Sha256(append([]byte("ugusd")))),
+		QStablePairId: fmt.Sprintf("%x", crypto.Sha256(append([]byte("uatom"+"uusd")))),
+		GTokenMetadata: banktypes.Metadata{
+			Description: "",
+			DenomUnits: []*banktypes.DenomUnit{
+				{Denom: "ugusd", Exponent: uint32(0), Aliases: []string{"microgusd"}},
+			},
+			Base:    "ugusd",
+			Display: "gusd",
+			Name:    "gUSQ",
+			Symbol:  "gUSQ",
+		},
+		MinAmountIn:                 "20uusd",
+		MinAmountOut:                "20ugusd",
+		GTokenLastPrice:             sdk.NewInt(1 * 1000000),
+		GTokenLatestPriceUpdateTime: uint64(time.Now().Unix() - (31536000)),
+	}
+
+	return pair
+}
+
+func (s *GrowKeeperTestSuite) GetNormalLendAsset(id uint64) types.LendAsset {
+	ba := types.LendAsset{
+		Id:          id,
+		LendAssetId: fmt.Sprintf("%x", crypto.Sha256(append([]byte("uosmo")))),
+		AssetMetadata: banktypes.Metadata{
+			Description: "",
+			DenomUnits: []*banktypes.DenomUnit{
+				{Denom: "uosmo", Exponent: uint32(0), Aliases: []string{"microosmo"}},
+			},
+			Base:    "uosmo",
+			Display: "osmo",
+			Name:    "OSMO",
+			Symbol:  "OSMO",
+		},
+		OracleAssetId: "OSMO",
+	}
+	return ba
+}
+
+func (s *GrowKeeperTestSuite) GetWrongLendAsset(id uint64) types.LendAsset {
+	ba := types.LendAsset{
+		Id:          id,
+		LendAssetId: fmt.Sprintf("%x", crypto.Sha256(append([]byte("uosmo")))),
+		AssetMetadata: banktypes.Metadata{
+			Description: "",
+			DenomUnits: []*banktypes.DenomUnit{
+				{Denom: "uosmo", Exponent: uint32(0), Aliases: []string{"microosmo"}},
+			},
+			Base:    "uosmo",
+			Display: "osmo",
+			Name:    "OSMO",
+			Symbol:  "OSMO",
+		},
+		OracleAssetId: "AKT",
+	}
+	return ba
+}
+
+func (s *GrowKeeperTestSuite) GetNormalConfig() NormalTestConfig {
+	return NormalTestConfig{
+		collateralAmount: 1000 * 1000000,
+		collateralDenom:  "uosmo",
+		sendTokenAmount:  1000 * 1000000,
+		sendTokenDenom:   "uusd",
+		lendTokenAmount:  250 * 1000000,
+		lendTokenDenom:   "uusd",
+	}
+}
+
+func (s *GrowKeeperTestSuite) GetNormalPosition() types.Position {
+	return types.Position{
+		Creator:             s.Address.String(),
+		DepositId:           s.app.GrowKeeper.CalculateDepositId(s.Address.String(), "btc"),
+		Collateral:          s.app.GrowKeeper.FastCoins("btc", sdk.NewInt(1)).String(),
+		OracleTicker:        "BTC",
+		BorrowedAmountInUSD: 0,
+		LoanIds:             []string{},
+	}
+}
+
+func (s *GrowKeeperTestSuite) GetNormalLiqPosition() types.LiquidatorPosition {
+	return types.LiquidatorPosition{
+		Liquidator:           s.Address.String(),
+		LiquidatorPositionId: s.app.GrowKeeper.GenerateLiquidatorPositionId(s.Address.String(), "btc", s.app.GrowKeeper.FastCoins("btc", sdk.NewInt(1)).String(), "5"),
+		Amount:               s.app.GrowKeeper.FastCoins("btc", sdk.NewInt(1)).String(),
+		BorrowAssetId:        "BTC",
+		Premium:              5,
+	}
+}
+
+func (s *GrowKeeperTestSuite) GetNormalLoan() types.Loan {
+	return types.Loan{
+		LoanId:       s.app.GrowKeeper.GenerateLoadIdHash("uusd", "btc", s.app.GrowKeeper.FastCoins("btc", sdk.NewInt(1)).String(), s.Address.String(), "test"),
+		Borrower:     s.Address.String(),
+		AmountOut:    s.app.GrowKeeper.FastCoins("btc", sdk.NewInt(1)).String(),
+		StartTime:    uint64(s.ctx.BlockTime().Unix()),
+		OracleTicker: "BTC",
+	}
+}
+
+func (s *GrowKeeperTestSuite) AddTestCoins(amount int64, denom string) {
 	s.app.BankKeeper.MintCoins(s.ctx, types.ModuleName, sdk.NewCoins(sdk.NewCoin(denom, sdk.NewInt(amount))))
 	s.app.BankKeeper.SendCoinsFromModuleToAccount(s.ctx, types.ModuleName, s.Address, sdk.NewCoins(sdk.NewCoin(denom, sdk.NewInt(amount))))
 }
 
-func (suite *StableKeeperTestSuite) IncreaseModuleBalance(amount int64, denom string) {
-	suite.app.BankKeeper.MintCoins(suite.ctx, types.ModuleName, sdk.NewCoins(sdk.NewCoin(denom, sdk.NewInt(amount))))
-}
-
-func (s *StableKeeperTestSuite) AddTestCoinsToCustomAccount(amount sdk.Int, denom string, acc sdk.AccAddress) {
+func (s *GrowKeeperTestSuite) AddTestCoinsToCustomAccount(amount sdk.Int, denom string, acc sdk.AccAddress) {
 	s.app.BankKeeper.MintCoins(s.ctx, types.ModuleName, sdk.NewCoins(sdk.NewCoin(denom, amount)))
 	s.app.BankKeeper.SendCoinsFromModuleToAccount(s.ctx, types.ModuleName, acc, sdk.NewCoins(sdk.NewCoin(denom, amount)))
 }
@@ -132,7 +243,7 @@ func NewTestMsgCreateValidator(address sdk.ValAddress, pubKey cryptotypes.PubKey
 	return msg
 }
 
-func (s *StableKeeperTestSuite) RegisterValidator() error {
+func (s *GrowKeeperTestSuite) RegisterValidator() error {
 	for _, vp := range s.ValPubKeys {
 		s.AddTestCoinsToCustomAccount(sdk.TokensFromConsensusPower(10, sdk.DefaultPowerReduction), "stake", sdk.AccAddress(vp.Address()))
 	}
@@ -148,7 +259,7 @@ func (s *StableKeeperTestSuite) RegisterValidator() error {
 	return nil
 }
 
-func (s *StableKeeperTestSuite) PrevoteVotePrice(exchangeRatesStr string) error {
+func (s *GrowKeeperTestSuite) PrevoteVotePrice(exchangeRatesStr string) error {
 	salt := "1"
 	hash := oracletypes.GetAggregateVoteHash(salt, exchangeRatesStr, sdk.ValAddress(s.ValPubKeys[0].Address()))
 
@@ -199,7 +310,7 @@ func GetTokensActualPrice() (string, error) {
 	return atomPriceString, nil
 }
 
-func (s *StableKeeperTestSuite) OracleAggregateExchangeRateFromNet() {
+func (s *GrowKeeperTestSuite) OracleAggregateExchangeRateFromNet() {
 	params := s.app.OracleKeeper.GetParams(s.ctx)
 	price, err := GetTokensActualPrice()
 	s.Require().NoError(err)
@@ -207,11 +318,16 @@ func (s *StableKeeperTestSuite) OracleAggregateExchangeRateFromNet() {
 	s.Require().NoError(err)
 }
 
-func (s *StableKeeperTestSuite) SetupOracleKeeper() {
+func (s *GrowKeeperTestSuite) OracleAggregateExchangeRateFromInput(price string, denom string) {
+	err := s.PrevoteVotePrice(price + denom)
+	s.Require().NoError(err)
+}
+
+func (s *GrowKeeperTestSuite) SetupOracleKeeper(denom string) {
 	params := s.app.OracleKeeper.GetParams(s.ctx)
 	params.Whitelist = oracletypes.DenomList{
 		{
-			Name: "uatom",
+			Name: denom,
 		},
 	}
 	params.VotePeriod = 1

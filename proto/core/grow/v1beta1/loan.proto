@@ -1,0 +1,14 @@
+syntax = "proto3";
+package core.grow.v1beta1;
+
+import "gogoproto/gogo.proto";
+option go_package = "github.com/QuadrateOrg/core/x/grow/types";
+
+message Loan {
+  uint64 id = 1;
+  string loanId = 2;
+  string borrower = 3; 
+  string amountOut = 4;
+  uint64 startTime = 5; 
+  string oracleTicker = 6; 
+}

@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package core.grow.v1beta1;
+
+option go_package = "github.com/QuadrateOrg/core/x/grow/types";
+
+
+message LiquidatorPosition {
+        uint64 id = 1;
+        string liquidatorPositionId = 2;
+        string borrowAssetId = 3;
+        string liquidator = 4;
+        string amount = 5;
+        uint64 premium = 6;
+}
+

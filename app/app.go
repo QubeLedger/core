@@ -129,6 +129,11 @@ import (
 	stablemodulekeeper "github.com/QuadrateOrg/core/x/stable/keeper"
 	stablemoduletypes "github.com/QuadrateOrg/core/x/stable/types"
 
+	growmodule "github.com/QuadrateOrg/core/x/grow"
+	growclient "github.com/QuadrateOrg/core/x/grow/client"
+	growmodulekeeper "github.com/QuadrateOrg/core/x/grow/keeper"
+	growmoduletypes "github.com/QuadrateOrg/core/x/grow/types"
+
 	// unnamed import of statik for swagger UI support
 	_ "github.com/cosmos/cosmos-sdk/client/docs/statik"
 )
@@ -179,6 +184,14 @@ func getGovProposalHandlers() []govclient.ProposalHandler {
 		ibcclientclient.UpgradeProposalHandler,
 		stableclient.RegisterPairHandler,
 		stableclient.RegisterChangeBurningFundAddressHandler,
+		growclient.RegisterChangeBorrowRateProposalHandler,
+		growclient.RegisterChangeGrowStakingReserveAddressProposalHandler,
+		growclient.RegisterChangeGrowYieldReserveAddressProposalHandler,
+		growclient.RegisterChangeRealRateProposalHandler,
+		growclient.RegisterChangeUSQReserveAddressProposalHandler,
+		growclient.RegisterGTokenPairProposalHandler,
+		growclient.RegisterLendAssetProposalHandler,
+		growclient.RegisterActivateGrowModuleProposalHandler,
 	)
 
 	return govProposalHandlers
@@ -218,6 +231,7 @@ var (
 		tokenfactory.AppModuleBasic{},
 		oraclemodule.AppModuleBasic{},
 		stablemodule.AppModuleBasic{},
+		growmodule.AppModuleBasic{},
 	)
 
 	// module account permissions
@@ -234,6 +248,7 @@ var (
 		tokenfactorytypes.ModuleName:   {authtypes.Minter, authtypes.Burner},
 		oraclemoduletypes.ModuleName:   {authtypes.Minter, authtypes.Burner, authtypes.Staking},
 		stablemoduletypes.ModuleName:   {authtypes.Minter, authtypes.Burner},
+		growmoduletypes.ModuleName:     {authtypes.Minter, authtypes.Burner, authtypes.Staking},
 	}
 )
 
@@ -280,6 +295,7 @@ type QuadrateApp struct { // nolint: golint
 	OracleKeeper        oraclemodulekeeper.Keeper
 	PacketForwardKeeper *packetforwardkeeper.Keeper
 	StableKeeper        stablemodulekeeper.Keeper
+	GrowKeeper          growmodulekeeper.Keeper
 
 	// make scoped keepers public for test purposes
 	ScopedIBCKeeper      capabilitykeeper.ScopedKeeper
@@ -336,7 +352,7 @@ func NewQuadrateApp(
 		evidencetypes.StoreKey, ibctransfertypes.StoreKey, capabilitytypes.StoreKey,
 		feegrant.StoreKey, authzkeeper.StoreKey, icahosttypes.StoreKey,
 		wasm.StoreKey, tokenfactorytypes.StoreKey,
-		oraclemoduletypes.StoreKey, packetforwardtypes.StoreKey, stablemoduletypes.StoreKey,
+		oraclemoduletypes.StoreKey, packetforwardtypes.StoreKey, stablemoduletypes.StoreKey, growmoduletypes.StoreKey,
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
 	memKeys := sdk.NewMemoryStoreKeys(capabilitytypes.MemStoreKey)
@@ -487,6 +503,16 @@ func NewQuadrateApp(
 	stableModule := stablemodule.NewAppModule(appCodec, app.StableKeeper, app.AccountKeeper, app.BankKeeper, app.OracleKeeper)
 	stableIBCModule := stablemodule.NewIBCModule(app.StableKeeper)
 
+	app.GrowKeeper = *growmodulekeeper.NewKeeper(
+		appCodec,
+		keys[growmoduletypes.StoreKey],
+		keys[growmoduletypes.MemStoreKey],
+		app.GetSubspace(growmoduletypes.ModuleName),
+		app.BankKeeper,
+		app.OracleKeeper,
+		app.StableKeeper,
+	)
+
 	// register the proposal types
 	govRouter := govtypes.NewRouter()
 	govRouter.
@@ -632,6 +658,7 @@ func NewQuadrateApp(
 		wasm.NewAppModule(appCodec, &app.wasmKeeper, app.StakingKeeper, app.AccountKeeper, app.BankKeeper),
 		tokenfactory.NewAppModule(appCodec, *app.TokenFactoryKeeper, app.AccountKeeper, app.BankKeeper),
 		stableModule,
+		growmodule.NewAppModule(appCodec, app.GrowKeeper, app.AccountKeeper, app.BankKeeper),
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
@@ -665,6 +692,7 @@ func NewQuadrateApp(
 		wasm.ModuleName,
 		oraclemoduletypes.ModuleName,
 		stablemoduletypes.ModuleName,
+		growmoduletypes.ModuleName,
 	)
 
 	app.mm.SetOrderEndBlockers(
@@ -692,6 +720,7 @@ func NewQuadrateApp(
 		wasm.ModuleName,
 		oraclemoduletypes.ModuleName,
 		stablemoduletypes.ModuleName,
+		growmoduletypes.ModuleName,
 	)
 
 	app.mm.SetOrderInitGenesis(
@@ -719,6 +748,7 @@ func NewQuadrateApp(
 		wasm.ModuleName,
 		oraclemoduletypes.ModuleName,
 		stablemoduletypes.ModuleName,
+		growmoduletypes.ModuleName,
 	)
 
 	app.mm.RegisterInvariants(&app.CrisisKeeper)
@@ -926,7 +956,7 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(tokenfactorytypes.ModuleName)
 	paramsKeeper.Subspace(oraclemoduletypes.ModuleName)
 	paramsKeeper.Subspace(stablemoduletypes.ModuleName)
-
+	paramsKeeper.Subspace(growmoduletypes.ModuleName)
 	return paramsKeeper
 }
 

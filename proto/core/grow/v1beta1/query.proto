@@ -1,0 +1,164 @@
+syntax = "proto3";
+
+package core.grow.v1beta1;
+
+import "gogoproto/gogo.proto";
+import "google/api/annotations.proto";
+import "cosmos/base/query/v1beta1/pagination.proto";
+import "core/grow/v1beta1/params.proto";
+import "core/grow/v1beta1/loan.proto";
+import "core/grow/v1beta1/lend.proto";
+import "core/grow/v1beta1/liquidation.proto";
+import "cosmos/bank/v1beta1/bank.proto";
+
+option go_package = "github.com/QuadrateOrg/core/x/grow/types";
+
+service Query {
+  rpc Params (QueryParamsRequest) returns (QueryParamsResponse) {
+    option (google.api.http).get = "/core/grow/v1beta1/grow/params";
+  }
+
+  rpc LendAssetByLendAssetId(QueryLendAssetByLendAssetIdRequest) returns (QueryLendAssetByLendAssetIdResponse) {
+    option (google.api.http).get = "/core/grow/v1beta1/lendasset/{id}";
+  }
+
+  rpc PositionById(QueryPositionByIdRequest) returns (QueryPositionResponse) {
+    option (google.api.http).get = "/core/grow/v1beta1/positionById/{id}";
+  }
+
+  rpc PositionByCreator(QueryPositionByCreatorRequest) returns (QueryPositionResponse) {
+    option (google.api.http).get = "/core/grow/v1beta1/positionByCreator/{creator}";
+  }
+
+  rpc AllPosition(QueryAllPositionRequest) returns (QueryAllPositionResponse) {
+    option (google.api.http).get = "/core/grow/v1beta1/position";
+  }
+
+  rpc AllLiquidatorPosition(QueryAllLiquidatorPositionRequest) returns (QueryAllLiquidatorPositionResponse) {
+    option (google.api.http).get = "/core/grow/v1beta1/liquidatorposition";
+  }
+
+  rpc LiquidatorPositionByCreator(QueryLiquidatorPositionByCreatorRequest) returns (QueryLiquidatorPositionByCreatorResponse) {
+    option (google.api.http).get = "/core/grow/v1beta1/liquidatorPositionByCreator/{creator}";
+  }
+
+  rpc LiquidatorPositionById(QueryLiquidatorPositionByIdRequest) returns (QueryLiquidatorPositionByCreatorResponse) {
+    option (google.api.http).get = "/core/grow/v1beta1/liquidatorPositionById/{id}";
+  }
+
+  rpc AllFundAddress(QueryAllFundAddressRequest) returns (QueryAllFundAddressResponse) {
+    option (google.api.http).get = "/core/grow/v1beta1/fundAddress";
+  }
+
+  rpc LoanById(QueryLoanByIdRequest) returns (QueryLoanByIdResponse) {
+    option (google.api.http).get = "/core/grow/v1beta1/loanById/{id}";
+  }
+
+  rpc YieldPercentage(QueryYieldPercentageRequest) returns (QueryYieldPercentageResponse) {
+    option (google.api.http).get = "/core/grow/v1beta1/yield/{id}";
+  }
+}
+
+message QueryParamsRequest {}
+
+message QueryParamsResponse {
+  Params params = 1;
+}
+
+/* LendAssetByLendAssetId */
+message QueryLendAssetByLendAssetIdRequest {
+  string id = 1;
+}
+
+message QueryLendAssetByLendAssetIdResponse {
+  string LendAssetId = 1;
+  cosmos.bank.v1beta1.Metadata assetMetadata = 2 [ (gogoproto.moretags) = "yaml:\"assetMetadata\"", (gogoproto.nullable)   = false ];
+  string oracleAssetId = 3;
+}
+
+/* PositionById */
+message QueryPositionByIdRequest {
+  string id = 1;
+}
+
+message QueryPositionResponse {
+  string creator = 1; 
+  string depositId = 2;
+  string collateral = 3;
+  string oracleTicker = 4; 
+  uint64 borrowedAmountInUSD = 5;
+  repeated string loanIds = 6;
+}
+
+/* PositionByCreator */
+message QueryPositionByCreatorRequest {
+  string creator = 1;
+}
+
+/* AllPosition */
+message QueryAllPositionRequest {}
+
+message QueryAllPositionResponse {
+  repeated Position Positions = 1 [(gogoproto.nullable) = false];
+}
+
+/* AllLiquidatorPosition */
+message QueryAllLiquidatorPositionRequest {}
+
+message QueryAllLiquidatorPositionResponse {
+  repeated LiquidatorPosition LiquidatorsPosition = 1 [(gogoproto.nullable) = false];
+}
+
+/* LiquidatorPositionByCreator */
+message QueryLiquidatorPositionByCreatorRequest {
+  string creator = 1;
+}
+
+message QueryLiquidatorPositionByCreatorResponse {
+  string liquidatorPositionId = 1;
+  string borrowAssetId = 2;
+  string liquidator = 3;
+  string amount = 4;
+  uint64 premium = 5;
+}
+
+/* LiquidatorPositionById */
+message QueryLiquidatorPositionByIdRequest {
+  string id = 1;
+}
+
+/* AllFundAddress */
+message QueryAllFundAddressRequest {}
+
+message QueryAllFundAddressResponse {
+  string USQReserveAddress = 1;
+  string GrowYieldReserveAddress = 2;
+  string GrowStakingReserveAddress = 3;
+}
+
+/* LoanById */
+message QueryLoanByIdRequest {
+  string id = 1;
+}
+
+message QueryLoanByIdResponse {
+  string loanId = 1;
+  string borrower = 2; 
+  string amountOut = 3;
+  uint64 startTime = 4; 
+  string oracleTicker = 5; 
+}
+
+/* YieldPercentage */
+message QueryYieldPercentageRequest {
+  string id = 1;
+}
+
+message QueryYieldPercentageResponse {
+  int64 RealRate = 1;
+  int64 BorrowRate = 2;
+  int64 RealYield = 3;
+  int64 GrowYield = 4;
+  string ActualAction = 5;
+  int64 Difference = 6;
+}

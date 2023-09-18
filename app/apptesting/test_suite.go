@@ -31,6 +31,7 @@ func (s *KeeperTestHelper) Setup() {
 	}
 
 	s.TestAccs = CreateRandomAccounts(3)
+
 }
 
 func (s *KeeperTestHelper) FundAcc(acc sdk.AccAddress, amounts sdk.Coins) {

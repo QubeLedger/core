@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package core.grow.v1beta1;
+
+import "gogoproto/gogo.proto";
+import "core/grow/v1beta1/params.proto";
+import "core/grow/v1beta1/pair.proto";
+
+option go_package = "github.com/QuadrateOrg/core/x/grow/types";
+
+// GenesisState defines the grow module's genesis state.
+message GenesisState {
+        Params                params          = 1 [(gogoproto.nullable) = false];
+        repeated gTokenPair   gTokenPairList  = 2 [(gogoproto.nullable) = false];
+        uint64 RealRate = 3;
+        uint64 BorrowRate = 4;
+        string GrowStakingReserveAddress = 5;
+        string USQReserveAddress = 6;
+        bool GrowStatus = 7;
+}
+
