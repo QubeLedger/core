@@ -8,7 +8,6 @@
   developed.](https://img.shields.io/badge/repo%20status-Active-green.svg?style=flat-square)](https://www.repostatus.org/#active)
   [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
   [![Telegram!](https://patrolavia.github.io/telegram-badge/follow.png)](https://t.me/QuadrateOrg)
-  ![core Actions](https://api.meercode.io/badge/QubeLedger/core?type=ci-score&lastDay=14)
 </div>
 
 ## Install qubed
@@ -24,4 +23,4 @@ The contributing guide for Qube explains the branching structure, how to use the
 
 ## Supporters
 
-[![Stargazers repo roster for @QuadrateOrg/core](https://reporoster.com/stars/QuadrateOrg/core)](https://github.com/QuadrateOrg/core)
+[![Stargazers repo roster for @QubeLedger/core](https://reporoster.com/stars/QubeLedger/core)](https://github.com/QubeLedger/core)
