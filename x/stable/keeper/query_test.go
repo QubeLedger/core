@@ -54,7 +54,7 @@ func (suite *StableKeeperTestSuite) TestPairByPairId() {
 					MinAmountOut:      s.GetNormalPair(0).MinAmountOut,
 					BackingRatio:      100,
 					MintingFee:        3,
-					BurningFee:        3,
+					BurningFee:        2,
 				}, pair)
 			} else {
 				suite.Error(err)
@@ -110,7 +110,7 @@ func (suite *StableKeeperTestSuite) TestPairById() {
 					MinAmountOut:      s.GetNormalPair(0).MinAmountOut,
 					BackingRatio:      100,
 					MintingFee:        3,
-					BurningFee:        3,
+					BurningFee:        2,
 				}, pair)
 			} else {
 				suite.Error(err)

@@ -117,7 +117,7 @@ func (suite *StableKeeperTestSuite) TestBurn() {
 			s.GetNormalPair(0),
 			"uusd",
 			1000000,
-			104947,
+			105052,
 			int64(95000),
 			false,
 			"",
@@ -183,7 +183,7 @@ func (suite *StableKeeperTestSuite) TestBurn() {
 				suite.Require().Equal(getTokenAmountFromBank.Amount, sdk.NewInt(int64(tc.getTokenAmount)))
 
 				burningFundBalance := suite.app.BankKeeper.GetBalance(suite.ctx, suite.app.StableKeeper.GetBurningFundAddress(suite.ctx), tc.pair.AmountInMetadata.Base)
-				feeForBurningFund := suite.app.StableKeeper.CalculateBurningFeeForBurningFund(sdk.NewInt(tc.sendTokenAmount), sdk.NewInt(tc.price), sdk.NewInt(3))
+				feeForBurningFund := suite.app.StableKeeper.CalculateBurningFeeForBurningFund(sdk.NewInt(tc.sendTokenAmount), sdk.NewInt(tc.price), sdk.NewInt(2))
 				suite.Require().Equal(burningFundBalance.Amount.Sub(BurningFundBalanceBeforeBurn.Amount), feeForBurningFund)
 
 				reserveFundBalance := suite.app.BankKeeper.GetBalance(suite.ctx, suite.app.StableKeeper.GetReserveFundAddress(suite.ctx), tc.pair.AmountInMetadata.Base)

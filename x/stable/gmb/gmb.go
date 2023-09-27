@@ -16,7 +16,7 @@ func CalculateBackingRatio(afp sdk.Int, ar sdk.Int, qm sdk.Int) (sdk.Int, error)
 		return sdk.Int{}, types.ErrQmNegative
 	}
 
-	backing_ratio := (afp.Mul(ar).Quo(qm).Quo(sdk.NewInt(100)))
+	backing_ratio := (afp.Mul(ar).Quo(qm).QuoRaw(100))
 
 	if backing_ratio.IsNegative() {
 		return sdk.Int{}, types.ErrBackingRatioNegative
@@ -32,20 +32,23 @@ func CalculateMintingFee(backing_ratio sdk.Int) (sdk.Int, error) {
 		return sdk.Int{}, types.ErrCalculateMintingFee
 	}
 	switch {
-	case backing_ratio.GT(sdk.NewInt(int64(120))) || backing_ratio.Equal(sdk.NewInt(int64(120))):
+	case backing_ratio.GT(sdk.NewInt(140)) || backing_ratio.Equal(sdk.NewInt(140)):
 		return sdk.Int{}, types.ErrMintBlocked
 
-	case backing_ratio.GT(sdk.NewInt(int64(110))) || backing_ratio.Equal(sdk.NewInt(int64(110))):
-		return sdk.NewInt(int64(20)), nil
+	case backing_ratio.GT(sdk.NewInt(120)) || backing_ratio.Equal(sdk.NewInt(120)):
+		return sdk.NewInt(10), nil
 
-	case backing_ratio.GT(sdk.NewInt(int64(93))) || backing_ratio.Equal(sdk.NewInt(int64(93))):
-		return sdk.NewInt(int64(3)), nil
+	case backing_ratio.GT(sdk.NewInt(100)) || backing_ratio.Equal(sdk.NewInt(100)):
+		return sdk.NewInt(3), nil
 
-	case backing_ratio.GT(sdk.NewInt(int64(85))) || backing_ratio.Equal(sdk.NewInt(int64(90))):
-		return sdk.NewInt(int64(3)), nil
+	case backing_ratio.GT(sdk.NewInt(93)) || backing_ratio.Equal(sdk.NewInt(93)):
+		return sdk.NewInt(2), nil
 
-	case sdk.NewInt(int64(85)).GT(backing_ratio):
-		return sdk.NewInt(int64(0)), nil
+	case backing_ratio.GT(sdk.NewInt(85)) || backing_ratio.Equal(sdk.NewInt(85)):
+		return sdk.NewInt(1), nil
+
+	case backing_ratio.LT(sdk.NewInt(85)):
+		return sdk.NewInt(0), nil
 
 	default:
 		return sdk.Int{}, types.ErrCalculateMintingFee
@@ -58,19 +61,22 @@ func CalculateBurningFee(backing_ratio sdk.Int) (sdk.Int, error) {
 		return sdk.Int{}, types.ErrCalculateBurningFee
 	}
 	switch {
-	case backing_ratio.GT(sdk.NewInt(int64(120))) || backing_ratio.Equal(sdk.NewInt(int64(120))):
-		return sdk.NewInt(int64(0)), nil
+	case backing_ratio.GT(sdk.NewInt(140)) || backing_ratio.Equal(sdk.NewInt(140)):
+		return sdk.NewInt(0), nil
 
-	case backing_ratio.GT(sdk.NewInt(int64(110))) || backing_ratio.Equal(sdk.NewInt(int64(110))):
-		return sdk.NewInt(int64(0)), nil
+	case backing_ratio.GT(sdk.NewInt(120)) || backing_ratio.Equal(sdk.NewInt(120)):
+		return sdk.NewInt(1), nil
 
-	case backing_ratio.GT(sdk.NewInt(int64(93))) || backing_ratio.Equal(sdk.NewInt(int64(93))):
-		return sdk.NewInt(int64(3)), nil
+	case backing_ratio.GT(sdk.NewInt(100)) || backing_ratio.Equal(sdk.NewInt(100)):
+		return sdk.NewInt(2), nil
 
-	case backing_ratio.GT(sdk.NewInt(int64(85))) || backing_ratio.Equal(sdk.NewInt(int64(85))):
-		return sdk.NewInt(int64(3)), nil
+	case backing_ratio.GT(sdk.NewInt(93)) || backing_ratio.Equal(sdk.NewInt(93)):
+		return sdk.NewInt(3), nil
 
-	case sdk.NewInt(int64(85)).GT(backing_ratio):
+	case backing_ratio.GT(sdk.NewInt(85)) || backing_ratio.Equal(sdk.NewInt(85)):
+		return sdk.NewInt(10), nil
+
+	case backing_ratio.LT(sdk.NewInt(85)):
 		return sdk.Int{}, types.ErrBurnBlocked
 
 	default:
