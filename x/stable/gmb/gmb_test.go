@@ -71,12 +71,17 @@ func TestCalculateMintingFee(t *testing.T) {
 			false,
 		},
 		{
-			sdk.NewInt(121),
+			sdk.NewInt(85),
+			1,
+			false,
+		},
+		{
+			sdk.NewInt(141),
 			0,
 			true,
 		},
 		{
-			sdk.NewInt(84),
+			sdk.NewInt(80),
 			0,
 			false,
 		},
@@ -89,7 +94,6 @@ func TestCalculateMintingFee(t *testing.T) {
 
 	for _, tc := range tests {
 		fee, err := gmb.CalculateMintingFee(tc.backing_ratio)
-
 		if tc.expectedErr {
 			require.Error(t, err)
 		} else {
@@ -107,18 +111,33 @@ func TestCalculateBurningFee(t *testing.T) {
 	}{
 		{
 			sdk.NewInt(100),
-			3,
+			2,
 			false,
 		},
 		{
-			sdk.NewInt(121),
-			0,
+			sdk.NewInt(93),
+			3,
 			false,
 		},
 		{
 			sdk.NewInt(84),
 			0,
 			true,
+		},
+		{
+			sdk.NewInt(140),
+			0,
+			false,
+		},
+		{
+			sdk.NewInt(141),
+			0,
+			false,
+		},
+		{
+			sdk.NewInt(85),
+			10,
+			false,
 		},
 		{
 			sdk.Int{},

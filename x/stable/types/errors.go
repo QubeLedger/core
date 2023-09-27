@@ -38,6 +38,6 @@ var (
 
 // GMD errors
 var (
-	ErrMintBlocked = sdkerrors.Register(ModuleName, 100, "Backing Ration >= 120%")
+	ErrMintBlocked = sdkerrors.Register(ModuleName, 100, "Backing Ration >= 140%")
 	ErrBurnBlocked = sdkerrors.Register(ModuleName, 101, "Backing Ration < 85%")
 )
