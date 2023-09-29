@@ -15,7 +15,7 @@ func (k Keeper) ExecuteBurn(ctx sdk.Context, msg *types.MsgBurn, pair types.Pair
 
 	qm, ar := pair.Qm, pair.Ar
 
-	backing_ratio, err = CalculateBackingRatio(qm, ar, atomPrice)
+	backing_ratio, err = k.CalculateBackingRatio(qm, ar, atomPrice)
 	if err != nil {
 		return err, sdk.Coin{}
 	}
