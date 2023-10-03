@@ -44,6 +44,8 @@ func (s *StableKeeperTestSuite) Setup() {
 	s.Address = apptesting.CreateRandomAccounts(1)[0]
 	s.ValPubKeys = simapp.CreateTestPubKeys(1)
 	s.app.GrowKeeper.SetBorrowRate(s.ctx, sdk.NewInt(15))
+	s.app.StableKeeper.SetBurningFundAddress(s.ctx, apptesting.CreateRandomAccounts(1)[0])
+	s.app.StableKeeper.SetReserveFundAddress(s.ctx, apptesting.CreateRandomAccounts(1)[0])
 }
 
 func TestStableKeeperTestSuite(t *testing.T) {

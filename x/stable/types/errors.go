@@ -30,13 +30,15 @@ var (
 	ErrPairNotFound                    = sdkerrors.Register(ModuleName, 1701, "ErrPairNotFound err")
 	ErrAmountInGTEminAmountIn          = sdkerrors.Register(ModuleName, 1801, "ErrAmountInGTEminAmountIn err")
 	ErrAmountOutGTEminAmountOut        = sdkerrors.Register(ModuleName, 1802, "ErrAmountOutGTEminAmountOut err")
+	ErrReserveFundAddressEmpty         = sdkerrors.Register(ModuleName, 1900, "ErrReserveFundAddressEmpty err")
+	ErrBurningFundAddressEmpty         = sdkerrors.Register(ModuleName, 1901, "ErrBurningFundAddressEmpty err")
 )
 
 var (
 	ErrUnrecognizedPacketType = sdkerrors.Register(ModuleName, 15, "unrecognized packet type")
 )
 
-// GMD errors
+// GMB errors
 var (
 	ErrMintBlocked = sdkerrors.Register(ModuleName, 100, "Backing Ration >= 140%")
 	ErrBurnBlocked = sdkerrors.Register(ModuleName, 101, "Backing Ration < 85%")

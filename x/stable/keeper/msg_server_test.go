@@ -69,8 +69,6 @@ func (suite *StableKeeperTestSuite) TestMint() {
 
 	for _, tc := range testCases {
 		suite.app.StableKeeper.SetTestingMode(true)
-		suite.app.StableKeeper.SetBurningFundAddress(suite.ctx, apptesting.CreateRandomAccounts(1)[0])
-		suite.app.StableKeeper.SetReserveFundAddress(suite.ctx, apptesting.CreateRandomAccounts(1)[0])
 		suite.Run(fmt.Sprintf("Case---%s", tc.name), func() {
 			suite.app.StableKeeper.AppendPair(suite.ctx, tc.pair)
 			suite.app.StableKeeper.UpdateAtomPriceTesting(suite.ctx, sdk.NewInt(tc.price))
@@ -158,8 +156,6 @@ func (suite *StableKeeperTestSuite) TestBurn() {
 
 	for _, tc := range testCases {
 		suite.app.StableKeeper.SetTestingMode(true)
-		suite.app.StableKeeper.SetBurningFundAddress(suite.ctx, apptesting.CreateRandomAccounts(1)[0])
-		suite.app.StableKeeper.SetReserveFundAddress(suite.ctx, apptesting.CreateRandomAccounts(1)[0])
 		suite.app.StableKeeper.AppendPair(suite.ctx, tc.pair)
 
 		suite.AddTestCoins(100000000, tc.pair.AmountInMetadata.Base)

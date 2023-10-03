@@ -34,3 +34,18 @@ func (k Keeper) SetReserveFundAddress(ctx sdk.Context, newReserveFundAddress sdk
 func (k Keeper) GetReserveFundAddress(ctx sdk.Context) sdk.AccAddress {
 	return ReserveFundAddress
 }
+
+/*
+Check Address for empty
+*/
+
+func (k Keeper) AddressEmptyCheck(ctx sdk.Context) bool {
+	if ReserveFundAddress.Empty() {
+		return true
+	}
+	if BurningFundAddress.Empty() {
+		return true
+	}
+
+	return false
+}

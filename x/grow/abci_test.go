@@ -28,8 +28,13 @@ func (s *GrowAbciTestSuite) TestGrowPriceChangeWhenBlockEnd() {
 		s.app.GrowKeeper.AppendPair(s.ctx, s.GetNormalGTokenPair(0))
 		s.app.GrowKeeper.SetGrowStakingReserveAddress(s.ctx, apptesting.CreateRandomAccounts(1)[0])
 		s.app.GrowKeeper.SetUSQReserveAddress(s.ctx, apptesting.CreateRandomAccounts(1)[0])
+		s.app.GrowKeeper.SetGrowYieldReserveAddress(s.ctx, apptesting.CreateRandomAccounts(1)[0])
 		s.app.GrowKeeper.SetRealRate(s.ctx, sdk.NewInt(15))
 		s.app.GrowKeeper.SetLastTimeUpdateReserve(s.ctx, sdk.NewInt(s.ctx.BlockTime().Unix()))
+
+		s.app.GrowKeeper.SetBorrowRate(s.ctx, sdk.NewInt(15))
+		s.app.StableKeeper.SetBurningFundAddress(s.ctx, apptesting.CreateRandomAccounts(1)[0])
+		s.app.StableKeeper.SetReserveFundAddress(s.ctx, apptesting.CreateRandomAccounts(1)[0])
 	}
 
 	s.OracleAggregateExchangeRateFromNet()
@@ -92,8 +97,13 @@ func (s *GrowAbciTestSuite) TestGrowReserveMath() {
 		s.app.GrowKeeper.AppendPair(s.ctx, s.GetNormalGTokenPair(0))
 		s.app.GrowKeeper.SetGrowStakingReserveAddress(s.ctx, apptesting.CreateRandomAccounts(1)[0])
 		s.app.GrowKeeper.SetUSQReserveAddress(s.ctx, apptesting.CreateRandomAccounts(1)[0])
+		s.app.GrowKeeper.SetGrowYieldReserveAddress(s.ctx, apptesting.CreateRandomAccounts(1)[0])
 		s.app.GrowKeeper.SetRealRate(s.ctx, sdk.NewInt(15))
 		s.app.GrowKeeper.SetLastTimeUpdateReserve(s.ctx, sdk.NewInt(s.ctx.BlockTime().Unix()))
+
+		s.app.GrowKeeper.SetBorrowRate(s.ctx, sdk.NewInt(15))
+		s.app.StableKeeper.SetBurningFundAddress(s.ctx, apptesting.CreateRandomAccounts(1)[0])
+		s.app.StableKeeper.SetReserveFundAddress(s.ctx, apptesting.CreateRandomAccounts(1)[0])
 	}
 
 	s.OracleAggregateExchangeRateFromNet()
@@ -163,8 +173,13 @@ func (s *GrowAbciTestSuite) TestGrowIncreaseUSQReserve() {
 		s.app.GrowKeeper.AppendPair(s.ctx, s.GetNormalGTokenPair(0))
 		s.app.GrowKeeper.SetGrowStakingReserveAddress(s.ctx, apptesting.CreateRandomAccounts(1)[0])
 		s.app.GrowKeeper.SetUSQReserveAddress(s.ctx, apptesting.CreateRandomAccounts(1)[0])
+		s.app.GrowKeeper.SetGrowYieldReserveAddress(s.ctx, apptesting.CreateRandomAccounts(1)[0])
 		s.app.GrowKeeper.SetRealRate(s.ctx, sdk.NewInt(15))
 		s.app.GrowKeeper.SetLastTimeUpdateReserve(s.ctx, sdk.NewInt(s.ctx.BlockTime().Unix()))
+
+		s.app.GrowKeeper.SetBorrowRate(s.ctx, sdk.NewInt(15))
+		s.app.StableKeeper.SetBurningFundAddress(s.ctx, apptesting.CreateRandomAccounts(1)[0])
+		s.app.StableKeeper.SetReserveFundAddress(s.ctx, apptesting.CreateRandomAccounts(1)[0])
 	}
 
 	s.OracleAggregateExchangeRateFromNet()
@@ -219,9 +234,14 @@ func (s *GrowAbciTestSuite) TestGrowReduceUSQReserve() {
 		s.app.GrowKeeper.AppendPair(s.ctx, s.GetNormalGTokenPair(0))
 		s.app.GrowKeeper.SetGrowStakingReserveAddress(s.ctx, apptesting.CreateRandomAccounts(1)[0])
 		s.app.GrowKeeper.SetUSQReserveAddress(s.ctx, apptesting.CreateRandomAccounts(1)[0])
+		s.app.GrowKeeper.SetGrowYieldReserveAddress(s.ctx, apptesting.CreateRandomAccounts(1)[0])
 		s.app.GrowKeeper.SetRealRate(s.ctx, sdk.NewInt(15))
 		s.app.GrowKeeper.SetLastTimeUpdateReserve(s.ctx, sdk.NewInt(s.ctx.BlockTime().Unix()))
 		s.AddTestCoinsToCustomAccount(sdk.NewInt(amt), s.GetNormalQStablePair(0).AmountOutMetadata.Base, s.app.GrowKeeper.GetUSQReserveAddress(s.ctx))
+
+		s.app.GrowKeeper.SetBorrowRate(s.ctx, sdk.NewInt(15))
+		s.app.StableKeeper.SetBurningFundAddress(s.ctx, apptesting.CreateRandomAccounts(1)[0])
+		s.app.StableKeeper.SetReserveFundAddress(s.ctx, apptesting.CreateRandomAccounts(1)[0])
 	}
 
 	s.OracleAggregateExchangeRateFromNet()
