@@ -13,6 +13,10 @@ func (k Keeper) ExecuteLend(ctx sdk.Context, msg *types.MsgCreateLend, LendAsset
 		return err, sdk.Coin{}, ""
 	}
 
+	if k.AddressEmptyCheck(ctx) {
+		return types.ErrReserveAddressEmpty, sdk.Coin{}, ""
+	}
+
 	if err := k.CheckIfPositionAlredyCreate(ctx, borrower.String(), msg.DenomIn); err == nil {
 		return err, sdk.Coin{}, ""
 	}
@@ -79,6 +83,10 @@ func (k Keeper) ExecuteDeleteLend(ctx sdk.Context, msg *types.MsgDeleteLend, Len
 	amountInCoins, err := sdk.ParseCoinsNormalized(msg.AmountIn)
 	if err != nil {
 		return err, ""
+	}
+
+	if k.AddressEmptyCheck(ctx) {
+		return types.ErrReserveAddressEmpty, ""
 	}
 
 	borrower, err := sdk.AccAddressFromBech32(msg.Borrower)

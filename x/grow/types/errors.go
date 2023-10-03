@@ -33,4 +33,5 @@ var (
 	ErrPriceNil                      = sdkerrors.Register(ModuleName, 1900, "ErrPriceNil err")
 	ErrUserAlredyDepositCollateral   = sdkerrors.Register(ModuleName, 2000, "ErrUserAlredyDepositCollateral err")
 	ErrGrowNotActivated              = sdkerrors.Register(ModuleName, 3000, "Grow module is off. Wait until it is turned on to start using it. To enable the module, make a proposal in the governance.")
+	ErrReserveAddressEmpty           = sdkerrors.Register(ModuleName, 4000, "ErrReserveAddressEmpty err")
 )

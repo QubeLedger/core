@@ -60,3 +60,21 @@ func (k Keeper) SetGrowStakingReserveAddress(ctx sdk.Context, newUSQStakingReser
 func (k Keeper) GetGrowStakingReserveAddress(ctx sdk.Context) sdk.AccAddress {
 	return GrowStakingReserveAddress
 }
+
+/*
+Check Address for empty
+*/
+
+func (k Keeper) AddressEmptyCheck(ctx sdk.Context) bool {
+	if USQReserveAddress.Empty() {
+		return true
+	}
+	if GrowYieldReserveAddress.Empty() {
+		return true
+	}
+	if GrowStakingReserveAddress.Empty() {
+		return true
+	}
+
+	return false
+}
