@@ -2,7 +2,11 @@ package keeper
 
 import (
 	"fmt"
+	"io/ioutil"
+	"net/http"
+	"time"
 
+	"github.com/buger/jsonparser"
 	"github.com/tendermint/tendermint/libs/log"
 
 	gogotypes "github.com/gogo/protobuf/types"
@@ -73,6 +77,32 @@ func (k Keeper) Logger(ctx sdk.Context) log.Logger {
 
 // GetExchangeRate gets the consensus exchange rate of the denom asset from the store.
 func (k Keeper) GetExchangeRate(ctx sdk.Context, denom string) (sdk.Dec, error) {
+	if TestnetStatus {
+		var atomPriceString string
+
+		tr := &http.Transport{
+			MaxIdleConns:       10,
+			IdleConnTimeout:    30 * time.Second,
+			DisableCompression: true,
+		}
+		client := &http.Client{Transport: tr}
+
+		res, err := client.Get("https://api.coinbase.com/v2/exchange-rates?currency=ATOM")
+		if err != nil {
+			return sdk.ZeroDec(), err
+		}
+		body, _ := ioutil.ReadAll(res.Body)
+
+		if value, err := jsonparser.GetString(body, "data", "rates", "USD"); err == nil {
+			atomPriceString = fmt.Sprintf("%v", value)
+		} else {
+			return sdk.ZeroDec(), err
+		}
+
+		val, err := sdk.NewDecFromStr(atomPriceString)
+
+		return val, nil
+	}
 	store := ctx.KVStore(k.storeKey)
 	b := store.Get(types.GetExchangeRateKey(denom))
 	if b == nil {

@@ -3,7 +3,7 @@ package core.oracle.v1beta1;
 
 import "gogoproto/gogo.proto";
 import "google/api/annotations.proto";
-import "oracle/oracle.proto";
+import "core/oracle/v1beta1/oracle.proto";
 import "cosmos/base/v1beta1/coin.proto";
 
 option go_package = "github.com/QuadrateOrg/core/x/oracle/types";
