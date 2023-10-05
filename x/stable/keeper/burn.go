@@ -13,10 +13,6 @@ func (k Keeper) ExecuteBurn(ctx sdk.Context, msg *types.MsgBurn, pair types.Pair
 		return err, sdk.Coin{}
 	}
 
-	if k.AddressEmptyCheck(ctx) {
-		return types.ErrBurningFundAddressEmpty, sdk.Coin{}
-	}
-
 	qm, ar := pair.Qm, pair.Ar
 
 	backing_ratio, err = CalculateBackingRatio(qm, ar, atomPrice)

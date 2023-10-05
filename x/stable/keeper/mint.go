@@ -18,10 +18,6 @@ func (k Keeper) ExecuteMint(ctx sdk.Context, msg *types.MsgMint, pair types.Pair
 		return err, sdk.Coin{}
 	}
 
-	if k.AddressEmptyCheck(ctx) {
-		return types.ErrReserveFundAddressEmpty, sdk.Coin{}
-	}
-
 	qm, ar := pair.Qm, pair.Ar
 
 	backing_ratio, err = CalculateBackingRatio(qm, ar, atomPrice)
