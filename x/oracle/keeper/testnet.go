@@ -1,7 +1,7 @@
 package keeper
 
 var (
-	TestnetStatus bool = false
+	TestnetStatus bool
 )
 
 func (k Keeper) SetTestnetStatus(val bool) {
