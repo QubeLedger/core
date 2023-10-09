@@ -159,3 +159,21 @@ func (k Keeper) GetAmountOutByAmountIn(goCtx context.Context, req *types.GetAmou
 		return nil, status.Error(codes.NotFound, "action not found")
 	}
 }
+
+func (k Keeper) AllPairs(goCtx context.Context, req *types.AllPairsRequest) (*types.AllPairsResponse, error) {
+	if req == nil {
+		return nil, status.Error(codes.InvalidArgument, "invalid request")
+	}
+	ctx := sdk.UnwrapSDKContext(goCtx)
+	ps := k.GetAllPair(ctx)
+
+	pairs := []*types.Pair{}
+
+	for _, pair := range ps {
+		pairs = append(pairs, &pair)
+	}
+
+	return &types.AllPairsResponse{
+		Pairs: pairs,
+	}, nil
+}
