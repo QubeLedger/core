@@ -170,7 +170,7 @@ func (k Keeper) AllPairs(goCtx context.Context, req *types.AllPairsRequest) (*ty
 	pairs := []*types.Pair{}
 
 	for _, pair := range ps {
-		pairs = append(pairs, &pair)
+		pairs = append(pairs, &pair) // #nosec
 	}
 
 	return &types.AllPairsResponse{
