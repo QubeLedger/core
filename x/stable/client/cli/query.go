@@ -111,3 +111,27 @@ func CmdQueryPairbyId() *cobra.Command {
 
 	return cmd
 }
+
+func CmdQueryAllPairs() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "pairs]",
+		Short: "get all qStable pair",
+		Args:  cobra.NoArgs,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx := client.GetClientContextFromCmd(cmd)
+
+			queryClient := types.NewQueryClient(clientCtx)
+
+			res, err := queryClient.AllPairs(context.Background(), &types.AllPairsRequest{})
+			if err != nil {
+				return err
+			}
+
+			return clientCtx.PrintProto(res)
+		},
+	}
+
+	flags.AddQueryFlagsToCmd(cmd)
+
+	return cmd
+}
