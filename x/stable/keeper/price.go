@@ -17,7 +17,7 @@ func (k Keeper) UpdateAtomPrice(ctx sdk.Context, pair types.Pair) error {
 	if AtomPrice.IsNil() {
 		AtomPrice = sdk.NewInt(0)
 	}
-	price, err := k.oracleKeeper.GetExchangeRate(ctx, pair.AmountInMetadata.Base)
+	price, err := k.oracleKeeper.GetExchangeRate(ctx, pair.AmountInMetadata.Display)
 	if err != nil {
 		return err
 	}

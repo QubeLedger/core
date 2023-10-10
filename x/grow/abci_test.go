@@ -130,7 +130,7 @@ func (s *GrowAbciTestSuite) TestGrowReserveMath() {
 
 	s.OracleAggregateExchangeRateFromNet()
 
-	atomPrice, _ := s.app.OracleKeeper.GetExchangeRate(s.ctx, updatedqStablePair.AmountInMetadata.Base)
+	atomPrice, _ := s.app.OracleKeeper.GetExchangeRate(s.ctx, updatedqStablePair.AmountInMetadata.Display)
 	br, _ := gmb.CalculateBackingRatio(atomPrice.MulInt64(10000).RoundInt(), updatedqStablePair.Ar, updatedqStablePair.Qm)
 
 	qm := updatedqStablePair.Qm
