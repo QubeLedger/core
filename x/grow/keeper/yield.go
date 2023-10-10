@@ -59,7 +59,7 @@ func (k Keeper) CalculateGrowRate(ctx sdk.Context, gTokenPair types.GTokenPair) 
 	if !found {
 		return sdk.Int{}, types.ErrPairNotFound
 	}
-	atomPrice, err := k.oracleKeeper.GetExchangeRate(ctx, qStablePair.AmountInMetadata.Base)
+	atomPrice, err := k.oracleKeeper.GetExchangeRate(ctx, qStablePair.AmountInMetadata.Display)
 	if err != nil {
 		return sdk.Int{}, err
 	}
@@ -94,7 +94,7 @@ func (k Keeper) CalculateRealYield(ctx sdk.Context, gTokenPair types.GTokenPair)
 		return sdk.Int{}, types.ErrPairNotFound
 	}
 
-	atomPrice, err := k.oracleKeeper.GetExchangeRate(ctx, qStablePair.AmountInMetadata.Base)
+	atomPrice, err := k.oracleKeeper.GetExchangeRate(ctx, qStablePair.AmountInMetadata.Display)
 	if err != nil {
 		return sdk.Int{}, err
 	}

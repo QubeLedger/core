@@ -34,7 +34,7 @@ func (suite *GrowKeeperTestSuite) TestLendAssetByLendAssetId() {
 	}
 	suite.Setup()
 	suite.Commit()
-	suite.SetupOracleKeeper("uatom")
+	suite.SetupOracleKeeper("ATOM")
 	suite.RegisterValidator()
 	suite.app.GrowKeeper.ChangeGrowStatus()
 	for _, tc := range testCases {
@@ -81,7 +81,7 @@ func (suite *GrowKeeperTestSuite) TestPositionById() {
 			"not found",
 		},
 	}
-	suite.SetupOracleKeeper("uatom")
+	suite.SetupOracleKeeper("ATOM")
 	suite.RegisterValidator()
 	suite.app.GrowKeeper.ChangeGrowStatus()
 	for _, tc := range testCases {
@@ -128,7 +128,7 @@ func (suite *GrowKeeperTestSuite) TestPositionByCreator() {
 			"not found",
 		},
 	}
-	suite.SetupOracleKeeper("uatom")
+	suite.SetupOracleKeeper("ATOM")
 	suite.RegisterValidator()
 	suite.app.GrowKeeper.ChangeGrowStatus()
 	for _, tc := range testCases {
@@ -175,7 +175,7 @@ func (suite *GrowKeeperTestSuite) TestLiquidatorPositionByCreator() {
 			"not found",
 		},
 	}
-	suite.SetupOracleKeeper("uatom")
+	suite.SetupOracleKeeper("ATOM")
 	suite.RegisterValidator()
 	suite.app.GrowKeeper.ChangeGrowStatus()
 	for _, tc := range testCases {
@@ -222,7 +222,7 @@ func (suite *GrowKeeperTestSuite) TestLiquidatorPositionById() {
 			"not found",
 		},
 	}
-	suite.SetupOracleKeeper("uatom")
+	suite.SetupOracleKeeper("ATOM")
 	suite.RegisterValidator()
 	suite.app.GrowKeeper.ChangeGrowStatus()
 	for _, tc := range testCases {
@@ -247,7 +247,7 @@ func (suite *GrowKeeperTestSuite) TestLiquidatorPositionById() {
 func (suite *GrowKeeperTestSuite) TestAllFundAddress() {
 	suite.Setup()
 	suite.Commit()
-	suite.SetupOracleKeeper("uatom")
+	suite.SetupOracleKeeper("ATOM")
 	suite.RegisterValidator()
 
 	address := []sdk.AccAddress{
@@ -301,7 +301,7 @@ func (suite *GrowKeeperTestSuite) TestLoanById() {
 			"not found",
 		},
 	}
-	suite.SetupOracleKeeper("uatom")
+	suite.SetupOracleKeeper("ATOM")
 	suite.RegisterValidator()
 	suite.app.GrowKeeper.ChangeGrowStatus()
 	for _, tc := range testCases {
@@ -326,7 +326,7 @@ func (suite *GrowKeeperTestSuite) TestLoanById() {
 func (suite *GrowKeeperTestSuite) TestYieldPercentage() {
 	suite.Setup()
 	suite.Commit()
-	suite.SetupOracleKeeper("uatom")
+	suite.SetupOracleKeeper("ATOM")
 	suite.RegisterValidator()
 	s.ctx = s.ctx.WithBlockTime(time.Now())
 

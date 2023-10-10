@@ -70,7 +70,7 @@ func (s *GrowAbciTestSuite) GetNormalQStablePair(id uint64) stabletypes.Pair {
 				{Denom: "uatom", Exponent: uint32(0), Aliases: []string{"microatom"}},
 			},
 			Base:    "uatom",
-			Display: "atom",
+			Display: "ATOM",
 			Name:    "ATOM",
 			Symbol:  "ATOM",
 		},
@@ -80,7 +80,7 @@ func (s *GrowAbciTestSuite) GetNormalQStablePair(id uint64) stabletypes.Pair {
 				{Denom: "uusd", Exponent: uint32(0), Aliases: []string{"microusd"}},
 			},
 			Base:    "uusd",
-			Display: "usd",
+			Display: "USQ",
 			Name:    "USQ",
 			Symbol:  "USQ",
 		},
@@ -104,7 +104,7 @@ func (s *GrowAbciTestSuite) GetNormalGTokenPair(id uint64) types.GTokenPair {
 				{Denom: "ugusd", Exponent: uint32(0), Aliases: []string{"microgusd"}},
 			},
 			Base:    "ugusd",
-			Display: "gusd",
+			Display: "gUSQ",
 			Name:    "gUSQ",
 			Symbol:  "gUSQ",
 		},
@@ -243,7 +243,7 @@ func (s *GrowAbciTestSuite) SetupOracleKeeper() {
 	params := s.app.OracleKeeper.GetParams(s.ctx)
 	params.Whitelist = oracletypes.DenomList{
 		{
-			Name: "uatom",
+			Name: "ATOM",
 		},
 	}
 	params.VotePeriod = 1

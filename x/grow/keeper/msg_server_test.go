@@ -52,7 +52,7 @@ func (suite *GrowKeeperTestSuite) TestExecuteDeposit() {
 
 	suite.Setup()
 	suite.Commit()
-	suite.SetupOracleKeeper("uatom")
+	suite.SetupOracleKeeper("ATOM")
 	suite.RegisterValidator()
 	suite.app.GrowKeeper.ChangeGrowStatus()
 	for _, tc := range testCases {
@@ -128,7 +128,7 @@ func (suite *GrowKeeperTestSuite) TestExecuteWithdrawal() {
 
 	suite.Setup()
 	suite.Commit()
-	suite.SetupOracleKeeper("uatom")
+	suite.SetupOracleKeeper("ATOM")
 	suite.RegisterValidator()
 	suite.app.GrowKeeper.ChangeGrowStatus()
 	suite.app.GrowKeeper.SetGrowStakingReserveAddress(s.ctx, apptesting.CreateRandomAccounts(1)[0])
@@ -1210,7 +1210,7 @@ func (suite *GrowKeeperTestSuite) TestGrowDeactivate() {
 
 	suite.Setup()
 	suite.Commit()
-	suite.SetupOracleKeeper("uatom")
+	suite.SetupOracleKeeper("ATOM")
 	suite.RegisterValidator()
 
 	config := s.GetNormalConfig()
