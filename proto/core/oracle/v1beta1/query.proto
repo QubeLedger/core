@@ -3,7 +3,7 @@ package core.oracle.v1beta1;
 
 import "gogoproto/gogo.proto";
 import "google/api/annotations.proto";
-import "oracle/oracle.proto";
+import "core/oracle/v1beta1/oracle.proto";
 import "cosmos/base/v1beta1/coin.proto";
 
 option go_package = "github.com/QuadrateOrg/core/x/oracle/types";
@@ -12,52 +12,52 @@ option go_package = "github.com/QuadrateOrg/core/x/oracle/types";
 service Query {
   // ExchangeRate returns exchange rate of a denom
   rpc ExchangeRate(QueryExchangeRateRequest) returns (QueryExchangeRateResponse) {
-    option (google.api.http).get = "/core/oracle/denoms/{denom}/exchange_rate";
+    option (google.api.http).get = "/core/oracle/v1beta1/denoms/{denom}/exchange_rate";
   }
 
   // ExchangeRates returns exchange rates of all denoms
   rpc ExchangeRates(QueryExchangeRatesRequest) returns (QueryExchangeRatesResponse) {
-    option (google.api.http).get = "/core/oracle/denoms/exchange_rates";
+    option (google.api.http).get = "/core/oracle/v1beta1/denoms/exchange_rates";
   }
 
   // Actives returns all active denoms
   rpc Actives(QueryActivesRequest) returns (QueryActivesResponse) {
-    option (google.api.http).get = "/core/oracle/denoms/actives";
+    option (google.api.http).get = "/core/oracle/v1beta1/denoms/actives";
   }
 
   // FeederDelegation returns feeder delegation of a validator
   rpc FeederDelegation(QueryFeederDelegationRequest) returns (QueryFeederDelegationResponse) {
-    option (google.api.http).get = "/core/oracle/validators/{validator_addr}/feeder";
+    option (google.api.http).get = "/core/oracle/v1beta1/validators/{validator_addr}/feeder";
   }
 
   // MissCounter returns oracle miss counter of a validator
   rpc MissCounter(QueryMissCounterRequest) returns (QueryMissCounterResponse) {
-    option (google.api.http).get = "/core/oracle/validators/{validator_addr}/miss";
+    option (google.api.http).get = "/core/oracle/v1beta1/validators/{validator_addr}/miss";
   }
 
   // AggregatePrevote returns an aggregate prevote of a validator
   rpc AggregatePrevote(QueryAggregatePrevoteRequest) returns (QueryAggregatePrevoteResponse) {
-    option (google.api.http).get = "/core/oracle/validators/{validator_addr}/aggregate_prevote";
+    option (google.api.http).get = "/core/oracle/v1beta1/validators/{validator_addr}/aggregate_prevote";
   }
 
   // AggregatePrevotes returns aggregate prevotes of all validators
   rpc AggregatePrevotes(QueryAggregatePrevotesRequest) returns (QueryAggregatePrevotesResponse) {
-    option (google.api.http).get = "/core/oracle/validators/aggregate_prevotes";
+    option (google.api.http).get = "/core/oracle/v1beta1/validators/aggregate_prevotes";
   }
 
   // AggregateVote returns an aggregate vote of a validator
   rpc AggregateVote(QueryAggregateVoteRequest) returns (QueryAggregateVoteResponse) {
-    option (google.api.http).get = "/core/oracle/valdiators/{validator_addr}/aggregate_vote";
+    option (google.api.http).get = "/core/oracle/v1beta1/valdiators/{validator_addr}/aggregate_vote";
   }
 
   // AggregateVotes returns aggregate votes of all validators
   rpc AggregateVotes(QueryAggregateVotesRequest) returns (QueryAggregateVotesResponse) {
-    option (google.api.http).get = "/core/oracle/validators/aggregate_votes";
+    option (google.api.http).get = "/core/oracle/v1beta1/validators/aggregate_votes";
   }
 
   // Params queries all parameters.
   rpc Params(QueryParamsRequest) returns (QueryParamsResponse) {
-    option (google.api.http).get = "/core/oracle/params";
+    option (google.api.http).get = "/core/oracle/v1beta1/params";
   }
 }
 
