@@ -75,7 +75,7 @@ func TestQueryExchangeRates(t *testing.T) {
 	res, err := querier.ExchangeRates(ctx, &types.QueryExchangeRatesRequest{})
 	require.NoError(t, err)
 
-	require.Equal(t, sdk.DecCoins{
+	require.Equal(t, []sdk.DecCoin{
 		sdk.NewDecCoinFromDec(types.TestDenomB, rate),
 		sdk.NewDecCoinFromDec(types.TestDenomD, rate),
 	}, res.ExchangeRates)
