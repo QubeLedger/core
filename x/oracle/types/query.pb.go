@@ -12,6 +12,7 @@ import (
 	proto "github.com/gogo/protobuf/proto"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	grpc "google.golang.org/grpc"
+	grpc1 "github.com/gogo/protobuf/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
 	io "io"
@@ -1090,10 +1091,10 @@ type QueryClient interface {
 }
 
 type queryClient struct {
-	cc *grpc.ClientConn
+	cc grpc1.ClientConn
 }
 
-func NewQueryClient(cc *grpc.ClientConn) QueryClient {
+func NewQueryClient(cc grpc1.ClientConn) QueryClient {
 	return &queryClient{cc}
 }
 
@@ -1246,7 +1247,7 @@ func (*UnimplementedQueryServer) Params(ctx context.Context, req *QueryParamsReq
 	return nil, status.Errorf(codes.Unimplemented, "method Params not implemented")
 }
 
-func RegisterQueryServer(s *grpc.Server, srv QueryServer) {
+func RegisterQueryServer(s grpc1.Server, srv QueryServer) {
 	s.RegisterService(&_Query_serviceDesc, srv)
 }
 
@@ -1529,13 +1530,16 @@ func (m *QueryExchangeRateResponse) MarshalToSizedBuffer(dAtA []byte) (int, erro
 	_ = i
 	var l int
 	_ = l
-	if len(m.ExchangeRate) > 0 {
-		i -= len(m.ExchangeRate)
-		copy(dAtA[i:], m.ExchangeRate)
-		i = encodeVarintQuery(dAtA, i, uint64(len(m.ExchangeRate)))
-		i--
-		dAtA[i] = 0xa
+	{
+		size := m.ExchangeRate.Size()
+		i -= size
+		if _, err := m.ExchangeRate.MarshalTo(dAtA[i:]); err != nil {
+			return 0, err
+		}
+		i = encodeVarintQuery(dAtA, i, uint64(size))
 	}
+	i--
+	dAtA[i] = 0xa
 	return len(dAtA) - i, nil
 }
 
@@ -2159,10 +2163,8 @@ func (m *QueryExchangeRateResponse) Size() (n int) {
 	}
 	var l int
 	_ = l
-	l = len(m.ExchangeRate)
-	if l > 0 {
-		n += 1 + l + sovQuery(uint64(l))
-	}
+	l = m.ExchangeRate.Size()
+	n += 1 + l + sovQuery(uint64(l))
 	return n
 }
 
@@ -2552,7 +2554,9 @@ func (m *QueryExchangeRateResponse) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.ExchangeRate = github_com_cosmos_cosmos_sdk_types.Dec(dAtA[iNdEx:postIndex])
+			if err := m.ExchangeRate.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
