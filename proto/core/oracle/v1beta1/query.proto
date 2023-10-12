@@ -59,6 +59,10 @@ service Query {
   rpc Params(QueryParamsRequest) returns (QueryParamsResponse) {
     option (google.api.http).get = "/core/oracle/v1beta1/params";
   }
+
+  rpc CalculateHash(QueryCalculateHashRequest) returns (QueryCalculateHashResponse) {
+    option (google.api.http).get = "/core/oracle/v1beta1/hash/{salt}/{rates}/{validator}";
+  }
 }
 
 // QueryExchangeRateRequest is the request type for the Query/ExchangeRate RPC method.
@@ -202,4 +206,14 @@ message QueryParamsRequest {}
 message QueryParamsResponse {
   // params defines the parameters of the module.
   Params params = 1 [(gogoproto.nullable) = false];
+}
+
+message QueryCalculateHashRequest {
+  string salt = 1;
+  string rates = 2;
+  string validator = 3;
+}
+
+message QueryCalculateHashResponse {
+  string hash = 1;
 }

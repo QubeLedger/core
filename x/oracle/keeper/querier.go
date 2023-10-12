@@ -185,3 +185,10 @@ func (q querier) AggregateVotes(c context.Context, req *types.QueryAggregateVote
 		AggregateVotes: votes,
 	}, nil
 }
+
+func (q querier) CalculateHash(c context.Context, req *types.QueryCalculateHashRequest) (*types.QueryCalculateHashResponse, error) {
+	hash := types.GetAggregateVoteHash(req.Salt, req.Rates, sdk.ValAddress(req.Validator))
+	return &types.QueryCalculateHashResponse{
+		Hash: hash.String(),
+	}, nil
+}
