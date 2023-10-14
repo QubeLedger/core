@@ -10,7 +10,6 @@ import (
 	"github.com/QuadrateOrg/core/app"
 	"github.com/QuadrateOrg/core/app/apptesting"
 	quadrateapptest "github.com/QuadrateOrg/core/app/helpers"
-	apptypes "github.com/QuadrateOrg/core/types"
 	"github.com/QuadrateOrg/core/x/grow/types"
 	"github.com/QuadrateOrg/core/x/oracle"
 	oraclekeeper "github.com/QuadrateOrg/core/x/oracle/keeper"
@@ -47,7 +46,6 @@ func (suite *GrowAbciTestSuite) Commit() {
 }
 
 func (s *GrowAbciTestSuite) Setup() {
-	apptypes.SetConfig()
 	s.app = quadrateapptest.Setup(s.T(), "qube-1", false, 1)
 	s.Address = apptesting.CreateRandomAccounts(1)[0]
 	s.ValPubKeys = simapp.CreateTestPubKeys(1)
