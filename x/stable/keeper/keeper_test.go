@@ -10,6 +10,7 @@ import (
 	"github.com/QuadrateOrg/core/app"
 	apptesting "github.com/QuadrateOrg/core/app/apptesting"
 	quadrateapptest "github.com/QuadrateOrg/core/app/helpers"
+	apptypes "github.com/QuadrateOrg/core/types"
 	"github.com/QuadrateOrg/core/x/oracle"
 	oraclekeeper "github.com/QuadrateOrg/core/x/oracle/keeper"
 	oracletypes "github.com/QuadrateOrg/core/x/oracle/types"
@@ -40,6 +41,7 @@ type StableKeeperTestSuite struct {
 var s *StableKeeperTestSuite
 
 func (s *StableKeeperTestSuite) Setup() {
+	apptypes.SetConfig()
 	s.app = quadrateapptest.Setup(s.T(), "qube-1", false, 1)
 	s.Address = apptesting.CreateRandomAccounts(1)[0]
 	s.ValPubKeys = simapp.CreateTestPubKeys(1)
