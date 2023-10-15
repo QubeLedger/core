@@ -35,6 +35,8 @@ func (s *GrowGenesisTestSuite) Setup() {
 }
 
 func (s *GrowGenesisTestSuite) TestInitGenesis() {
+	s.Setup()
+	s.Commit()
 	testCases := []struct {
 		name         string
 		genesisState types.GenesisState
@@ -111,7 +113,7 @@ func (s *GrowGenesisTestSuite) TestInitGenesis() {
 			valid: false,
 		},
 		{
-			name: "address null",
+			name: "percent null",
 			genesisState: types.GenesisState{
 				Params: types.DefaultParams(),
 				GTokenPairList: []types.GTokenPair{
@@ -144,8 +146,6 @@ func (s *GrowGenesisTestSuite) TestInitGenesis() {
 		},
 	}
 	for _, tc := range testCases {
-		s.Setup()
-		s.Commit()
 		s.Run(fmt.Sprintf("Case---%s", tc.name), func() {
 			if tc.valid {
 				s.Require().NotPanics(func() {
