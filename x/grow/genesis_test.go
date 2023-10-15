@@ -161,8 +161,13 @@ func (s *GrowGenesisTestSuite) TestInitGenesis() {
 					s.Require().Len(tc.genesisState.GTokenPairList, 0)
 				}
 
-				s.Require().Equal(sdk.AccAddress(tc.genesisState.USQReserveAddress), s.app.GrowKeeper.GetUSQReserveAddress(s.ctx))
-				s.Require().Equal(sdk.AccAddress(tc.genesisState.GrowStakingReserveAddress), s.app.GrowKeeper.GetGrowStakingReserveAddress(s.ctx))
+				uf, err := sdk.AccAddressFromBech32(tc.genesisState.USQReserveAddress)
+				s.Require().NoError(err, tc.name)
+				gf, err := sdk.AccAddressFromBech32(tc.genesisState.GrowStakingReserveAddress)
+				s.Require().NoError(err, tc.name)
+
+				s.Require().Equal(uf, s.app.GrowKeeper.GetUSQReserveAddress(s.ctx))
+				s.Require().Equal(gf, s.app.GrowKeeper.GetGrowStakingReserveAddress(s.ctx))
 			}
 		})
 	}
