@@ -14,8 +14,8 @@ func DefaultGenesis() *GenesisState {
 		GTokenPairList:            []GTokenPair{},
 		RealRate:                  1,
 		BorrowRate:                1,
-		GrowStakingReserveAddress: "qube1xpurqvpsxqcrqvpsxqcrqvpsxqcrqvpsxqcrqv",
-		USQReserveAddress:         "qube1xpurqvpsxqcrqvpsxqcrqvpsxqcrqvpsxqcrqv",
+		GrowStakingReserveAddress: "qube13zq340zzjgua9h98pltzwv0ga5r0kkn0ryjz4v",
+		USQReserveAddress:         "qube13zq340zzjgua9h98pltzwv0ga5r0kkn0ryjz4v",
 	}
 }
 
