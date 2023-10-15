@@ -8,6 +8,7 @@ import (
 	"github.com/QuadrateOrg/core/app"
 	"github.com/QuadrateOrg/core/app/apptesting"
 	quadrateapptest "github.com/QuadrateOrg/core/app/helpers"
+	apptypes "github.com/QuadrateOrg/core/types"
 	"github.com/QuadrateOrg/core/x/grow"
 	"github.com/QuadrateOrg/core/x/grow/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -29,10 +30,13 @@ func (suite *GrowGenesisTestSuite) Commit() {
 }
 
 func (s *GrowGenesisTestSuite) Setup() {
+	apptypes.SetConfig()
 	s.app = quadrateapptest.Setup(s.T(), "qube-1", false, 1)
 }
 
 func (s *GrowGenesisTestSuite) TestInitGenesis() {
+	s.Setup()
+	s.Commit()
 	testCases := []struct {
 		name         string
 		genesisState types.GenesisState
@@ -109,7 +113,7 @@ func (s *GrowGenesisTestSuite) TestInitGenesis() {
 			valid: false,
 		},
 		{
-			name: "address null",
+			name: "percent null",
 			genesisState: types.GenesisState{
 				Params: types.DefaultParams(),
 				GTokenPairList: []types.GTokenPair{
@@ -142,8 +146,6 @@ func (s *GrowGenesisTestSuite) TestInitGenesis() {
 		},
 	}
 	for _, tc := range testCases {
-		s.Setup()
-		s.Commit()
 		s.Run(fmt.Sprintf("Case---%s", tc.name), func() {
 			if tc.valid {
 				s.Require().NotPanics(func() {
@@ -159,8 +161,13 @@ func (s *GrowGenesisTestSuite) TestInitGenesis() {
 					s.Require().Len(tc.genesisState.GTokenPairList, 0)
 				}
 
-				s.Require().Equal(sdk.AccAddress(tc.genesisState.USQReserveAddress), s.app.GrowKeeper.GetUSQReserveAddress(s.ctx))
-				s.Require().Equal(sdk.AccAddress(tc.genesisState.GrowStakingReserveAddress), s.app.GrowKeeper.GetGrowStakingReserveAddress(s.ctx))
+				uf, err := sdk.AccAddressFromBech32(tc.genesisState.USQReserveAddress)
+				s.Require().NoError(err, tc.name)
+				gf, err := sdk.AccAddressFromBech32(tc.genesisState.GrowStakingReserveAddress)
+				s.Require().NoError(err, tc.name)
+
+				s.Require().Equal(uf, s.app.GrowKeeper.GetUSQReserveAddress(s.ctx))
+				s.Require().Equal(gf, s.app.GrowKeeper.GetGrowStakingReserveAddress(s.ctx))
 			}
 		})
 	}
