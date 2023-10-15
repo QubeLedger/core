@@ -20,8 +20,11 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) 
 		k.AppendPair(ctx, pair)
 	}
 
-	k.SetReserveFundAddress(ctx, sdk.AccAddress(genState.ReserveFundAddress))
-	k.SetBurningFundAddress(ctx, sdk.AccAddress(genState.BurningFundAddress))
+	rf, _ := sdk.AccAddressFromBech32(genState.ReserveFundAddress)
+	bf, _ := sdk.AccAddressFromBech32(genState.BurningFundAddress)
+
+	k.SetReserveFundAddress(ctx, rf)
+	k.SetBurningFundAddress(ctx, bf)
 }
 
 func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {

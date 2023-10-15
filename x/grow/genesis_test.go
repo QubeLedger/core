@@ -8,6 +8,7 @@ import (
 	"github.com/QuadrateOrg/core/app"
 	"github.com/QuadrateOrg/core/app/apptesting"
 	quadrateapptest "github.com/QuadrateOrg/core/app/helpers"
+	apptypes "github.com/QuadrateOrg/core/types"
 	"github.com/QuadrateOrg/core/x/grow"
 	"github.com/QuadrateOrg/core/x/grow/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -29,6 +30,7 @@ func (suite *GrowGenesisTestSuite) Commit() {
 }
 
 func (s *GrowGenesisTestSuite) Setup() {
+	apptypes.SetConfig()
 	s.app = quadrateapptest.Setup(s.T(), "qube-1", false, 1)
 }
 

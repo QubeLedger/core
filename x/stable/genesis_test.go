@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"testing"
 
+	apptypes "github.com/QuadrateOrg/core/types"
 	"github.com/QuadrateOrg/core/x/stable"
 	"github.com/QuadrateOrg/core/x/stable/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
@@ -28,8 +29,8 @@ func (suite *StableGenesisTestSuite) Commit() {
 }
 
 func (s *StableGenesisTestSuite) Setup() {
+	apptypes.SetConfig()
 	s.app = quadrateapptest.Setup(s.T(), "qube-1", false, 1)
-
 }
 
 func (s *StableGenesisTestSuite) TestInitGenesis() {
@@ -99,10 +100,14 @@ func (s *StableGenesisTestSuite) TestInitGenesis() {
 			}
 
 			reserveFundAddress := s.app.StableKeeper.GetReserveFundAddress(s.ctx)
-			s.Require().Equal(sdk.AccAddress(tc.genesisState.ReserveFundAddress), reserveFundAddress)
+			rf, err := sdk.AccAddressFromBech32(tc.genesisState.ReserveFundAddress)
+			s.Require().NoError(err, tc.name)
+			s.Require().Equal(rf, reserveFundAddress)
 
 			burningFundBalance := s.app.StableKeeper.GetBurningFundAddress(s.ctx)
-			s.Require().Equal(sdk.AccAddress(tc.genesisState.BurningFundAddress), burningFundBalance)
+			bf, err := sdk.AccAddressFromBech32(tc.genesisState.BurningFundAddress)
+			s.Require().NoError(err, tc.name)
+			s.Require().Equal(bf, burningFundBalance)
 		})
 	}
 

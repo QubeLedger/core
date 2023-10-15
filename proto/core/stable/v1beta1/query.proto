@@ -4,7 +4,6 @@ package core.stable.v1beta1;
 import "gogoproto/gogo.proto";
 import "google/api/annotations.proto";
 import "cosmos/base/query/v1beta1/pagination.proto";
-import "core/stable/v1beta1/params.proto";
 import "core/stable/v1beta1/pair.proto";
 import "cosmos/bank/v1beta1/bank.proto";
 option go_package = "github.com/QuadrateOrg/core/x/stable/types";
@@ -32,7 +31,8 @@ service Query {
 message QueryParamsRequest {}
 
 message QueryParamsResponse {
-  Params params = 1;
+  string ReserveFundAddress = 1;
+	string BurningFundAddress = 2;
 }
 
 message PairByPairIdRequest {
