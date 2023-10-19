@@ -90,14 +90,14 @@ func (k Keeper) PairById(goCtx context.Context, req *types.PairByIdRequest) (*ty
 		return nil, err
 	}
 
-	mintingFee, err := gmd.CalculateMintingFee(backing_ratio)
-	if err != nil {
-		return nil, err
+	mintingFee, _ := gmd.CalculateMintingFee(backing_ratio)
+	if mintingFee.IsNil() {
+		mintingFee = sdk.NewInt(0)
 	}
 
-	burning_fee, err := gmd.CalculateBurningFee(backing_ratio)
-	if err != nil {
-		return nil, err
+	burningFee, _ := gmd.CalculateBurningFee(backing_ratio)
+	if burningFee.IsNil() {
+		burningFee = sdk.NewInt(0)
 	}
 
 	return &types.PairRequestResponse{
@@ -110,7 +110,7 @@ func (k Keeper) PairById(goCtx context.Context, req *types.PairByIdRequest) (*ty
 		MinAmountOut:      pair.MinAmountOut,
 		BackingRatio:      backing_ratio.Uint64(),
 		MintingFee:        mintingFee.Uint64(),
-		BurningFee:        burning_fee.Uint64(),
+		BurningFee:        burningFee.Uint64(),
 	}, nil
 }
 
@@ -136,9 +136,9 @@ func (k Keeper) GetAmountOutByAmountIn(goCtx context.Context, req *types.GetAmou
 	}
 	switch req.Action {
 	case "mint":
-		mintingFee, err := gmd.CalculateMintingFee(backing_ratio)
-		if err != nil {
-			return nil, err
+		mintingFee, _ := gmd.CalculateMintingFee(backing_ratio)
+		if mintingFee.IsNil() {
+			mintingFee = sdk.NewInt(0)
 		}
 		amountOutToMint := k.CalculateAmountToMint(sdk.NewIntFromUint64(req.AmountIn), atomPrice, mintingFee)
 		return &types.GetAmountOutByAmountInResponse{
@@ -147,9 +147,9 @@ func (k Keeper) GetAmountOutByAmountIn(goCtx context.Context, req *types.GetAmou
 			Action:    req.Action,
 		}, nil
 	case "burn":
-		burningFee, err := gmd.CalculateBurningFee(backing_ratio)
-		if err != nil {
-			return nil, err
+		burningFee, _ := gmd.CalculateBurningFee(backing_ratio)
+		if burningFee.IsNil() {
+			burningFee = sdk.NewInt(0)
 		}
 		amountOutToSend := k.CalculateAmountToSend(sdk.NewIntFromUint64(req.AmountIn), atomPrice, burningFee)
 		return &types.GetAmountOutByAmountInResponse{
