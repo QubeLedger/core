@@ -244,7 +244,7 @@ func (s *GrowAbciTestSuite) TestGrowReduceUSQReserve() {
 		s.app.StableKeeper.SetReserveFundAddress(s.ctx, apptesting.CreateRandomAccounts(1)[0])
 	}
 
-	s.OracleAggregateExchangeRateFromNet()
+	s.OracleAggregateExchangeRateFromInput("7")
 
 	s.AddTestCoins(amt, s.GetNormalQStablePair(0).AmountInMetadata.Base)
 	err := s.MintStable(amt, s.GetNormalQStablePair(0))
