@@ -7,6 +7,10 @@ import (
 )
 
 func CalculateBackingRatio(qm sdk.Int, ar sdk.Int, atomPrice sdk.Int) (sdk.Int, error) {
+	if qm.IsZero() && !ar.IsZero() {
+		qm = types.SdkMultiplier
+	}
+
 	if qm.IsZero() && ar.IsZero() {
 		backing_ratio = sdk.NewInt(100)
 	} else {
