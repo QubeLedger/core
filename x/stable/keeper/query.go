@@ -40,7 +40,7 @@ func (k Keeper) PairByPairId(goCtx context.Context, req *types.PairByPairIdReque
 	}
 	qm, ar := pair.Qm, pair.Ar
 
-	backing_ratio, err = CalculateBackingRatio(qm, ar, atomPrice)
+	backing_ratio, err = k.CalculateBackingRatio(qm, ar, atomPrice)
 	if err != nil {
 		return nil, err
 	}
@@ -85,7 +85,7 @@ func (k Keeper) PairById(goCtx context.Context, req *types.PairByIdRequest) (*ty
 	}
 	qm, ar := pair.Qm, pair.Ar
 
-	backing_ratio, err = CalculateBackingRatio(qm, ar, atomPrice)
+	backing_ratio, err = k.CalculateBackingRatio(qm, ar, atomPrice)
 	if err != nil {
 		return nil, err
 	}
@@ -130,7 +130,7 @@ func (k Keeper) GetAmountOutByAmountIn(goCtx context.Context, req *types.GetAmou
 	}
 	qm, ar := pair.Qm, pair.Ar
 
-	backing_ratio, err = CalculateBackingRatio(qm, ar, atomPrice)
+	backing_ratio, err = k.CalculateBackingRatio(qm, ar, atomPrice)
 	if err != nil {
 		return nil, err
 	}

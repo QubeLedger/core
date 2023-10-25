@@ -6,6 +6,7 @@ import (
 	"time"
 
 	apptesting "github.com/QuadrateOrg/core/app/apptesting"
+	"github.com/QuadrateOrg/core/x/stable/gmb"
 	"github.com/QuadrateOrg/core/x/stable/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -86,8 +87,16 @@ func (suite *StableKeeperTestSuite) TestMint() {
 				getTokenAmountFromBank := suite.app.BankKeeper.GetBalance(suite.ctx, suite.Address, tc.pair.AmountOutMetadata.Base)
 				suite.Require().Equal(getTokenAmountFromBank.Amount, sdk.NewInt(int64(tc.getTokenAmount)))
 
+				new_pair, _ := s.app.StableKeeper.GetPairByPairID(s.ctx, tc.pair.PairId)
+
+				backing_ratio, err := s.app.StableKeeper.CalculateBackingRatio(new_pair.Qm, new_pair.Ar, sdk.NewInt(tc.price))
+				suite.Require().NoError(err)
+
+				burningFee, err := gmb.CalculateMintingFee(backing_ratio)
+				suite.Require().NoError(err)
+
 				burningFundBalance := suite.app.BankKeeper.GetBalance(suite.ctx, suite.app.StableKeeper.GetBurningFundAddress(suite.ctx), tc.pair.AmountInMetadata.Base)
-				feeForBurningFund := suite.app.StableKeeper.CalculateMintingFeeForBurningFund(sdk.NewInt(tc.sendTokenAmount), sdk.NewInt(tc.price), sdk.NewInt(3))
+				feeForBurningFund := suite.app.StableKeeper.CalculateMintingFeeForBurningFund(sdk.NewInt(tc.sendTokenAmount), sdk.NewInt(tc.price), burningFee)
 				suite.Require().Equal(burningFundBalance.Amount, feeForBurningFund)
 
 				reserveFundBalance := suite.app.BankKeeper.GetBalance(suite.ctx, suite.app.StableKeeper.GetReserveFundAddress(suite.ctx), tc.pair.AmountInMetadata.Base)
@@ -178,8 +187,16 @@ func (suite *StableKeeperTestSuite) TestBurn() {
 				getTokenAmountFromBank := suite.app.BankKeeper.GetBalance(suite.ctx, suite.Address, tc.pair.AmountInMetadata.Base)
 				suite.Require().Equal(getTokenAmountFromBank.Amount, sdk.NewInt(int64(tc.getTokenAmount)))
 
+				new_pair, _ := s.app.StableKeeper.GetPairByPairID(s.ctx, tc.pair.PairId)
+
+				backing_ratio, err := s.app.StableKeeper.CalculateBackingRatio(new_pair.Qm, new_pair.Ar, sdk.NewInt(tc.price))
+				suite.Require().NoError(err)
+
+				burningFee, err := gmb.CalculateBurningFee(backing_ratio)
+				suite.Require().NoError(err)
+
 				burningFundBalance := suite.app.BankKeeper.GetBalance(suite.ctx, suite.app.StableKeeper.GetBurningFundAddress(suite.ctx), tc.pair.AmountInMetadata.Base)
-				feeForBurningFund := suite.app.StableKeeper.CalculateBurningFeeForBurningFund(sdk.NewInt(tc.sendTokenAmount), sdk.NewInt(tc.price), sdk.NewInt(2))
+				feeForBurningFund := suite.app.StableKeeper.CalculateBurningFeeForBurningFund(sdk.NewInt(tc.sendTokenAmount), sdk.NewInt(tc.price), burningFee)
 				suite.Require().Equal(burningFundBalance.Amount.Sub(BurningFundBalanceBeforeBurn.Amount), feeForBurningFund)
 
 				reserveFundBalance := suite.app.BankKeeper.GetBalance(suite.ctx, suite.app.StableKeeper.GetReserveFundAddress(suite.ctx), tc.pair.AmountInMetadata.Base)
