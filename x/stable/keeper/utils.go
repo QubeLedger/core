@@ -6,7 +6,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-func CalculateBackingRatio(qm sdk.Int, ar sdk.Int, atomPrice sdk.Int) (sdk.Int, error) {
+func (k Keeper) CalculateBackingRatio(qm sdk.Int, ar sdk.Int, atomPrice sdk.Int) (sdk.Int, error) {
 	if qm.IsZero() && !ar.IsZero() {
 		qm = types.SdkMultiplier
 	}
