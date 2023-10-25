@@ -57,6 +57,13 @@ func (s *GrowKeeperTestSuite) Setup() {
 	s.Address = apptesting.CreateRandomAccounts(1)[0]
 	s.LiquidatorAddress = apptesting.CreateRandomAccounts(1)[0]
 	s.ValPubKeys = simapp.CreateTestPubKeys(1)
+	s.app.GrowKeeper.SetGrowStakingReserveAddress(s.ctx, apptesting.CreateRandomAccounts(1)[0])
+	s.app.GrowKeeper.SetUSQReserveAddress(s.ctx, apptesting.CreateRandomAccounts(1)[0])
+	s.app.GrowKeeper.SetGrowYieldReserveAddress(s.ctx, apptesting.CreateRandomAccounts(1)[0])
+
+	s.app.GrowKeeper.SetBorrowRate(s.ctx, sdk.NewInt(15))
+	s.app.StableKeeper.SetBurningFundAddress(s.ctx, apptesting.CreateRandomAccounts(1)[0])
+	s.app.StableKeeper.SetReserveFundAddress(s.ctx, apptesting.CreateRandomAccounts(1)[0])
 }
 
 func TestGrowKeeperTestSuite(t *testing.T) {
@@ -97,8 +104,8 @@ func (s *GrowKeeperTestSuite) GetNormalQStablePair(id uint64) stabletypes.Pair {
 				{Denom: "uatom", Exponent: uint32(0), Aliases: []string{"microatom"}},
 			},
 			Base:    "uatom",
-			Display: "atom",
-			Name:    "ATOM",
+			Display: "ATOM",
+			Name:    "Atom",
 			Symbol:  "ATOM",
 		},
 		AmountOutMetadata: banktypes.Metadata{
@@ -131,7 +138,7 @@ func (s *GrowKeeperTestSuite) GetNormalGTokenPair(id uint64) types.GTokenPair {
 				{Denom: "ugusd", Exponent: uint32(0), Aliases: []string{"microgusd"}},
 			},
 			Base:    "ugusd",
-			Display: "gusd",
+			Display: "gUSQ",
 			Name:    "gUSQ",
 			Symbol:  "gUSQ",
 		},
@@ -154,7 +161,7 @@ func (s *GrowKeeperTestSuite) GetNormalLendAsset(id uint64) types.LendAsset {
 				{Denom: "uosmo", Exponent: uint32(0), Aliases: []string{"microosmo"}},
 			},
 			Base:    "uosmo",
-			Display: "osmo",
+			Display: "OSMO",
 			Name:    "OSMO",
 			Symbol:  "OSMO",
 		},

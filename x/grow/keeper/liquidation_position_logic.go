@@ -11,6 +11,10 @@ func (k Keeper) ExecuteCreateLiqPosition(ctx sdk.Context, msg *types.MsgOpenLiqu
 		return err, ""
 	}
 
+	if k.AddressEmptyCheck(ctx) {
+		return types.ErrReserveAddressEmpty, ""
+	}
+
 	creator, err := sdk.AccAddressFromBech32(msg.Creator)
 	if err != nil {
 		return err, ""
@@ -49,6 +53,10 @@ func (k Keeper) ExecuteCloseLiqPosition(ctx sdk.Context, msg *types.MsgCloseLiqu
 	creator, err := sdk.AccAddressFromBech32(msg.Creator)
 	if err != nil {
 		return err, sdk.Coin{}
+	}
+
+	if k.AddressEmptyCheck(ctx) {
+		return types.ErrReserveAddressEmpty, sdk.Coin{}
 	}
 
 	liqPosition, found := k.GetLiquidatorPositionByLiquidatorPositionId(ctx, msg.LiquidatorPositionId)

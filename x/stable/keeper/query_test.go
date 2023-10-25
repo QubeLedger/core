@@ -160,3 +160,40 @@ func (suite *StableKeeperTestSuite) TestGetAmountOutByAmountIn() {
 		})
 	}
 }
+
+func (suite *StableKeeperTestSuite) TestAllPairs() {
+	testCases := []struct {
+		name   string
+		pair   types.Pair
+		amount uint64
+	}{
+		{
+			"ok",
+			s.GetNormalPair(0),
+			1,
+		},
+		{
+			"ok",
+			s.GetNormalPair(0),
+			2,
+		},
+	}
+
+	for _, tc := range testCases {
+		suite.Run(fmt.Sprintf("Case---%s", tc.name), func() {
+			suite.Setup()
+			suite.Commit()
+			ctx := sdk.WrapSDKContext(suite.ctx)
+			for i := 0; i < int(tc.amount); i++ {
+				suite.app.StableKeeper.AppendPair(suite.ctx, suite.GetNormalPair(0))
+			}
+
+			req := types.AllPairsRequest{}
+
+			res, err := suite.app.StableKeeper.AllPairs(ctx, &req)
+			suite.NoError(err)
+
+			s.Require().Equal(len(res.Pairs), int(tc.amount))
+		})
+	}
+}

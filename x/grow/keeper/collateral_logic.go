@@ -11,6 +11,10 @@ func (k Keeper) ExecuteDepositCollateral(ctx sdk.Context, msg *types.MsgDepositC
 		return err, ""
 	}
 
+	if k.AddressEmptyCheck(ctx) {
+		return types.ErrReserveAddressEmpty, ""
+	}
+
 	depositor, err := sdk.AccAddressFromBech32(msg.Depositor)
 	if err != nil {
 		return err, ""
@@ -49,6 +53,10 @@ func (k Keeper) ExecuteWithdrawalCollateral(ctx sdk.Context, msg *types.MsgWithd
 	depositor, err := sdk.AccAddressFromBech32(msg.Depositor)
 	if err != nil {
 		return err, sdk.Coin{}
+	}
+
+	if k.AddressEmptyCheck(ctx) {
+		return types.ErrReserveAddressEmpty, sdk.Coin{}
 	}
 
 	denom := msg.Denom

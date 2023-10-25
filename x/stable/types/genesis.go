@@ -14,8 +14,8 @@ func DefaultGenesis() *GenesisState {
 		Params:             DefaultParams(),
 		PortId:             PortID,
 		Pairs:              []Pair{},
-		ReserveFundAddress: "",
-		BurningFundAddress: "",
+		ReserveFundAddress: "qube13zq340zzjgua9h98pltzwv0ga5r0kkn0ryjz4v",
+		BurningFundAddress: "qube13zq340zzjgua9h98pltzwv0ga5r0kkn0ryjz4v",
 	}
 }
 

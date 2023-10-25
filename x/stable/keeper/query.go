@@ -17,9 +17,11 @@ func (k Keeper) Params(goCtx context.Context, req *types.QueryParamsRequest) (*t
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	params := k.GetParams(ctx)
 
-	return &types.QueryParamsResponse{Params: &params}, nil
+	return &types.QueryParamsResponse{
+		ReserveFundAddress: k.GetReserveFundAddress(ctx).String(),
+		BurningFundAddress: k.GetBurningFundAddress(ctx).String(),
+	}, nil
 }
 
 func (k Keeper) PairByPairId(goCtx context.Context, req *types.PairByPairIdRequest) (*types.PairRequestResponse, error) {
@@ -43,14 +45,14 @@ func (k Keeper) PairByPairId(goCtx context.Context, req *types.PairByPairIdReque
 		return nil, err
 	}
 
-	mintingFee, err := gmd.CalculateMintingFee(backing_ratio)
-	if err != nil {
-		return nil, err
+	mintingFee, _ := gmd.CalculateMintingFee(backing_ratio)
+	if mintingFee.IsNil() {
+		mintingFee = sdk.NewInt(9999)
 	}
 
-	burning_fee, err := gmd.CalculateBurningFee(backing_ratio)
-	if err != nil {
-		return nil, err
+	burningFee, _ := gmd.CalculateBurningFee(backing_ratio)
+	if burningFee.IsNil() {
+		burningFee = sdk.NewInt(9999)
 	}
 
 	return &types.PairRequestResponse{
@@ -63,7 +65,7 @@ func (k Keeper) PairByPairId(goCtx context.Context, req *types.PairByPairIdReque
 		MinAmountOut:      pair.MinAmountOut,
 		BackingRatio:      backing_ratio.Uint64(),
 		MintingFee:        mintingFee.Uint64(),
-		BurningFee:        burning_fee.Uint64(),
+		BurningFee:        burningFee.Uint64(),
 	}, nil
 }
 
@@ -88,14 +90,14 @@ func (k Keeper) PairById(goCtx context.Context, req *types.PairByIdRequest) (*ty
 		return nil, err
 	}
 
-	mintingFee, err := gmd.CalculateMintingFee(backing_ratio)
-	if err != nil {
-		return nil, err
+	mintingFee, _ := gmd.CalculateMintingFee(backing_ratio)
+	if mintingFee.IsNil() {
+		mintingFee = sdk.NewInt(9999)
 	}
 
-	burning_fee, err := gmd.CalculateBurningFee(backing_ratio)
-	if err != nil {
-		return nil, err
+	burningFee, _ := gmd.CalculateBurningFee(backing_ratio)
+	if burningFee.IsNil() {
+		burningFee = sdk.NewInt(9999)
 	}
 
 	return &types.PairRequestResponse{
@@ -108,7 +110,7 @@ func (k Keeper) PairById(goCtx context.Context, req *types.PairByIdRequest) (*ty
 		MinAmountOut:      pair.MinAmountOut,
 		BackingRatio:      backing_ratio.Uint64(),
 		MintingFee:        mintingFee.Uint64(),
-		BurningFee:        burning_fee.Uint64(),
+		BurningFee:        burningFee.Uint64(),
 	}, nil
 }
 
@@ -158,4 +160,22 @@ func (k Keeper) GetAmountOutByAmountIn(goCtx context.Context, req *types.GetAmou
 	default:
 		return nil, status.Error(codes.NotFound, "action not found")
 	}
+}
+
+func (k Keeper) AllPairs(goCtx context.Context, req *types.AllPairsRequest) (*types.AllPairsResponse, error) {
+	if req == nil {
+		return nil, status.Error(codes.InvalidArgument, "invalid request")
+	}
+	ctx := sdk.UnwrapSDKContext(goCtx)
+	ps := k.GetAllPair(ctx)
+
+	pairs := []*types.Pair{}
+
+	for _, pair := range ps {
+		pairs = append(pairs, &pair) // #nosec
+	}
+
+	return &types.AllPairsResponse{
+		Pairs: pairs,
+	}, nil
 }

@@ -28,8 +28,13 @@ func (s *GrowAbciTestSuite) TestGrowPriceChangeWhenBlockEnd() {
 		s.app.GrowKeeper.AppendPair(s.ctx, s.GetNormalGTokenPair(0))
 		s.app.GrowKeeper.SetGrowStakingReserveAddress(s.ctx, apptesting.CreateRandomAccounts(1)[0])
 		s.app.GrowKeeper.SetUSQReserveAddress(s.ctx, apptesting.CreateRandomAccounts(1)[0])
+		s.app.GrowKeeper.SetGrowYieldReserveAddress(s.ctx, apptesting.CreateRandomAccounts(1)[0])
 		s.app.GrowKeeper.SetRealRate(s.ctx, sdk.NewInt(15))
 		s.app.GrowKeeper.SetLastTimeUpdateReserve(s.ctx, sdk.NewInt(s.ctx.BlockTime().Unix()))
+
+		s.app.GrowKeeper.SetBorrowRate(s.ctx, sdk.NewInt(15))
+		s.app.StableKeeper.SetBurningFundAddress(s.ctx, apptesting.CreateRandomAccounts(1)[0])
+		s.app.StableKeeper.SetReserveFundAddress(s.ctx, apptesting.CreateRandomAccounts(1)[0])
 	}
 
 	s.OracleAggregateExchangeRateFromNet()
@@ -92,8 +97,13 @@ func (s *GrowAbciTestSuite) TestGrowReserveMath() {
 		s.app.GrowKeeper.AppendPair(s.ctx, s.GetNormalGTokenPair(0))
 		s.app.GrowKeeper.SetGrowStakingReserveAddress(s.ctx, apptesting.CreateRandomAccounts(1)[0])
 		s.app.GrowKeeper.SetUSQReserveAddress(s.ctx, apptesting.CreateRandomAccounts(1)[0])
+		s.app.GrowKeeper.SetGrowYieldReserveAddress(s.ctx, apptesting.CreateRandomAccounts(1)[0])
 		s.app.GrowKeeper.SetRealRate(s.ctx, sdk.NewInt(15))
 		s.app.GrowKeeper.SetLastTimeUpdateReserve(s.ctx, sdk.NewInt(s.ctx.BlockTime().Unix()))
+
+		s.app.GrowKeeper.SetBorrowRate(s.ctx, sdk.NewInt(15))
+		s.app.StableKeeper.SetBurningFundAddress(s.ctx, apptesting.CreateRandomAccounts(1)[0])
+		s.app.StableKeeper.SetReserveFundAddress(s.ctx, apptesting.CreateRandomAccounts(1)[0])
 	}
 
 	s.OracleAggregateExchangeRateFromNet()
@@ -120,7 +130,7 @@ func (s *GrowAbciTestSuite) TestGrowReserveMath() {
 
 	s.OracleAggregateExchangeRateFromNet()
 
-	atomPrice, _ := s.app.OracleKeeper.GetExchangeRate(s.ctx, updatedqStablePair.AmountInMetadata.Base)
+	atomPrice, _ := s.app.OracleKeeper.GetExchangeRate(s.ctx, updatedqStablePair.AmountInMetadata.Display)
 	br, _ := gmb.CalculateBackingRatio(atomPrice.MulInt64(10000).RoundInt(), updatedqStablePair.Ar, updatedqStablePair.Qm)
 
 	qm := updatedqStablePair.Qm
@@ -163,8 +173,13 @@ func (s *GrowAbciTestSuite) TestGrowIncreaseUSQReserve() {
 		s.app.GrowKeeper.AppendPair(s.ctx, s.GetNormalGTokenPair(0))
 		s.app.GrowKeeper.SetGrowStakingReserveAddress(s.ctx, apptesting.CreateRandomAccounts(1)[0])
 		s.app.GrowKeeper.SetUSQReserveAddress(s.ctx, apptesting.CreateRandomAccounts(1)[0])
+		s.app.GrowKeeper.SetGrowYieldReserveAddress(s.ctx, apptesting.CreateRandomAccounts(1)[0])
 		s.app.GrowKeeper.SetRealRate(s.ctx, sdk.NewInt(15))
 		s.app.GrowKeeper.SetLastTimeUpdateReserve(s.ctx, sdk.NewInt(s.ctx.BlockTime().Unix()))
+
+		s.app.GrowKeeper.SetBorrowRate(s.ctx, sdk.NewInt(15))
+		s.app.StableKeeper.SetBurningFundAddress(s.ctx, apptesting.CreateRandomAccounts(1)[0])
+		s.app.StableKeeper.SetReserveFundAddress(s.ctx, apptesting.CreateRandomAccounts(1)[0])
 	}
 
 	s.OracleAggregateExchangeRateFromNet()
@@ -219,12 +234,17 @@ func (s *GrowAbciTestSuite) TestGrowReduceUSQReserve() {
 		s.app.GrowKeeper.AppendPair(s.ctx, s.GetNormalGTokenPair(0))
 		s.app.GrowKeeper.SetGrowStakingReserveAddress(s.ctx, apptesting.CreateRandomAccounts(1)[0])
 		s.app.GrowKeeper.SetUSQReserveAddress(s.ctx, apptesting.CreateRandomAccounts(1)[0])
+		s.app.GrowKeeper.SetGrowYieldReserveAddress(s.ctx, apptesting.CreateRandomAccounts(1)[0])
 		s.app.GrowKeeper.SetRealRate(s.ctx, sdk.NewInt(15))
 		s.app.GrowKeeper.SetLastTimeUpdateReserve(s.ctx, sdk.NewInt(s.ctx.BlockTime().Unix()))
 		s.AddTestCoinsToCustomAccount(sdk.NewInt(amt), s.GetNormalQStablePair(0).AmountOutMetadata.Base, s.app.GrowKeeper.GetUSQReserveAddress(s.ctx))
+
+		s.app.GrowKeeper.SetBorrowRate(s.ctx, sdk.NewInt(15))
+		s.app.StableKeeper.SetBurningFundAddress(s.ctx, apptesting.CreateRandomAccounts(1)[0])
+		s.app.StableKeeper.SetReserveFundAddress(s.ctx, apptesting.CreateRandomAccounts(1)[0])
 	}
 
-	s.OracleAggregateExchangeRateFromNet()
+	s.OracleAggregateExchangeRateFromInput("7")
 
 	s.AddTestCoins(amt, s.GetNormalQStablePair(0).AmountInMetadata.Base)
 	err := s.MintStable(amt, s.GetNormalQStablePair(0))

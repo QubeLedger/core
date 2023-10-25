@@ -4,7 +4,7 @@ package core.stable.v1beta1;
 import "gogoproto/gogo.proto";
 import "google/api/annotations.proto";
 import "cosmos/base/query/v1beta1/pagination.proto";
-import "core/stable/params.proto";
+import "core/stable/v1beta1/pair.proto";
 import "cosmos/bank/v1beta1/bank.proto";
 option go_package = "github.com/QuadrateOrg/core/x/stable/types";
 
@@ -23,12 +23,16 @@ service Query {
   rpc GetAmountOutByAmountIn(GetAmountOutByAmountInRequest) returns (GetAmountOutByAmountInResponse) {
     option (google.api.http).get = "/core/stable/v1beta1/getAmountOutByAmountIn/{pairId}/{amountIn}/{action}";
   }
+  rpc AllPairs(AllPairsRequest) returns (AllPairsResponse) {
+    option (google.api.http).get = "/core/stable/v1beta1/pairs";
+  }
 }
 
 message QueryParamsRequest {}
 
 message QueryParamsResponse {
-  Params params = 1;
+  string ReserveFundAddress = 1;
+	string BurningFundAddress = 2;
 }
 
 message PairByPairIdRequest {
@@ -76,4 +80,10 @@ message AmountOutResponse {
   string pairId = 1;
   uint64 amountOut = 2;
   string denom = 3;
+}
+
+message AllPairsRequest {}
+
+message AllPairsResponse {
+  repeated Pair pairs = 1;
 }

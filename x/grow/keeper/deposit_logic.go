@@ -13,6 +13,10 @@ func (k Keeper) ExecuteDeposit(ctx sdk.Context, msg *types.MsgDeposit, gTokenPai
 		return err, sdk.Coin{}
 	}
 
+	if k.AddressEmptyCheck(ctx) {
+		return types.ErrReserveAddressEmpty, sdk.Coin{}
+	}
+
 	sender, err := sdk.AccAddressFromBech32(msg.Creator)
 	if err != nil {
 		return err, sdk.Coin{}
@@ -67,6 +71,10 @@ func (k Keeper) ExecuteWithdrawal(ctx sdk.Context, msg *types.MsgWithdrawal, gTo
 	amountInCoins, err := sdk.ParseCoinsNormalized(msg.AmountIn)
 	if err != nil {
 		return err, sdk.Coin{}
+	}
+
+	if k.AddressEmptyCheck(ctx) {
+		return types.ErrReserveAddressEmpty, sdk.Coin{}
 	}
 
 	sender, err := sdk.AccAddressFromBech32(msg.Creator)
