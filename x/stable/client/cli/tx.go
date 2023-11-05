@@ -203,9 +203,9 @@ func NewRegisterPairProposalCmd() *cobra.Command {
 
 func NewRegisterChangeBurningFundAddressProposalCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "change-stability-fund [address]",
+		Use:   "change-burning-fund [address]",
 		Args:  cobra.ExactArgs(1),
-		Short: "Submit a change stability fund address proposal",
+		Short: "Submit a change burning fund address proposal",
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
