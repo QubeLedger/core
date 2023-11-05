@@ -16,6 +16,8 @@ func NewStableProposalHandler(k *keeper.Keeper) govtypes.Handler {
 			return handleRegisterPairProposal(ctx, k, c)
 		case *types.RegisterChangeBurningFundAddressProposal:
 			return handleRegisterChangeBurningFundAddressProposal(ctx, k, c)
+		case *types.RegisterChangeReserveFundAddressProposal:
+			return handleRegisterChangeReserveFundAddressProposal(ctx, k, c)
 		default:
 			return sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "unrecognized %s proposal content type: %T", types.ModuleName, c)
 		}
@@ -52,6 +54,23 @@ func handleRegisterChangeBurningFundAddressProposal(ctx sdk.Context, k *keeper.K
 	ctx.EventManager().EmitEvent(
 		sdk.NewEvent(
 			types.EventRegisterChangeBurningFundAddressProposal,
+		),
+	)
+	return nil
+}
+
+func handleRegisterChangeReserveFundAddressProposal(ctx sdk.Context, k *keeper.Keeper, p *types.RegisterChangeReserveFundAddressProposal) error {
+	address, err := sdk.AccAddressFromBech32(p.Address)
+	if err != nil {
+		return err
+	}
+	err = k.ChangeReserveFundAddress(ctx, address)
+	if err != nil {
+		return err
+	}
+	ctx.EventManager().EmitEvent(
+		sdk.NewEvent(
+			types.EventRegisterChangeReserveFundAddressProposal,
 		),
 	)
 	return nil
