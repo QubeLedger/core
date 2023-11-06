@@ -118,7 +118,8 @@ import (
 	tokenfactorykeeper "github.com/QuadrateOrg/core/x/tokenfactory/keeper"
 	tokenfactorytypes "github.com/QuadrateOrg/core/x/tokenfactory/types"
 
-	etupgrade "github.com/QuadrateOrg/core/app/upgrades"
+	tfupgrades "github.com/QuadrateOrg/core/app/upgrades/TF"
+	v1 "github.com/QuadrateOrg/core/app/upgrades/v1"
 
 	oraclemodule "github.com/QuadrateOrg/core/x/oracle"
 	oraclemodulekeeper "github.com/QuadrateOrg/core/x/oracle/keeper"
@@ -963,11 +964,19 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 
 func (app *QuadrateApp) setUpgradeHandlers() {
 	app.UpgradeKeeper.SetUpgradeHandler(
-		etupgrade.UpgradeName,
-		etupgrade.CreateUpgradeHandler(
+		tfupgrades.UpgradeName,
+		tfupgrades.CreateUpgradeHandler(
 			app.mm,
 			app.configurator,
 			*app.TokenFactoryKeeper,
+		),
+	)
+
+	app.UpgradeKeeper.SetUpgradeHandler(
+		v1.UpgradeName,
+		v1.CreateUpgradeHandler(
+			app.mm,
+			app.configurator,
 		),
 	)
 
@@ -984,6 +993,11 @@ func (app *QuadrateApp) setUpgradeHandlers() {
 	}
 
 	var storeUpgrades *storetypes.StoreUpgrades
+
+	switch upgradeInfo.Name {
+	case tfupgrades.UpgradeName:
+	case v1.UpgradeName:
+	}
 
 	if storeUpgrades != nil {
 		// configure store loader that checks if version == upgradeHeight and applies store upgrades
