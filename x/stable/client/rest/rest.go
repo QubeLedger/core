@@ -33,6 +33,14 @@ type RegisterChangeBurningFundAddressProposal struct {
 	Address     string       `json:"address" yaml:"address"`
 }
 
+type RegisterChangeReserveFundAddressProposal struct {
+	BaseReq     rest.BaseReq `json:"base_req" yaml:"base_req"`
+	Title       string       `json:"title" yaml:"title"`
+	Description string       `json:"description" yaml:"description"`
+	Deposit     sdk.Coins    `json:"deposit" yaml:"deposit"`
+	Address     string       `json:"address" yaml:"address"`
+}
+
 func RegisterPairRESTHandler(clientCtx client.Context) govrest.ProposalRESTHandler {
 	return govrest.ProposalRESTHandler{
 		SubRoute: types.ModuleName,
@@ -120,7 +128,7 @@ func RegisterChangeReserveFundAddressProposalRESTHandler(clientCtx client.Contex
 
 func newRegisterChangeReserveFundAddressProposal(clientCtx client.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var req RegisterChangeBurningFundAddressProposal
+		var req RegisterChangeReserveFundAddressProposal
 
 		if !rest.ReadRESTReq(w, r, clientCtx.LegacyAmino, &req) {
 			return
