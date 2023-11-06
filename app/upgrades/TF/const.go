@@ -1,4 +1,4 @@
-package upgrades
+package TF
 
 const (
 	UpgradeName = "TF"

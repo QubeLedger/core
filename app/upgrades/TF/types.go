@@ -1,4 +1,4 @@
-package upgrades
+package TF
 
 import (
 	tokenfactorytypes "github.com/QuadrateOrg/core/x/tokenfactory/types"
