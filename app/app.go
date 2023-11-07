@@ -120,6 +120,7 @@ import (
 
 	tfupgrades "github.com/QuadrateOrg/core/app/upgrades/TF"
 	v1 "github.com/QuadrateOrg/core/app/upgrades/v1"
+	v1rc0 "github.com/QuadrateOrg/core/app/upgrades/v1rc0"
 
 	oraclemodule "github.com/QuadrateOrg/core/x/oracle"
 	oraclemodulekeeper "github.com/QuadrateOrg/core/x/oracle/keeper"
@@ -980,6 +981,14 @@ func (app *QuadrateApp) setUpgradeHandlers() {
 		),
 	)
 
+	app.UpgradeKeeper.SetUpgradeHandler(
+		v1rc0.UpgradeName,
+		v1rc0.CreateUpgradeHandler(
+			app.mm,
+			app.configurator,
+		),
+	)
+
 	// When a planned update height is reached, the old binary will panic
 	// writing on disk the height and name of the update that triggered it
 	// This will read that value, and execute the preparations for the upgrade.
@@ -997,6 +1006,7 @@ func (app *QuadrateApp) setUpgradeHandlers() {
 	switch upgradeInfo.Name {
 	case tfupgrades.UpgradeName:
 	case v1.UpgradeName:
+	case v1rc0.UpgradeName:
 	}
 
 	if storeUpgrades != nil {
