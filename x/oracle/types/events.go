@@ -18,3 +18,7 @@ const (
 
 	AttributeValueCategory = ModuleName
 )
+
+const (
+	EventRegisterAddNewDenomProposal = "register_add_new_denom_proposal"
+)

@@ -123,6 +123,7 @@ import (
 	v1rc0 "github.com/QuadrateOrg/core/app/upgrades/v1rc0"
 
 	oraclemodule "github.com/QuadrateOrg/core/x/oracle"
+	oracleclient "github.com/QuadrateOrg/core/x/oracle/client"
 	oraclemodulekeeper "github.com/QuadrateOrg/core/x/oracle/keeper"
 	oraclemoduletypes "github.com/QuadrateOrg/core/x/oracle/types"
 
@@ -195,6 +196,7 @@ func getGovProposalHandlers() []govclient.ProposalHandler {
 		growclient.RegisterGTokenPairProposalHandler,
 		growclient.RegisterLendAssetProposalHandler,
 		growclient.RegisterActivateGrowModuleProposalHandler,
+		oracleclient.RegisterAddNewDenomProposal,
 	)
 
 	return govProposalHandlers
