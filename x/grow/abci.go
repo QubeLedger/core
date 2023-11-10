@@ -14,6 +14,12 @@ import (
 /* #nosec */
 func EndBlocker(ctx sdk.Context, k keeper.Keeper) error {
 	defer telemetry.ModuleMeasureSince(types.ModuleName, time.Now(), telemetry.MetricKeyEndBlocker)
+
+	err := k.CheckGrowStatus(ctx)
+	if err != nil {
+		return types.ErrGrowNotActivated
+	}
+
 	allGTokenPair := k.GetAllPair(ctx)
 	for _, gp := range allGTokenPair {
 		action, rawValue, err := k.CheckYieldRate(ctx, gp)
