@@ -23,7 +23,7 @@ func NewRegisterLendAssetProposalCmd() *cobra.Command {
 		Args:  cobra.ExactArgs(1),
 		Short: "Submit a register lend asset proposal",
 		Long:  `Submit a proposal for couple's registration to x/grow along with the down payment. The offer data should be submitted as a JSON file.`,
-		Example: fmt.Sprintf(`qubed tx gov submit-proposal register-pair metadata.json --from=<key_or_address>
+		Example: fmt.Sprintf(`qubed tx gov submit-proposal register-lend-asset metadata.json --from=<key_or_address>
 
 		Where metadata.json contains (example):
 		{
@@ -109,7 +109,7 @@ func NewRegisterGTokenPairProposalCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "register-gtoken-pair [metadata]",
 		Args:  cobra.ExactArgs(1),
-		Short: "Submit a register lend asset proposal",
+		Short: "Submit a register gToken pair proposal",
 		Long:  `Submit a proposal for couple's registration to x/grow along with the down payment. The offer data should be submitted as a JSON file.`,
 		Example: fmt.Sprintf(`qubed tx gov submit-proposal register-pair metadata.json --from=<key_or_address>
 
@@ -133,7 +133,7 @@ func NewRegisterGTokenPairProposalCmd() *cobra.Command {
 				"name": "Atom",
 				"symbol": "ATOM"
 			},
-			"qStablePairId": "ATOM",
+			"qStablePairId": "",
 			"minAmountIn": "20ibc/<HASH>",
 			"minAmountOut": "2uusd",
 		}`,

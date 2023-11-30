@@ -109,32 +109,11 @@ func (rtbp *RegisterLendAssetProposal) ValidateBasic() error {
 		if err := ibctransfertypes.ValidateIBCDenom(rtbp.AssetMetadata.Base); err != nil {
 			return err
 		}
-
-		if err := validateIBCVoucherMetadata(rtbp.AssetMetadata); err != nil {
-			return err
-		}
 	}
 	{
 		if len(rtbp.OracleAssetId) == 0 {
 			return ErrInvalidLength
 		}
-	}
-
-	return nil
-}
-
-func validateIBCVoucherMetadata(metadata banktypes.Metadata) error {
-	// Check ibc/ denom
-	denomSplit := strings.SplitN(metadata.Base, "/", 2)
-
-	if denomSplit[0] == metadata.Base && strings.TrimSpace(metadata.Base) != "" {
-		// Not IBC
-		return nil
-	}
-
-	if len(denomSplit) != 2 || denomSplit[0] != ibctransfertypes.DenomPrefix {
-		// NOTE: should be unaccessible (covered on ValidateIBCDenom)
-		return fmt.Errorf("invalid metadata. %s denomination should be prefixed with the format 'ibc/", metadata.Base)
 	}
 
 	return nil
@@ -179,10 +158,6 @@ func (rtbp *RegisterGTokenPairProposal) ValidateBasic() error {
 			return fmt.Errorf("invalid metadata display denom: %w", err)
 		}
 		if err := ibctransfertypes.ValidateIBCDenom(rtbp.GTokenMetadata.Base); err != nil {
-			return err
-		}
-
-		if err := validateIBCVoucherMetadata(rtbp.GTokenMetadata); err != nil {
 			return err
 		}
 	}

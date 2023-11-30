@@ -5,6 +5,7 @@ import (
 	cdctypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/msgservice"
+	gov "github.com/cosmos/cosmos-sdk/x/gov/types"
 )
 
 func RegisterCodec(cdc *codec.LegacyAmino) {
@@ -43,6 +44,19 @@ func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
 	)
 	registry.RegisterImplementations((*sdk.Msg)(nil),
 		&MsgCloseLiquidationPosition{},
+	)
+	registry.RegisterImplementations(
+		(*gov.Content)(nil),
+		&RegisterLendAssetProposal{},
+		&RegisterGTokenPairProposal{},
+		&RegisterChangeGrowYieldReserveAddressProposal{},
+		&RegisterChangeUSQReserveAddressProposal{},
+		&RegisterChangeGrowStakingReserveAddressProposal{},
+		&RegisterChangeRealRateProposal{},
+		&RegisterChangeBorrowRateProposal{},
+		&RegisterActivateGrowModuleProposal{},
+		&RegisterRemoveLendAssetProposal{},
+		&RegisterRemoveGTokenPairProposal{},
 	)
 
 	msgservice.RegisterMsgServiceDesc(registry, &_Msg_serviceDesc)
