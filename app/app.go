@@ -119,8 +119,9 @@ import (
 	tokenfactorytypes "github.com/QuadrateOrg/core/x/tokenfactory/types"
 
 	tfupgrades "github.com/QuadrateOrg/core/app/upgrades/TF"
-	v1 "github.com/QuadrateOrg/core/app/upgrades/v1"
-	v1rc0 "github.com/QuadrateOrg/core/app/upgrades/v1rc0"
+	v4 "github.com/QuadrateOrg/core/app/upgrades/v1/v4"
+	v4rc0 "github.com/QuadrateOrg/core/app/upgrades/v1/v4rc0"
+	v5 "github.com/QuadrateOrg/core/app/upgrades/v1/v5"
 
 	oraclemodule "github.com/QuadrateOrg/core/x/oracle"
 	oracleclient "github.com/QuadrateOrg/core/x/oracle/client"
@@ -976,16 +977,24 @@ func (app *QuadrateApp) setUpgradeHandlers() {
 	)
 
 	app.UpgradeKeeper.SetUpgradeHandler(
-		v1.UpgradeName,
-		v1.CreateUpgradeHandler(
+		v4.UpgradeName,
+		v4.CreateUpgradeHandler(
 			app.mm,
 			app.configurator,
 		),
 	)
 
 	app.UpgradeKeeper.SetUpgradeHandler(
-		v1rc0.UpgradeName,
-		v1rc0.CreateUpgradeHandler(
+		v4rc0.UpgradeName,
+		v4rc0.CreateUpgradeHandler(
+			app.mm,
+			app.configurator,
+		),
+	)
+
+	app.UpgradeKeeper.SetUpgradeHandler(
+		v5.UpgradeName,
+		v5.CreateUpgradeHandler(
 			app.mm,
 			app.configurator,
 		),
@@ -1007,8 +1016,9 @@ func (app *QuadrateApp) setUpgradeHandlers() {
 
 	switch upgradeInfo.Name {
 	case tfupgrades.UpgradeName:
-	case v1.UpgradeName:
-	case v1rc0.UpgradeName:
+	case v4.UpgradeName:
+	case v4rc0.UpgradeName:
+	case v5.UpgradeName:
 	}
 
 	if storeUpgrades != nil {
