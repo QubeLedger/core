@@ -40,7 +40,7 @@ var (
 
 func init() {
 	govtypes.RegisterProposalType(ProposalTypeRegisterLendAssetProposal)
-	govtypes.RegisterProposalTypeCodec(&RegisterLendAssetProposal{}, "grow/RegisterPairProposal")
+	govtypes.RegisterProposalTypeCodec(&RegisterLendAssetProposal{}, "grow/RegisterLendAssetProposal")
 
 	govtypes.RegisterProposalType(ProposalTypeRegisterGTokenPairProposal)
 	govtypes.RegisterProposalTypeCodec(&RegisterGTokenPairProposal{}, "grow/RegisterGTokenPairProposal")

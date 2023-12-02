@@ -9,7 +9,7 @@ import (
 	"github.com/QuadrateOrg/core/x/grow/types"
 )
 
-func NewStableProposalHandler(k *keeper.Keeper) govtypes.Handler {
+func NewGrowProposalHandler(k *keeper.Keeper) govtypes.Handler {
 	return func(ctx sdk.Context, content govtypes.Content) error {
 		switch c := content.(type) {
 		case *types.RegisterLendAssetProposal:
