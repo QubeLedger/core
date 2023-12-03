@@ -528,7 +528,9 @@ func NewQuadrateApp(
 		AddRoute(upgradetypes.RouterKey, upgrade.NewSoftwareUpgradeProposalHandler(app.UpgradeKeeper)).
 		AddRoute(ibcclienttypes.RouterKey, ibcclient.NewClientProposalHandler(app.IBCKeeper.ClientKeeper)).
 		AddRoute(stablemoduletypes.RouterKey, stablemodule.NewStableProposalHandler(&app.StableKeeper)).
-		AddRoute(growmoduletypes.RouterKey, growmodule.NewGrowProposalHandler(&app.GrowKeeper))
+		AddRoute(growmoduletypes.RouterKey, growmodule.NewGrowProposalHandler(&app.GrowKeeper)).
+		AddRoute(oraclemoduletypes.RouterKey, oraclemodule.NewOracleProposalHandler(&app.OracleKeeper))
+
 	wasmDir := filepath.Join(homePath, "data")
 	wasmConfig, err := wasm.ReadWasmConfig(appOpts)
 	if err != nil {
