@@ -240,3 +240,48 @@ func (k Keeper) YieldPercentage(goCtx context.Context, req *types.QueryYieldPerc
 		Difference:   value.Int64(),
 	}, nil
 }
+
+func (k Keeper) PairByDenomId(goCtx context.Context, req *types.PairByDenomIdRequest) (*types.PairByDenomIdResponse, error) {
+	if req == nil {
+		return nil, status.Error(codes.InvalidArgument, "invalid request")
+	}
+	ctx := sdk.UnwrapSDKContext(goCtx)
+	pair, found := k.GetPairByDenomID(ctx, req.DenomId)
+	if !found {
+		return nil, status.Error(codes.NotFound, "not found")
+	}
+
+	return &types.PairByDenomIdResponse{
+		DenomID:                     pair.DenomID,
+		QStablePairId:               pair.QStablePairId,
+		GTokenMetadata:              pair.GTokenMetadata,
+		MinAmountIn:                 pair.MinAmountIn,
+		MinAmountOut:                pair.MinAmountOut,
+		GTokenLastPrice:             pair.GTokenLastPrice,
+		GTokenLatestPriceUpdateTime: pair.GTokenLatestPriceUpdateTime,
+		St:                          pair.St,
+	}, nil
+}
+
+func (k Keeper) AllPairs(goCtx context.Context, req *types.AllPairsRequest) (*types.AllPairsResponse, error) {
+	if req == nil {
+		return nil, status.Error(codes.InvalidArgument, "invalid request")
+	}
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	allPair := k.GetAllPair(ctx)
+
+	if len(allPair) == 0 {
+		return nil, status.Error(codes.NotFound, "not found")
+	}
+
+	pairs := []*types.GTokenPair{}
+
+	for _, pair := range allPair {
+		pairs = append(pairs, &pair) // #nosec
+	}
+
+	return &types.AllPairsResponse{
+		Pairs: pairs,
+	}, nil
+}

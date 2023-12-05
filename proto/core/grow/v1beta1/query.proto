@@ -9,6 +9,7 @@ import "core/grow/v1beta1/params.proto";
 import "core/grow/v1beta1/loan.proto";
 import "core/grow/v1beta1/lend.proto";
 import "core/grow/v1beta1/liquidation.proto";
+import "core/grow/v1beta1/pair.proto";
 import "cosmos/bank/v1beta1/bank.proto";
 
 option go_package = "github.com/QuadrateOrg/core/x/grow/types";
@@ -56,6 +57,14 @@ service Query {
 
   rpc YieldPercentage(QueryYieldPercentageRequest) returns (QueryYieldPercentageResponse) {
     option (google.api.http).get = "/core/grow/v1beta1/yield/{id}";
+  }
+
+  rpc PairByDenomId(PairByDenomIdRequest) returns (PairByDenomIdResponse) {
+    option (google.api.http).get = "/core/grow/v1beta1/pair/{denomId}";
+  }
+
+  rpc AllPairs(AllPairsRequest) returns (AllPairsResponse) {
+    option (google.api.http).get = "/core/grow/v1beta1/pairs";
   }
 }
 
@@ -161,4 +170,35 @@ message QueryYieldPercentageResponse {
   int64 GrowYield = 4;
   string ActualAction = 5;
   int64 Difference = 6;
+}
+
+/* PairByDenomId */
+message PairByDenomIdRequest {
+  string denomId = 1;
+}
+
+message PairByDenomIdResponse {
+  string denomID = 1;
+  string qStablePairId = 2;
+  cosmos.bank.v1beta1.Metadata gTokenMetadata = 3 [ (gogoproto.moretags) = "yaml:\"gTokenMetadata\"", (gogoproto.nullable)   = false ];
+  string minAmountIn = 4;
+  string minAmountOut = 5;
+  string gTokenLastPrice = 6 [
+          (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
+          (gogoproto.moretags) = "yaml:\"gTokenLastPrice\"",
+          (gogoproto.nullable) = false
+  ];
+  uint64 gTokenLatestPriceUpdateTime = 7;
+  string st = 8 [
+          (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
+          (gogoproto.moretags) = "yaml:\"st\"",
+          (gogoproto.nullable) = false
+  ];
+}
+
+/* AllPairs */
+message AllPairsRequest {}
+
+message AllPairsResponse {
+  repeated gTokenPair pairs = 1;
 }
