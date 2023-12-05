@@ -385,3 +385,87 @@ func (suite *GrowKeeperTestSuite) TestYieldPercentage() {
 		fmt.Printf("Real send to/from reserve: %f\n", float64(realValue.Int64())/1000000)
 	})
 }
+
+func (suite *GrowKeeperTestSuite) TestPairByDenomId() {
+	suite.Setup()
+	suite.Commit()
+	testCases := []struct {
+		name      string
+		pair      types.GTokenPair
+		denomId   string
+		err       bool
+		errString string
+	}{
+		{
+			"ok-get position",
+			s.GetNormalGTokenPair(1),
+			s.GetNormalGTokenPair(1).DenomID,
+			false,
+			"",
+		},
+		{
+			"false-position not found",
+			s.GetNormalGTokenPair(1),
+			"test",
+			true,
+			"not found",
+		},
+	}
+	suite.SetupOracleKeeper("ATOM")
+	suite.RegisterValidator()
+	suite.app.GrowKeeper.ChangeGrowStatus()
+	for _, tc := range testCases {
+		suite.app.GrowKeeper.AppendPair(s.ctx, tc.pair)
+		suite.Run(fmt.Sprintf("Case---%s", tc.name), func() {
+			ctx := sdk.WrapSDKContext(suite.ctx)
+
+			req := types.PairByDenomIdRequest{
+				DenomId: tc.denomId,
+			}
+
+			_, err := suite.app.GrowKeeper.PairByDenomId(ctx, &req)
+			if !tc.err {
+				suite.Require().NoError(err)
+			} else {
+				suite.Require().Error(err, tc.errString)
+			}
+		})
+	}
+}
+
+func (suite *GrowKeeperTestSuite) TestAllPairs() {
+	testCases := []struct {
+		name   string
+		pair   types.GTokenPair
+		amount uint64
+	}{
+		{
+			"ok",
+			s.GetNormalGTokenPair(0),
+			1,
+		},
+		{
+			"ok",
+			s.GetNormalGTokenPair(0),
+			2,
+		},
+	}
+
+	for _, tc := range testCases {
+		suite.Run(fmt.Sprintf("Case---%s", tc.name), func() {
+			suite.Setup()
+			suite.Commit()
+			ctx := sdk.WrapSDKContext(suite.ctx)
+			for i := 0; i < int(tc.amount); i++ {
+				suite.app.GrowKeeper.AppendPair(suite.ctx, suite.GetNormalGTokenPair(0))
+			}
+
+			req := types.AllPairsRequest{}
+
+			res, err := suite.app.GrowKeeper.AllPairs(ctx, &req)
+			suite.NoError(err)
+
+			s.Require().Equal(len(res.Pairs), int(tc.amount))
+		})
+	}
+}
