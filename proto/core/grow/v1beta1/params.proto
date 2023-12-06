@@ -8,4 +8,11 @@ option go_package = "github.com/QuadrateOrg/core/x/grow/types";
 // Params defines the parameters for the module.
 message Params {
   option (gogoproto.goproto_stringer) = false;
+  uint64 RealRate = 1;
+  uint64 BorrowRate = 2;
+  uint64 LastTimeUpdateReserve = 3;
+  string GrowStakingReserveAddress = 4;
+  string USQReserveAddress = 5;
+  string GrowYieldReserveAddress = 6;
+  bool GrowStatus = 7;
 }

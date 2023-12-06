@@ -17,10 +17,11 @@ func (k Keeper) Params(goCtx context.Context, req *types.QueryParamsRequest) (*t
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
 	ctx := sdk.UnwrapSDKContext(goCtx)
+	params := k.GetParams(ctx)
 
 	return &types.QueryParamsResponse{
-		ReserveFundAddress: k.GetReserveFundAddress(ctx).String(),
-		BurningFundAddress: k.GetBurningFundAddress(ctx).String(),
+		ReserveFundAddress: params.ReserveFundAddress,
+		BurningFundAddress: params.BurningFundAddress,
 	}, nil
 }
 

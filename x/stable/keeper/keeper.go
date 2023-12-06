@@ -22,7 +22,7 @@ type (
 		cdc        codec.BinaryCodec
 		storeKey   storetypes.StoreKey
 		memKey     storetypes.StoreKey
-		paramstore paramtypes.Subspace
+		paramSpace paramtypes.Subspace
 
 		channelKeeper types.ChannelKeeper
 		portKeeper    types.PortKeeper
@@ -54,7 +54,7 @@ func NewKeeper(
 		cdc:        cdc,
 		storeKey:   storeKey,
 		memKey:     memKey,
-		paramstore: ps,
+		paramSpace: ps,
 
 		channelKeeper: channelKeeper,
 		portKeeper:    portKeeper,

@@ -25,6 +25,13 @@ const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
 // Params defines the parameters for the module.
 type Params struct {
+	RealRate                  uint64 `protobuf:"varint,1,opt,name=RealRate,proto3" json:"RealRate,omitempty"`
+	BorrowRate                uint64 `protobuf:"varint,2,opt,name=BorrowRate,proto3" json:"BorrowRate,omitempty"`
+	LastTimeUpdateReserve     uint64 `protobuf:"varint,4,opt,name=LastTimeUpdateReserve,proto3" json:"LastTimeUpdateReserve,omitempty"`
+	GrowStakingReserveAddress string `protobuf:"bytes,5,opt,name=GrowStakingReserveAddress,proto3" json:"GrowStakingReserveAddress,omitempty"`
+	USQReserveAddress         string `protobuf:"bytes,6,opt,name=USQReserveAddress,proto3" json:"USQReserveAddress,omitempty"`
+	GrowYieldReserveAddress   string `protobuf:"bytes,7,opt,name=GrowYieldReserveAddress,proto3" json:"GrowYieldReserveAddress,omitempty"`
+	GrowStatus                bool   `protobuf:"varint,8,opt,name=GrowStatus,proto3" json:"GrowStatus,omitempty"`
 }
 
 func (m *Params) Reset()      { *m = Params{} }
@@ -59,6 +66,55 @@ func (m *Params) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_Params proto.InternalMessageInfo
 
+func (m *Params) GetRealRate() uint64 {
+	if m != nil {
+		return m.RealRate
+	}
+	return 0
+}
+
+func (m *Params) GetBorrowRate() uint64 {
+	if m != nil {
+		return m.BorrowRate
+	}
+	return 0
+}
+
+func (m *Params) GetLastTimeUpdateReserve() uint64 {
+	if m != nil {
+		return m.LastTimeUpdateReserve
+	}
+	return 0
+}
+
+func (m *Params) GetGrowStakingReserveAddress() string {
+	if m != nil {
+		return m.GrowStakingReserveAddress
+	}
+	return ""
+}
+
+func (m *Params) GetUSQReserveAddress() string {
+	if m != nil {
+		return m.USQReserveAddress
+	}
+	return ""
+}
+
+func (m *Params) GetGrowYieldReserveAddress() string {
+	if m != nil {
+		return m.GrowYieldReserveAddress
+	}
+	return ""
+}
+
+func (m *Params) GetGrowStatus() bool {
+	if m != nil {
+		return m.GrowStatus
+	}
+	return false
+}
+
 func init() {
 	proto.RegisterType((*Params)(nil), "core.grow.v1beta1.Params")
 }
@@ -66,17 +122,27 @@ func init() {
 func init() { proto.RegisterFile("core/grow/v1beta1/params.proto", fileDescriptor_28929114d7d669ed) }
 
 var fileDescriptor_28929114d7d669ed = []byte{
-	// 160 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0x92, 0x4b, 0xce, 0x2f, 0x4a,
-	0xd5, 0x4f, 0x2f, 0xca, 0x2f, 0xd7, 0x2f, 0x33, 0x4c, 0x4a, 0x2d, 0x49, 0x34, 0xd4, 0x2f, 0x48,
-	0x2c, 0x4a, 0xcc, 0x2d, 0xd6, 0x2b, 0x28, 0xca, 0x2f, 0xc9, 0x17, 0x12, 0x04, 0xc9, 0xeb, 0x81,
-	0xe4, 0xf5, 0xa0, 0xf2, 0x52, 0x22, 0xe9, 0xf9, 0xe9, 0xf9, 0x60, 0x59, 0x7d, 0x10, 0x0b, 0xa2,
-	0x50, 0x89, 0x8f, 0x8b, 0x2d, 0x00, 0xac, 0xd1, 0x8a, 0x65, 0xc6, 0x02, 0x79, 0x06, 0x27, 0xa7,
-	0x13, 0x8f, 0xe4, 0x18, 0x2f, 0x3c, 0x92, 0x63, 0x7c, 0xf0, 0x48, 0x8e, 0x71, 0xc2, 0x63, 0x39,
-	0x86, 0x0b, 0x8f, 0xe5, 0x18, 0x6e, 0x3c, 0x96, 0x63, 0x88, 0xd2, 0x48, 0xcf, 0x2c, 0xc9, 0x28,
-	0x4d, 0xd2, 0x4b, 0xce, 0xcf, 0xd5, 0x0f, 0x2c, 0x4d, 0x4c, 0x29, 0x4a, 0x2c, 0x49, 0xf5, 0x2f,
-	0x4a, 0xd7, 0x07, 0xbb, 0xa4, 0x02, 0xe2, 0x96, 0x92, 0xca, 0x82, 0xd4, 0xe2, 0x24, 0x36, 0xb0,
-	0xd1, 0xc6, 0x80, 0x00, 0x00, 0x00, 0xff, 0xff, 0x3b, 0xfc, 0x46, 0x76, 0xa5, 0x00, 0x00, 0x00,
+	// 309 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x74, 0x91, 0xb1, 0x4e, 0xeb, 0x30,
+	0x18, 0x85, 0xe3, 0xaa, 0xb7, 0xb7, 0x78, 0xab, 0x05, 0x22, 0x74, 0x30, 0x15, 0x53, 0x06, 0x14,
+	0xab, 0x82, 0x01, 0x21, 0x16, 0xba, 0xb0, 0x20, 0x41, 0x5d, 0x3a, 0xc0, 0xe6, 0x36, 0xbf, 0x4c,
+	0x44, 0x83, 0x23, 0xdb, 0x69, 0xe0, 0x2d, 0x18, 0x19, 0x79, 0x1a, 0xc4, 0xd8, 0x91, 0x11, 0x25,
+	0x2f, 0x82, 0xe2, 0x46, 0xa8, 0x2a, 0x74, 0x4b, 0xce, 0x77, 0x3e, 0xcb, 0xd6, 0xc1, 0x74, 0xaa,
+	0x34, 0x30, 0xa9, 0x55, 0xce, 0xe6, 0xfd, 0x09, 0x58, 0xd1, 0x67, 0xa9, 0xd0, 0x22, 0x31, 0x61,
+	0xaa, 0x95, 0x55, 0xa4, 0x53, 0xf1, 0xb0, 0xe2, 0x61, 0xcd, 0xbb, 0xdb, 0x52, 0x49, 0xe5, 0x28,
+	0xab, 0xbe, 0x96, 0xc5, 0x83, 0xf7, 0x06, 0x6e, 0x5d, 0x3b, 0x93, 0x74, 0x71, 0x9b, 0x83, 0x98,
+	0x71, 0x61, 0xc1, 0x47, 0x3d, 0x14, 0x34, 0xf9, 0xcf, 0x3f, 0xa1, 0x18, 0x0f, 0x94, 0xd6, 0x2a,
+	0x77, 0xb4, 0xe1, 0xe8, 0x4a, 0x42, 0x8e, 0xf1, 0xce, 0xa5, 0x30, 0xf6, 0x26, 0x4e, 0x60, 0x9c,
+	0x46, 0xc2, 0x02, 0x07, 0x03, 0x7a, 0x0e, 0x7e, 0xd3, 0x55, 0xff, 0x86, 0xe4, 0x0c, 0xef, 0x5d,
+	0x68, 0x95, 0x8f, 0xac, 0x78, 0x88, 0x1f, 0x65, 0x9d, 0x9e, 0x47, 0x91, 0x06, 0x63, 0xfc, 0x7f,
+	0x3d, 0x14, 0x6c, 0xf1, 0xcd, 0x05, 0x72, 0x88, 0x3b, 0xe3, 0xd1, 0x70, 0xcd, 0x6a, 0x39, 0xeb,
+	0x37, 0x20, 0x27, 0x78, 0xb7, 0x3a, 0xea, 0x36, 0x86, 0x59, 0xb4, 0xe6, 0xfc, 0x77, 0xce, 0x26,
+	0x5c, 0xbd, 0xbd, 0xbe, 0x84, 0xcd, 0x8c, 0xdf, 0xee, 0xa1, 0xa0, 0xcd, 0x57, 0x92, 0xd3, 0xe6,
+	0xeb, 0xdb, 0xbe, 0x37, 0x18, 0x7c, 0x14, 0x14, 0x2d, 0x0a, 0x8a, 0xbe, 0x0a, 0x8a, 0x5e, 0x4a,
+	0xea, 0x2d, 0x4a, 0xea, 0x7d, 0x96, 0xd4, 0xbb, 0x0b, 0x64, 0x6c, 0xef, 0xb3, 0x49, 0x38, 0x55,
+	0x09, 0x1b, 0x66, 0x22, 0xd2, 0xc2, 0xc2, 0x95, 0x96, 0xcc, 0x4d, 0xf8, 0xb4, 0x1c, 0xd1, 0x3e,
+	0xa7, 0x60, 0x26, 0x2d, 0xb7, 0xc9, 0xd1, 0x77, 0x00, 0x00, 0x00, 0xff, 0xff, 0x22, 0x87, 0x23,
+	0xa4, 0xde, 0x01, 0x00, 0x00,
 }
 
 func (m *Params) Marshal() (dAtA []byte, err error) {
@@ -99,6 +165,52 @@ func (m *Params) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
+	if m.GrowStatus {
+		i--
+		if m.GrowStatus {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x40
+	}
+	if len(m.GrowYieldReserveAddress) > 0 {
+		i -= len(m.GrowYieldReserveAddress)
+		copy(dAtA[i:], m.GrowYieldReserveAddress)
+		i = encodeVarintParams(dAtA, i, uint64(len(m.GrowYieldReserveAddress)))
+		i--
+		dAtA[i] = 0x3a
+	}
+	if len(m.USQReserveAddress) > 0 {
+		i -= len(m.USQReserveAddress)
+		copy(dAtA[i:], m.USQReserveAddress)
+		i = encodeVarintParams(dAtA, i, uint64(len(m.USQReserveAddress)))
+		i--
+		dAtA[i] = 0x32
+	}
+	if len(m.GrowStakingReserveAddress) > 0 {
+		i -= len(m.GrowStakingReserveAddress)
+		copy(dAtA[i:], m.GrowStakingReserveAddress)
+		i = encodeVarintParams(dAtA, i, uint64(len(m.GrowStakingReserveAddress)))
+		i--
+		dAtA[i] = 0x2a
+	}
+	if m.LastTimeUpdateReserve != 0 {
+		i = encodeVarintParams(dAtA, i, uint64(m.LastTimeUpdateReserve))
+		i--
+		dAtA[i] = 0x20
+	}
+	if m.BorrowRate != 0 {
+		i = encodeVarintParams(dAtA, i, uint64(m.BorrowRate))
+		i--
+		dAtA[i] = 0x10
+	}
+	if m.RealRate != 0 {
+		i = encodeVarintParams(dAtA, i, uint64(m.RealRate))
+		i--
+		dAtA[i] = 0x8
+	}
 	return len(dAtA) - i, nil
 }
 
@@ -119,6 +231,30 @@ func (m *Params) Size() (n int) {
 	}
 	var l int
 	_ = l
+	if m.RealRate != 0 {
+		n += 1 + sovParams(uint64(m.RealRate))
+	}
+	if m.BorrowRate != 0 {
+		n += 1 + sovParams(uint64(m.BorrowRate))
+	}
+	if m.LastTimeUpdateReserve != 0 {
+		n += 1 + sovParams(uint64(m.LastTimeUpdateReserve))
+	}
+	l = len(m.GrowStakingReserveAddress)
+	if l > 0 {
+		n += 1 + l + sovParams(uint64(l))
+	}
+	l = len(m.USQReserveAddress)
+	if l > 0 {
+		n += 1 + l + sovParams(uint64(l))
+	}
+	l = len(m.GrowYieldReserveAddress)
+	if l > 0 {
+		n += 1 + l + sovParams(uint64(l))
+	}
+	if m.GrowStatus {
+		n += 2
+	}
 	return n
 }
 
@@ -157,6 +293,179 @@ func (m *Params) Unmarshal(dAtA []byte) error {
 			return fmt.Errorf("proto: Params: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
+		case 1:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field RealRate", wireType)
+			}
+			m.RealRate = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowParams
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.RealRate |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 2:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field BorrowRate", wireType)
+			}
+			m.BorrowRate = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowParams
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.BorrowRate |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 4:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field LastTimeUpdateReserve", wireType)
+			}
+			m.LastTimeUpdateReserve = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowParams
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.LastTimeUpdateReserve |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 5:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field GrowStakingReserveAddress", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowParams
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthParams
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthParams
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.GrowStakingReserveAddress = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 6:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field USQReserveAddress", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowParams
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthParams
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthParams
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.USQReserveAddress = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 7:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field GrowYieldReserveAddress", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowParams
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthParams
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthParams
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.GrowYieldReserveAddress = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 8:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field GrowStatus", wireType)
+			}
+			var v int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowParams
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				v |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			m.GrowStatus = bool(v != 0)
 		default:
 			iNdEx = preIndex
 			skippy, err := skipParams(dAtA[iNdEx:])

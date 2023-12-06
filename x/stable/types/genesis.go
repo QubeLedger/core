@@ -11,21 +11,17 @@ const DefaultIndex uint64 = 1
 // DefaultGenesis returns the default genesis state
 func DefaultGenesis() *GenesisState {
 	return &GenesisState{
-		Params:             DefaultParams(),
-		PortId:             PortID,
-		Pairs:              []Pair{},
-		ReserveFundAddress: "qube13zq340zzjgua9h98pltzwv0ga5r0kkn0ryjz4v",
-		BurningFundAddress: "qube13zq340zzjgua9h98pltzwv0ga5r0kkn0ryjz4v",
+		Params: DefaultParams(),
+		PortId: PortID,
+		Pairs:  []Pair{},
 	}
 }
 
-func NewGenesisState(params Params, portID string, pairs []Pair, reserveFundAddress string, burningFundBalance string) GenesisState {
+func NewGenesisState(params Params, portID string, pairs []Pair) GenesisState {
 	return GenesisState{
-		Params:             params,
-		PortId:             portID,
-		Pairs:              pairs,
-		ReserveFundAddress: reserveFundAddress,
-		BurningFundAddress: burningFundBalance,
+		Params: params,
+		PortId: portID,
+		Pairs:  pairs,
 	}
 }
 
