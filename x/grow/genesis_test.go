@@ -76,7 +76,7 @@ func (s *GrowGenesisTestSuite) TestInitGenesis() {
 			valid: true,
 		},
 		{
-			name: "address null",
+			name: "name null",
 			genesisState: types.GenesisState{
 				Params: types.DefaultParams(),
 				GTokenPairList: []types.GTokenPair{
@@ -91,35 +91,7 @@ func (s *GrowGenesisTestSuite) TestInitGenesis() {
 							},
 							Base:    "ugusd",
 							Display: "gusd",
-							Name:    "gUSQ",
-							Symbol:  "gUSQ",
-						},
-						MinAmountIn:                 "20uusd",
-						MinAmountOut:                "20ugusd",
-						GTokenLastPrice:             sdk.NewInt(1 * 1000000),
-						GTokenLatestPriceUpdateTime: uint64(time.Now().Unix()),
-					},
-				},
-			},
-			valid: false,
-		},
-		{
-			name: "percent null",
-			genesisState: types.GenesisState{
-				Params: types.DefaultParams(),
-				GTokenPairList: []types.GTokenPair{
-					{
-						Id:            0,
-						DenomID:       fmt.Sprintf("%x", crypto.Sha256(append([]byte("ugusd")))),
-						QStablePairId: fmt.Sprintf("%x", crypto.Sha256(append([]byte("uatom"+"uusd")))),
-						GTokenMetadata: banktypes.Metadata{
-							Description: "",
-							DenomUnits: []*banktypes.DenomUnit{
-								{Denom: "ugusd", Exponent: uint32(0), Aliases: []string{"microgusd"}},
-							},
-							Base:    "ugusd",
-							Display: "gusd",
-							Name:    "gUSQ",
+							Name:    "",
 							Symbol:  "gUSQ",
 						},
 						MinAmountIn:                 "20uusd",
