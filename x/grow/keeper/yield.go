@@ -166,5 +166,11 @@ func (k Keeper) CalculateAddToReserveValue(ctx sdk.Context, val sdk.Int, gTokenP
 	if (sdk.NewInt(31536000).Quo(diff)).IsNil() || (sdk.NewInt(31536000).Quo(diff)).IsZero() {
 		return sdk.Int{}, true
 	}
+	/*
+		TODO
+		Before you enable the x/grow for the first time, need to use upgrades to change the LastTimeUpdateReserve
+	*/
+	k.SetLastTimeUpdateReserve(ctx, sdk.NewInt(ctx.BlockTime().Unix()))
+
 	return val.Quo(sdk.NewInt(31536000).Quo(diff)), false
 }

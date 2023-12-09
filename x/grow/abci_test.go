@@ -53,6 +53,7 @@ func (s *GrowAbciTestSuite) TestGrowPriceChangeWhenBlockEnd() {
 		res, err := s.app.GrowKeeper.Deposit(ctx, msg)
 		s.Require().NoError(err)
 		s.Require().Equal(res.AmountOut, sdk.NewCoin(s.GetNormalGTokenPair(0).GTokenMetadata.Base, sdk.NewInt(amt)).String())
+		s.AddTestCoinsToCustomAccount(sdk.NewInt(amt*10000), s.GetNormalQStablePair(0).AmountOutMetadata.Base, s.app.GrowKeeper.GetGrowStakingReserveAddress(s.ctx)) //fix 252 err
 	}
 
 	s.ctx = s.ctx.WithBlockHeight(2)
@@ -194,6 +195,8 @@ func (s *GrowAbciTestSuite) TestGrowIncreaseUSQReserve() {
 		s.GetNormalGTokenPair(0).GTokenMetadata.Base,
 	)
 	ctx := sdk.WrapSDKContext(s.ctx)
+	oldTime := sdk.NewInt(s.ctx.BlockTime().Unix())
+
 	res, err := s.app.GrowKeeper.Deposit(ctx, msg)
 	s.Require().NoError(err)
 	s.Require().Equal(res.AmountOut, sdk.NewCoin(s.GetNormalGTokenPair(0).GTokenMetadata.Base, sdk.NewInt(amt)).String())
@@ -211,8 +214,7 @@ func (s *GrowAbciTestSuite) TestGrowIncreaseUSQReserve() {
 	_, value, err := s.app.GrowKeeper.CheckYieldRate(s.ctx, updatedPair)
 	s.Require().NoError(err)
 
-	realValue, blocked := s.app.GrowKeeper.CalculateAddToReserveValue(s.ctx, value, updatedPair)
-	s.Require().Equal(blocked, false)
+	realValue := value.Quo(sdk.NewInt(31536000).Quo(sdk.NewInt(s.ctx.BlockTime().Unix()).Sub(oldTime)))
 
 	balanceGrowStakingReserve := s.app.BankKeeper.GetBalance(s.ctx, s.app.GrowKeeper.GetGrowStakingReserveAddress(s.ctx), s.GetNormalQStablePair(0).AmountOutMetadata.Base)
 	s.Require().Equal((balanceGrowStakingReserveOld.Amount).Sub(balanceGrowStakingReserve.Amount), realValue)
@@ -256,6 +258,8 @@ func (s *GrowAbciTestSuite) TestGrowReduceUSQReserve() {
 		s.GetNormalGTokenPair(0).GTokenMetadata.Base,
 	)
 	ctx := sdk.WrapSDKContext(s.ctx)
+	oldTime := sdk.NewInt(s.ctx.BlockTime().Unix())
+
 	res, err := s.app.GrowKeeper.Deposit(ctx, msg)
 	s.Require().NoError(err)
 	s.Require().Equal(res.AmountOut, sdk.NewCoin(s.GetNormalGTokenPair(0).GTokenMetadata.Base, sdk.NewInt(amt2)).String())
@@ -273,8 +277,7 @@ func (s *GrowAbciTestSuite) TestGrowReduceUSQReserve() {
 	_, value, err := s.app.GrowKeeper.CheckYieldRate(s.ctx, updatedPair)
 	s.Require().NoError(err)
 
-	realValue, blocked := s.app.GrowKeeper.CalculateAddToReserveValue(s.ctx, value, updatedPair)
-	s.Require().Equal(blocked, false)
+	realValue := value.Quo(sdk.NewInt(31536000).Quo(sdk.NewInt(s.ctx.BlockTime().Unix()).Sub(oldTime)))
 
 	balanceGrowStakingReserve := s.app.BankKeeper.GetBalance(s.ctx, s.app.GrowKeeper.GetGrowStakingReserveAddress(s.ctx), s.GetNormalQStablePair(0).AmountOutMetadata.Base)
 	s.Require().Equal((balanceGrowStakingReserve.Amount).Sub(balanceGrowStakingReserveOld.Amount), realValue)
