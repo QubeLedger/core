@@ -57,11 +57,16 @@ func (s *GrowKeeperTestSuite) Setup() {
 	s.Address = apptesting.CreateRandomAccounts(1)[0]
 	s.LiquidatorAddress = apptesting.CreateRandomAccounts(1)[0]
 	s.ValPubKeys = simapp.CreateTestPubKeys(1)
+
+	s.Commit()
+	s.app.GrowKeeper.SetParams(s.ctx, types.DefaultParams())
+	s.app.StableKeeper.SetParams(s.ctx, stabletypes.DefaultParams())
+
 	s.app.GrowKeeper.SetGrowStakingReserveAddress(s.ctx, apptesting.CreateRandomAccounts(1)[0])
 	s.app.GrowKeeper.SetUSQReserveAddress(s.ctx, apptesting.CreateRandomAccounts(1)[0])
 	s.app.GrowKeeper.SetGrowYieldReserveAddress(s.ctx, apptesting.CreateRandomAccounts(1)[0])
-
 	s.app.GrowKeeper.SetBorrowRate(s.ctx, sdk.NewInt(15))
+
 	s.app.StableKeeper.SetBurningFundAddress(s.ctx, apptesting.CreateRandomAccounts(1)[0])
 	s.app.StableKeeper.SetReserveFundAddress(s.ctx, apptesting.CreateRandomAccounts(1)[0])
 }

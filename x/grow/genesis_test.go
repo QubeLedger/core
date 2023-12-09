@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/QuadrateOrg/core/app"
-	"github.com/QuadrateOrg/core/app/apptesting"
 	quadrateapptest "github.com/QuadrateOrg/core/app/helpers"
 	apptypes "github.com/QuadrateOrg/core/types"
 	"github.com/QuadrateOrg/core/x/grow"
@@ -73,15 +72,11 @@ func (s *GrowGenesisTestSuite) TestInitGenesis() {
 						St:                          sdk.NewInt(0),
 					},
 				},
-				RealRate:                  15,
-				BorrowRate:                15,
-				GrowStakingReserveAddress: apptesting.CreateRandomAccounts(1)[0].String(),
-				USQReserveAddress:         apptesting.CreateRandomAccounts(1)[0].String(),
 			},
 			valid: true,
 		},
 		{
-			name: "address null",
+			name: "name null",
 			genesisState: types.GenesisState{
 				Params: types.DefaultParams(),
 				GTokenPairList: []types.GTokenPair{
@@ -96,7 +91,7 @@ func (s *GrowGenesisTestSuite) TestInitGenesis() {
 							},
 							Base:    "ugusd",
 							Display: "gusd",
-							Name:    "gUSQ",
+							Name:    "",
 							Symbol:  "gUSQ",
 						},
 						MinAmountIn:                 "20uusd",
@@ -105,42 +100,6 @@ func (s *GrowGenesisTestSuite) TestInitGenesis() {
 						GTokenLatestPriceUpdateTime: uint64(time.Now().Unix()),
 					},
 				},
-				RealRate:                  15,
-				BorrowRate:                15,
-				GrowStakingReserveAddress: "",
-				USQReserveAddress:         "",
-			},
-			valid: false,
-		},
-		{
-			name: "percent null",
-			genesisState: types.GenesisState{
-				Params: types.DefaultParams(),
-				GTokenPairList: []types.GTokenPair{
-					{
-						Id:            0,
-						DenomID:       fmt.Sprintf("%x", crypto.Sha256(append([]byte("ugusd")))),
-						QStablePairId: fmt.Sprintf("%x", crypto.Sha256(append([]byte("uatom"+"uusd")))),
-						GTokenMetadata: banktypes.Metadata{
-							Description: "",
-							DenomUnits: []*banktypes.DenomUnit{
-								{Denom: "ugusd", Exponent: uint32(0), Aliases: []string{"microgusd"}},
-							},
-							Base:    "ugusd",
-							Display: "gusd",
-							Name:    "gUSQ",
-							Symbol:  "gUSQ",
-						},
-						MinAmountIn:                 "20uusd",
-						MinAmountOut:                "20ugusd",
-						GTokenLastPrice:             sdk.NewInt(1 * 1000000),
-						GTokenLatestPriceUpdateTime: uint64(time.Now().Unix()),
-					},
-				},
-				RealRate:                  0,
-				BorrowRate:                0,
-				GrowStakingReserveAddress: "",
-				USQReserveAddress:         "",
 			},
 			valid: false,
 		},
@@ -160,14 +119,6 @@ func (s *GrowGenesisTestSuite) TestInitGenesis() {
 				} else {
 					s.Require().Len(tc.genesisState.GTokenPairList, 0)
 				}
-
-				uf, err := sdk.AccAddressFromBech32(tc.genesisState.USQReserveAddress)
-				s.Require().NoError(err, tc.name)
-				gf, err := sdk.AccAddressFromBech32(tc.genesisState.GrowStakingReserveAddress)
-				s.Require().NoError(err, tc.name)
-
-				s.Require().Equal(uf, s.app.GrowKeeper.GetUSQReserveAddress(s.ctx))
-				s.Require().Equal(gf, s.app.GrowKeeper.GetGrowStakingReserveAddress(s.ctx))
 			}
 		})
 	}

@@ -7,6 +7,10 @@ import (
 )
 
 func (k Keeper) ExecuteBurn(ctx sdk.Context, msg *types.MsgBurn, pair types.Pair) (error, sdk.Coin) {
+
+	ReserveFundAddress := k.GetReserveFundAddress(ctx)
+	BurningFundAddress := k.GetBurningFundAddress(ctx)
+
 	atomPrice, err := k.GetAtomPrice(ctx, pair)
 
 	if err != nil {
