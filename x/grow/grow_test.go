@@ -4,8 +4,11 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"strconv"
 	"testing"
 	"time"
+
+	"encoding/json"
 
 	"github.com/QuadrateOrg/core/app"
 	"github.com/QuadrateOrg/core/app/apptesting"
@@ -31,11 +34,12 @@ import (
 
 type GrowAbciTestSuite struct {
 	suite.Suite
-	ctx        sdk.Context
-	app        *app.QuadrateApp
-	genesis    types.GenesisState
-	Address    sdk.AccAddress
-	ValPubKeys []cryptotypes.PubKey
+	ctx         sdk.Context
+	app         *app.QuadrateApp
+	genesis     types.GenesisState
+	Address     sdk.AccAddress
+	ValPubKeys  []cryptotypes.PubKey
+	PoolAddress sdk.AccAddress
 }
 
 var s *GrowAbciTestSuite
@@ -48,6 +52,7 @@ func (suite *GrowAbciTestSuite) Commit() {
 func (s *GrowAbciTestSuite) Setup() {
 	s.app = quadrateapptest.Setup(s.T(), "qube-1", false, 1)
 	s.Address = apptesting.CreateRandomAccounts(1)[0]
+	s.PoolAddress = apptesting.CreateRandomAccounts(1)[0]
 	s.ValPubKeys = simapp.CreateTestPubKeys(1)
 	s.ctx = s.ctx.WithBlockTime(time.Now())
 }
@@ -225,6 +230,39 @@ func GetTokensActualPrice() (string, error) {
 	return atomPriceString, nil
 }
 
+func (s *GrowAbciTestSuite) GetActualSTATOM_RedemptionRate() (float64, error) {
+
+	var red_rate string
+	var red_rate_float float64
+
+	tr := &http.Transport{
+		MaxIdleConns:       10,
+		IdleConnTimeout:    30 * time.Second,
+		DisableCompression: true,
+	}
+	client := &http.Client{Transport: tr}
+
+	res, err := client.Get("https://stride-api.polkachu.com/Stride-Labs/stride/stakeibc/host_zone")
+	if err != nil {
+		return 0.0, err
+	}
+	body, _ := ioutil.ReadAll(res.Body)
+	m := map[string]any{}
+	json.Unmarshal(body, &m)
+
+	host_zones := m["host_zone"].([]any)
+	for i := 0; i < 10; i++ {
+		host_zone := host_zones[i].(map[string]any)
+		if host_zone["chain_id"].(string) == "cosmoshub-4" {
+			red_rate = host_zone["redemption_rate"].(string)
+		}
+	}
+	if s, err := strconv.ParseFloat(red_rate, 64); err == nil {
+		red_rate_float = s
+	}
+	return red_rate_float, nil
+}
+
 func (s *GrowAbciTestSuite) OracleAggregateExchangeRateFromNet() {
 	params := s.app.OracleKeeper.GetParams(s.ctx)
 	price, err := GetTokensActualPrice()
@@ -250,4 +288,30 @@ func (s *GrowAbciTestSuite) SetupOracleKeeper() {
 	params.SlashWindow = 100
 	params.RewardDistributionWindow = 100
 	s.app.OracleKeeper.SetParams(s.ctx, params)
+}
+
+func (s *GrowAbciTestSuite) swap_ATOM_STATOM_USQ_tik(time sdk.Int) sdk.Int {
+	BalanceGrowStakingReserve := s.app.BankKeeper.GetBalance(s.ctx, s.app.GrowKeeper.GetGrowStakingReserveAddress(s.ctx), s.GetNormalQStablePair(0).AmountInMetadata.Base)
+	BalanceGrowStakingReserveF := BalanceGrowStakingReserve.Amount
+
+	//RedemptionRate, err := s.GetActualSTATOM_RedemptionRate()
+	//s.Require().NoError(err)
+
+	RedemptionRate := 1.277220770895276080 //static redemption rate
+
+	/*priceS, err := GetTokensActualPrice()
+	var price float64
+	if s, err := strconv.ParseFloat(priceS, 64); err == nil {
+		price = s
+	}
+	s.Require().NoError(err)*/
+
+	price := 11.05 //static price
+
+	BalanceSTATOM := (BalanceGrowStakingReserveF.Mul(sdk.NewInt(int64(RedemptionRate * 1000000)))).Quo(sdk.NewInt(1000000))
+	tik_1_statom := BalanceSTATOM.Quo(sdk.NewInt(31536000).Quo(time))
+	res := ((tik_1_statom.Mul(sdk.NewInt(int64(RedemptionRate * 1000000)))).Quo(sdk.NewInt(1000000))).Mul(sdk.NewInt(int64(price * 1000000))).Quo(sdk.NewInt(1000000))
+
+	s.AddTestCoinsToCustomAccount(res, s.GetNormalQStablePair(0).AmountOutMetadata.Base, s.app.GrowKeeper.GetGrowStakingReserveAddress(s.ctx))
+	return res
 }
