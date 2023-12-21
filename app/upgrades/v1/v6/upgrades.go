@@ -1,8 +1,11 @@
-package v1
+package v6
 
 import (
-	"github.com/QuadrateOrg/core/app"
+	"errors"
+
+	growmodulekeeper "github.com/QuadrateOrg/core/x/grow/keeper"
 	growtypes "github.com/QuadrateOrg/core/x/grow/types"
+	stablemodulekeeper "github.com/QuadrateOrg/core/x/stable/keeper"
 	stabletypes "github.com/QuadrateOrg/core/x/stable/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
@@ -12,7 +15,8 @@ import (
 func CreateUpgradeHandler(
 	mm *module.Manager,
 	configurator module.Configurator,
-	app *app.QuadrateApp,
+	stablekeepers stablemodulekeeper.Keeper,
+	growkeepers growmodulekeeper.Keeper,
 ) upgradetypes.UpgradeHandler {
 	return func(ctx sdk.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
 		migrations, err := mm.RunMigrations(ctx, configurator, fromVM)
@@ -20,12 +24,16 @@ func CreateUpgradeHandler(
 			return nil, err
 		}
 
-		app.StableKeeper.SetParams(ctx, stabletypes.DefaultParams())
-		app.GrowKeeper.SetParams(ctx, growtypes.DefaultParams())
+		stablekeepers.SetParams(ctx, stabletypes.DefaultParams())
+		growkeepers.SetParams(ctx, growtypes.DefaultParams())
 
-		pair, _ := app.GrowKeeper.GetPairByDenomID(ctx, app.GrowKeeper.GenerateDenomIdHash("uusd"))
+		pair, found := growkeepers.GetPairByDenomID(ctx, growkeepers.GenerateDenomIdHash("ugusd"))
+		if !found {
+			return nil, errors.New("gTokenPair not found")
+		}
+
 		pair.GTokenLastPrice = sdk.NewInt(1 * 1000000)
-		app.GrowKeeper.SetPair(ctx, pair)
+		growkeepers.SetPair(ctx, pair)
 
 		return migrations, nil
 	}
