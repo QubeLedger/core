@@ -190,6 +190,7 @@ func getGovProposalHandlers() []govclient.ProposalHandler {
 		stableclient.RegisterPairHandler,
 		stableclient.RegisterChangeBurningFundAddressHandler,
 		stableclient.RegisterChangeReserveFundAddressHandler,
+		stableclient.RegisterDeletePairHandler,
 		growclient.RegisterChangeBorrowRateProposalHandler,
 		growclient.RegisterChangeGrowStakingReserveAddressProposalHandler,
 		growclient.RegisterChangeGrowYieldReserveAddressProposalHandler,

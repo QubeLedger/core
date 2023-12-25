@@ -1,6 +1,8 @@
 package stable
 
 import (
+	"errors"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
@@ -18,6 +20,8 @@ func NewStableProposalHandler(k *keeper.Keeper) govtypes.Handler {
 			return handleRegisterChangeBurningFundAddressProposal(ctx, k, c)
 		case *types.RegisterChangeReserveFundAddressProposal:
 			return handleRegisterChangeReserveFundAddressProposal(ctx, k, c)
+		case *types.RegisterDeletePairProposal:
+			return handleRegisterDeletePairProposal(ctx, k, c)
 		default:
 			return sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "unrecognized %s proposal content type: %T", types.ModuleName, c)
 		}
@@ -71,6 +75,23 @@ func handleRegisterChangeReserveFundAddressProposal(ctx sdk.Context, k *keeper.K
 	ctx.EventManager().EmitEvent(
 		sdk.NewEvent(
 			types.EventRegisterChangeReserveFundAddressProposal,
+		),
+	)
+	return nil
+}
+
+func handleRegisterDeletePairProposal(ctx sdk.Context, k *keeper.Keeper, p *types.RegisterDeletePairProposal) error {
+	pairId := p.PairId
+
+	pair, found := k.GetPairByPairID(ctx, pairId)
+	if !found {
+		return errors.New("pair not found")
+	}
+
+	k.RemovePair(ctx, pair.Id)
+	ctx.EventManager().EmitEvent(
+		sdk.NewEvent(
+			types.EventRegisterDeletePairProposal,
 		),
 	)
 	return nil
