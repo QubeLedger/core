@@ -15,6 +15,7 @@ const (
 	ProposalTypeRegisterPairProposal                     string = "RegisterPairProposal"
 	ProposalTypeRegisterChangeBurningFundAddressProposal string = "RegisterChangeBurningFundAddressProposal"
 	ProposalTypeRegisterChangeReserveFundAddressProposal string = "RegisterChangeReserveFundAddressProposal"
+	ProposalTypeRegisterDeletePairProposal               string = "RegisterDeletePairProposal"
 )
 
 // Implements Proposal Interface
@@ -22,6 +23,7 @@ var (
 	_ govtypes.Content = &RegisterPairProposal{}
 	_ govtypes.Content = &RegisterChangeBurningFundAddressProposal{}
 	_ govtypes.Content = &RegisterChangeReserveFundAddressProposal{}
+	_ govtypes.Content = &RegisterDeletePairProposal{}
 )
 
 func init() {
@@ -33,6 +35,9 @@ func init() {
 
 	govtypes.RegisterProposalType(ProposalTypeRegisterChangeReserveFundAddressProposal)
 	govtypes.RegisterProposalTypeCodec(&RegisterChangeReserveFundAddressProposal{}, "stable/RegisterChangeReserveFundAddressProposal")
+
+	govtypes.RegisterProposalType(ProposalTypeRegisterDeletePairProposal)
+	govtypes.RegisterProposalTypeCodec(&RegisterDeletePairProposal{}, "stable/RegisterDeletePairProposal")
 }
 
 /*
@@ -180,6 +185,31 @@ func (rtbp *RegisterChangeReserveFundAddressProposal) ValidateBasic() error {
 	_, err := sdk.AccAddressFromBech32(rtbp.Address)
 	if err != nil {
 		return nil
+	}
+	return nil
+}
+
+/*
+DeletePairProposal
+*/
+
+func NewRegisterDeletePairProposal(title, description string, pairId string) govtypes.Content {
+	return &RegisterDeletePairProposal{
+		Title:       title,
+		Description: description,
+		PairId:      pairId,
+	}
+}
+
+func (*RegisterDeletePairProposal) ProposalRoute() string { return RouterKey }
+
+func (*RegisterDeletePairProposal) ProposalType() string {
+	return ProposalTypeRegisterDeletePairProposal
+}
+
+func (rtbp *RegisterDeletePairProposal) ValidateBasic() error {
+	if len(rtbp.PairId) == 0 {
+		return ErrInvalidLength
 	}
 	return nil
 }

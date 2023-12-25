@@ -43,3 +43,13 @@ message RegisterChangeReserveFundAddressProposal {
 
   string address = 3;
 }
+
+message RegisterDeletePairProposal {
+  option (gogoproto.equal) = false;
+  // title of the proposal
+  string title = 1;
+  // description of the proposal
+  string description = 2;
+
+  string pairId = 3;
+}

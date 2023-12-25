@@ -185,3 +185,35 @@ func TestRegisterChangeReserveFundAddressProposal(t *testing.T) {
 		}
 	}
 }
+
+func TestRegisterDeletePairProposal(t *testing.T) {
+	tests := []struct {
+		title       string
+		description string
+		pairId      string
+		expectedErr bool
+	}{
+		{
+			"test",
+			"test",
+			"1111",
+			false,
+		},
+		{
+			"test",
+			"test",
+			"",
+			true,
+		},
+	}
+
+	for _, tc := range tests {
+		msg := types.NewRegisterDeletePairProposal(tc.title, tc.description, tc.pairId)
+		err := msg.ValidateBasic()
+		if tc.expectedErr {
+			require.Error(t, err)
+		} else {
+			require.NoError(t, err)
+		}
+	}
+}
