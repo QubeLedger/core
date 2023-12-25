@@ -8,12 +8,12 @@ import (
 	"github.com/QuadrateOrg/core/app/apptesting"
 	growtypes "github.com/QuadrateOrg/core/x/grow/types"
 	stabletypes "github.com/QuadrateOrg/core/x/stable/types"
-	"github.com/cometbft/cometbft/crypto"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 	"github.com/stretchr/testify/suite"
 	"github.com/tendermint/tendermint/abci/types"
+	"github.com/tendermint/tendermint/crypto"
 )
 
 const (
