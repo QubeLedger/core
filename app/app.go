@@ -122,7 +122,7 @@ import (
 	v4 "github.com/QuadrateOrg/core/app/upgrades/v1/v4"
 	v4rc0 "github.com/QuadrateOrg/core/app/upgrades/v1/v4rc0"
 	v5 "github.com/QuadrateOrg/core/app/upgrades/v1/v5"
-	v6 "github.com/QuadrateOrg/core/app/upgrades/v1/v6"
+	v2 "github.com/QuadrateOrg/core/app/upgrades/v2/v0"
 
 	oraclemodule "github.com/QuadrateOrg/core/x/oracle"
 	oracleclient "github.com/QuadrateOrg/core/x/oracle/client"
@@ -1013,8 +1013,8 @@ func (app *QuadrateApp) setUpgradeHandlers() {
 	)
 
 	app.UpgradeKeeper.SetUpgradeHandler(
-		v6.UpgradeName,
-		v6.CreateUpgradeHandler(
+		v2.UpgradeName,
+		v2.CreateUpgradeHandler(
 			app.mm,
 			app.configurator,
 			app.StableKeeper,
