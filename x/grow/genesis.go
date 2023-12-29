@@ -13,12 +13,6 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) 
 		k.AppendPair(ctx, elem)
 	}
 	k.SetParams(ctx, genState.Params)
-	k.SetRealRate(ctx, sdk.NewIntFromUint64(genState.RealRate))     //nolint:errcheck
-	k.SetBorrowRate(ctx, sdk.NewIntFromUint64(genState.BorrowRate)) //nolint:errcheck
-	gs, _ := sdk.AccAddressFromBech32(genState.GrowStakingReserveAddress)
-	ur, _ := sdk.AccAddressFromBech32(genState.USQReserveAddress)
-	k.SetGrowStakingReserveAddress(ctx, gs)
-	k.SetUSQReserveAddress(ctx, ur)
 }
 
 // ExportGenesis returns the module's exported genesis
@@ -27,11 +21,6 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 	genesis.Params = k.GetParams(ctx)
 
 	genesis.GTokenPairList = k.GetAllPair(ctx)
-	genesis.RealRate = k.GetRealRate(ctx).Uint64()
-	genesis.BorrowRate = k.GetBorrowRate(ctx).Uint64()
-
-	genesis.GrowStakingReserveAddress = string(k.GetGrowStakingReserveAddress(ctx))
-	genesis.USQReserveAddress = string(k.GetUSQReserveAddress(ctx))
 
 	return genesis
 }

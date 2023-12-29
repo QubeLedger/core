@@ -45,9 +45,9 @@ func (s *StableKeeperTestSuite) Setup() {
 	s.app = quadrateapptest.Setup(s.T(), "qube-1", false, 1)
 	s.Address = apptesting.CreateRandomAccounts(1)[0]
 	s.ValPubKeys = simapp.CreateTestPubKeys(1)
+	s.Commit()
 	s.app.GrowKeeper.SetBorrowRate(s.ctx, sdk.NewInt(15))
-	s.app.StableKeeper.SetBurningFundAddress(s.ctx, apptesting.CreateRandomAccounts(1)[0])
-	s.app.StableKeeper.SetReserveFundAddress(s.ctx, apptesting.CreateRandomAccounts(1)[0])
+	s.app.StableKeeper.SetParams(s.ctx, types.DefaultParams())
 }
 
 func TestStableKeeperTestSuite(t *testing.T) {

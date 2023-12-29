@@ -6,6 +6,7 @@ import (
 
 func (s *StableKeeperTestSuite) TestGetParams() {
 	s.Setup()
+	s.Commit()
 	params := types.DefaultParams()
 
 	s.app.StableKeeper.SetParams(s.ctx, params)

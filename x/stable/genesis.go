@@ -19,12 +19,6 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) 
 	for _, pair := range genState.Pairs {
 		k.AppendPair(ctx, pair)
 	}
-
-	rf, _ := sdk.AccAddressFromBech32(genState.ReserveFundAddress)
-	bf, _ := sdk.AccAddressFromBech32(genState.BurningFundAddress)
-
-	k.SetReserveFundAddress(ctx, rf)
-	k.SetBurningFundAddress(ctx, bf)
 }
 
 func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
@@ -34,10 +28,6 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 	genesis.PortId = k.GetPort(ctx)
 
 	genesis.Pairs = k.GetAllPair(ctx)
-
-	genesis.ReserveFundAddress = string(k.GetReserveFundAddress(ctx))
-
-	genesis.BurningFundAddress = string(k.GetBurningFundAddress(ctx))
 
 	return genesis
 }

@@ -4,12 +4,6 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-var (
-	USQReserveAddress         sdk.AccAddress
-	GrowYieldReserveAddress   sdk.AccAddress
-	GrowStakingReserveAddress sdk.AccAddress
-)
-
 /*
 USQReserveAddress
 */
@@ -20,11 +14,15 @@ func (k Keeper) ChangeUSQReserveAddress(ctx sdk.Context, address sdk.AccAddress)
 }
 
 func (k Keeper) SetUSQReserveAddress(ctx sdk.Context, newUSQReserveAddress sdk.AccAddress) {
-	USQReserveAddress = newUSQReserveAddress
+	params := k.GetParams(ctx)
+	params.USQReserveAddress = newUSQReserveAddress.String()
+	k.SetParams(ctx, params)
 }
 
 func (k Keeper) GetUSQReserveAddress(ctx sdk.Context) sdk.AccAddress {
-	return USQReserveAddress
+	params := k.GetParams(ctx)
+	addr, _ := sdk.AccAddressFromBech32(params.USQReserveAddress)
+	return addr
 }
 
 /*
@@ -37,11 +35,15 @@ func (k Keeper) ChangeGrowYieldReserveAddress(ctx sdk.Context, address sdk.AccAd
 }
 
 func (k Keeper) SetGrowYieldReserveAddress(ctx sdk.Context, newGrowYieldReserveAddress sdk.AccAddress) {
-	GrowYieldReserveAddress = newGrowYieldReserveAddress
+	params := k.GetParams(ctx)
+	params.GrowYieldReserveAddress = newGrowYieldReserveAddress.String()
+	k.SetParams(ctx, params)
 }
 
 func (k Keeper) GetGrowYieldReserveAddress(ctx sdk.Context) sdk.AccAddress {
-	return GrowYieldReserveAddress
+	params := k.GetParams(ctx)
+	addr, _ := sdk.AccAddressFromBech32(params.GrowYieldReserveAddress)
+	return addr
 }
 
 /*
@@ -53,12 +55,16 @@ func (k Keeper) ChangeGrowStakingReserveAddress(ctx sdk.Context, address sdk.Acc
 	return nil
 }
 
-func (k Keeper) SetGrowStakingReserveAddress(ctx sdk.Context, newUSQStakingReserveAddress sdk.AccAddress) {
-	GrowStakingReserveAddress = newUSQStakingReserveAddress
+func (k Keeper) SetGrowStakingReserveAddress(ctx sdk.Context, newGrowStakingReserveAddress sdk.AccAddress) {
+	params := k.GetParams(ctx)
+	params.GrowStakingReserveAddress = newGrowStakingReserveAddress.String()
+	k.SetParams(ctx, params)
 }
 
 func (k Keeper) GetGrowStakingReserveAddress(ctx sdk.Context) sdk.AccAddress {
-	return GrowStakingReserveAddress
+	params := k.GetParams(ctx)
+	addr, _ := sdk.AccAddressFromBech32(params.GrowStakingReserveAddress)
+	return addr
 }
 
 /*
@@ -66,6 +72,11 @@ Check Address for empty
 */
 
 func (k Keeper) AddressEmptyCheck(ctx sdk.Context) bool {
+	params := k.GetParams(ctx)
+	USQReserveAddress, _ := sdk.AccAddressFromBech32(params.USQReserveAddress)
+	GrowYieldReserveAddress, _ := sdk.AccAddressFromBech32(params.GrowYieldReserveAddress)
+	GrowStakingReserveAddress, _ := sdk.AccAddressFromBech32(params.GrowStakingReserveAddress)
+
 	if USQReserveAddress.Empty() {
 		return true
 	}

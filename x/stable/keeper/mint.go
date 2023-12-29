@@ -13,6 +13,10 @@ var (
 
 func (k Keeper) ExecuteMint(ctx sdk.Context, msg *types.MsgMint, pair types.Pair) (error, sdk.Coin) {
 
+	params := k.GetParams(ctx)
+	ReserveFundAddress, _ := sdk.AccAddressFromBech32(params.ReserveFundAddress)
+	BurningFundAddress, _ := sdk.AccAddressFromBech32(params.BurningFundAddress)
+
 	atomPrice, err := k.GetAtomPrice(ctx, pair)
 	if err != nil {
 		return err, sdk.Coin{}
@@ -70,6 +74,7 @@ func (k Keeper) ExecuteMint(ctx sdk.Context, msg *types.MsgMint, pair types.Pair
 	if err != nil {
 		return err, sdk.Coin{}
 	}
+
 	fee := sdk.NewInt(0)
 	if !mintingFee.IsZero() {
 		fee = k.CalculateMintingFeeForBurningFund(amountInt, atomPrice, mintingFee)

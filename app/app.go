@@ -122,6 +122,7 @@ import (
 	v4 "github.com/QuadrateOrg/core/app/upgrades/v1/v4"
 	v4rc0 "github.com/QuadrateOrg/core/app/upgrades/v1/v4rc0"
 	v5 "github.com/QuadrateOrg/core/app/upgrades/v1/v5"
+	v6 "github.com/QuadrateOrg/core/app/upgrades/v1/v6"
 
 	oraclemodule "github.com/QuadrateOrg/core/x/oracle"
 	oracleclient "github.com/QuadrateOrg/core/x/oracle/client"
@@ -189,6 +190,7 @@ func getGovProposalHandlers() []govclient.ProposalHandler {
 		stableclient.RegisterPairHandler,
 		stableclient.RegisterChangeBurningFundAddressHandler,
 		stableclient.RegisterChangeReserveFundAddressHandler,
+		stableclient.RegisterDeletePairHandler,
 		growclient.RegisterChangeBorrowRateProposalHandler,
 		growclient.RegisterChangeGrowStakingReserveAddressProposalHandler,
 		growclient.RegisterChangeGrowYieldReserveAddressProposalHandler,
@@ -490,8 +492,15 @@ func NewQuadrateApp(
 	)
 
 	app.OracleKeeper = oraclemodulekeeper.NewKeeper(
-		appCodec, keys[oraclemoduletypes.StoreKey], app.GetSubspace(oraclemoduletypes.ModuleName),
-		app.AccountKeeper, app.BankKeeper, app.DistrKeeper, app.SlashingKeeper, &stakingKeeper, distrtypes.ModuleName,
+		appCodec,
+		keys[oraclemoduletypes.StoreKey],
+		app.GetSubspace(oraclemoduletypes.ModuleName),
+		app.AccountKeeper,
+		app.BankKeeper,
+		app.DistrKeeper,
+		app.SlashingKeeper,
+		&stakingKeeper,
+		distrtypes.ModuleName,
 	)
 	oracleModule := oraclemodule.NewAppModule(appCodec, app.OracleKeeper, app.AccountKeeper, app.BankKeeper)
 
@@ -1000,6 +1009,16 @@ func (app *QuadrateApp) setUpgradeHandlers() {
 		v5.CreateUpgradeHandler(
 			app.mm,
 			app.configurator,
+		),
+	)
+
+	app.UpgradeKeeper.SetUpgradeHandler(
+		v6.UpgradeName,
+		v6.CreateUpgradeHandler(
+			app.mm,
+			app.configurator,
+			app.StableKeeper,
+			app.GrowKeeper,
 		),
 	)
 

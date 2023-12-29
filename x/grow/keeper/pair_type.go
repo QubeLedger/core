@@ -120,7 +120,7 @@ func (k Keeper) RegisterPair(ctx sdk.Context, p types.GTokenPair) error {
 		GTokenMetadata:              p.GTokenMetadata,
 		MinAmountIn:                 p.MinAmountIn,
 		MinAmountOut:                p.MinAmountOut,
-		GTokenLastPrice:             sdk.Int{},
+		GTokenLastPrice:             sdk.NewInt(1 * 1000000),
 		GTokenLatestPriceUpdateTime: uint64(time.Now().Unix()),
 	}
 	_ = k.AppendPair(ctx, pair)
