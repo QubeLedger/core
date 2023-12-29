@@ -34,7 +34,7 @@ func TestUpgradeTestSuite(t *testing.T) {
 
 func (s *UpgradeTestSuite) runV6Upgrade() {
 	s.Ctx = s.Ctx.WithBlockHeight(v6UpgradeHeight - 1)
-	plan := upgradetypes.Plan{Name: "v0.1.6", Height: v6UpgradeHeight}
+	plan := upgradetypes.Plan{Name: "v0.2.0", Height: v6UpgradeHeight}
 	err := s.App.UpgradeKeeper.ScheduleUpgrade(s.Ctx, plan)
 	s.Require().NoError(err)
 	_, exists := s.App.UpgradeKeeper.GetUpgradePlan(s.Ctx)
