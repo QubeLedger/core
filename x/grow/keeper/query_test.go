@@ -330,11 +330,6 @@ func (suite *GrowKeeperTestSuite) TestYieldPercentage() {
 	suite.RegisterValidator()
 	s.ctx = s.ctx.WithBlockTime(time.Now())
 
-	err := suite.app.GrowKeeper.SetBorrowRate(s.ctx, sdk.NewInt(15))
-	suite.Require().NoError(err)
-	err = suite.app.GrowKeeper.SetRealRate(s.ctx, sdk.NewInt(15))
-	suite.Require().NoError(err)
-
 	address := []sdk.AccAddress{
 		apptesting.CreateRandomAccounts(1)[0],
 		apptesting.CreateRandomAccounts(1)[0],
@@ -350,6 +345,11 @@ func (suite *GrowKeeperTestSuite) TestYieldPercentage() {
 
 	suite.app.StableKeeper.AppendPair(s.ctx, s.GetNormalQStablePair(0))
 	suite.app.GrowKeeper.AppendPair(s.ctx, s.GetNormalGTokenPair(0))
+
+	err := suite.app.GrowKeeper.SetBorrowRate(s.ctx, sdk.NewInt(15), s.GetNormalGTokenPair(0).DenomID)
+	suite.Require().NoError(err)
+	err = suite.app.GrowKeeper.SetRealRate(s.ctx, sdk.NewInt(15), s.GetNormalGTokenPair(0).DenomID)
+	suite.Require().NoError(err)
 
 	suite.AddTestCoins(1000*1000000, s.GetNormalQStablePair(0).AmountInMetadata.Base)
 	suite.MintStable(1000*1000000, s.GetNormalQStablePair(0))

@@ -134,12 +134,13 @@ func (suite *GrowKeeperTestSuite) TestExecuteWithdrawal() {
 	suite.app.GrowKeeper.SetGrowStakingReserveAddress(s.ctx, apptesting.CreateRandomAccounts(1)[0])
 	suite.app.GrowKeeper.SetGrowYieldReserveAddress(s.ctx, apptesting.CreateRandomAccounts(1)[0])
 	suite.app.GrowKeeper.SetUSQReserveAddress(s.ctx, apptesting.CreateRandomAccounts(1)[0])
-	suite.app.GrowKeeper.SetBorrowRate(s.ctx, sdk.NewInt(15))
-	suite.app.GrowKeeper.SetRealRate(s.ctx, sdk.NewInt(15))
 	for _, tc := range testCases {
 
 		suite.app.StableKeeper.AppendPair(s.ctx, tc.qStablePair)
 		suite.app.GrowKeeper.AppendPair(s.ctx, tc.gTokenPair)
+
+		suite.app.GrowKeeper.SetBorrowRate(s.ctx, sdk.NewInt(15), tc.gTokenPair.DenomID)
+		suite.app.GrowKeeper.SetRealRate(s.ctx, sdk.NewInt(15), tc.gTokenPair.DenomID)
 
 		suite.OracleAggregateExchangeRateFromNet()
 

@@ -211,13 +211,13 @@ func (k Keeper) YieldPercentage(goCtx context.Context, req *types.QueryYieldPerc
 	}
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	RealRate := k.GetRealRate(ctx)
-	BorrowRate := k.GetBorrowRate(ctx)
-
 	gTokenPair, found := k.GetPairByDenomID(ctx, req.Id)
 	if !found {
 		return nil, status.Error(codes.NotFound, "not found")
 	}
+
+	RealRate := k.GetRealRate(ctx, gTokenPair.DenomID)
+	BorrowRate := k.GetBorrowRate(ctx, gTokenPair.DenomID)
 
 	growYield, err := k.CalculateGrowYield(ctx, gTokenPair)
 	if err != nil {

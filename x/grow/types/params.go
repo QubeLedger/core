@@ -8,8 +8,6 @@ import (
 var _ paramtypes.ParamSet = &Params{}
 
 const (
-	DefaultRealRate                  = uint64(1)
-	DefaultBorrowRate                = uint64(1)
 	DefaultLastTimeUpdateReserve     = uint64(1)
 	DefaultGrowStakingReserveAddress = "qube13zq340zzjgua9h98pltzwv0ga5r0kkn0ryjz4v"
 	DefaultUSQReserveAddress         = "qube1nx9scnpdnp5wsw88at9e35fng56788h7yz9srs"
@@ -35,8 +33,6 @@ func ParamKeyTable() paramtypes.KeyTable {
 // DefaultParams returns a default set of parameters
 func DefaultParams() Params {
 	return Params{
-		RealRate:                  DefaultRealRate,
-		BorrowRate:                DefaultBorrowRate,
 		LastTimeUpdateReserve:     DefaultLastTimeUpdateReserve,
 		GrowStakingReserveAddress: DefaultGrowStakingReserveAddress,
 		USQReserveAddress:         DefaultUSQReserveAddress,
@@ -48,8 +44,6 @@ func DefaultParams() Params {
 // ParamSetPairs get the params.ParamSet
 func (p *Params) ParamSetPairs() paramtypes.ParamSetPairs {
 	return paramtypes.ParamSetPairs{
-		paramtypes.NewParamSetPair(KeyRealRate, &p.RealRate, validate),
-		paramtypes.NewParamSetPair(KeyBorrowRate, &p.BorrowRate, validate),
 		paramtypes.NewParamSetPair(KeyLastTimeUpdateReserve, &p.LastTimeUpdateReserve, validate),
 		paramtypes.NewParamSetPair(KeyGrowStakingReserveAddress, &p.GrowStakingReserveAddress, validate),
 		paramtypes.NewParamSetPair(KeyUSQReserveAddress, &p.USQReserveAddress, validate),

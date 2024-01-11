@@ -23,35 +23,44 @@ func (k Keeper) GetLastTimeUpdateReserve(ctx sdk.Context) sdk.Int {
 }
 
 /* Real Rate */
-func (k Keeper) SetRealRate(ctx sdk.Context, val sdk.Int) error {
+func (k Keeper) SetRealRate(ctx sdk.Context, val sdk.Int, id string) error {
+	pair, f := k.GetPairByDenomID(ctx, id)
+	if !f {
+		return types.ErrPairNotFound
+	}
+
 	if val.IsNil() || val.IsZero() || val.IsNegative() {
 		return types.ErrIntNegativeOrZero
 	}
-	params := k.GetParams(ctx)
-	params.RealRate = val.Uint64()
-	k.SetParams(ctx, params)
+	pair.RealRate = val.Uint64()
+	k.SetPair(ctx, pair)
 	return nil
 }
 
-func (k Keeper) GetRealRate(ctx sdk.Context) sdk.Int {
-	params := k.GetParams(ctx)
-	return sdk.NewIntFromUint64(params.RealRate)
+func (k Keeper) GetRealRate(ctx sdk.Context, id string) sdk.Int {
+	pair, _ := k.GetPairByDenomID(ctx, id)
+	return sdk.NewIntFromUint64(pair.RealRate)
 }
 
 /* Borrow Rate */
-func (k Keeper) SetBorrowRate(ctx sdk.Context, val sdk.Int) error {
+func (k Keeper) SetBorrowRate(ctx sdk.Context, val sdk.Int, id string) error {
+
+	pair, f := k.GetPairByDenomID(ctx, id)
+	if !f {
+		return types.ErrPairNotFound
+	}
+
 	if val.IsNil() || val.IsZero() || val.IsNegative() {
 		return types.ErrIntNegativeOrZero
 	}
-	params := k.GetParams(ctx)
-	params.BorrowRate = val.Uint64()
-	k.SetParams(ctx, params)
+	pair.BorrowRate = val.Uint64()
+	k.SetPair(ctx, pair)
 	return nil
 }
 
-func (k Keeper) GetBorrowRate(ctx sdk.Context) sdk.Int {
-	params := k.GetParams(ctx)
-	return sdk.NewIntFromUint64(params.BorrowRate)
+func (k Keeper) GetBorrowRate(ctx sdk.Context, id string) sdk.Int {
+	pair, _ := k.GetPairByDenomID(ctx, id)
+	return sdk.NewIntFromUint64(pair.BorrowRate)
 }
 
 /*
@@ -131,7 +140,7 @@ func (k Keeper) CalculateRealYield(ctx sdk.Context, gTokenPair types.GTokenPair)
 
 	qm := qStablePair.Qm
 
-	res := ((qm.Mul(br)).Mul(k.GetRealRate(ctx))).QuoRaw(10000)
+	res := ((qm.Mul(br)).Mul(k.GetRealRate(ctx, gTokenPair.DenomID))).QuoRaw(10000)
 
 	return res, nil
 }
