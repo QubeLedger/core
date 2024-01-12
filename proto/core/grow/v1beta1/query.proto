@@ -16,7 +16,7 @@ option go_package = "github.com/QuadrateOrg/core/x/grow/types";
 
 service Query {
   rpc Params (QueryParamsRequest) returns (QueryParamsResponse) {
-    option (google.api.http).get = "/core/grow/v1beta1/grow/params";
+    option (google.api.http).get = "/core/grow/v1beta1/params";
   }
 
   rpc LendAssetByLendAssetId(QueryLendAssetByLendAssetIdRequest) returns (QueryLendAssetByLendAssetIdResponse) {
@@ -83,6 +83,7 @@ message QueryLendAssetByLendAssetIdResponse {
   string LendAssetId = 1;
   cosmos.bank.v1beta1.Metadata assetMetadata = 2 [ (gogoproto.moretags) = "yaml:\"assetMetadata\"", (gogoproto.nullable)   = false ];
   string oracleAssetId = 3;
+  uint64 LendRate = 4;
 }
 
 /* PositionById */
@@ -194,6 +195,8 @@ message PairByDenomIdResponse {
           (gogoproto.moretags) = "yaml:\"st\"",
           (gogoproto.nullable) = false
   ];
+  uint64 RealRate = 11;
+  uint64 BorrowRate = 12;
 }
 
 /* AllPairs */

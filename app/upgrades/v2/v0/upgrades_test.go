@@ -108,12 +108,4 @@ func (s *UpgradeTestSuite) TestUpgrade() {
 	grow_yield_reserve_addr := s.App.GrowKeeper.GetGrowYieldReserveAddress(s.Ctx)
 	default_grow_yield_reserve_addr, _ := sdk.AccAddressFromBech32(growtypes.DefaultParams().GrowYieldReserveAddress)
 	s.Require().Equal(default_grow_yield_reserve_addr, grow_yield_reserve_addr)
-
-	real_rate := s.App.GrowKeeper.GetRealRate(s.Ctx)
-	default_real_rate := growtypes.DefaultParams().RealRate
-	s.Require().Equal(sdk.NewIntFromUint64(default_real_rate), real_rate)
-
-	borrow_rate := s.App.GrowKeeper.GetBorrowRate(s.Ctx)
-	default_borrow_rate := growtypes.DefaultParams().BorrowRate
-	s.Require().Equal(sdk.NewIntFromUint64(default_borrow_rate), borrow_rate)
 }

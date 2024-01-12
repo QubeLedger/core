@@ -20,4 +20,5 @@ message LendAsset {
         string LendAssetId = 2;
         cosmos.bank.v1beta1.Metadata assetMetadata = 3 [ (gogoproto.moretags) = "yaml:\"assetMetadata\"", (gogoproto.nullable)   = false ];
         string oracleAssetId = 4;
+        uint64 LendRate = 5;
 }

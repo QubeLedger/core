@@ -19,6 +19,7 @@ const (
 	ProposalTypeRegisterChangeGrowStakingReserveAddressProposal string = "RegisterChangeGrowStakingReserveAddressProposal"
 	ProposalTypeRegisterChangeRealRateProposal                  string = "RegisterChangeRealRateProposal"
 	ProposalTypeRegisterChangeBorrowRateProposal                string = "RegisterChangeBorrowRateProposal"
+	ProposalTypeRegisterChangeLendRateProposal                  string = "RegisterChangeLendRateProposal"
 	ProposalTypeRegisterActivateGrowModuleProposal              string = "RegisterActivateGrowModuleProposal"
 	ProposalTypeRegisterRemoveLendAssetProposal                 string = "RegisterRemoveLendAssetProposal"
 	ProposalTypeRegisterRemoveGTokenPairProposal                string = "RegisterRemoveGTokenPairProposal"
@@ -33,6 +34,7 @@ var (
 	_ govtypes.Content = &RegisterChangeGrowStakingReserveAddressProposal{}
 	_ govtypes.Content = &RegisterChangeRealRateProposal{}
 	_ govtypes.Content = &RegisterChangeBorrowRateProposal{}
+	_ govtypes.Content = &RegisterChangeLendRateProposal{}
 	_ govtypes.Content = &RegisterActivateGrowModuleProposal{}
 	_ govtypes.Content = &RegisterRemoveLendAssetProposal{}
 	_ govtypes.Content = &RegisterRemoveGTokenPairProposal{}
@@ -59,6 +61,9 @@ func init() {
 
 	govtypes.RegisterProposalType(ProposalTypeRegisterChangeBorrowRateProposal)
 	govtypes.RegisterProposalTypeCodec(&RegisterChangeBorrowRateProposal{}, "grow/RegisterChangeBorrowRateProposal")
+
+	govtypes.RegisterProposalType(ProposalTypeRegisterChangeLendRateProposal)
+	govtypes.RegisterProposalTypeCodec(&RegisterChangeLendRateProposal{}, "grow/RegisterChangeLendRateProposal")
 
 	govtypes.RegisterProposalType(ProposalTypeRegisterActivateGrowModuleProposal)
 	govtypes.RegisterProposalTypeCodec(&RegisterActivateGrowModuleProposal{}, "grow/RegisterActivateGrowModuleProposal")
@@ -332,6 +337,44 @@ func (rtbp *RegisterChangeBorrowRateProposal) ValidateBasic() error {
 		value := sdk.NewInt(int64(rtbp.Rate))
 		if value.IsNegative() || value.IsNil() || value.IsZero() {
 			return ErrIntNegativeOrZero
+		}
+	}
+	return nil
+}
+
+/*
+RegisterChangeLendRateProposal
+*/
+
+func NewRegisterChangeLendRateProposal(title, description string, rate uint64, id string) govtypes.Content {
+	return &RegisterChangeLendRateProposal{
+		Title:       title,
+		Description: description,
+		Rate:        rate,
+		Id:          id,
+	}
+}
+
+func (*RegisterChangeLendRateProposal) ProposalRoute() string { return RouterKey }
+
+func (*RegisterChangeLendRateProposal) ProposalType() string {
+	return ProposalTypeRegisterChangeLendRateProposal
+}
+
+/* #nosec */
+func (rtbp *RegisterChangeLendRateProposal) ValidateBasic() error {
+	{
+		if rtbp.Rate == uint64(0) {
+			return ErrIntNegativeOrZero
+		}
+
+		value := sdk.NewInt(int64(rtbp.Rate))
+		if value.IsNegative() || value.IsNil() || value.IsZero() {
+			return ErrIntNegativeOrZero
+		}
+
+		if len(rtbp.Id) == 0 {
+			return ErrInvalidLength
 		}
 	}
 	return nil

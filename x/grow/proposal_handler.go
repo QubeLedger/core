@@ -127,7 +127,7 @@ func handleRegisterChangeGrowStakingReserveAddressProposal(ctx sdk.Context, k *k
 }
 
 func handleRegisterChangeRealRateProposal(ctx sdk.Context, k *keeper.Keeper, p *types.RegisterChangeRealRateProposal) error {
-	err := k.SetRealRate(ctx, sdk.NewIntFromUint64(p.Rate))
+	err := k.SetRealRate(ctx, sdk.NewIntFromUint64(p.Rate), p.Id)
 	if err != nil {
 		return err
 	}
@@ -140,7 +140,7 @@ func handleRegisterChangeRealRateProposal(ctx sdk.Context, k *keeper.Keeper, p *
 }
 
 func handleRegisterChangeBorrowRateProposal(ctx sdk.Context, k *keeper.Keeper, p *types.RegisterChangeBorrowRateProposal) error {
-	err := k.SetBorrowRate(ctx, sdk.NewIntFromUint64(p.Rate))
+	err := k.SetBorrowRate(ctx, sdk.NewIntFromUint64(p.Rate), p.Id)
 	if err != nil {
 		return err
 	}
