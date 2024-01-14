@@ -24,9 +24,18 @@ func (k Keeper) Mint(goCtx context.Context, msg *types.MsgMint) (*types.MsgMintR
 		return nil, err
 	}
 
-	err, amountOut := k.ExecuteMint(ctx, msg, pair)
-	if err != nil {
-		return nil, err
+	var (
+		mint_err  error
+		amountOut sdk.Coin
+	)
+
+	switch pair.Model {
+	case "gmb":
+		mint_err, amountOut = k.GMB_ExecuteMint(ctx, msg, pair)
+	}
+
+	if mint_err != nil {
+		return nil, mint_err
 	}
 
 	ctx.EventManager().EmitEvents(sdk.Events{
@@ -60,10 +69,18 @@ func (k Keeper) Burn(goCtx context.Context, msg *types.MsgBurn) (*types.MsgBurnR
 		return nil, err
 	}
 
-	err, amountOut := k.ExecuteBurn(ctx, msg, pair)
+	var (
+		burn_err  error
+		amountOut sdk.Coin
+	)
 
-	if err != nil {
-		return nil, err
+	switch pair.Model {
+	case "gmb":
+		burn_err, amountOut = k.GMB_ExecuteBurn(ctx, msg, pair)
+	}
+
+	if burn_err != nil {
+		return nil, burn_err
 	}
 
 	ctx.EventManager().EmitEvents(sdk.Events{

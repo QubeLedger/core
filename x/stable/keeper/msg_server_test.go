@@ -25,7 +25,7 @@ func (suite *StableKeeperTestSuite) TestMint() {
 	}{
 		{
 			"ok-mint",
-			s.GetNormalPair(0),
+			s.GetNormalGMBPair(0),
 			"uatom",
 			1000,
 			9471,
@@ -35,7 +35,7 @@ func (suite *StableKeeperTestSuite) TestMint() {
 		},
 		{
 			"fail-pair not found",
-			s.GetNormalPair(0),
+			s.GetNormalGMBPair(0),
 			"uqube",
 			1000,
 			9272,
@@ -45,7 +45,7 @@ func (suite *StableKeeperTestSuite) TestMint() {
 		},
 		{
 			"fail-mint blocked",
-			s.GetNormalPair(0),
+			s.GetNormalGMBPair(0),
 			"uatom",
 			1000,
 			9471,
@@ -55,7 +55,7 @@ func (suite *StableKeeperTestSuite) TestMint() {
 		},
 		{
 			"fail-amountIn less minAmountIn",
-			s.GetNormalPair(0),
+			s.GetNormalGMBPair(0),
 			"uatom",
 			19,
 			0,
@@ -121,7 +121,7 @@ func (suite *StableKeeperTestSuite) TestBurn() {
 	}{
 		{
 			"ok - burn",
-			s.GetNormalPair(0),
+			s.GetNormalGMBPair(0),
 			"uusd",
 			1000000,
 			105052,
@@ -131,7 +131,7 @@ func (suite *StableKeeperTestSuite) TestBurn() {
 		},
 		{
 			"fail - wrong denom",
-			s.GetNormalPair(0),
+			s.GetNormalGMBPair(0),
 			"uqube",
 			1000,
 			104,
@@ -141,7 +141,7 @@ func (suite *StableKeeperTestSuite) TestBurn() {
 		},
 		{
 			"fail - burn blocked",
-			s.GetNormalPair(0),
+			s.GetNormalGMBPair(0),
 			"uusd",
 			1000,
 			104,
@@ -151,7 +151,7 @@ func (suite *StableKeeperTestSuite) TestBurn() {
 		},
 		{
 			"fail-amountOut less minAnountOut",
-			s.GetNormalPair(0),
+			s.GetNormalGMBPair(0),
 			"uusd",
 			19,
 			0,
@@ -220,7 +220,7 @@ func (suite *StableKeeperTestSuite) TestMintGetPriceFromOracle() {
 	}{
 		{
 			"ok-mint№1",
-			s.GetNormalPair(0),
+			s.GetNormalGMBPair(0),
 			"uatom",
 			1000,
 			false,
@@ -228,7 +228,7 @@ func (suite *StableKeeperTestSuite) TestMintGetPriceFromOracle() {
 		},
 		{
 			"ok-mint№2",
-			s.GetNormalPair(0),
+			s.GetNormalGMBPair(0),
 			"uatom",
 			300,
 			false,
@@ -236,7 +236,7 @@ func (suite *StableKeeperTestSuite) TestMintGetPriceFromOracle() {
 		},
 		{
 			"ok-mint№3",
-			s.GetNormalPair(0),
+			s.GetNormalGMBPair(0),
 			"uatom",
 			730,
 			false,
@@ -280,7 +280,7 @@ func (suite *StableKeeperTestSuite) TestBurnGetPriceFromOracle() {
 	}{
 		{
 			"ok-burn№1",
-			s.GetNormalPair(0),
+			s.GetNormalGMBPair(0),
 			"uusd",
 			1000,
 			false,
@@ -288,7 +288,7 @@ func (suite *StableKeeperTestSuite) TestBurnGetPriceFromOracle() {
 		},
 		{
 			"ok-burn№2",
-			s.GetNormalPair(0),
+			s.GetNormalGMBPair(0),
 			"uusd",
 			300,
 			false,
@@ -296,7 +296,7 @@ func (suite *StableKeeperTestSuite) TestBurnGetPriceFromOracle() {
 		},
 		{
 			"ok-burn№3",
-			s.GetNormalPair(0),
+			s.GetNormalGMBPair(0),
 			"uusd",
 			730,
 			false,
@@ -312,7 +312,7 @@ func (suite *StableKeeperTestSuite) TestBurnGetPriceFromOracle() {
 		suite.OracleAggregateExchangeRateFromNet()
 		suite.app.StableKeeper.AppendPair(suite.ctx, tc.pair)
 		suite.AddTestCoins(10000, tc.pair.AmountInMetadata.Base)
-		err := suite.MintStable(10000, s.GetNormalPair(0))
+		err := suite.MintStable(10000, s.GetNormalGMBPair(0))
 		suite.Require().NoError(err)
 		price, _ := suite.app.StableKeeper.GetAtomPrice(suite.ctx, tc.pair)
 		suite.Run(fmt.Sprintf("Case---%s---price---%f", tc.name, float64(float64(price.Int64())/10000)), func() {
@@ -348,7 +348,7 @@ func (suite *StableKeeperTestSuite) TestExtremeMarketSituations() {
 	}{
 		{
 			"mint-user1",
-			s.GetNormalPair(0),
+			s.GetNormalGMBPair(0),
 			"uatom",
 			1000,
 			100,
@@ -360,7 +360,7 @@ func (suite *StableKeeperTestSuite) TestExtremeMarketSituations() {
 		},
 		{
 			"mint-user2",
-			s.GetNormalPair(0),
+			s.GetNormalGMBPair(0),
 			"uatom",
 			1000,
 			100,
@@ -372,7 +372,7 @@ func (suite *StableKeeperTestSuite) TestExtremeMarketSituations() {
 		},
 		{
 			"mint№2-user1",
-			s.GetNormalPair(0),
+			s.GetNormalGMBPair(0),
 			"uatom",
 			1000,
 			50,
@@ -384,7 +384,7 @@ func (suite *StableKeeperTestSuite) TestExtremeMarketSituations() {
 		},
 		{
 			"mint№2-user2",
-			s.GetNormalPair(0),
+			s.GetNormalGMBPair(0),
 			"uatom",
 			700,
 			50,
@@ -396,7 +396,7 @@ func (suite *StableKeeperTestSuite) TestExtremeMarketSituations() {
 		},
 		{
 			"burn-user1",
-			s.GetNormalPair(0),
+			s.GetNormalGMBPair(0),
 			"uusd",
 			9000,
 			50,
@@ -408,7 +408,7 @@ func (suite *StableKeeperTestSuite) TestExtremeMarketSituations() {
 		},
 		{
 			"burn-user1",
-			s.GetNormalPair(0),
+			s.GetNormalGMBPair(0),
 			"uusd",
 			9000,
 			50,
@@ -482,7 +482,7 @@ func (suite *StableKeeperTestSuite) TestMarketDropOf40() {
 	for i := 0; i < 10; i++ {
 		newTestCase := testCase{
 			name:                fmt.Sprintf("mint-user%d", i),
-			pair:                suite.GetNormalPair(0),
+			pair:                suite.GetNormalGMBPair(0),
 			sendTokenDenom:      "uatom",
 			sendTokenAmount:     1000,
 			expectedTokenAmount: 100,
@@ -497,7 +497,7 @@ func (suite *StableKeeperTestSuite) TestMarketDropOf40() {
 
 	burnTestCaseFail := testCase{
 		name:                fmt.Sprintf("burn"),
-		pair:                suite.GetNormalPair(0),
+		pair:                suite.GetNormalGMBPair(0),
 		sendTokenDenom:      "uusd",
 		sendTokenAmount:     8000,
 		expectedTokenAmount: 50,
@@ -509,7 +509,7 @@ func (suite *StableKeeperTestSuite) TestMarketDropOf40() {
 	}
 	mintForTest := testCase{
 		name:                fmt.Sprintf("mint"),
-		pair:                suite.GetNormalPair(0),
+		pair:                suite.GetNormalGMBPair(0),
 		sendTokenDenom:      "uatom",
 		sendTokenAmount:     1000,
 		expectedTokenAmount: 100,
@@ -521,7 +521,7 @@ func (suite *StableKeeperTestSuite) TestMarketDropOf40() {
 	}
 	burnTestCase1Succses := testCase{
 		name:                fmt.Sprintf("burn"),
-		pair:                suite.GetNormalPair(0),
+		pair:                suite.GetNormalGMBPair(0),
 		sendTokenDenom:      "uusd",
 		sendTokenAmount:     8000,
 		expectedTokenAmount: 50,

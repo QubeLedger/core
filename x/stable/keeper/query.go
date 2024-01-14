@@ -20,8 +20,7 @@ func (k Keeper) Params(goCtx context.Context, req *types.QueryParamsRequest) (*t
 	params := k.GetParams(ctx)
 
 	return &types.QueryParamsResponse{
-		ReserveFundAddress: params.ReserveFundAddress,
-		BurningFundAddress: params.BurningFundAddress,
+		Params: &params,
 	}, nil
 }
 

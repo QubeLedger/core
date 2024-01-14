@@ -80,7 +80,7 @@ func (suite *StableKeeperTestSuite) MintStable(amount int64, pair types.Pair) er
 	return nil
 }
 
-func (s *StableKeeperTestSuite) GetNormalPair(id uint64) types.Pair {
+func (s *StableKeeperTestSuite) GetNormalGMBPair(id uint64) types.Pair {
 	pair := types.Pair{
 		Id:     id,
 		PairId: fmt.Sprintf("%x", crypto.Sha256(append([]byte("uatom"+"uusd")))),
@@ -104,6 +104,7 @@ func (s *StableKeeperTestSuite) GetNormalPair(id uint64) types.Pair {
 			Name:    "USQ",
 			Symbol:  "USQ",
 		},
+		Model:        "gmb",
 		Qm:           sdk.NewInt(0),
 		Ar:           sdk.NewInt(0),
 		MinAmountIn:  "20uatom",

@@ -120,6 +120,7 @@ func (k Keeper) RegisterPair(ctx sdk.Context, p types.Pair) error {
 		PairId:            k.GeneratePairIdHash(p.AmountInMetadata.Base, p.AmountOutMetadata.Base),
 		AmountInMetadata:  p.AmountInMetadata,
 		AmountOutMetadata: p.AmountOutMetadata,
+		Model:             p.Model,
 		Qm:                sdk.NewInt(0),
 		Ar:                sdk.NewInt(0),
 		MinAmountIn:       p.MinAmountIn,

@@ -6,7 +6,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-func (k Keeper) ExecuteBurn(ctx sdk.Context, msg *types.MsgBurn, pair types.Pair) (error, sdk.Coin) {
+func (k Keeper) GMB_ExecuteBurn(ctx sdk.Context, msg *types.MsgBurn, pair types.Pair) (error, sdk.Coin) {
 
 	ReserveFundAddress := k.GetReserveFundAddress(ctx)
 	BurningFundAddress := k.GetBurningFundAddress(ctx)

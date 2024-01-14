@@ -5,6 +5,7 @@ import "gogoproto/gogo.proto";
 import "google/api/annotations.proto";
 import "cosmos/base/query/v1beta1/pagination.proto";
 import "core/stable/v1beta1/pair.proto";
+import "core/stable/v1beta1/params.proto";
 import "cosmos/bank/v1beta1/bank.proto";
 option go_package = "github.com/QuadrateOrg/core/x/stable/types";
 
@@ -31,8 +32,7 @@ service Query {
 message QueryParamsRequest {}
 
 message QueryParamsResponse {
-  string ReserveFundAddress = 1;
-	string BurningFundAddress = 2;
+  Params params = 1;
 }
 
 message PairByPairIdRequest {
@@ -59,18 +59,19 @@ message PairRequestResponse {
   string pairId = 1;
   cosmos.bank.v1beta1.Metadata amountInMetadata = 2 [ (gogoproto.moretags) = "yaml:\"amountInMetadata\"", (gogoproto.nullable)   = false ];
   cosmos.bank.v1beta1.Metadata amountOutMetadata = 3 [ (gogoproto.moretags) = "yaml:\"amountOutMetadata\"", (gogoproto.nullable)   = false ];
-  string qm = 4 [
+  string model = 4;
+  string qm = 5 [
           (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
           (gogoproto.moretags) = "yaml:\"qm\"",
           (gogoproto.nullable) = false
   ];
-  string ar = 5 [
+  string ar = 6 [
           (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
           (gogoproto.moretags) = "yaml:\"ar\"",
           (gogoproto.nullable) = false
   ];
-  string minAmountIn = 6;
-  string minAmountOut = 7;
+  string minAmountIn = 7;
+  string minAmountOut = 8;
   uint64 backing_ratio = 9;
   uint64 minting_fee = 10;
   uint64 burning_fee = 11;
