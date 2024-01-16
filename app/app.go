@@ -139,6 +139,10 @@ import (
 	growmodulekeeper "github.com/QuadrateOrg/core/x/grow/keeper"
 	growmoduletypes "github.com/QuadrateOrg/core/x/grow/types"
 
+	dexmodule "github.com/QuadrateOrg/core/x/dex"
+	dexmodulekeeper "github.com/QuadrateOrg/core/x/dex/keeper"
+	dexmoduletypes "github.com/QuadrateOrg/core/x/dex/types"
+
 	// unnamed import of statik for swagger UI support
 	_ "github.com/cosmos/cosmos-sdk/client/docs/statik"
 )
@@ -240,6 +244,7 @@ var (
 		oraclemodule.AppModuleBasic{},
 		stablemodule.AppModuleBasic{},
 		growmodule.AppModuleBasic{},
+		dexmodule.AppModuleBasic{},
 	)
 
 	// module account permissions
@@ -257,6 +262,7 @@ var (
 		oraclemoduletypes.ModuleName:   {authtypes.Minter, authtypes.Burner, authtypes.Staking},
 		stablemoduletypes.ModuleName:   {authtypes.Minter, authtypes.Burner},
 		growmoduletypes.ModuleName:     {authtypes.Minter, authtypes.Burner, authtypes.Staking},
+		dexmoduletypes.ModuleName:      {authtypes.Minter, authtypes.Burner, authtypes.Staking},
 	}
 )
 
@@ -304,6 +310,7 @@ type QuadrateApp struct { // nolint: golint
 	PacketForwardKeeper *packetforwardkeeper.Keeper
 	StableKeeper        stablemodulekeeper.Keeper
 	GrowKeeper          growmodulekeeper.Keeper
+	DexKeeper           dexmodulekeeper.Keeper
 
 	// make scoped keepers public for test purposes
 	ScopedIBCKeeper      capabilitykeeper.ScopedKeeper
@@ -354,13 +361,18 @@ func NewQuadrateApp(
 	bApp.SetInterfaceRegistry(interfaceRegistry)
 
 	keys := sdk.NewKVStoreKeys(
-		authtypes.StoreKey, banktypes.StoreKey, stakingtypes.StoreKey,
-		minttypes.StoreKey, distrtypes.StoreKey, slashingtypes.StoreKey,
-		govtypes.StoreKey, paramstypes.StoreKey, ibchost.StoreKey, upgradetypes.StoreKey,
-		evidencetypes.StoreKey, ibctransfertypes.StoreKey, capabilitytypes.StoreKey,
-		feegrant.StoreKey, authzkeeper.StoreKey, icahosttypes.StoreKey,
+		authtypes.StoreKey, banktypes.StoreKey,
+		stakingtypes.StoreKey, minttypes.StoreKey,
+		distrtypes.StoreKey, slashingtypes.StoreKey,
+		govtypes.StoreKey, paramstypes.StoreKey,
+		ibchost.StoreKey, upgradetypes.StoreKey,
+		evidencetypes.StoreKey, ibctransfertypes.StoreKey,
+		capabilitytypes.StoreKey, feegrant.StoreKey,
+		authzkeeper.StoreKey, icahosttypes.StoreKey,
 		wasm.StoreKey, tokenfactorytypes.StoreKey,
-		oraclemoduletypes.StoreKey, packetforwardtypes.StoreKey, stablemoduletypes.StoreKey, growmoduletypes.StoreKey,
+		oraclemoduletypes.StoreKey, packetforwardtypes.StoreKey,
+		stablemoduletypes.StoreKey, growmoduletypes.StoreKey,
+		dexmoduletypes.StoreKey,
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
 	memKeys := sdk.NewMemoryStoreKeys(capabilitytypes.MemStoreKey)
@@ -528,6 +540,15 @@ func NewQuadrateApp(
 		app.StableKeeper,
 	)
 
+	app.DexKeeper = *dexmodulekeeper.NewKeeper(
+		appCodec,
+		keys[dexmoduletypes.StoreKey],
+		keys[dexmoduletypes.MemStoreKey],
+		app.GetSubspace(dexmoduletypes.ModuleName),
+		app.BankKeeper,
+	)
+	dexModule := dexmodule.NewAppModule(appCodec, app.DexKeeper, app.BankKeeper)
+
 	// register the proposal types
 	govRouter := govtypes.NewRouter()
 	govRouter.
@@ -677,6 +698,7 @@ func NewQuadrateApp(
 		tokenfactory.NewAppModule(appCodec, *app.TokenFactoryKeeper, app.AccountKeeper, app.BankKeeper),
 		stableModule,
 		growmodule.NewAppModule(appCodec, app.GrowKeeper, app.AccountKeeper, app.BankKeeper),
+		dexModule,
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
@@ -711,6 +733,7 @@ func NewQuadrateApp(
 		oraclemoduletypes.ModuleName,
 		stablemoduletypes.ModuleName,
 		growmoduletypes.ModuleName,
+		dexmoduletypes.ModuleName,
 	)
 
 	app.mm.SetOrderEndBlockers(
@@ -739,6 +762,7 @@ func NewQuadrateApp(
 		oraclemoduletypes.ModuleName,
 		stablemoduletypes.ModuleName,
 		growmoduletypes.ModuleName,
+		dexmoduletypes.ModuleName,
 	)
 
 	app.mm.SetOrderInitGenesis(
@@ -767,6 +791,7 @@ func NewQuadrateApp(
 		oraclemoduletypes.ModuleName,
 		stablemoduletypes.ModuleName,
 		growmoduletypes.ModuleName,
+		dexmoduletypes.ModuleName,
 	)
 
 	app.mm.RegisterInvariants(&app.CrisisKeeper)
@@ -975,6 +1000,7 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(oraclemoduletypes.ModuleName)
 	paramsKeeper.Subspace(stablemoduletypes.ModuleName)
 	paramsKeeper.Subspace(growmoduletypes.ModuleName)
+	paramsKeeper.Subspace(dexmoduletypes.ModuleName)
 	return paramsKeeper
 }
 

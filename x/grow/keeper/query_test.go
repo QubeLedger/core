@@ -354,13 +354,13 @@ func (suite *GrowKeeperTestSuite) TestYieldPercentage() {
 	suite.AddTestCoins(1000*1000000, s.GetNormalQStablePair(0).AmountInMetadata.Base)
 	suite.MintStable(1000*1000000, s.GetNormalQStablePair(0))
 
-	msg := types.NewMsgDeposit(
+	msg := types.NewMsgGrowDeposit(
 		s.Address.String(),
 		sdk.NewInt(1000*1000000).String()+"uusd",
 		s.GetNormalGTokenPair(0).GTokenMetadata.Base,
 	)
 	ctx := sdk.WrapSDKContext(suite.ctx)
-	_, err = suite.app.GrowKeeper.Deposit(ctx, msg)
+	_, err = suite.app.GrowKeeper.GrowDeposit(ctx, msg)
 	suite.Require().NoError(err)
 
 	suite.Run(fmt.Sprintf("Case---%s", "found all address"), func() {

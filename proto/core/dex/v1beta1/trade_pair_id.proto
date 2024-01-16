@@ -1,0 +1,9 @@
+syntax = "proto3";
+package core.dex;
+
+option go_package = "coregithub.com/QuadrateOrg/core/x/dex/types";
+
+message TradePairID {
+    string makerDenom = 2; 
+    string takerDenom = 3; 
+}

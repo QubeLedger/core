@@ -6,7 +6,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-func (k Keeper) ExecuteDeposit(ctx sdk.Context, msg *types.MsgDeposit, gTokenPair types.GTokenPair) (error, sdk.Coin) {
+func (k Keeper) ExecuteDeposit(ctx sdk.Context, msg *types.MsgGrowDeposit, gTokenPair types.GTokenPair) (error, sdk.Coin) {
 
 	amountInCoins, err := sdk.ParseCoinsNormalized(msg.AmountIn)
 	if err != nil {
@@ -66,7 +66,7 @@ func (k Keeper) ExecuteDeposit(ctx sdk.Context, msg *types.MsgDeposit, gTokenPai
 	return nil, amountOut
 }
 
-func (k Keeper) ExecuteWithdrawal(ctx sdk.Context, msg *types.MsgWithdrawal, gTokenPair types.GTokenPair) (error, sdk.Coin) {
+func (k Keeper) ExecuteWithdrawal(ctx sdk.Context, msg *types.MsgGrowWithdrawal, gTokenPair types.GTokenPair) (error, sdk.Coin) {
 
 	amountInCoins, err := sdk.ParseCoinsNormalized(msg.AmountIn)
 	if err != nil {

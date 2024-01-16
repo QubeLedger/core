@@ -44,13 +44,13 @@ func (s *GrowAbciTestSuite) TestGrowPriceChangeWhenBlockEnd() {
 		err := s.MintStable(amt, s.GetNormalQStablePair(0))
 		s.Require().NoError(err)
 
-		msg := types.NewMsgDeposit(
+		msg := types.NewMsgGrowDeposit(
 			s.Address.String(),
 			sdk.NewInt(amt).String()+s.GetNormalQStablePair(0).AmountOutMetadata.Base,
 			s.GetNormalGTokenPair(0).GTokenMetadata.Base,
 		)
 		ctx := sdk.WrapSDKContext(s.ctx)
-		res, err := s.app.GrowKeeper.Deposit(ctx, msg)
+		res, err := s.app.GrowKeeper.GrowDeposit(ctx, msg)
 		s.Require().NoError(err)
 		s.Require().Equal(res.AmountOut, sdk.NewCoin(s.GetNormalGTokenPair(0).GTokenMetadata.Base, sdk.NewInt(amt)).String())
 		s.AddTestCoinsToCustomAccount(sdk.NewInt(amt*10000), s.GetNormalQStablePair(0).AmountOutMetadata.Base, s.app.GrowKeeper.GetGrowStakingReserveAddress(s.ctx)) //fix 252 err
@@ -113,13 +113,13 @@ func (s *GrowAbciTestSuite) TestGrowReserveMath() {
 	err := s.MintStable(amt, s.GetNormalQStablePair(0))
 	s.Require().NoError(err)
 
-	msg := types.NewMsgDeposit(
+	msg := types.NewMsgGrowDeposit(
 		s.Address.String(),
 		sdk.NewInt(amt).String()+s.GetNormalQStablePair(0).AmountOutMetadata.Base,
 		s.GetNormalGTokenPair(0).GTokenMetadata.Base,
 	)
 	ctx := sdk.WrapSDKContext(s.ctx)
-	res, err := s.app.GrowKeeper.Deposit(ctx, msg)
+	res, err := s.app.GrowKeeper.GrowDeposit(ctx, msg)
 	s.Require().NoError(err)
 	s.Require().Equal(res.AmountOut, sdk.NewCoin(s.GetNormalGTokenPair(0).GTokenMetadata.Base, sdk.NewInt(amt)).String())
 
@@ -200,7 +200,7 @@ func (s *GrowAbciTestSuite) TestGrowIncreaseUSQReserve() {
 	err := s.MintStable(amt, s.GetNormalQStablePair(0))
 	s.Require().NoError(err)
 
-	msg := types.NewMsgDeposit(
+	msg := types.NewMsgGrowDeposit(
 		s.Address.String(),
 		sdk.NewInt(amt).String()+s.GetNormalQStablePair(0).AmountOutMetadata.Base,
 		s.GetNormalGTokenPair(0).GTokenMetadata.Base,
@@ -208,7 +208,7 @@ func (s *GrowAbciTestSuite) TestGrowIncreaseUSQReserve() {
 	ctx := sdk.WrapSDKContext(s.ctx)
 	oldTime := sdk.NewInt(s.ctx.BlockTime().Unix())
 
-	res, err := s.app.GrowKeeper.Deposit(ctx, msg)
+	res, err := s.app.GrowKeeper.GrowDeposit(ctx, msg)
 	s.Require().NoError(err)
 	s.Require().Equal(res.AmountOut, sdk.NewCoin(s.GetNormalGTokenPair(0).GTokenMetadata.Base, sdk.NewInt(amt)).String())
 
@@ -263,7 +263,7 @@ func (s *GrowAbciTestSuite) TestGrowReduceUSQReserve() {
 	err := s.MintStable(amt, s.GetNormalQStablePair(0))
 	s.Require().NoError(err)
 
-	msg := types.NewMsgDeposit(
+	msg := types.NewMsgGrowDeposit(
 		s.Address.String(),
 		sdk.NewInt(amt2).String()+s.GetNormalQStablePair(0).AmountOutMetadata.Base,
 		s.GetNormalGTokenPair(0).GTokenMetadata.Base,
@@ -271,7 +271,7 @@ func (s *GrowAbciTestSuite) TestGrowReduceUSQReserve() {
 	ctx := sdk.WrapSDKContext(s.ctx)
 	oldTime := sdk.NewInt(s.ctx.BlockTime().Unix())
 
-	res, err := s.app.GrowKeeper.Deposit(ctx, msg)
+	res, err := s.app.GrowKeeper.GrowDeposit(ctx, msg)
 	s.Require().NoError(err)
 	s.Require().Equal(res.AmountOut, sdk.NewCoin(s.GetNormalGTokenPair(0).GTokenMetadata.Base, sdk.NewInt(amt2)).String())
 
@@ -325,13 +325,13 @@ func (s *GrowAbciTestSuite) TestGrowSimulate() {
 		err := s.MintStable(amt, s.GetNormalQStablePair(0))
 		s.Require().NoError(err)
 
-		msg := types.NewMsgDeposit(
+		msg := types.NewMsgGrowDeposit(
 			s.Address.String(),
 			sdk.NewInt(amt).String()+s.GetNormalQStablePair(0).AmountOutMetadata.Base,
 			s.GetNormalGTokenPair(0).GTokenMetadata.Base,
 		)
 		ctx := sdk.WrapSDKContext(s.ctx)
-		res, err := s.app.GrowKeeper.Deposit(ctx, msg)
+		res, err := s.app.GrowKeeper.GrowDeposit(ctx, msg)
 		s.Require().NoError(err)
 		s.Require().Equal(res.AmountOut, sdk.NewCoin(s.GetNormalGTokenPair(0).GTokenMetadata.Base, sdk.NewInt(amt)).String())
 	}

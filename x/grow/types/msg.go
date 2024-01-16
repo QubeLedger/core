@@ -7,8 +7,8 @@ import (
 
 const TypeMsgCreateLend = "create_lend"
 const TypeMsgDeleteLend = "delete_lend"
-const TypeMsgDeposit = "deposit"
-const TypeMsgWithdrawal = "withdrawal"
+const TypeMsgGrowDeposit = "grow_deposit"
+const TypeMsgGrowWithdrawal = "grow_withdrawal"
 const TypeMsgDepositCollateral = "deposit_collateral"
 const TypeMsgWithdrawalCollateral = "withdrawal_collateral"
 const TypeMsgOpenLiquidationPosition = "create_liquidation_position"
@@ -16,8 +16,8 @@ const TypeMsgCloseLiquidationPosition = "close_liquidation_position"
 
 var _ sdk.Msg = &MsgCreateLend{}
 var _ sdk.Msg = &MsgDeleteLend{}
-var _ sdk.Msg = &MsgDeposit{}
-var _ sdk.Msg = &MsgWithdrawal{}
+var _ sdk.Msg = &MsgGrowDeposit{}
+var _ sdk.Msg = &MsgGrowWithdrawal{}
 var _ sdk.Msg = &MsgOpenLiquidationPosition{}
 var _ sdk.Msg = &MsgCloseLiquidationPosition{}
 var _ sdk.Msg = &MsgDepositCollateral{}
@@ -109,23 +109,23 @@ func (msg *MsgDeleteLend) ValidateBasic() error {
 deposit
 */
 
-func NewMsgDeposit(creator string, amountIn string, denomOut string) *MsgDeposit {
-	return &MsgDeposit{
+func NewMsgGrowDeposit(creator string, amountIn string, denomOut string) *MsgGrowDeposit {
+	return &MsgGrowDeposit{
 		Creator:  creator,
 		AmountIn: amountIn,
 		DenomOut: denomOut,
 	}
 }
 
-func (msg *MsgDeposit) Route() string {
+func (msg *MsgGrowDeposit) Route() string {
 	return RouterKey
 }
 
-func (msg *MsgDeposit) Type() string {
-	return TypeMsgDeposit
+func (msg *MsgGrowDeposit) Type() string {
+	return TypeMsgGrowDeposit
 }
 
-func (msg *MsgDeposit) GetSigners() []sdk.AccAddress {
+func (msg *MsgGrowDeposit) GetSigners() []sdk.AccAddress {
 	creator, err := sdk.AccAddressFromBech32(msg.Creator)
 	if err != nil {
 		panic(err)
@@ -133,12 +133,12 @@ func (msg *MsgDeposit) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{creator}
 }
 
-func (msg *MsgDeposit) GetSignBytes() []byte {
+func (msg *MsgGrowDeposit) GetSignBytes() []byte {
 	bz := ModuleCdc.MustMarshalJSON(msg)
 	return sdk.MustSortJSON(bz)
 }
 
-func (msg *MsgDeposit) ValidateBasic() error {
+func (msg *MsgGrowDeposit) ValidateBasic() error {
 	_, err := sdk.AccAddressFromBech32(msg.Creator)
 	if err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
@@ -150,22 +150,22 @@ func (msg *MsgDeposit) ValidateBasic() error {
 withdrawal
 */
 
-func NewMsgWithdrawal(creator string, amountIn string) *MsgWithdrawal {
-	return &MsgWithdrawal{
+func NewMsgGrowWithdrawal(creator string, amountIn string) *MsgGrowWithdrawal {
+	return &MsgGrowWithdrawal{
 		Creator:  creator,
 		AmountIn: amountIn,
 	}
 }
 
-func (msg *MsgWithdrawal) Route() string {
+func (msg *MsgGrowWithdrawal) Route() string {
 	return RouterKey
 }
 
-func (msg *MsgWithdrawal) Type() string {
-	return TypeMsgWithdrawal
+func (msg *MsgGrowWithdrawal) Type() string {
+	return TypeMsgGrowWithdrawal
 }
 
-func (msg *MsgWithdrawal) GetSigners() []sdk.AccAddress {
+func (msg *MsgGrowWithdrawal) GetSigners() []sdk.AccAddress {
 	creator, err := sdk.AccAddressFromBech32(msg.Creator)
 	if err != nil {
 		panic(err)
@@ -173,12 +173,12 @@ func (msg *MsgWithdrawal) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{creator}
 }
 
-func (msg *MsgWithdrawal) GetSignBytes() []byte {
+func (msg *MsgGrowWithdrawal) GetSignBytes() []byte {
 	bz := ModuleCdc.MustMarshalJSON(msg)
 	return sdk.MustSortJSON(bz)
 }
 
-func (msg *MsgWithdrawal) ValidateBasic() error {
+func (msg *MsgGrowWithdrawal) ValidateBasic() error {
 	_, err := sdk.AccAddressFromBech32(msg.Creator)
 	if err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
