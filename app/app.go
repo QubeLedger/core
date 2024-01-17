@@ -143,6 +143,12 @@ import (
 	dexmodulekeeper "github.com/QuadrateOrg/core/x/dex/keeper"
 	dexmoduletypes "github.com/QuadrateOrg/core/x/dex/types"
 
+	swapmiddleware "github.com/QuadrateOrg/core/x/ibcswap"
+	swapkeeper "github.com/QuadrateOrg/core/x/ibcswap/keeper"
+	swaptypes "github.com/QuadrateOrg/core/x/ibcswap/types"
+
+	gmpmiddleware "github.com/QuadrateOrg/core/x/gmp"
+
 	// unnamed import of statik for swagger UI support
 	_ "github.com/cosmos/cosmos-sdk/client/docs/statik"
 )
@@ -150,6 +156,7 @@ import (
 var (
 	ProposalsEnabled        = "true"
 	EnableSpecificProposals = ""
+	HomeDir                 = ".quadrate"
 )
 
 // GetEnabledProposals parses the ProposalsEnabled / EnableSpecificProposals values to
@@ -311,6 +318,7 @@ type QuadrateApp struct { // nolint: golint
 	StableKeeper        stablemodulekeeper.Keeper
 	GrowKeeper          growmodulekeeper.Keeper
 	DexKeeper           dexmodulekeeper.Keeper
+	SwapKeeper          swapkeeper.Keeper
 
 	// make scoped keepers public for test purposes
 	ScopedIBCKeeper      capabilitykeeper.ScopedKeeper
@@ -333,7 +341,7 @@ func init() {
 		stdlog.Println("Failed to get home dir %2", err)
 	}
 
-	DefaultNodeHome = filepath.Join(userHomeDir, ".quadrate")
+	DefaultNodeHome = filepath.Join(userHomeDir, HomeDir)
 	// apply custom power reduction for 'a' base denom unit 10^18
 	sdk.DefaultPowerReduction = sdk.NewIntFromBigInt(new(big.Int).Exp(big.NewInt(10), big.NewInt(18), nil))
 }
@@ -549,6 +557,15 @@ func NewQuadrateApp(
 	)
 	dexModule := dexmodule.NewAppModule(appCodec, app.DexKeeper, app.BankKeeper)
 
+	// Create swap middleware keeper
+	app.SwapKeeper = swapkeeper.NewKeeper(
+		appCodec,
+		app.MsgServiceRouter(),
+		app.IBCKeeper.ChannelKeeper,
+		app.BankKeeper,
+	)
+	swapModule := swapmiddleware.NewAppModule(app.SwapKeeper)
+
 	// register the proposal types
 	govRouter := govtypes.NewRouter()
 	govRouter.
@@ -644,13 +661,26 @@ func NewQuadrateApp(
 		app.IBCKeeper.ChannelKeeper,
 	)
 
+	var transferStack porttypes.IBCModule
+	transferStack = transfer.NewIBCModule(app.TransferKeeper)
+	transferStack = packetforward.NewIBCMiddleware(
+		transferStack,
+		app.PacketForwardKeeper,
+		0, // TODO explore changing default values for retries and timeouts
+		packetforwardkeeper.DefaultForwardTransferPacketTimeoutTimestamp,
+		packetforwardkeeper.DefaultRefundTransferPacketTimeoutTimestamp,
+	)
+	transferStack = swapmiddleware.NewIBCMiddleware(transferStack, app.SwapKeeper)
+	transferStack = gmpmiddleware.NewIBCMiddleware(transferStack)
+
 	// routerModule := router.NewAppModule(app.RouterKeeper, transferIBCModule)
 	// create static IBC router, add transfer route, then set and seal it
 	ibcRouter := porttypes.NewRouter()
 	ibcRouter.AddRoute(icahosttypes.SubModuleName, icaHostIBCModule).
 		AddRoute(wasm.ModuleName, wasm.NewIBCHandler(app.wasmKeeper, app.IBCKeeper.ChannelKeeper, app.IBCKeeper.ChannelKeeper)).
 		AddRoute(ibctransfertypes.ModuleName, transferIBCModule).
-		AddRoute(stablemoduletypes.ModuleName, stableIBCModule)
+		AddRoute(stablemoduletypes.ModuleName, stableIBCModule).
+		AddRoute(ibctransfertypes.ModuleName, transferStack)
 
 	app.IBCKeeper.SetRouter(ibcRouter)
 
@@ -699,6 +729,7 @@ func NewQuadrateApp(
 		stableModule,
 		growmodule.NewAppModule(appCodec, app.GrowKeeper, app.AccountKeeper, app.BankKeeper),
 		dexModule,
+		swapModule,
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
@@ -734,6 +765,7 @@ func NewQuadrateApp(
 		stablemoduletypes.ModuleName,
 		growmoduletypes.ModuleName,
 		dexmoduletypes.ModuleName,
+		swaptypes.ModuleName,
 	)
 
 	app.mm.SetOrderEndBlockers(
@@ -763,6 +795,7 @@ func NewQuadrateApp(
 		stablemoduletypes.ModuleName,
 		growmoduletypes.ModuleName,
 		dexmoduletypes.ModuleName,
+		swaptypes.ModuleName,
 	)
 
 	app.mm.SetOrderInitGenesis(
@@ -792,6 +825,7 @@ func NewQuadrateApp(
 		stablemoduletypes.ModuleName,
 		growmoduletypes.ModuleName,
 		dexmoduletypes.ModuleName,
+		swaptypes.ModuleName,
 	)
 
 	app.mm.RegisterInvariants(&app.CrisisKeeper)
