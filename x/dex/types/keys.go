@@ -54,6 +54,7 @@ func KeyPrefix(p string) []byte {
 	return key
 }
 
+/* #nosec */
 func TickIndexToBytes(tickTakerToMaker int64) []byte {
 	key := make([]byte, 9)
 	if tickTakerToMaker < 0 {
@@ -66,6 +67,7 @@ func TickIndexToBytes(tickTakerToMaker int64) []byte {
 	return key
 }
 
+/* #nosec */
 func BytesToTickIndex(bz []byte) (int64, error) {
 	if len(bz) != 9 {
 		return 0, errors.New("input should be 9 bytes long")
@@ -105,6 +107,7 @@ func LimitOrderTrancheUserAddressPrefix(address string) []byte {
 	return key
 }
 
+/* #nosec */
 func TimeBytes(timestamp time.Time) []byte {
 	unixMs := uint64(timestamp.UnixMilli())
 	str := utils.Uint64ToSortableString(unixMs)

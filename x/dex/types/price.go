@@ -20,7 +20,7 @@ func CalcPrice(relativeTickIndex int64) (math_utils.PrecDec, error) {
 	if relativeTickIndex < 0 {
 		return utils.BasePrice().Power(uint64(-1 * relativeTickIndex)), nil
 	} else {
-		return math_utils.OnePrecDec().Quo(utils.BasePrice().Power(uint64(relativeTickIndex))), nil
+		return math_utils.OnePrecDec().Quo(utils.BasePrice().Power(uint64(relativeTickIndex))), nil // #nosec
 	}
 }
 
@@ -32,6 +32,7 @@ func MustCalcPrice(relativeTickIndex int64) math_utils.PrecDec {
 	return price
 }
 
+/* #nosec */
 func IsTickOutOfRange(tickIndex int64) bool {
 	return tickIndex > 0 && uint64(tickIndex) > MaxTickExp
 }

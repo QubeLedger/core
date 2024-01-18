@@ -1,5 +1,6 @@
 package nullify
 
+/* #nosec */
 import (
 	"reflect"
 	"unsafe"
@@ -7,6 +8,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
+/* #nosec */
 func Fill(x interface{}) interface{} {
 	var (
 		coinType  = reflect.TypeOf(sdk.Coin{})

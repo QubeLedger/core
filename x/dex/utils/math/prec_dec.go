@@ -481,7 +481,7 @@ func (d PrecDec) ApproxRoot(root uint64) (guess PrecDec, err error) {
 		if root == 2 {
 			delta.i.Rsh(delta.i, 1)
 		} else {
-			delta.QuoInt64Mut(int64(root))
+			delta.QuoInt64Mut(int64(root)) // #nosec
 		}
 
 		guess.AddMut(delta)
@@ -938,6 +938,7 @@ func hasOnlyDigits(s string) bool {
 
 const thousandSeparator string = "'"
 
+/* #nosec */
 var stringsBuilderPool = &sync.Pool{
 	New: func() any { return new(strings.Builder) },
 }

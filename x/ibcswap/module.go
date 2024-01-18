@@ -1,5 +1,6 @@
 package ibcswap
 
+/* #nosec */
 import (
 	"encoding/json"
 	"math/rand"

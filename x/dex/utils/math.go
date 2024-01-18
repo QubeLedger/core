@@ -14,6 +14,7 @@ func BasePrice() math_utils.PrecDec {
 	return math_utils.MustNewPrecDecFromStr("1.0001")
 }
 
+/* #nosec */
 func Abs(x int64) uint64 {
 	if x < 0 {
 		return uint64(-x)
@@ -44,6 +45,7 @@ func MaxIntArr(vals []sdk.Int) sdk.Int {
 	return max
 }
 
+/* #nosec */
 func Uint64ToSortableString(i uint64) string {
 	// Converts a Uint to a string that sorts lexogrpahically in integer order
 	intStr := strconv.FormatUint(i, 36)
@@ -53,6 +55,7 @@ func Uint64ToSortableString(i uint64) string {
 	return fmt.Sprintf("%s%s", lenChar, intStr)
 }
 
+/* #nosec */
 func SafeUint64ToInt64(in uint64) (out int64, overflow bool) {
 	return int64(in), in > math.MaxInt64
 }

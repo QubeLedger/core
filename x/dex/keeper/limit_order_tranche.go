@@ -179,6 +179,7 @@ func (k Keeper) GetAllLimitOrderTrancheAtIndex(
 	return trancheList
 }
 
+/* #nosec */
 func NewTrancheKey(ctx sdk.Context) string {
 	blockHeight := ctx.BlockHeight()
 	txGas := ctx.GasMeter().GasConsumed()

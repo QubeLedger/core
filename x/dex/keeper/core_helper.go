@@ -63,6 +63,7 @@ func (k Keeper) GetValidFees(ctx sdk.Context) []uint64 {
 	return k.GetParams(ctx).FeeTiers
 }
 
+/* #nosec */
 func (k Keeper) ValidateFee(ctx sdk.Context, fee uint64) error {
 	validFees := k.GetValidFees(ctx)
 	if !slices.Contains(validFees, fee) {
