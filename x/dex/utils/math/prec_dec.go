@@ -938,9 +938,8 @@ func hasOnlyDigits(s string) bool {
 
 const thousandSeparator string = "'"
 
-/* #nosec */
 var stringsBuilderPool = &sync.Pool{
-	New: func() any { return new(strings.Builder) },
+	New: func() any { return new(strings.Builder) }, // #nosec G104
 }
 
 func FormatInt(v string) (string, error) {
