@@ -1,8 +1,6 @@
 package keeper
 
 import (
-	"slices"
-
 	"github.com/QuadrateOrg/core/x/dex/types"
 	math_utils "github.com/QuadrateOrg/core/x/dex/utils/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -64,9 +62,18 @@ func (k Keeper) GetValidFees(ctx sdk.Context) []uint64 {
 	return k.GetParams(ctx).FeeTiers
 }
 
+func Contains[T comparable](s []T, e T) bool {
+	for _, v := range s {
+		if v == e {
+			return true
+		}
+	}
+	return false
+}
+
 func (k Keeper) ValidateFee(ctx sdk.Context, fee uint64) error {
 	validFees := k.GetValidFees(ctx)
-	if !slices.Contains(validFees, fee) { // #nosec G104
+	if !Contains(validFees, fee) { // #nosec G104
 		return sdkerrors.Wrapf(types.ErrInvalidFee, "%d", validFees)
 	}
 
