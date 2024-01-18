@@ -352,7 +352,8 @@ func (suite *GrowKeeperTestSuite) TestYieldPercentage() {
 	suite.Require().NoError(err)
 
 	suite.AddTestCoins(1000*1000000, s.GetNormalQStablePair(0).AmountInMetadata.Base)
-	suite.MintStable(1000*1000000, s.GetNormalQStablePair(0))
+	err = suite.MintStable(1000*1000000, s.GetNormalQStablePair(0))
+	suite.Require().NoError(err)
 
 	msg := types.NewMsgGrowDeposit(
 		s.Address.String(),

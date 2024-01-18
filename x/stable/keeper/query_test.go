@@ -16,7 +16,7 @@ func (suite *StableKeeperTestSuite) TestPairByPairId() {
 	}{
 		{
 			"ok-found",
-			s.GetNormalPair(0).PairId,
+			s.GetNormalGMBPair(0).PairId,
 			1000,
 			false,
 		},
@@ -34,8 +34,8 @@ func (suite *StableKeeperTestSuite) TestPairByPairId() {
 		suite.app.StableKeeper.SetTestingMode(true)
 		suite.Run(fmt.Sprintf("Case---%s", tc.name), func() {
 			ctx := sdk.WrapSDKContext(suite.ctx)
-			suite.app.StableKeeper.AppendPair(suite.ctx, s.GetNormalPair(0))
-			suite.MintStable(10000000000, s.GetNormalPair(0))
+			suite.app.StableKeeper.AppendPair(suite.ctx, s.GetNormalGMBPair(0))
+			suite.MintStable(10000000000, s.GetNormalGMBPair(0))
 
 			req := types.PairByPairIdRequest{
 				PairId: tc.pairID,
@@ -45,13 +45,13 @@ func (suite *StableKeeperTestSuite) TestPairByPairId() {
 			if !tc.err {
 				suite.NoError(err)
 				suite.Equal(&types.PairRequestResponse{
-					PairId:            s.GetNormalPair(0).PairId,
-					AmountInMetadata:  s.GetNormalPair(0).AmountInMetadata,
-					AmountOutMetadata: s.GetNormalPair(0).AmountOutMetadata,
-					Qm:                s.GetNormalPair(0).Qm,
-					Ar:                s.GetNormalPair(0).Ar,
-					MinAmountIn:       s.GetNormalPair(0).MinAmountIn,
-					MinAmountOut:      s.GetNormalPair(0).MinAmountOut,
+					PairId:            s.GetNormalGMBPair(0).PairId,
+					AmountInMetadata:  s.GetNormalGMBPair(0).AmountInMetadata,
+					AmountOutMetadata: s.GetNormalGMBPair(0).AmountOutMetadata,
+					Qm:                s.GetNormalGMBPair(0).Qm,
+					Ar:                s.GetNormalGMBPair(0).Ar,
+					MinAmountIn:       s.GetNormalGMBPair(0).MinAmountIn,
+					MinAmountOut:      s.GetNormalGMBPair(0).MinAmountOut,
 					BackingRatio:      100,
 					MintingFee:        3,
 					BurningFee:        2,
@@ -72,7 +72,7 @@ func (suite *StableKeeperTestSuite) TestPairById() {
 	}{
 		{
 			"ok-found",
-			s.GetNormalPair(0).Id,
+			s.GetNormalGMBPair(0).Id,
 			1000,
 			false,
 		},
@@ -90,8 +90,8 @@ func (suite *StableKeeperTestSuite) TestPairById() {
 		suite.app.StableKeeper.SetTestingMode(true)
 		suite.Run(fmt.Sprintf("Case---%s", tc.name), func() {
 			ctx := sdk.WrapSDKContext(suite.ctx)
-			suite.app.StableKeeper.AppendPair(suite.ctx, s.GetNormalPair(0))
-			suite.MintStable(10000000000, s.GetNormalPair(0))
+			suite.app.StableKeeper.AppendPair(suite.ctx, s.GetNormalGMBPair(0))
+			suite.MintStable(10000000000, s.GetNormalGMBPair(0))
 
 			req := types.PairByIdRequest{
 				Id: tc.id,
@@ -101,13 +101,13 @@ func (suite *StableKeeperTestSuite) TestPairById() {
 			if !tc.err {
 				suite.NoError(err)
 				suite.Equal(&types.PairRequestResponse{
-					PairId:            s.GetNormalPair(0).PairId,
-					AmountInMetadata:  s.GetNormalPair(0).AmountInMetadata,
-					AmountOutMetadata: s.GetNormalPair(0).AmountOutMetadata,
-					Qm:                s.GetNormalPair(0).Qm,
-					Ar:                s.GetNormalPair(0).Ar,
-					MinAmountIn:       s.GetNormalPair(0).MinAmountIn,
-					MinAmountOut:      s.GetNormalPair(0).MinAmountOut,
+					PairId:            s.GetNormalGMBPair(0).PairId,
+					AmountInMetadata:  s.GetNormalGMBPair(0).AmountInMetadata,
+					AmountOutMetadata: s.GetNormalGMBPair(0).AmountOutMetadata,
+					Qm:                s.GetNormalGMBPair(0).Qm,
+					Ar:                s.GetNormalGMBPair(0).Ar,
+					MinAmountIn:       s.GetNormalGMBPair(0).MinAmountIn,
+					MinAmountOut:      s.GetNormalGMBPair(0).MinAmountOut,
 					BackingRatio:      100,
 					MintingFee:        3,
 					BurningFee:        2,
@@ -128,13 +128,13 @@ func (suite *StableKeeperTestSuite) TestGetAmountOutByAmountIn() {
 	}{
 		{
 			"ok-mint",
-			s.GetNormalPair(0),
+			s.GetNormalGMBPair(0),
 			1000,
 			"mint",
 		},
 		{
 			"ok-burn",
-			s.GetNormalPair(0),
+			s.GetNormalGMBPair(0),
 			1000,
 			"burn",
 		},
@@ -146,8 +146,8 @@ func (suite *StableKeeperTestSuite) TestGetAmountOutByAmountIn() {
 		suite.app.StableKeeper.SetTestingMode(true)
 		suite.Run(fmt.Sprintf("Case---%s", tc.name), func() {
 			ctx := sdk.WrapSDKContext(suite.ctx)
-			suite.app.StableKeeper.AppendPair(suite.ctx, suite.GetNormalPair(0))
-			suite.MintStable(10000000000, s.GetNormalPair(0))
+			suite.app.StableKeeper.AppendPair(suite.ctx, suite.GetNormalGMBPair(0))
+			suite.MintStable(10000000000, s.GetNormalGMBPair(0))
 
 			req := types.GetAmountOutByAmountInRequest{
 				PairId:   tc.pair.PairId,
@@ -169,12 +169,12 @@ func (suite *StableKeeperTestSuite) TestAllPairs() {
 	}{
 		{
 			"ok",
-			s.GetNormalPair(0),
+			s.GetNormalGMBPair(0),
 			1,
 		},
 		{
 			"ok",
-			s.GetNormalPair(0),
+			s.GetNormalGMBPair(0),
 			2,
 		},
 	}
@@ -185,7 +185,7 @@ func (suite *StableKeeperTestSuite) TestAllPairs() {
 			suite.Commit()
 			ctx := sdk.WrapSDKContext(suite.ctx)
 			for i := 0; i < int(tc.amount); i++ {
-				suite.app.StableKeeper.AppendPair(suite.ctx, suite.GetNormalPair(0))
+				suite.app.StableKeeper.AppendPair(suite.ctx, suite.GetNormalGMBPair(0))
 			}
 
 			req := types.AllPairsRequest{}

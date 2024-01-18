@@ -89,6 +89,7 @@ func (s *GrowAbciTestSuite) GetNormalQStablePair(id uint64) stabletypes.Pair {
 			Name:    "USQ",
 			Symbol:  "USQ",
 		},
+		Model:        "gmb",
 		Qm:           sdk.NewInt(0),
 		Ar:           sdk.NewInt(0),
 		MinAmountIn:  "20uatom",

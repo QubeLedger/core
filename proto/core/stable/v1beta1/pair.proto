@@ -11,16 +11,17 @@ message Pair {
         string pairId = 2;
         cosmos.bank.v1beta1.Metadata amountInMetadata = 3 [ (gogoproto.moretags) = "yaml:\"amountInMetadata\"", (gogoproto.nullable)   = false ];
         cosmos.bank.v1beta1.Metadata amountOutMetadata = 4 [ (gogoproto.moretags) = "yaml:\"amountOutMetadata\"", (gogoproto.nullable)   = false ];
-        string qm = 5 [
+        string model = 5;
+        string qm = 6 [
                 (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
                 (gogoproto.moretags) = "yaml:\"qm\"",
                 (gogoproto.nullable) = false
         ];
-        string ar = 6 [
+        string ar = 7 [
                 (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
                 (gogoproto.moretags) = "yaml:\"ar\"",
                 (gogoproto.nullable) = false
         ];
-        string minAmountIn = 7;
-        string minAmountOut = 8;
+        string minAmountIn = 8;
+        string minAmountOut = 9;
 }
