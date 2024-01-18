@@ -78,7 +78,7 @@ func (k Keeper) DepositCore(
 		if err := k.MintShares(ctx, receiverAddr, outShares); err != nil {
 			return nil, nil, nil, err
 		}
-		sharesIssued = sharesIssued.Add(outShares)
+		sharesIssued = append(sharesIssued, outShares)
 
 		amounts0Deposited[i] = inAmount0
 		amounts1Deposited[i] = inAmount1
@@ -97,6 +97,9 @@ func (k Keeper) DepositCore(
 			outShares.Amount,
 		))
 	}
+
+	// Neutron Audit Fix
+	sharesIssued = utils.SanitizeCoins(sharesIssued)
 
 	if totalAmountReserve0.IsPositive() {
 		coin0 := sdk.NewCoin(pairID.Token0, totalAmountReserve0)
