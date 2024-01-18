@@ -2,8 +2,8 @@ package types
 
 const (
 	AttributeValueCategory                 = ModuleName
-	AttributeKeyActionDeposit              = "deposit"
-	AttributeKeyActionWithdrawal           = "withdrawal"
+	AttributeKeyActionDeposit              = "grow_deposit"
+	AttributeKeyActionWithdrawal           = "grow_withdrawal"
 	AttributeKeyActionCreateLend           = "create_lend"
 	AttributeKeyActionDeleteLend           = "delete_lend"
 	AttributeKeyActionDepositColletaral    = "deposit_collateral"

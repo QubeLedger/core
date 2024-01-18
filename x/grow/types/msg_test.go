@@ -74,18 +74,18 @@ func TestMsgDeleteLend_ValidateBasic(t *testing.T) {
 func TestMsgDeposit_ValidateBasic(t *testing.T) {
 	tests := []struct {
 		name string
-		msg  types.MsgDeposit
+		msg  types.MsgGrowDeposit
 		err  error
 	}{
 		{
 			name: "invalid address",
-			msg: types.MsgDeposit{
+			msg: types.MsgGrowDeposit{
 				Creator: "invalid_address",
 			},
 			err: sdkerrors.ErrInvalidAddress,
 		}, {
 			name: "valid address",
-			msg: types.MsgDeposit{
+			msg: types.MsgGrowDeposit{
 				Creator: apptesting.CreateRandomAccounts(1)[0].String(),
 			},
 		},
@@ -105,18 +105,18 @@ func TestMsgDeposit_ValidateBasic(t *testing.T) {
 func TestMsgWithdrawal_ValidateBasic(t *testing.T) {
 	tests := []struct {
 		name string
-		msg  types.MsgWithdrawal
+		msg  types.MsgGrowWithdrawal
 		err  error
 	}{
 		{
 			name: "invalid address",
-			msg: types.MsgWithdrawal{
+			msg: types.MsgGrowWithdrawal{
 				Creator: "invalid_address",
 			},
 			err: sdkerrors.ErrInvalidAddress,
 		}, {
 			name: "valid address",
-			msg: types.MsgWithdrawal{
+			msg: types.MsgGrowWithdrawal{
 				Creator: apptesting.CreateRandomAccounts(1)[0].String(),
 			},
 		},

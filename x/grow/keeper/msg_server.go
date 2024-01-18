@@ -10,7 +10,7 @@ import (
 var _ types.MsgServer = Keeper{}
 
 // Msg for USQ deposit
-func (k Keeper) Deposit(goCtx context.Context, msg *types.MsgDeposit) (*types.MsgDepositResponse, error) {
+func (k Keeper) GrowDeposit(goCtx context.Context, msg *types.MsgGrowDeposit) (*types.MsgGrowDepositResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	err := k.CheckGrowStatus(ctx)
@@ -44,7 +44,7 @@ func (k Keeper) Deposit(goCtx context.Context, msg *types.MsgDeposit) (*types.Ms
 		),
 	})
 
-	return &types.MsgDepositResponse{
+	return &types.MsgGrowDepositResponse{
 		Creator:   msg.Creator,
 		AmountIn:  msg.AmountIn,
 		AmountOut: amountOut.String(),
@@ -52,7 +52,7 @@ func (k Keeper) Deposit(goCtx context.Context, msg *types.MsgDeposit) (*types.Ms
 }
 
 // Msg for USQ withdrawal
-func (k Keeper) Withdrawal(goCtx context.Context, msg *types.MsgWithdrawal) (*types.MsgWithdrawalResponse, error) {
+func (k Keeper) GrowWithdrawal(goCtx context.Context, msg *types.MsgGrowWithdrawal) (*types.MsgGrowWithdrawalResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	err := k.CheckGrowStatus(ctx)
@@ -88,7 +88,7 @@ func (k Keeper) Withdrawal(goCtx context.Context, msg *types.MsgWithdrawal) (*ty
 		),
 	})
 
-	return &types.MsgWithdrawalResponse{
+	return &types.MsgGrowWithdrawalResponse{
 		Creator:   msg.Creator,
 		AmountIn:  msg.AmountIn,
 		AmountOut: amountOut.String(),

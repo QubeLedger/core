@@ -6,8 +6,8 @@ option go_package = "github.com/QuadrateOrg/core/x/grow/types";
 
 // Msg defines the Msg service.
 service Msg {
-  rpc Deposit    (MsgDeposit) returns (MsgDepositResponse);
-  rpc Withdrawal (MsgWithdrawal) returns (MsgWithdrawalResponse);
+  rpc GrowDeposit    (MsgGrowDeposit) returns (MsgGrowDepositResponse);
+  rpc GrowWithdrawal (MsgGrowWithdrawal) returns (MsgGrowWithdrawalResponse);
 
   rpc DepositCollateral (MsgDepositCollateral) returns (MsgDepositCollateralResponse);
   rpc WithdrawalCollateral (MsgWithdrawalCollateral) returns (MsgWithdrawalCollateralResponse);
@@ -20,24 +20,24 @@ service Msg {
 }
 
 // Grow Logic
-message MsgDeposit {
+message MsgGrowDeposit {
   string creator = 1;
   string amountIn = 2;
   string denomOut = 3;
 }
 
-message MsgDepositResponse {
+message MsgGrowDepositResponse {
   string creator = 1;
   string amountIn = 2;
   string amountOut = 3;
 }
 
-message MsgWithdrawal {
+message MsgGrowWithdrawal {
   string creator = 1;
   string amountIn = 2;
 }
 
-message MsgWithdrawalResponse {
+message MsgGrowWithdrawalResponse {
   string creator = 1;
   string amountIn = 2;
   string amountOut = 3;

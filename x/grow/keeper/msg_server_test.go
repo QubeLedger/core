@@ -69,13 +69,13 @@ func (suite *GrowKeeperTestSuite) TestExecuteDeposit() {
 
 		suite.Run(fmt.Sprintf("Case---%s", tc.name), func() {
 			suite.AddTestCoins(tc.sendTokenAmount, tc.sendTokenDenom)
-			msg := types.NewMsgDeposit(
+			msg := types.NewMsgGrowDeposit(
 				suite.Address.String(),
 				sdk.NewInt(tc.sendTokenAmount).String()+tc.sendTokenDenom,
 				tc.gTokenPair.GTokenMetadata.Base,
 			)
 			ctx := sdk.WrapSDKContext(suite.ctx)
-			_, err := suite.app.GrowKeeper.Deposit(ctx, msg)
+			_, err := suite.app.GrowKeeper.GrowDeposit(ctx, msg)
 			if !tc.err {
 				suite.Require().NoError(err)
 				getTokenAmountFromBank := suite.app.BankKeeper.GetBalance(suite.ctx, suite.Address, tc.gTokenPair.GTokenMetadata.Base)
@@ -155,12 +155,12 @@ func (suite *GrowKeeperTestSuite) TestExecuteWithdrawal() {
 			denom := tc.qStablePair.AmountOutMetadata.Base
 
 			oldBalance := s.app.BankKeeper.GetBalance(s.ctx, s.Address, denom)
-			msg := types.NewMsgWithdrawal(
+			msg := types.NewMsgGrowWithdrawal(
 				suite.Address.String(),
 				sdk.NewInt(tc.sendTokenAmount).String()+tc.sendTokenDenom,
 			)
 			ctx := sdk.WrapSDKContext(suite.ctx)
-			res, err := suite.app.GrowKeeper.Withdrawal(ctx, msg)
+			res, err := suite.app.GrowKeeper.GrowWithdrawal(ctx, msg)
 			if !tc.err {
 				suite.Require().NoError(err)
 				newBalance := s.app.BankKeeper.GetBalance(s.ctx, s.Address, denom)
@@ -1218,13 +1218,13 @@ func (suite *GrowKeeperTestSuite) TestGrowDeactivate() {
 
 	suite.Run(fmt.Sprintf("Grow Deactivated"), func() {
 		suite.AddTestCoins(config.sendTokenAmount, config.sendTokenDenom)
-		msg := types.NewMsgDeposit(
+		msg := types.NewMsgGrowDeposit(
 			suite.Address.String(),
 			sdk.NewInt(config.sendTokenAmount).String()+config.sendTokenDenom,
 			s.GetNormalGTokenPair(0).GTokenMetadata.Base,
 		)
 		ctx := sdk.WrapSDKContext(suite.ctx)
-		_, err := suite.app.GrowKeeper.Deposit(ctx, msg)
+		_, err := suite.app.GrowKeeper.GrowDeposit(ctx, msg)
 		suite.Require().Error(err, types.ErrGrowNotActivated)
 	})
 
