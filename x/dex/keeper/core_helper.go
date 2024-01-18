@@ -1,11 +1,12 @@
 package keeper
 
 import (
+	"slices"
+
 	"github.com/QuadrateOrg/core/x/dex/types"
 	math_utils "github.com/QuadrateOrg/core/x/dex/utils/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	"golang.org/x/exp/slices"
 )
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -938,6 +938,8 @@ func hasOnlyDigits(s string) bool {
 
 const thousandSeparator string = "'"
 
+type any = interface{}
+
 var stringsBuilderPool = &sync.Pool{
 	New: func() any { return new(strings.Builder) }, // #nosec G104
 }
