@@ -62,9 +62,9 @@ func (k Keeper) GetValidFees(ctx sdk.Context) []uint64 {
 	return k.GetParams(ctx).FeeTiers
 }
 
-func Contains[T comparable](s []T, e T) bool {
-	for _, v := range s {
-		if v == e {
+func contains(s []uint64, e uint64) bool {
+	for _, a := range s {
+		if a == e {
 			return true
 		}
 	}
@@ -73,7 +73,7 @@ func Contains[T comparable](s []T, e T) bool {
 
 func (k Keeper) ValidateFee(ctx sdk.Context, fee uint64) error {
 	validFees := k.GetValidFees(ctx)
-	if !Contains(validFees, fee) { // #nosec G104
+	if !contains(validFees, fee) { // #nosec G104
 		return sdkerrors.Wrapf(types.ErrInvalidFee, "%d", validFees)
 	}
 
