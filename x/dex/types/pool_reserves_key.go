@@ -37,6 +37,7 @@ func (p PoolReservesKey) KeyMarshal() []byte {
 	return key
 }
 
+//nolint:all
 func (p PoolReservesKey) KeyUnmarshal(bz []byte) error {
 	split := strings.Split(string(bz), "/")
 

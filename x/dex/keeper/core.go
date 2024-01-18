@@ -327,7 +327,6 @@ func (k Keeper) PlaceLimitOrderCore(
 		takerTradePairID := pairID.MustTradePairIDFromMaker(tokenOut)
 		var limitPrice math_utils.PrecDec
 		limitPrice, err = types.CalcPrice(tickIndexInToOut)
-		err = err
 		if err != nil {
 			return
 		}

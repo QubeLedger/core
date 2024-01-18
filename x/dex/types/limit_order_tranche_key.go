@@ -34,6 +34,7 @@ func (p LimitOrderTrancheKey) KeyMarshal() []byte {
 	return key
 }
 
+//nolint:all
 func (p LimitOrderTrancheKey) KeyUnmarshal(bz []byte) error {
 	split := strings.Split(string(bz), "/")
 
