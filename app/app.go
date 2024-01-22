@@ -122,6 +122,7 @@ import (
 	v4 "github.com/QuadrateOrg/core/app/upgrades/v1/v4"
 	v4rc0 "github.com/QuadrateOrg/core/app/upgrades/v1/v4rc0"
 	v5 "github.com/QuadrateOrg/core/app/upgrades/v1/v5"
+	v0 "github.com/QuadrateOrg/core/app/upgrades/v2/v0"
 	v2 "github.com/QuadrateOrg/core/app/upgrades/v2/v0"
 	v1 "github.com/QuadrateOrg/core/app/upgrades/v2/v1"
 
@@ -1083,12 +1084,20 @@ func (app *QuadrateApp) setUpgradeHandlers() {
 	)
 
 	app.UpgradeKeeper.SetUpgradeHandler(
-		v1.UpgradeName,
-		v1.CreateUpgradeHandler(
+		v0.UpgradeName,
+		v0.CreateUpgradeHandler(
 			app.mm,
 			app.configurator,
 			app.StableKeeper,
 			app.GrowKeeper,
+		),
+	)
+
+	app.UpgradeKeeper.SetUpgradeHandler(
+		v1.UpgradeName,
+		v1.CreateUpgradeHandler(
+			app.mm,
+			app.configurator,
 		),
 	)
 
@@ -1104,17 +1113,22 @@ func (app *QuadrateApp) setUpgradeHandlers() {
 		return
 	}
 
-	var storeUpgrades *storetypes.StoreUpgrades
+	var storeUpgrades []*storetypes.StoreUpgrades
 
 	switch upgradeInfo.Name {
 	case tfupgrades.UpgradeName:
 	case v4.UpgradeName:
 	case v4rc0.UpgradeName:
 	case v5.UpgradeName:
+	case v2.UpgradeName:
+	case v1.UpgradeName:
+		storeUpgrades = append(storeUpgrades, &v1.Upgrade.StoreUpgrades)
 	}
 
-	if storeUpgrades != nil {
-		// configure store loader that checks if version == upgradeHeight and applies store upgrades
-		app.SetStoreLoader(upgradetypes.UpgradeStoreLoader(upgradeInfo.Height, storeUpgrades))
+	for _, storeUpgrade := range storeUpgrades {
+		if storeUpgrade != nil {
+			// configure store loader that checks if version == upgradeHeight and applies store upgrades
+			app.SetStoreLoader(upgradetypes.UpgradeStoreLoader(upgradeInfo.Height, storeUpgrade))
+		}
 	}
 }
