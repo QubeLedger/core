@@ -1,0 +1,9 @@
+syntax = "proto3";
+package core.dex;
+
+option go_package = "coregithub.com/QuadrateOrg/core/x/dex/types";
+
+message PairID {
+  string token0 = 1; 
+  string token1 = 2; 
+}

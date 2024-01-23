@@ -2,7 +2,7 @@ package app
 
 //nolint:all
 const (
-	appName = "QuadrateApp"
+	appName = "QubeApp"
 
 	authzMsgExec                        = "/cosmos.authz.v1beta1.MsgExec"
 	authzMsgGrant                       = "/cosmos.authz.v1beta1.MsgGrant"

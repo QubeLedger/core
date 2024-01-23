@@ -11,7 +11,7 @@ var (
 	err           error
 )
 
-func (k Keeper) ExecuteMint(ctx sdk.Context, msg *types.MsgMint, pair types.Pair) (error, sdk.Coin) {
+func (k Keeper) GMB_ExecuteMint(ctx sdk.Context, msg *types.MsgMint, pair types.Pair) (error, sdk.Coin) {
 
 	params := k.GetParams(ctx)
 	ReserveFundAddress, _ := sdk.AccAddressFromBech32(params.ReserveFundAddress)

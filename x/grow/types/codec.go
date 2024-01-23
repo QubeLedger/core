@@ -9,8 +9,8 @@ import (
 )
 
 func RegisterCodec(cdc *codec.LegacyAmino) {
-	cdc.RegisterConcrete(&MsgDeposit{}, "grow/Deposit", nil)
-	cdc.RegisterConcrete(&MsgWithdrawal{}, "grow/Withdrawal", nil)
+	cdc.RegisterConcrete(&MsgGrowDeposit{}, "grow/GrowDeposit", nil)
+	cdc.RegisterConcrete(&MsgGrowWithdrawal{}, "grow/GrowWithdrawal", nil)
 	cdc.RegisterConcrete(&MsgCreateLend{}, "grow/CreateLend", nil)
 	cdc.RegisterConcrete(&MsgDeleteLend{}, "grow/DeleteLend", nil)
 	cdc.RegisterConcrete(&MsgDepositCollateral{}, "grow/DepositCollateral", nil)
@@ -22,10 +22,10 @@ func RegisterCodec(cdc *codec.LegacyAmino) {
 
 func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
 	registry.RegisterImplementations((*sdk.Msg)(nil),
-		&MsgDeposit{},
+		&MsgGrowDeposit{},
 	)
 	registry.RegisterImplementations((*sdk.Msg)(nil),
-		&MsgWithdrawal{},
+		&MsgGrowWithdrawal{},
 	)
 	registry.RegisterImplementations((*sdk.Msg)(nil),
 		&MsgCreateLend{},
@@ -54,7 +54,9 @@ func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
 		&RegisterChangeGrowStakingReserveAddressProposal{},
 		&RegisterChangeRealRateProposal{},
 		&RegisterChangeBorrowRateProposal{},
-		&RegisterActivateGrowModuleProposal{},
+		&RegisterChangeDepositMethodStatusProposal{},
+		&RegisterChangeCollateralMethodStatusProposal{},
+		&RegisterChangeBorrowMethodStatusProposal{},
 		&RegisterRemoveLendAssetProposal{},
 		&RegisterRemoveGTokenPairProposal{},
 	)

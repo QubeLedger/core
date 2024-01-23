@@ -78,6 +78,8 @@ message RegisterChangeRealRateProposal {
   string description = 2;
 
   uint64 rate = 3;
+
+  string id = 4;
 }
 
 message RegisterChangeBorrowRateProposal {
@@ -88,9 +90,35 @@ message RegisterChangeBorrowRateProposal {
   string description = 2;
 
   uint64 rate = 3;
+  
+  string id = 4;
 }
 
-message RegisterActivateGrowModuleProposal {
+message RegisterChangeLendRateProposal {
+  option (gogoproto.equal) = false;
+  // title of the proposal
+  string title = 1;
+  // description of the proposal
+  string description = 2;
+
+  uint64 rate = 3;
+
+  string id = 4;
+}
+
+message RegisterChangeDepositMethodStatusProposal {
+  option (gogoproto.equal) = false;
+  string title = 1;
+  string description = 2;
+}
+
+message RegisterChangeCollateralMethodStatusProposal {
+  option (gogoproto.equal) = false;
+  string title = 1;
+  string description = 2;
+}
+
+message RegisterChangeBorrowMethodStatusProposal {
   option (gogoproto.equal) = false;
   string title = 1;
   string description = 2;

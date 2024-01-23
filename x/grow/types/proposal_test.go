@@ -389,7 +389,7 @@ func TestRegisterChangeRealRateProposal(t *testing.T) {
 	}
 }
 
-func TestRegisterChangeRealBorrowProposal(t *testing.T) {
+func TestRegisterChangeBorrowProposal(t *testing.T) {
 	apptypes.SetConfig()
 	tests := []struct {
 		title       string
@@ -419,6 +419,56 @@ func TestRegisterChangeRealBorrowProposal(t *testing.T) {
 
 	for _, tc := range tests {
 		msg := types.NewRegisterChangeBorrowRateProposal(tc.title, tc.description, uint64(tc.value))
+		err := msg.ValidateBasic()
+		if tc.expectedErr {
+			require.Error(t, err)
+		} else {
+			require.NoError(t, err)
+		}
+	}
+}
+
+func TestRegisterChangeLendRateProposal(t *testing.T) {
+	apptypes.SetConfig()
+	tests := []struct {
+		title       string
+		description string
+		value       int64
+		id          string
+		expectedErr bool
+	}{
+		{
+			"test",
+			"test",
+			10,
+			"test",
+			false,
+		},
+		{
+			"test",
+			"test",
+			0,
+			"test",
+			true,
+		},
+		{
+			"test",
+			"test",
+			-25,
+			"test",
+			true,
+		},
+		{
+			"test",
+			"test",
+			25,
+			"",
+			true,
+		},
+	}
+
+	for _, tc := range tests {
+		msg := types.NewRegisterChangeLendRateProposal(tc.title, tc.description, uint64(tc.value), tc.id)
 		err := msg.ValidateBasic()
 		if tc.expectedErr {
 			require.Error(t, err)

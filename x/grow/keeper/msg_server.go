@@ -9,11 +9,11 @@ import (
 
 var _ types.MsgServer = Keeper{}
 
-// Msg for USQ deposit
-func (k Keeper) Deposit(goCtx context.Context, msg *types.MsgDeposit) (*types.MsgDepositResponse, error) {
+// Msg for deposit
+func (k Keeper) GrowDeposit(goCtx context.Context, msg *types.MsgGrowDeposit) (*types.MsgGrowDepositResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	err := k.CheckGrowStatus(ctx)
+	err := k.CheckDepositMethodStatus(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -44,18 +44,18 @@ func (k Keeper) Deposit(goCtx context.Context, msg *types.MsgDeposit) (*types.Ms
 		),
 	})
 
-	return &types.MsgDepositResponse{
+	return &types.MsgGrowDepositResponse{
 		Creator:   msg.Creator,
 		AmountIn:  msg.AmountIn,
 		AmountOut: amountOut.String(),
 	}, nil
 }
 
-// Msg for USQ withdrawal
-func (k Keeper) Withdrawal(goCtx context.Context, msg *types.MsgWithdrawal) (*types.MsgWithdrawalResponse, error) {
+// Msg for withdrawal
+func (k Keeper) GrowWithdrawal(goCtx context.Context, msg *types.MsgGrowWithdrawal) (*types.MsgGrowWithdrawalResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	err := k.CheckGrowStatus(ctx)
+	err := k.CheckDepositMethodStatus(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -88,7 +88,7 @@ func (k Keeper) Withdrawal(goCtx context.Context, msg *types.MsgWithdrawal) (*ty
 		),
 	})
 
-	return &types.MsgWithdrawalResponse{
+	return &types.MsgGrowWithdrawalResponse{
 		Creator:   msg.Creator,
 		AmountIn:  msg.AmountIn,
 		AmountOut: amountOut.String(),
@@ -99,7 +99,7 @@ func (k Keeper) Withdrawal(goCtx context.Context, msg *types.MsgWithdrawal) (*ty
 func (k Keeper) DepositCollateral(goCtx context.Context, msg *types.MsgDepositCollateral) (*types.MsgDepositCollateralResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	err := k.CheckGrowStatus(ctx)
+	err := k.CheckCollateralMethodStatus(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -141,7 +141,7 @@ func (k Keeper) DepositCollateral(goCtx context.Context, msg *types.MsgDepositCo
 func (k Keeper) WithdrawalCollateral(goCtx context.Context, msg *types.MsgWithdrawalCollateral) (*types.MsgWithdrawalCollateralResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	err := k.CheckGrowStatus(ctx)
+	err := k.CheckCollateralMethodStatus(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -183,7 +183,7 @@ func (k Keeper) WithdrawalCollateral(goCtx context.Context, msg *types.MsgWithdr
 func (k Keeper) CreateLend(goCtx context.Context, msg *types.MsgCreateLend) (*types.MsgCreateLendResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	err := k.CheckGrowStatus(ctx)
+	err := k.CheckBorrowMethodStatus(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -229,7 +229,7 @@ func (k Keeper) CreateLend(goCtx context.Context, msg *types.MsgCreateLend) (*ty
 func (k Keeper) DeleteLend(goCtx context.Context, msg *types.MsgDeleteLend) (*types.MsgDeleteLendResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	err := k.CheckGrowStatus(ctx)
+	err := k.CheckBorrowMethodStatus(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -273,7 +273,7 @@ func (k Keeper) DeleteLend(goCtx context.Context, msg *types.MsgDeleteLend) (*ty
 func (k Keeper) OpenLiquidationPosition(goCtx context.Context, msg *types.MsgOpenLiquidationPosition) (*types.MsgOpenLiquidationPositionResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	err := k.CheckGrowStatus(ctx)
+	err := k.CheckBorrowMethodStatus(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -311,7 +311,7 @@ func (k Keeper) OpenLiquidationPosition(goCtx context.Context, msg *types.MsgOpe
 func (k Keeper) CloseLiquidationPosition(goCtx context.Context, msg *types.MsgCloseLiquidationPosition) (*types.MsgCloseLiquidationPositionResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	err := k.CheckGrowStatus(ctx)
+	err := k.CheckBorrowMethodStatus(ctx)
 	if err != nil {
 		return nil, err
 	}

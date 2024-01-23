@@ -65,7 +65,6 @@ func (s *GrowKeeperTestSuite) Setup() {
 	s.app.GrowKeeper.SetGrowStakingReserveAddress(s.ctx, apptesting.CreateRandomAccounts(1)[0])
 	s.app.GrowKeeper.SetUSQReserveAddress(s.ctx, apptesting.CreateRandomAccounts(1)[0])
 	s.app.GrowKeeper.SetGrowYieldReserveAddress(s.ctx, apptesting.CreateRandomAccounts(1)[0])
-	s.app.GrowKeeper.SetBorrowRate(s.ctx, sdk.NewInt(15))
 
 	s.app.StableKeeper.SetBurningFundAddress(s.ctx, apptesting.CreateRandomAccounts(1)[0])
 	s.app.StableKeeper.SetReserveFundAddress(s.ctx, apptesting.CreateRandomAccounts(1)[0])
@@ -123,6 +122,7 @@ func (s *GrowKeeperTestSuite) GetNormalQStablePair(id uint64) stabletypes.Pair {
 			Name:    "USQ",
 			Symbol:  "USQ",
 		},
+		Model:        "gmb",
 		Qm:           sdk.NewInt(0),
 		Ar:           sdk.NewInt(0),
 		MinAmountIn:  "20uatom",
@@ -151,6 +151,8 @@ func (s *GrowKeeperTestSuite) GetNormalGTokenPair(id uint64) types.GTokenPair {
 		MinAmountOut:                "20ugusd",
 		GTokenLastPrice:             sdk.NewInt(1 * 1000000),
 		GTokenLatestPriceUpdateTime: uint64(time.Now().Unix() - (31536000)),
+		BorrowRate:                  1,
+		RealRate:                    1,
 	}
 
 	return pair

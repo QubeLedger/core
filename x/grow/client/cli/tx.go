@@ -119,7 +119,7 @@ func CmdDeposit() *cobra.Command {
 				return err
 			}
 
-			msg := types.NewMsgDeposit(
+			msg := types.NewMsgGrowDeposit(
 				clientCtx.GetFromAddress().String(),
 				argAmountIn,
 				argAmountOut,
@@ -149,7 +149,7 @@ func CmdWithdrawal() *cobra.Command {
 				return err
 			}
 
-			msg := types.NewMsgWithdrawal(
+			msg := types.NewMsgGrowWithdrawal(
 				clientCtx.GetFromAddress().String(),
 				argAmountIn,
 			)

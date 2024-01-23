@@ -74,11 +74,13 @@ type RegisterChangeBorrowRateProposal struct {
 	Rate        uint64       `json:"rate" yaml:"rate"`
 }
 
-type RegisterActivateGrowModuleProposal struct {
+type RegisterChangeLendRateProposal struct {
 	BaseReq     rest.BaseReq `json:"base_req" yaml:"base_req"`
 	Title       string       `json:"title" yaml:"title"`
 	Description string       `json:"description" yaml:"description"`
 	Deposit     sdk.Coins    `json:"deposit" yaml:"deposit"`
+	Rate        uint64       `json:"rate" yaml:"rate"`
+	Id          string       `json:"id" yaml:"id"`
 }
 
 type RegisterRemoveLendAssetProposal struct {
@@ -95,6 +97,27 @@ type RegisterRemoveGTokenPairProposal struct {
 	Description  string       `json:"description" yaml:"description"`
 	Deposit      sdk.Coins    `json:"deposit" yaml:"deposit"`
 	GTokenPairID string       `json:"lendAssetId" yaml:"lendAssetId"`
+}
+
+type RegisterChangeDepositMethodStatusProposal struct {
+	BaseReq     rest.BaseReq `json:"base_req" yaml:"base_req"`
+	Title       string       `json:"title" yaml:"title"`
+	Description string       `json:"description" yaml:"description"`
+	Deposit     sdk.Coins    `json:"deposit" yaml:"deposit"`
+}
+
+type RegisterChangeCollateralMethodStatusProposal struct {
+	BaseReq     rest.BaseReq `json:"base_req" yaml:"base_req"`
+	Title       string       `json:"title" yaml:"title"`
+	Description string       `json:"description" yaml:"description"`
+	Deposit     sdk.Coins    `json:"deposit" yaml:"deposit"`
+}
+
+type RegisterChangeBorrowMethodStatusProposal struct {
+	BaseReq     rest.BaseReq `json:"base_req" yaml:"base_req"`
+	Title       string       `json:"title" yaml:"title"`
+	Description string       `json:"description" yaml:"description"`
+	Deposit     sdk.Coins    `json:"deposit" yaml:"deposit"`
 }
 
 func RegisterLendAssetProposalRESTHandler(clientCtx client.Context) govrest.ProposalRESTHandler {
@@ -340,7 +363,7 @@ func RegisterChangeBorrowRateProposalRESTHandler(clientCtx client.Context) govre
 
 func newRegisterChangeBorrowRateProposal(clientCtx client.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var req RegisterChangeRealRateProposal
+		var req RegisterChangeBorrowRateProposal
 
 		if !rest.ReadRESTReq(w, r, clientCtx.LegacyAmino, &req) {
 			return
@@ -370,16 +393,16 @@ func newRegisterChangeBorrowRateProposal(clientCtx client.Context) http.HandlerF
 	}
 }
 
-func RegisterActivateGrowModuleProposalRESTHandler(clientCtx client.Context) govrest.ProposalRESTHandler {
+func RegisterChangeLendRateProposalRESTHandler(clientCtx client.Context) govrest.ProposalRESTHandler {
 	return govrest.ProposalRESTHandler{
 		SubRoute: types.ModuleName,
-		Handler:  newRegisterActivateGrowModuleProposal(clientCtx),
+		Handler:  newRegisterChangeLendRateProposal(clientCtx),
 	}
 }
 
-func newRegisterActivateGrowModuleProposal(clientCtx client.Context) http.HandlerFunc {
+func newRegisterChangeLendRateProposal(clientCtx client.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var req RegisterChangeRealRateProposal
+		var req RegisterChangeLendRateProposal
 
 		if !rest.ReadRESTReq(w, r, clientCtx.LegacyAmino, &req) {
 			return
@@ -395,7 +418,7 @@ func newRegisterActivateGrowModuleProposal(clientCtx client.Context) http.Handle
 			return
 		}
 
-		content := types.NewRegisterActivateGrowModuleProposal(req.Title, req.Description)
+		content := types.NewRegisterChangeLendRateProposal(req.Title, req.Description, req.Rate, req.Id)
 		msg, err := govtypes.NewMsgSubmitProposal(content, req.Deposit, fromAddr)
 		if rest.CheckBadRequestError(w, err) {
 			return
@@ -474,6 +497,124 @@ func newRegisterRemoveGTokenPairProposal(clientCtx client.Context) http.HandlerF
 		}
 
 		content := types.NewRegisterRemoveGTokenPairProposal(req.Title, req.Description, req.GTokenPairID)
+		msg, err := govtypes.NewMsgSubmitProposal(content, req.Deposit, fromAddr)
+		if rest.CheckBadRequestError(w, err) {
+			return
+		}
+
+		if rest.CheckBadRequestError(w, msg.ValidateBasic()) {
+			return
+		}
+
+		tx.WriteGeneratedTxResponse(clientCtx, w, req.BaseReq, msg)
+	}
+}
+
+/**/
+func RegisterChangeDepositMethodStatusProposalRESTHandler(clientCtx client.Context) govrest.ProposalRESTHandler {
+	return govrest.ProposalRESTHandler{
+		SubRoute: types.ModuleName,
+		Handler:  newRegisterChangeDepositMethodStatusProposal(clientCtx),
+	}
+}
+
+func newRegisterChangeDepositMethodStatusProposal(clientCtx client.Context) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		var req RegisterChangeRealRateProposal
+
+		if !rest.ReadRESTReq(w, r, clientCtx.LegacyAmino, &req) {
+			return
+		}
+
+		req.BaseReq = req.BaseReq.Sanitize()
+		if !req.BaseReq.ValidateBasic(w) {
+			return
+		}
+
+		fromAddr, err := sdk.AccAddressFromBech32(req.BaseReq.From)
+		if rest.CheckBadRequestError(w, err) {
+			return
+		}
+
+		content := types.NewRegisterChangeDepositMethodStatusProposal(req.Title, req.Description)
+		msg, err := govtypes.NewMsgSubmitProposal(content, req.Deposit, fromAddr)
+		if rest.CheckBadRequestError(w, err) {
+			return
+		}
+
+		if rest.CheckBadRequestError(w, msg.ValidateBasic()) {
+			return
+		}
+
+		tx.WriteGeneratedTxResponse(clientCtx, w, req.BaseReq, msg)
+	}
+}
+
+func RegisterChangeCollateralMethodStatusProposalRESTHandler(clientCtx client.Context) govrest.ProposalRESTHandler {
+	return govrest.ProposalRESTHandler{
+		SubRoute: types.ModuleName,
+		Handler:  newRegisterChangeCollateralMethodStatusProposal(clientCtx),
+	}
+}
+
+func newRegisterChangeCollateralMethodStatusProposal(clientCtx client.Context) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		var req RegisterChangeRealRateProposal
+
+		if !rest.ReadRESTReq(w, r, clientCtx.LegacyAmino, &req) {
+			return
+		}
+
+		req.BaseReq = req.BaseReq.Sanitize()
+		if !req.BaseReq.ValidateBasic(w) {
+			return
+		}
+
+		fromAddr, err := sdk.AccAddressFromBech32(req.BaseReq.From)
+		if rest.CheckBadRequestError(w, err) {
+			return
+		}
+
+		content := types.NewRegisterChangeCollateralMethodStatusProposal(req.Title, req.Description)
+		msg, err := govtypes.NewMsgSubmitProposal(content, req.Deposit, fromAddr)
+		if rest.CheckBadRequestError(w, err) {
+			return
+		}
+
+		if rest.CheckBadRequestError(w, msg.ValidateBasic()) {
+			return
+		}
+
+		tx.WriteGeneratedTxResponse(clientCtx, w, req.BaseReq, msg)
+	}
+}
+
+func RegisterChangeBorrowMethodStatusProposalRESTHandler(clientCtx client.Context) govrest.ProposalRESTHandler {
+	return govrest.ProposalRESTHandler{
+		SubRoute: types.ModuleName,
+		Handler:  newRegisterChangeBorrowMethodStatusProposal(clientCtx),
+	}
+}
+
+func newRegisterChangeBorrowMethodStatusProposal(clientCtx client.Context) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		var req RegisterChangeRealRateProposal
+
+		if !rest.ReadRESTReq(w, r, clientCtx.LegacyAmino, &req) {
+			return
+		}
+
+		req.BaseReq = req.BaseReq.Sanitize()
+		if !req.BaseReq.ValidateBasic(w) {
+			return
+		}
+
+		fromAddr, err := sdk.AccAddressFromBech32(req.BaseReq.From)
+		if rest.CheckBadRequestError(w, err) {
+			return
+		}
+
+		content := types.NewRegisterChangeBorrowMethodStatusProposal(req.Title, req.Description)
 		msg, err := govtypes.NewMsgSubmitProposal(content, req.Deposit, fromAddr)
 		if rest.CheckBadRequestError(w, err) {
 			return

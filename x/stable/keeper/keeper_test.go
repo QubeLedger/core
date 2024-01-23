@@ -11,6 +11,7 @@ import (
 	apptesting "github.com/QuadrateOrg/core/app/apptesting"
 	quadrateapptest "github.com/QuadrateOrg/core/app/helpers"
 	apptypes "github.com/QuadrateOrg/core/types"
+	growtypes "github.com/QuadrateOrg/core/x/grow/types"
 	"github.com/QuadrateOrg/core/x/oracle"
 	oraclekeeper "github.com/QuadrateOrg/core/x/oracle/keeper"
 	oracletypes "github.com/QuadrateOrg/core/x/oracle/types"
@@ -46,7 +47,8 @@ func (s *StableKeeperTestSuite) Setup() {
 	s.Address = apptesting.CreateRandomAccounts(1)[0]
 	s.ValPubKeys = simapp.CreateTestPubKeys(1)
 	s.Commit()
-	s.app.GrowKeeper.SetBorrowRate(s.ctx, sdk.NewInt(15))
+	s.app.GrowKeeper.AppendPair(s.ctx, s.GetNormalGTokenPair(0))
+	s.app.GrowKeeper.SetBorrowRate(s.ctx, sdk.NewInt(15), s.GetNormalGTokenPair(0).DenomID)
 	s.app.StableKeeper.SetParams(s.ctx, types.DefaultParams())
 }
 
@@ -78,7 +80,7 @@ func (suite *StableKeeperTestSuite) MintStable(amount int64, pair types.Pair) er
 	return nil
 }
 
-func (s *StableKeeperTestSuite) GetNormalPair(id uint64) types.Pair {
+func (s *StableKeeperTestSuite) GetNormalGMBPair(id uint64) types.Pair {
 	pair := types.Pair{
 		Id:     id,
 		PairId: fmt.Sprintf("%x", crypto.Sha256(append([]byte("uatom"+"uusd")))),
@@ -102,10 +104,37 @@ func (s *StableKeeperTestSuite) GetNormalPair(id uint64) types.Pair {
 			Name:    "USQ",
 			Symbol:  "USQ",
 		},
+		Model:        "gmb",
 		Qm:           sdk.NewInt(0),
 		Ar:           sdk.NewInt(0),
 		MinAmountIn:  "20uatom",
 		MinAmountOut: "20uusd",
+	}
+
+	return pair
+}
+
+func (s *StableKeeperTestSuite) GetNormalGTokenPair(id uint64) growtypes.GTokenPair {
+	pair := growtypes.GTokenPair{
+		Id:            id,
+		DenomID:       fmt.Sprintf("%x", crypto.Sha256(append([]byte("ugusd")))),
+		QStablePairId: fmt.Sprintf("%x", crypto.Sha256(append([]byte("uatom"+"uusd")))),
+		GTokenMetadata: banktypes.Metadata{
+			Description: "",
+			DenomUnits: []*banktypes.DenomUnit{
+				{Denom: "ugusd", Exponent: uint32(0), Aliases: []string{"microgusd"}},
+			},
+			Base:    "ugusd",
+			Display: "gUSQ",
+			Name:    "gUSQ",
+			Symbol:  "gUSQ",
+		},
+		MinAmountIn:                 "20uusd",
+		MinAmountOut:                "20ugusd",
+		GTokenLastPrice:             sdk.NewInt(1 * 1000000),
+		GTokenLatestPriceUpdateTime: uint64(time.Now().Unix() - (31536000)),
+		BorrowRate:                  1,
+		RealRate:                    1,
 	}
 
 	return pair

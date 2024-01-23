@@ -24,4 +24,6 @@ message gTokenPair {
                 (gogoproto.moretags) = "yaml:\"st\"",
                 (gogoproto.nullable) = false
         ];
+        uint64 RealRate = 11;
+        uint64 BorrowRate = 12;
 }

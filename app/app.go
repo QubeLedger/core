@@ -122,7 +122,9 @@ import (
 	v4 "github.com/QuadrateOrg/core/app/upgrades/v1/v4"
 	v4rc0 "github.com/QuadrateOrg/core/app/upgrades/v1/v4rc0"
 	v5 "github.com/QuadrateOrg/core/app/upgrades/v1/v5"
+	v0 "github.com/QuadrateOrg/core/app/upgrades/v2/v0"
 	v2 "github.com/QuadrateOrg/core/app/upgrades/v2/v0"
+	v1 "github.com/QuadrateOrg/core/app/upgrades/v2/v1"
 
 	oraclemodule "github.com/QuadrateOrg/core/x/oracle"
 	oracleclient "github.com/QuadrateOrg/core/x/oracle/client"
@@ -139,6 +141,16 @@ import (
 	growmodulekeeper "github.com/QuadrateOrg/core/x/grow/keeper"
 	growmoduletypes "github.com/QuadrateOrg/core/x/grow/types"
 
+	dexmodule "github.com/QuadrateOrg/core/x/dex"
+	dexmodulekeeper "github.com/QuadrateOrg/core/x/dex/keeper"
+	dexmoduletypes "github.com/QuadrateOrg/core/x/dex/types"
+
+	swapmiddleware "github.com/QuadrateOrg/core/x/ibcswap"
+	swapkeeper "github.com/QuadrateOrg/core/x/ibcswap/keeper"
+	swaptypes "github.com/QuadrateOrg/core/x/ibcswap/types"
+
+	gmpmiddleware "github.com/QuadrateOrg/core/x/gmp"
+
 	// unnamed import of statik for swagger UI support
 	_ "github.com/cosmos/cosmos-sdk/client/docs/statik"
 )
@@ -146,6 +158,7 @@ import (
 var (
 	ProposalsEnabled        = "true"
 	EnableSpecificProposals = ""
+	HomeDir                 = ".quadrate"
 )
 
 // GetEnabledProposals parses the ProposalsEnabled / EnableSpecificProposals values to
@@ -191,14 +204,17 @@ func getGovProposalHandlers() []govclient.ProposalHandler {
 		stableclient.RegisterChangeBurningFundAddressHandler,
 		stableclient.RegisterChangeReserveFundAddressHandler,
 		stableclient.RegisterDeletePairHandler,
-		growclient.RegisterChangeBorrowRateProposalHandler,
 		growclient.RegisterChangeGrowStakingReserveAddressProposalHandler,
 		growclient.RegisterChangeGrowYieldReserveAddressProposalHandler,
 		growclient.RegisterChangeRealRateProposalHandler,
+		growclient.RegisterChangeBorrowRateProposalHandler,
+		growclient.RegisterChangeLendRateProposalHandler,
 		growclient.RegisterChangeUSQReserveAddressProposalHandler,
 		growclient.RegisterGTokenPairProposalHandler,
 		growclient.RegisterLendAssetProposalHandler,
-		growclient.RegisterActivateGrowModuleProposalHandler,
+		growclient.RegisterChangeDepositMethodStatusProposalHandler,
+		growclient.RegisterChangeCollateralMethodStatusProposalHandler,
+		growclient.RegisterChangeBorrowMethodStatusProposalHandler,
 		oracleclient.RegisterAddNewDenomProposal,
 	)
 
@@ -240,6 +256,7 @@ var (
 		oraclemodule.AppModuleBasic{},
 		stablemodule.AppModuleBasic{},
 		growmodule.AppModuleBasic{},
+		dexmodule.AppModuleBasic{},
 	)
 
 	// module account permissions
@@ -257,6 +274,7 @@ var (
 		oraclemoduletypes.ModuleName:   {authtypes.Minter, authtypes.Burner, authtypes.Staking},
 		stablemoduletypes.ModuleName:   {authtypes.Minter, authtypes.Burner},
 		growmoduletypes.ModuleName:     {authtypes.Minter, authtypes.Burner, authtypes.Staking},
+		dexmoduletypes.ModuleName:      {authtypes.Minter, authtypes.Burner, authtypes.Staking},
 	}
 )
 
@@ -304,6 +322,8 @@ type QuadrateApp struct { // nolint: golint
 	PacketForwardKeeper *packetforwardkeeper.Keeper
 	StableKeeper        stablemodulekeeper.Keeper
 	GrowKeeper          growmodulekeeper.Keeper
+	DexKeeper           dexmodulekeeper.Keeper
+	SwapKeeper          swapkeeper.Keeper
 
 	// make scoped keepers public for test purposes
 	ScopedIBCKeeper      capabilitykeeper.ScopedKeeper
@@ -326,7 +346,7 @@ func init() {
 		stdlog.Println("Failed to get home dir %2", err)
 	}
 
-	DefaultNodeHome = filepath.Join(userHomeDir, ".quadrate")
+	DefaultNodeHome = filepath.Join(userHomeDir, HomeDir)
 	// apply custom power reduction for 'a' base denom unit 10^18
 	sdk.DefaultPowerReduction = sdk.NewIntFromBigInt(new(big.Int).Exp(big.NewInt(10), big.NewInt(18), nil))
 }
@@ -354,13 +374,18 @@ func NewQuadrateApp(
 	bApp.SetInterfaceRegistry(interfaceRegistry)
 
 	keys := sdk.NewKVStoreKeys(
-		authtypes.StoreKey, banktypes.StoreKey, stakingtypes.StoreKey,
-		minttypes.StoreKey, distrtypes.StoreKey, slashingtypes.StoreKey,
-		govtypes.StoreKey, paramstypes.StoreKey, ibchost.StoreKey, upgradetypes.StoreKey,
-		evidencetypes.StoreKey, ibctransfertypes.StoreKey, capabilitytypes.StoreKey,
-		feegrant.StoreKey, authzkeeper.StoreKey, icahosttypes.StoreKey,
+		authtypes.StoreKey, banktypes.StoreKey,
+		stakingtypes.StoreKey, minttypes.StoreKey,
+		distrtypes.StoreKey, slashingtypes.StoreKey,
+		govtypes.StoreKey, paramstypes.StoreKey,
+		ibchost.StoreKey, upgradetypes.StoreKey,
+		evidencetypes.StoreKey, ibctransfertypes.StoreKey,
+		capabilitytypes.StoreKey, feegrant.StoreKey,
+		authzkeeper.StoreKey, icahosttypes.StoreKey,
 		wasm.StoreKey, tokenfactorytypes.StoreKey,
-		oraclemoduletypes.StoreKey, packetforwardtypes.StoreKey, stablemoduletypes.StoreKey, growmoduletypes.StoreKey,
+		oraclemoduletypes.StoreKey, packetforwardtypes.StoreKey,
+		stablemoduletypes.StoreKey, growmoduletypes.StoreKey,
+		dexmoduletypes.StoreKey,
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
 	memKeys := sdk.NewMemoryStoreKeys(capabilitytypes.MemStoreKey)
@@ -528,6 +553,24 @@ func NewQuadrateApp(
 		app.StableKeeper,
 	)
 
+	app.DexKeeper = *dexmodulekeeper.NewKeeper(
+		appCodec,
+		keys[dexmoduletypes.StoreKey],
+		keys[dexmoduletypes.MemStoreKey],
+		app.GetSubspace(dexmoduletypes.ModuleName),
+		app.BankKeeper,
+	)
+	dexModule := dexmodule.NewAppModule(appCodec, app.DexKeeper, app.BankKeeper)
+
+	// Create swap middleware keeper
+	app.SwapKeeper = swapkeeper.NewKeeper(
+		appCodec,
+		app.MsgServiceRouter(),
+		app.IBCKeeper.ChannelKeeper,
+		app.BankKeeper,
+	)
+	swapModule := swapmiddleware.NewAppModule(app.SwapKeeper)
+
 	// register the proposal types
 	govRouter := govtypes.NewRouter()
 	govRouter.
@@ -598,7 +641,6 @@ func NewQuadrateApp(
 		scopedTransferKeeper,
 	)
 	transferModule := transfer.NewAppModule(app.TransferKeeper)
-	transferIBCModule := transfer.NewIBCModule(app.TransferKeeper)
 
 	app.ICAHostKeeper = icahostkeeper.NewKeeper(
 		appCodec, keys[icahosttypes.StoreKey],
@@ -623,13 +665,25 @@ func NewQuadrateApp(
 		app.IBCKeeper.ChannelKeeper,
 	)
 
+	var transferStack porttypes.IBCModule
+	transferStack = transfer.NewIBCModule(app.TransferKeeper)
+	transferStack = packetforward.NewIBCMiddleware(
+		transferStack,
+		app.PacketForwardKeeper,
+		0, // TODO explore changing default values for retries and timeouts
+		packetforwardkeeper.DefaultForwardTransferPacketTimeoutTimestamp,
+		packetforwardkeeper.DefaultRefundTransferPacketTimeoutTimestamp,
+	)
+	transferStack = swapmiddleware.NewIBCMiddleware(transferStack, app.SwapKeeper)
+	transferStack = gmpmiddleware.NewIBCMiddleware(transferStack)
+
 	// routerModule := router.NewAppModule(app.RouterKeeper, transferIBCModule)
 	// create static IBC router, add transfer route, then set and seal it
 	ibcRouter := porttypes.NewRouter()
 	ibcRouter.AddRoute(icahosttypes.SubModuleName, icaHostIBCModule).
 		AddRoute(wasm.ModuleName, wasm.NewIBCHandler(app.wasmKeeper, app.IBCKeeper.ChannelKeeper, app.IBCKeeper.ChannelKeeper)).
-		AddRoute(ibctransfertypes.ModuleName, transferIBCModule).
-		AddRoute(stablemoduletypes.ModuleName, stableIBCModule)
+		AddRoute(stablemoduletypes.ModuleName, stableIBCModule).
+		AddRoute(ibctransfertypes.ModuleName, transferStack)
 
 	app.IBCKeeper.SetRouter(ibcRouter)
 
@@ -677,6 +731,8 @@ func NewQuadrateApp(
 		tokenfactory.NewAppModule(appCodec, *app.TokenFactoryKeeper, app.AccountKeeper, app.BankKeeper),
 		stableModule,
 		growmodule.NewAppModule(appCodec, app.GrowKeeper, app.AccountKeeper, app.BankKeeper),
+		dexModule,
+		swapModule,
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
@@ -711,6 +767,8 @@ func NewQuadrateApp(
 		oraclemoduletypes.ModuleName,
 		stablemoduletypes.ModuleName,
 		growmoduletypes.ModuleName,
+		dexmoduletypes.ModuleName,
+		swaptypes.ModuleName,
 	)
 
 	app.mm.SetOrderEndBlockers(
@@ -739,6 +797,8 @@ func NewQuadrateApp(
 		oraclemoduletypes.ModuleName,
 		stablemoduletypes.ModuleName,
 		growmoduletypes.ModuleName,
+		dexmoduletypes.ModuleName,
+		swaptypes.ModuleName,
 	)
 
 	app.mm.SetOrderInitGenesis(
@@ -767,6 +827,8 @@ func NewQuadrateApp(
 		oraclemoduletypes.ModuleName,
 		stablemoduletypes.ModuleName,
 		growmoduletypes.ModuleName,
+		dexmoduletypes.ModuleName,
+		swaptypes.ModuleName,
 	)
 
 	app.mm.RegisterInvariants(&app.CrisisKeeper)
@@ -975,6 +1037,7 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(oraclemoduletypes.ModuleName)
 	paramsKeeper.Subspace(stablemoduletypes.ModuleName)
 	paramsKeeper.Subspace(growmoduletypes.ModuleName)
+	paramsKeeper.Subspace(dexmoduletypes.ModuleName)
 	return paramsKeeper
 }
 
@@ -1022,6 +1085,24 @@ func (app *QuadrateApp) setUpgradeHandlers() {
 		),
 	)
 
+	app.UpgradeKeeper.SetUpgradeHandler(
+		v0.UpgradeName,
+		v0.CreateUpgradeHandler(
+			app.mm,
+			app.configurator,
+			app.StableKeeper,
+			app.GrowKeeper,
+		),
+	)
+
+	app.UpgradeKeeper.SetUpgradeHandler(
+		v1.UpgradeName,
+		v1.CreateUpgradeHandler(
+			app.mm,
+			app.configurator,
+		),
+	)
+
 	// When a planned update height is reached, the old binary will panic
 	// writing on disk the height and name of the update that triggered it
 	// This will read that value, and execute the preparations for the upgrade.
@@ -1034,17 +1115,22 @@ func (app *QuadrateApp) setUpgradeHandlers() {
 		return
 	}
 
-	var storeUpgrades *storetypes.StoreUpgrades
+	var storeUpgrades []*storetypes.StoreUpgrades
 
 	switch upgradeInfo.Name {
 	case tfupgrades.UpgradeName:
 	case v4.UpgradeName:
 	case v4rc0.UpgradeName:
 	case v5.UpgradeName:
+	case v2.UpgradeName:
+	case v1.UpgradeName:
+		storeUpgrades = append(storeUpgrades, &v1.Upgrade.StoreUpgrades)
 	}
 
-	if storeUpgrades != nil {
-		// configure store loader that checks if version == upgradeHeight and applies store upgrades
-		app.SetStoreLoader(upgradetypes.UpgradeStoreLoader(upgradeInfo.Height, storeUpgrades))
+	for _, storeUpgrade := range storeUpgrades {
+		if storeUpgrade != nil {
+			// configure store loader that checks if version == upgradeHeight and applies store upgrades
+			app.SetStoreLoader(upgradetypes.UpgradeStoreLoader(upgradeInfo.Height, storeUpgrade))
+		}
 	}
 }

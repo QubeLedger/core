@@ -54,7 +54,9 @@ func (suite *GrowKeeperTestSuite) TestExecuteDeposit() {
 	suite.Commit()
 	suite.SetupOracleKeeper("ATOM")
 	suite.RegisterValidator()
-	suite.app.GrowKeeper.ChangeGrowStatus()
+	suite.app.GrowKeeper.ChangeDepositMethodStatus(s.ctx)
+	suite.app.GrowKeeper.ChangeCollateralMethodStatus(s.ctx)
+	suite.app.GrowKeeper.ChangeBorrowMethodStatus(s.ctx)
 	for _, tc := range testCases {
 
 		suite.app.StableKeeper.AppendPair(s.ctx, tc.qStablePair)
@@ -69,13 +71,13 @@ func (suite *GrowKeeperTestSuite) TestExecuteDeposit() {
 
 		suite.Run(fmt.Sprintf("Case---%s", tc.name), func() {
 			suite.AddTestCoins(tc.sendTokenAmount, tc.sendTokenDenom)
-			msg := types.NewMsgDeposit(
+			msg := types.NewMsgGrowDeposit(
 				suite.Address.String(),
 				sdk.NewInt(tc.sendTokenAmount).String()+tc.sendTokenDenom,
 				tc.gTokenPair.GTokenMetadata.Base,
 			)
 			ctx := sdk.WrapSDKContext(suite.ctx)
-			_, err := suite.app.GrowKeeper.Deposit(ctx, msg)
+			_, err := suite.app.GrowKeeper.GrowDeposit(ctx, msg)
 			if !tc.err {
 				suite.Require().NoError(err)
 				getTokenAmountFromBank := suite.app.BankKeeper.GetBalance(suite.ctx, suite.Address, tc.gTokenPair.GTokenMetadata.Base)
@@ -130,16 +132,19 @@ func (suite *GrowKeeperTestSuite) TestExecuteWithdrawal() {
 	suite.Commit()
 	suite.SetupOracleKeeper("ATOM")
 	suite.RegisterValidator()
-	suite.app.GrowKeeper.ChangeGrowStatus()
+	suite.app.GrowKeeper.ChangeDepositMethodStatus(s.ctx)
+	suite.app.GrowKeeper.ChangeCollateralMethodStatus(s.ctx)
+	suite.app.GrowKeeper.ChangeBorrowMethodStatus(s.ctx)
 	suite.app.GrowKeeper.SetGrowStakingReserveAddress(s.ctx, apptesting.CreateRandomAccounts(1)[0])
 	suite.app.GrowKeeper.SetGrowYieldReserveAddress(s.ctx, apptesting.CreateRandomAccounts(1)[0])
 	suite.app.GrowKeeper.SetUSQReserveAddress(s.ctx, apptesting.CreateRandomAccounts(1)[0])
-	suite.app.GrowKeeper.SetBorrowRate(s.ctx, sdk.NewInt(15))
-	suite.app.GrowKeeper.SetRealRate(s.ctx, sdk.NewInt(15))
 	for _, tc := range testCases {
 
 		suite.app.StableKeeper.AppendPair(s.ctx, tc.qStablePair)
 		suite.app.GrowKeeper.AppendPair(s.ctx, tc.gTokenPair)
+
+		suite.app.GrowKeeper.SetBorrowRate(s.ctx, sdk.NewInt(15), tc.gTokenPair.DenomID)
+		suite.app.GrowKeeper.SetRealRate(s.ctx, sdk.NewInt(15), tc.gTokenPair.DenomID)
 
 		suite.OracleAggregateExchangeRateFromNet()
 
@@ -154,12 +159,12 @@ func (suite *GrowKeeperTestSuite) TestExecuteWithdrawal() {
 			denom := tc.qStablePair.AmountOutMetadata.Base
 
 			oldBalance := s.app.BankKeeper.GetBalance(s.ctx, s.Address, denom)
-			msg := types.NewMsgWithdrawal(
+			msg := types.NewMsgGrowWithdrawal(
 				suite.Address.String(),
 				sdk.NewInt(tc.sendTokenAmount).String()+tc.sendTokenDenom,
 			)
 			ctx := sdk.WrapSDKContext(suite.ctx)
-			res, err := suite.app.GrowKeeper.Withdrawal(ctx, msg)
+			res, err := suite.app.GrowKeeper.GrowWithdrawal(ctx, msg)
 			if !tc.err {
 				suite.Require().NoError(err)
 				newBalance := s.app.BankKeeper.GetBalance(s.ctx, s.Address, denom)
@@ -219,7 +224,9 @@ func (suite *GrowKeeperTestSuite) TestExecuteDepositCollateral() {
 	suite.Commit()
 	suite.SetupOracleKeeper("OSMO")
 	suite.RegisterValidator()
-	suite.app.GrowKeeper.ChangeGrowStatus()
+	suite.app.GrowKeeper.ChangeDepositMethodStatus(s.ctx)
+	suite.app.GrowKeeper.ChangeCollateralMethodStatus(s.ctx)
+	suite.app.GrowKeeper.ChangeBorrowMethodStatus(s.ctx)
 	s.ctx = s.ctx.WithBlockTime(time.Now())
 	for _, tc := range testCases {
 
@@ -287,7 +294,9 @@ func (suite *GrowKeeperTestSuite) TestExecuteWithdrawalCollateral() {
 	suite.Commit()
 	suite.SetupOracleKeeper("OSMO")
 	suite.RegisterValidator()
-	suite.app.GrowKeeper.ChangeGrowStatus()
+	suite.app.GrowKeeper.ChangeDepositMethodStatus(s.ctx)
+	suite.app.GrowKeeper.ChangeCollateralMethodStatus(s.ctx)
+	suite.app.GrowKeeper.ChangeBorrowMethodStatus(s.ctx)
 	s.ctx = s.ctx.WithBlockTime(time.Now())
 
 	suite.app.StableKeeper.AppendPair(s.ctx, s.GetNormalQStablePair(0))
@@ -385,7 +394,9 @@ func (suite *GrowKeeperTestSuite) TestExecuteCreateLend() {
 	suite.Commit()
 	suite.SetupOracleKeeper("OSMO")
 	suite.RegisterValidator()
-	suite.app.GrowKeeper.ChangeGrowStatus()
+	suite.app.GrowKeeper.ChangeDepositMethodStatus(s.ctx)
+	suite.app.GrowKeeper.ChangeCollateralMethodStatus(s.ctx)
+	suite.app.GrowKeeper.ChangeBorrowMethodStatus(s.ctx)
 	s.ctx = s.ctx.WithBlockTime(time.Now())
 
 	suite.app.StableKeeper.AppendPair(s.ctx, s.GetNormalQStablePair(0))
@@ -516,7 +527,9 @@ func (suite *GrowKeeperTestSuite) TestExecuteDeleteLend() {
 	suite.Commit()
 	suite.SetupOracleKeeper("OSMO")
 	suite.RegisterValidator()
-	suite.app.GrowKeeper.ChangeGrowStatus()
+	suite.app.GrowKeeper.ChangeDepositMethodStatus(s.ctx)
+	suite.app.GrowKeeper.ChangeCollateralMethodStatus(s.ctx)
+	suite.app.GrowKeeper.ChangeBorrowMethodStatus(s.ctx)
 	s.ctx = s.ctx.WithBlockTime(time.Now())
 
 	suite.app.StableKeeper.AppendPair(s.ctx, s.GetNormalQStablePair(0))
@@ -670,7 +683,9 @@ func (suite *GrowKeeperTestSuite) TestExecuteOpenLiqPosition() {
 	suite.Commit()
 	suite.SetupOracleKeeper("OSMO")
 	suite.RegisterValidator()
-	suite.app.GrowKeeper.ChangeGrowStatus()
+	suite.app.GrowKeeper.ChangeDepositMethodStatus(s.ctx)
+	suite.app.GrowKeeper.ChangeCollateralMethodStatus(s.ctx)
+	suite.app.GrowKeeper.ChangeBorrowMethodStatus(s.ctx)
 	s.ctx = s.ctx.WithBlockTime(time.Now())
 	for _, tc := range testCases {
 
@@ -755,7 +770,9 @@ func (suite *GrowKeeperTestSuite) TestExecuteCloseLiqPosition() {
 	suite.Commit()
 	suite.SetupOracleKeeper("OSMO")
 	suite.RegisterValidator()
-	suite.app.GrowKeeper.ChangeGrowStatus()
+	suite.app.GrowKeeper.ChangeDepositMethodStatus(s.ctx)
+	suite.app.GrowKeeper.ChangeCollateralMethodStatus(s.ctx)
+	suite.app.GrowKeeper.ChangeBorrowMethodStatus(s.ctx)
 	s.ctx = s.ctx.WithBlockTime(time.Now())
 
 	config := s.GetNormalConfig()
@@ -840,7 +857,9 @@ func (suite *GrowKeeperTestSuite) TestLiquidatePositionFull() {
 	suite.Commit()
 	suite.SetupOracleKeeper("OSMO")
 	suite.RegisterValidator()
-	suite.app.GrowKeeper.ChangeGrowStatus()
+	suite.app.GrowKeeper.ChangeDepositMethodStatus(s.ctx)
+	suite.app.GrowKeeper.ChangeCollateralMethodStatus(s.ctx)
+	suite.app.GrowKeeper.ChangeBorrowMethodStatus(s.ctx)
 	s.ctx = s.ctx.WithBlockTime(time.Now())
 	for _, tc := range testCases {
 
@@ -997,7 +1016,9 @@ func (suite *GrowKeeperTestSuite) Test4Liquidator() {
 	suite.Commit()
 	suite.SetupOracleKeeper("OSMO")
 	suite.RegisterValidator()
-	suite.app.GrowKeeper.ChangeGrowStatus()
+	suite.app.GrowKeeper.ChangeDepositMethodStatus(s.ctx)
+	suite.app.GrowKeeper.ChangeCollateralMethodStatus(s.ctx)
+	suite.app.GrowKeeper.ChangeBorrowMethodStatus(s.ctx)
 	s.ctx = s.ctx.WithBlockTime(time.Now())
 	for _, tc := range testCases {
 
@@ -1144,7 +1165,9 @@ func (suite *GrowKeeperTestSuite) Test7Liquidator() {
 	suite.Commit()
 	suite.SetupOracleKeeper("OSMO")
 	suite.RegisterValidator()
-	suite.app.GrowKeeper.ChangeGrowStatus()
+	suite.app.GrowKeeper.ChangeDepositMethodStatus(s.ctx)
+	suite.app.GrowKeeper.ChangeCollateralMethodStatus(s.ctx)
+	suite.app.GrowKeeper.ChangeBorrowMethodStatus(s.ctx)
 	s.ctx = s.ctx.WithBlockTime(time.Now())
 	for _, tc := range testCases {
 
@@ -1206,7 +1229,7 @@ func (suite *GrowKeeperTestSuite) Test7Liquidator() {
 	}
 }
 
-func (suite *GrowKeeperTestSuite) TestGrowDeactivate() {
+func (suite *GrowKeeperTestSuite) TestGrowDepositDeactivate() {
 
 	suite.Setup()
 	suite.Commit()
@@ -1215,16 +1238,61 @@ func (suite *GrowKeeperTestSuite) TestGrowDeactivate() {
 
 	config := s.GetNormalConfig()
 
-	suite.Run(fmt.Sprintf("Grow Deactivated"), func() {
+	suite.Run(fmt.Sprintf("Grow Deposit Deactivated"), func() {
 		suite.AddTestCoins(config.sendTokenAmount, config.sendTokenDenom)
-		msg := types.NewMsgDeposit(
+		msg := types.NewMsgGrowDeposit(
 			suite.Address.String(),
 			sdk.NewInt(config.sendTokenAmount).String()+config.sendTokenDenom,
 			s.GetNormalGTokenPair(0).GTokenMetadata.Base,
 		)
 		ctx := sdk.WrapSDKContext(suite.ctx)
-		_, err := suite.app.GrowKeeper.Deposit(ctx, msg)
-		suite.Require().Error(err, types.ErrGrowNotActivated)
+		_, err := suite.app.GrowKeeper.GrowDeposit(ctx, msg)
+		suite.Require().Error(err, types.ErrDepositNotActivated)
+	})
+
+}
+
+func (suite *GrowKeeperTestSuite) TestGrowCollateralDeactivate() {
+
+	suite.Setup()
+	suite.Commit()
+	suite.SetupOracleKeeper("ATOM")
+	suite.RegisterValidator()
+
+	config := s.GetNormalConfig()
+
+	suite.Run(fmt.Sprintf("Grow Collateral Deactivated"), func() {
+		suite.AddTestCoins(config.sendTokenAmount, config.sendTokenDenom)
+		msg := types.NewMsgDepositCollateral(
+			suite.Address.String(),
+			sdk.NewInt(config.sendTokenAmount).String()+config.sendTokenDenom,
+		)
+		ctx := sdk.WrapSDKContext(suite.ctx)
+		_, err := suite.app.GrowKeeper.DepositCollateral(ctx, msg)
+		suite.Require().Error(err, types.ErrCollateralNotActivated)
+	})
+
+}
+
+func (suite *GrowKeeperTestSuite) TestGrowBorrowDeactivate() {
+
+	suite.Setup()
+	suite.Commit()
+	suite.SetupOracleKeeper("ATOM")
+	suite.RegisterValidator()
+
+	config := s.GetNormalConfig()
+
+	suite.Run(fmt.Sprintf("Grow Borrow Deactivated"), func() {
+		suite.AddTestCoins(config.sendTokenAmount, config.sendTokenDenom)
+		msg := types.NewMsgCreateLend(
+			suite.Address.String(),
+			config.sendTokenDenom,
+			sdk.NewInt(config.lendTokenAmount).String(),
+		)
+		ctx := sdk.WrapSDKContext(suite.ctx)
+		_, err := suite.app.GrowKeeper.CreateLend(ctx, msg)
+		suite.Require().Error(err, types.ErrBorrowNotActivated)
 	})
 
 }

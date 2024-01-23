@@ -26,8 +26,12 @@ func NewGrowProposalHandler(k *keeper.Keeper) govtypes.Handler {
 			return handleRegisterChangeRealRateProposal(ctx, k, c)
 		case *types.RegisterChangeBorrowRateProposal:
 			return handleRegisterChangeBorrowRateProposal(ctx, k, c)
-		case *types.RegisterActivateGrowModuleProposal:
-			return handelRegisterActivateGrowModuleProposal(ctx, k, c)
+		case *types.RegisterChangeDepositMethodStatusProposal:
+			return handelRegisterChangeDepositMethodStatusProposal(ctx, k, c)
+		case *types.RegisterChangeCollateralMethodStatusProposal:
+			return handelRegisterChangeCollateralMethodStatusProposal(ctx, k, c)
+		case *types.RegisterChangeBorrowMethodStatusProposal:
+			return handleRegisterChangeBorrowMethodStatusProposal(ctx, k, c)
 		case *types.RegisterRemoveLendAssetProposal:
 			return handleRegisterRemoveLendAssetProposal(ctx, k, c)
 		case *types.RegisterRemoveGTokenPairProposal:
@@ -127,7 +131,7 @@ func handleRegisterChangeGrowStakingReserveAddressProposal(ctx sdk.Context, k *k
 }
 
 func handleRegisterChangeRealRateProposal(ctx sdk.Context, k *keeper.Keeper, p *types.RegisterChangeRealRateProposal) error {
-	err := k.SetRealRate(ctx, sdk.NewIntFromUint64(p.Rate))
+	err := k.SetRealRate(ctx, sdk.NewIntFromUint64(p.Rate), p.Id)
 	if err != nil {
 		return err
 	}
@@ -140,20 +144,10 @@ func handleRegisterChangeRealRateProposal(ctx sdk.Context, k *keeper.Keeper, p *
 }
 
 func handleRegisterChangeBorrowRateProposal(ctx sdk.Context, k *keeper.Keeper, p *types.RegisterChangeBorrowRateProposal) error {
-	err := k.SetBorrowRate(ctx, sdk.NewIntFromUint64(p.Rate))
+	err := k.SetBorrowRate(ctx, sdk.NewIntFromUint64(p.Rate), p.Id)
 	if err != nil {
 		return err
 	}
-	ctx.EventManager().EmitEvent(
-		sdk.NewEvent(
-			types.EventRegisterChangeBorrowRateProposal,
-		),
-	)
-	return nil
-}
-
-func handelRegisterActivateGrowModuleProposal(ctx sdk.Context, k *keeper.Keeper, p *types.RegisterActivateGrowModuleProposal) error {
-	k.ChangeGrowStatus()
 	ctx.EventManager().EmitEvent(
 		sdk.NewEvent(
 			types.EventRegisterChangeBorrowRateProposal,
@@ -185,6 +179,36 @@ func handleRegisterRemoveGTokenPairProposal(ctx sdk.Context, k *keeper.Keeper, p
 	ctx.EventManager().EmitEvent(
 		sdk.NewEvent(
 			types.EventRegisterRemoveGTokenPairProposal,
+		),
+	)
+	return nil
+}
+
+func handelRegisterChangeDepositMethodStatusProposal(ctx sdk.Context, k *keeper.Keeper, p *types.RegisterChangeDepositMethodStatusProposal) error {
+	k.ChangeDepositMethodStatus(ctx)
+	ctx.EventManager().EmitEvent(
+		sdk.NewEvent(
+			types.EventRegisterChangeDepositMethodStatusProposal,
+		),
+	)
+	return nil
+}
+
+func handelRegisterChangeCollateralMethodStatusProposal(ctx sdk.Context, k *keeper.Keeper, p *types.RegisterChangeCollateralMethodStatusProposal) error {
+	k.ChangeCollateralMethodStatus(ctx)
+	ctx.EventManager().EmitEvent(
+		sdk.NewEvent(
+			types.EventRegisterChangeCollateralMethodStatusProposal,
+		),
+	)
+	return nil
+}
+
+func handleRegisterChangeBorrowMethodStatusProposal(ctx sdk.Context, k *keeper.Keeper, p *types.RegisterChangeBorrowMethodStatusProposal) error {
+	k.ChangeBorrowMethodStatus(ctx)
+	ctx.EventManager().EmitEvent(
+		sdk.NewEvent(
+			types.EventRegisterChangeBorrowMethodStatusProposal,
 		),
 	)
 	return nil

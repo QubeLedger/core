@@ -19,9 +19,13 @@ const (
 	ProposalTypeRegisterChangeGrowStakingReserveAddressProposal string = "RegisterChangeGrowStakingReserveAddressProposal"
 	ProposalTypeRegisterChangeRealRateProposal                  string = "RegisterChangeRealRateProposal"
 	ProposalTypeRegisterChangeBorrowRateProposal                string = "RegisterChangeBorrowRateProposal"
-	ProposalTypeRegisterActivateGrowModuleProposal              string = "RegisterActivateGrowModuleProposal"
+	ProposalTypeRegisterChangeLendRateProposal                  string = "RegisterChangeLendRateProposal"
 	ProposalTypeRegisterRemoveLendAssetProposal                 string = "RegisterRemoveLendAssetProposal"
 	ProposalTypeRegisterRemoveGTokenPairProposal                string = "RegisterRemoveGTokenPairProposal"
+	/**/
+	ProposalTypeRegisterChangeDepositMethodStatusProposal    string = "RegisterChangeDepositMethodStatusProposal"
+	ProposalTypeRegisterChangeCollateralMethodStatusProposal string = "RegisterChangeCollateralMethodStatusProposal"
+	ProposalTypeRegisterChangeBorrowMethodStatusProposal     string = "RegisterChangeBorrowMethodStatusProposal"
 )
 
 // Implements Proposal Interface
@@ -33,9 +37,12 @@ var (
 	_ govtypes.Content = &RegisterChangeGrowStakingReserveAddressProposal{}
 	_ govtypes.Content = &RegisterChangeRealRateProposal{}
 	_ govtypes.Content = &RegisterChangeBorrowRateProposal{}
-	_ govtypes.Content = &RegisterActivateGrowModuleProposal{}
+	_ govtypes.Content = &RegisterChangeLendRateProposal{}
 	_ govtypes.Content = &RegisterRemoveLendAssetProposal{}
 	_ govtypes.Content = &RegisterRemoveGTokenPairProposal{}
+	_ govtypes.Content = &RegisterChangeDepositMethodStatusProposal{}
+	_ govtypes.Content = &RegisterChangeCollateralMethodStatusProposal{}
+	_ govtypes.Content = &RegisterChangeBorrowMethodStatusProposal{}
 )
 
 func init() {
@@ -60,14 +67,23 @@ func init() {
 	govtypes.RegisterProposalType(ProposalTypeRegisterChangeBorrowRateProposal)
 	govtypes.RegisterProposalTypeCodec(&RegisterChangeBorrowRateProposal{}, "grow/RegisterChangeBorrowRateProposal")
 
-	govtypes.RegisterProposalType(ProposalTypeRegisterActivateGrowModuleProposal)
-	govtypes.RegisterProposalTypeCodec(&RegisterActivateGrowModuleProposal{}, "grow/RegisterActivateGrowModuleProposal")
+	govtypes.RegisterProposalType(ProposalTypeRegisterChangeLendRateProposal)
+	govtypes.RegisterProposalTypeCodec(&RegisterChangeLendRateProposal{}, "grow/RegisterChangeLendRateProposal")
 
 	govtypes.RegisterProposalType(ProposalTypeRegisterRemoveLendAssetProposal)
 	govtypes.RegisterProposalTypeCodec(&RegisterRemoveLendAssetProposal{}, "grow/RegisterRemoveLendAssetProposal")
 
 	govtypes.RegisterProposalType(ProposalTypeRegisterRemoveGTokenPairProposal)
 	govtypes.RegisterProposalTypeCodec(&RegisterRemoveGTokenPairProposal{}, "grow/RegisterRemoveGTokenPairProposal")
+
+	govtypes.RegisterProposalType(ProposalTypeRegisterChangeDepositMethodStatusProposal)
+	govtypes.RegisterProposalTypeCodec(&RegisterChangeDepositMethodStatusProposal{}, "grow/RegisterChangeDepositMethodStatusProposal")
+
+	govtypes.RegisterProposalType(ProposalTypeRegisterChangeCollateralMethodStatusProposal)
+	govtypes.RegisterProposalTypeCodec(&RegisterChangeCollateralMethodStatusProposal{}, "grow/RegisterChangeCollateralMethodStatusProposal")
+
+	govtypes.RegisterProposalType(ProposalTypeRegisterChangeBorrowMethodStatusProposal)
+	govtypes.RegisterProposalTypeCodec(&RegisterChangeBorrowMethodStatusProposal{}, "grow/RegisterChangeBorrowMethodStatusProposal")
 }
 
 /*
@@ -338,24 +354,40 @@ func (rtbp *RegisterChangeBorrowRateProposal) ValidateBasic() error {
 }
 
 /*
-RegisterActivateGrowModule
+RegisterChangeLendRateProposal
 */
 
-func NewRegisterActivateGrowModuleProposal(title, description string) govtypes.Content {
-	return &RegisterActivateGrowModuleProposal{
+func NewRegisterChangeLendRateProposal(title, description string, rate uint64, id string) govtypes.Content {
+	return &RegisterChangeLendRateProposal{
 		Title:       title,
 		Description: description,
+		Rate:        rate,
+		Id:          id,
 	}
 }
 
-func (*RegisterActivateGrowModuleProposal) ProposalRoute() string { return RouterKey }
+func (*RegisterChangeLendRateProposal) ProposalRoute() string { return RouterKey }
 
-func (*RegisterActivateGrowModuleProposal) ProposalType() string {
-	return ProposalTypeRegisterActivateGrowModuleProposal
+func (*RegisterChangeLendRateProposal) ProposalType() string {
+	return ProposalTypeRegisterChangeLendRateProposal
 }
 
 /* #nosec */
-func (rtbp *RegisterActivateGrowModuleProposal) ValidateBasic() error {
+func (rtbp *RegisterChangeLendRateProposal) ValidateBasic() error {
+	{
+		if rtbp.Rate == uint64(0) {
+			return ErrIntNegativeOrZero
+		}
+
+		value := sdk.NewInt(int64(rtbp.Rate))
+		if value.IsNegative() || value.IsNil() || value.IsZero() {
+			return ErrIntNegativeOrZero
+		}
+
+		if len(rtbp.Id) == 0 {
+			return ErrInvalidLength
+		}
+	}
 	return nil
 }
 
@@ -408,5 +440,71 @@ func (rtbp *RegisterRemoveGTokenPairProposal) ValidateBasic() error {
 	if len(rtbp.GTokenPairID) == 0 {
 		return ErrInvalidLength
 	}
+	return nil
+}
+
+/*
+RegisterChangeDepositMethodStatusProposal
+*/
+
+func NewRegisterChangeDepositMethodStatusProposal(title, description string) govtypes.Content {
+	return &RegisterChangeDepositMethodStatusProposal{
+		Title:       title,
+		Description: description,
+	}
+}
+
+func (*RegisterChangeDepositMethodStatusProposal) ProposalRoute() string { return RouterKey }
+
+func (*RegisterChangeDepositMethodStatusProposal) ProposalType() string {
+	return ProposalTypeRegisterChangeDepositMethodStatusProposal
+}
+
+/* #nosec */
+func (rtbp *RegisterChangeDepositMethodStatusProposal) ValidateBasic() error {
+	return nil
+}
+
+/*
+RegisterChangeCollateralMethodStatusProposal
+*/
+
+func NewRegisterChangeCollateralMethodStatusProposal(title, description string) govtypes.Content {
+	return &RegisterChangeCollateralMethodStatusProposal{
+		Title:       title,
+		Description: description,
+	}
+}
+
+func (*RegisterChangeCollateralMethodStatusProposal) ProposalRoute() string { return RouterKey }
+
+func (*RegisterChangeCollateralMethodStatusProposal) ProposalType() string {
+	return ProposalTypeRegisterChangeCollateralMethodStatusProposal
+}
+
+/* #nosec */
+func (rtbp *RegisterChangeCollateralMethodStatusProposal) ValidateBasic() error {
+	return nil
+}
+
+/*
+RegisterChangeBorrowMethodStatusProposal
+*/
+
+func NewRegisterChangeBorrowMethodStatusProposal(title, description string) govtypes.Content {
+	return &RegisterChangeBorrowMethodStatusProposal{
+		Title:       title,
+		Description: description,
+	}
+}
+
+func (*RegisterChangeBorrowMethodStatusProposal) ProposalRoute() string { return RouterKey }
+
+func (*RegisterChangeBorrowMethodStatusProposal) ProposalType() string {
+	return ProposalTypeRegisterChangeBorrowMethodStatusProposal
+}
+
+/* #nosec */
+func (rtbp *RegisterChangeBorrowMethodStatusProposal) ValidateBasic() error {
 	return nil
 }

@@ -23,16 +23,18 @@ func (s *GrowAbciTestSuite) TestGrowPriceChangeWhenBlockEnd() {
 		s.Commit()
 		s.SetupOracleKeeper()
 		s.RegisterValidator()
-		s.app.GrowKeeper.ChangeGrowStatus()
+		s.app.GrowKeeper.ChangeDepositMethodStatus(s.ctx)
+		s.app.GrowKeeper.ChangeCollateralMethodStatus(s.ctx)
+		s.app.GrowKeeper.ChangeBorrowMethodStatus(s.ctx)
 		s.app.StableKeeper.AppendPair(s.ctx, s.GetNormalQStablePair(0))
 		s.app.GrowKeeper.AppendPair(s.ctx, s.GetNormalGTokenPair(0))
 		s.app.GrowKeeper.SetGrowStakingReserveAddress(s.ctx, apptesting.CreateRandomAccounts(1)[0])
 		s.app.GrowKeeper.SetUSQReserveAddress(s.ctx, apptesting.CreateRandomAccounts(1)[0])
 		s.app.GrowKeeper.SetGrowYieldReserveAddress(s.ctx, apptesting.CreateRandomAccounts(1)[0])
-		s.app.GrowKeeper.SetRealRate(s.ctx, sdk.NewInt(15))
+		s.app.GrowKeeper.SetRealRate(s.ctx, sdk.NewInt(15), s.GetNormalGTokenPair(0).DenomID)
 		s.app.GrowKeeper.SetLastTimeUpdateReserve(s.ctx, sdk.NewInt(s.ctx.BlockTime().Unix()))
 
-		s.app.GrowKeeper.SetBorrowRate(s.ctx, sdk.NewInt(15))
+		s.app.GrowKeeper.SetBorrowRate(s.ctx, sdk.NewInt(15), s.GetNormalGTokenPair(0).DenomID)
 		s.app.StableKeeper.SetBurningFundAddress(s.ctx, apptesting.CreateRandomAccounts(1)[0])
 		s.app.StableKeeper.SetReserveFundAddress(s.ctx, apptesting.CreateRandomAccounts(1)[0])
 	}
@@ -44,13 +46,13 @@ func (s *GrowAbciTestSuite) TestGrowPriceChangeWhenBlockEnd() {
 		err := s.MintStable(amt, s.GetNormalQStablePair(0))
 		s.Require().NoError(err)
 
-		msg := types.NewMsgDeposit(
+		msg := types.NewMsgGrowDeposit(
 			s.Address.String(),
 			sdk.NewInt(amt).String()+s.GetNormalQStablePair(0).AmountOutMetadata.Base,
 			s.GetNormalGTokenPair(0).GTokenMetadata.Base,
 		)
 		ctx := sdk.WrapSDKContext(s.ctx)
-		res, err := s.app.GrowKeeper.Deposit(ctx, msg)
+		res, err := s.app.GrowKeeper.GrowDeposit(ctx, msg)
 		s.Require().NoError(err)
 		s.Require().Equal(res.AmountOut, sdk.NewCoin(s.GetNormalGTokenPair(0).GTokenMetadata.Base, sdk.NewInt(amt)).String())
 		s.AddTestCoinsToCustomAccount(sdk.NewInt(amt*10000), s.GetNormalQStablePair(0).AmountOutMetadata.Base, s.app.GrowKeeper.GetGrowStakingReserveAddress(s.ctx)) //fix 252 err
@@ -93,16 +95,18 @@ func (s *GrowAbciTestSuite) TestGrowReserveMath() {
 		s.Commit()
 		s.SetupOracleKeeper()
 		s.RegisterValidator()
-		s.app.GrowKeeper.ChangeGrowStatus()
+		s.app.GrowKeeper.ChangeDepositMethodStatus(s.ctx)
+		s.app.GrowKeeper.ChangeCollateralMethodStatus(s.ctx)
+		s.app.GrowKeeper.ChangeBorrowMethodStatus(s.ctx)
 		s.app.StableKeeper.AppendPair(s.ctx, s.GetNormalQStablePair(0))
 		s.app.GrowKeeper.AppendPair(s.ctx, s.GetNormalGTokenPair(0))
 		s.app.GrowKeeper.SetGrowStakingReserveAddress(s.ctx, apptesting.CreateRandomAccounts(1)[0])
 		s.app.GrowKeeper.SetUSQReserveAddress(s.ctx, apptesting.CreateRandomAccounts(1)[0])
 		s.app.GrowKeeper.SetGrowYieldReserveAddress(s.ctx, apptesting.CreateRandomAccounts(1)[0])
-		s.app.GrowKeeper.SetRealRate(s.ctx, sdk.NewInt(15))
+		s.app.GrowKeeper.SetRealRate(s.ctx, sdk.NewInt(15), s.GetNormalGTokenPair(0).DenomID)
 		s.app.GrowKeeper.SetLastTimeUpdateReserve(s.ctx, sdk.NewInt(s.ctx.BlockTime().Unix()))
 
-		s.app.GrowKeeper.SetBorrowRate(s.ctx, sdk.NewInt(15))
+		s.app.GrowKeeper.SetBorrowRate(s.ctx, sdk.NewInt(15), s.GetNormalGTokenPair(0).DenomID)
 		s.app.StableKeeper.SetBurningFundAddress(s.ctx, apptesting.CreateRandomAccounts(1)[0])
 		s.app.StableKeeper.SetReserveFundAddress(s.ctx, apptesting.CreateRandomAccounts(1)[0])
 	}
@@ -113,13 +117,13 @@ func (s *GrowAbciTestSuite) TestGrowReserveMath() {
 	err := s.MintStable(amt, s.GetNormalQStablePair(0))
 	s.Require().NoError(err)
 
-	msg := types.NewMsgDeposit(
+	msg := types.NewMsgGrowDeposit(
 		s.Address.String(),
 		sdk.NewInt(amt).String()+s.GetNormalQStablePair(0).AmountOutMetadata.Base,
 		s.GetNormalGTokenPair(0).GTokenMetadata.Base,
 	)
 	ctx := sdk.WrapSDKContext(s.ctx)
-	res, err := s.app.GrowKeeper.Deposit(ctx, msg)
+	res, err := s.app.GrowKeeper.GrowDeposit(ctx, msg)
 	s.Require().NoError(err)
 	s.Require().Equal(res.AmountOut, sdk.NewCoin(s.GetNormalGTokenPair(0).GTokenMetadata.Base, sdk.NewInt(amt)).String())
 
@@ -180,16 +184,18 @@ func (s *GrowAbciTestSuite) TestGrowIncreaseUSQReserve() {
 		s.Commit()
 		s.SetupOracleKeeper()
 		s.RegisterValidator()
-		s.app.GrowKeeper.ChangeGrowStatus()
+		s.app.GrowKeeper.ChangeDepositMethodStatus(s.ctx)
+		s.app.GrowKeeper.ChangeCollateralMethodStatus(s.ctx)
+		s.app.GrowKeeper.ChangeBorrowMethodStatus(s.ctx)
 		s.app.StableKeeper.AppendPair(s.ctx, s.GetNormalQStablePair(0))
 		s.app.GrowKeeper.AppendPair(s.ctx, s.GetNormalGTokenPair(0))
 		s.app.GrowKeeper.SetGrowStakingReserveAddress(s.ctx, apptesting.CreateRandomAccounts(1)[0])
 		s.app.GrowKeeper.SetUSQReserveAddress(s.ctx, apptesting.CreateRandomAccounts(1)[0])
 		s.app.GrowKeeper.SetGrowYieldReserveAddress(s.ctx, apptesting.CreateRandomAccounts(1)[0])
-		s.app.GrowKeeper.SetRealRate(s.ctx, sdk.NewInt(15))
+		s.app.GrowKeeper.SetRealRate(s.ctx, sdk.NewInt(15), s.GetNormalGTokenPair(0).DenomID)
 		s.app.GrowKeeper.SetLastTimeUpdateReserve(s.ctx, sdk.NewInt(s.ctx.BlockTime().Unix()))
 
-		s.app.GrowKeeper.SetBorrowRate(s.ctx, sdk.NewInt(15))
+		s.app.GrowKeeper.SetBorrowRate(s.ctx, sdk.NewInt(15), s.GetNormalGTokenPair(0).DenomID)
 		s.app.StableKeeper.SetBurningFundAddress(s.ctx, apptesting.CreateRandomAccounts(1)[0])
 		s.app.StableKeeper.SetReserveFundAddress(s.ctx, apptesting.CreateRandomAccounts(1)[0])
 	}
@@ -200,7 +206,7 @@ func (s *GrowAbciTestSuite) TestGrowIncreaseUSQReserve() {
 	err := s.MintStable(amt, s.GetNormalQStablePair(0))
 	s.Require().NoError(err)
 
-	msg := types.NewMsgDeposit(
+	msg := types.NewMsgGrowDeposit(
 		s.Address.String(),
 		sdk.NewInt(amt).String()+s.GetNormalQStablePair(0).AmountOutMetadata.Base,
 		s.GetNormalGTokenPair(0).GTokenMetadata.Base,
@@ -208,7 +214,7 @@ func (s *GrowAbciTestSuite) TestGrowIncreaseUSQReserve() {
 	ctx := sdk.WrapSDKContext(s.ctx)
 	oldTime := sdk.NewInt(s.ctx.BlockTime().Unix())
 
-	res, err := s.app.GrowKeeper.Deposit(ctx, msg)
+	res, err := s.app.GrowKeeper.GrowDeposit(ctx, msg)
 	s.Require().NoError(err)
 	s.Require().Equal(res.AmountOut, sdk.NewCoin(s.GetNormalGTokenPair(0).GTokenMetadata.Base, sdk.NewInt(amt)).String())
 
@@ -242,17 +248,19 @@ func (s *GrowAbciTestSuite) TestGrowReduceUSQReserve() {
 		s.Commit()
 		s.SetupOracleKeeper()
 		s.RegisterValidator()
-		s.app.GrowKeeper.ChangeGrowStatus()
+		s.app.GrowKeeper.ChangeDepositMethodStatus(s.ctx)
+		s.app.GrowKeeper.ChangeCollateralMethodStatus(s.ctx)
+		s.app.GrowKeeper.ChangeBorrowMethodStatus(s.ctx)
 		s.app.StableKeeper.AppendPair(s.ctx, s.GetNormalQStablePair(0))
 		s.app.GrowKeeper.AppendPair(s.ctx, s.GetNormalGTokenPair(0))
 		s.app.GrowKeeper.SetGrowStakingReserveAddress(s.ctx, apptesting.CreateRandomAccounts(1)[0])
 		s.app.GrowKeeper.SetUSQReserveAddress(s.ctx, apptesting.CreateRandomAccounts(1)[0])
 		s.app.GrowKeeper.SetGrowYieldReserveAddress(s.ctx, apptesting.CreateRandomAccounts(1)[0])
-		s.app.GrowKeeper.SetRealRate(s.ctx, sdk.NewInt(15))
+		s.app.GrowKeeper.SetRealRate(s.ctx, sdk.NewInt(15), s.GetNormalGTokenPair(0).DenomID)
 		s.app.GrowKeeper.SetLastTimeUpdateReserve(s.ctx, sdk.NewInt(s.ctx.BlockTime().Unix()))
 		s.AddTestCoinsToCustomAccount(sdk.NewInt(amt), s.GetNormalQStablePair(0).AmountOutMetadata.Base, s.app.GrowKeeper.GetUSQReserveAddress(s.ctx))
 
-		s.app.GrowKeeper.SetBorrowRate(s.ctx, sdk.NewInt(15))
+		s.app.GrowKeeper.SetBorrowRate(s.ctx, sdk.NewInt(15), s.GetNormalGTokenPair(0).DenomID)
 		s.app.StableKeeper.SetBurningFundAddress(s.ctx, apptesting.CreateRandomAccounts(1)[0])
 		s.app.StableKeeper.SetReserveFundAddress(s.ctx, apptesting.CreateRandomAccounts(1)[0])
 	}
@@ -263,7 +271,7 @@ func (s *GrowAbciTestSuite) TestGrowReduceUSQReserve() {
 	err := s.MintStable(amt, s.GetNormalQStablePair(0))
 	s.Require().NoError(err)
 
-	msg := types.NewMsgDeposit(
+	msg := types.NewMsgGrowDeposit(
 		s.Address.String(),
 		sdk.NewInt(amt2).String()+s.GetNormalQStablePair(0).AmountOutMetadata.Base,
 		s.GetNormalGTokenPair(0).GTokenMetadata.Base,
@@ -271,7 +279,7 @@ func (s *GrowAbciTestSuite) TestGrowReduceUSQReserve() {
 	ctx := sdk.WrapSDKContext(s.ctx)
 	oldTime := sdk.NewInt(s.ctx.BlockTime().Unix())
 
-	res, err := s.app.GrowKeeper.Deposit(ctx, msg)
+	res, err := s.app.GrowKeeper.GrowDeposit(ctx, msg)
 	s.Require().NoError(err)
 	s.Require().Equal(res.AmountOut, sdk.NewCoin(s.GetNormalGTokenPair(0).GTokenMetadata.Base, sdk.NewInt(amt2)).String())
 
@@ -304,16 +312,18 @@ func (s *GrowAbciTestSuite) TestGrowSimulate() {
 		s.Commit()
 		s.SetupOracleKeeper()
 		s.RegisterValidator()
-		s.app.GrowKeeper.ChangeGrowStatus()
+		s.app.GrowKeeper.ChangeDepositMethodStatus(s.ctx)
+		s.app.GrowKeeper.ChangeCollateralMethodStatus(s.ctx)
+		s.app.GrowKeeper.ChangeBorrowMethodStatus(s.ctx)
 		s.app.StableKeeper.AppendPair(s.ctx, s.GetNormalQStablePair(0))
 		s.app.GrowKeeper.AppendPair(s.ctx, s.GetNormalGTokenPair(0))
 		s.app.GrowKeeper.SetGrowStakingReserveAddress(s.ctx, apptesting.CreateRandomAccounts(1)[0])
 		s.app.GrowKeeper.SetUSQReserveAddress(s.ctx, apptesting.CreateRandomAccounts(1)[0])
 		s.app.GrowKeeper.SetGrowYieldReserveAddress(s.ctx, apptesting.CreateRandomAccounts(1)[0])
-		s.app.GrowKeeper.SetRealRate(s.ctx, sdk.NewInt(15))
+		s.app.GrowKeeper.SetRealRate(s.ctx, sdk.NewInt(15), s.GetNormalGTokenPair(0).DenomID)
 		s.app.GrowKeeper.SetLastTimeUpdateReserve(s.ctx, sdk.NewInt(s.ctx.BlockTime().Unix()))
 
-		s.app.GrowKeeper.SetBorrowRate(s.ctx, sdk.NewInt(15))
+		s.app.GrowKeeper.SetBorrowRate(s.ctx, sdk.NewInt(15), s.GetNormalGTokenPair(0).DenomID)
 		s.app.StableKeeper.SetBurningFundAddress(s.ctx, apptesting.CreateRandomAccounts(1)[0])
 		s.app.StableKeeper.SetReserveFundAddress(s.ctx, apptesting.CreateRandomAccounts(1)[0])
 	}
@@ -325,13 +335,13 @@ func (s *GrowAbciTestSuite) TestGrowSimulate() {
 		err := s.MintStable(amt, s.GetNormalQStablePair(0))
 		s.Require().NoError(err)
 
-		msg := types.NewMsgDeposit(
+		msg := types.NewMsgGrowDeposit(
 			s.Address.String(),
 			sdk.NewInt(amt).String()+s.GetNormalQStablePair(0).AmountOutMetadata.Base,
 			s.GetNormalGTokenPair(0).GTokenMetadata.Base,
 		)
 		ctx := sdk.WrapSDKContext(s.ctx)
-		res, err := s.app.GrowKeeper.Deposit(ctx, msg)
+		res, err := s.app.GrowKeeper.GrowDeposit(ctx, msg)
 		s.Require().NoError(err)
 		s.Require().Equal(res.AmountOut, sdk.NewCoin(s.GetNormalGTokenPair(0).GTokenMetadata.Base, sdk.NewInt(amt)).String())
 	}

@@ -36,7 +36,9 @@ func (suite *GrowKeeperTestSuite) TestLendAssetByLendAssetId() {
 	suite.Commit()
 	suite.SetupOracleKeeper("ATOM")
 	suite.RegisterValidator()
-	suite.app.GrowKeeper.ChangeGrowStatus()
+	s.app.GrowKeeper.ChangeDepositMethodStatus(s.ctx)
+	s.app.GrowKeeper.ChangeCollateralMethodStatus(s.ctx)
+	s.app.GrowKeeper.ChangeBorrowMethodStatus(s.ctx)
 	for _, tc := range testCases {
 		suite.app.GrowKeeper.AppendLendAsset(s.ctx, tc.lendAsset)
 		suite.Run(fmt.Sprintf("Case---%s", tc.name), func() {
@@ -83,7 +85,9 @@ func (suite *GrowKeeperTestSuite) TestPositionById() {
 	}
 	suite.SetupOracleKeeper("ATOM")
 	suite.RegisterValidator()
-	suite.app.GrowKeeper.ChangeGrowStatus()
+	s.app.GrowKeeper.ChangeDepositMethodStatus(s.ctx)
+	s.app.GrowKeeper.ChangeCollateralMethodStatus(s.ctx)
+	s.app.GrowKeeper.ChangeBorrowMethodStatus(s.ctx)
 	for _, tc := range testCases {
 		suite.app.GrowKeeper.AppendPosition(s.ctx, tc.position)
 		suite.Run(fmt.Sprintf("Case---%s", tc.name), func() {
@@ -130,7 +134,9 @@ func (suite *GrowKeeperTestSuite) TestPositionByCreator() {
 	}
 	suite.SetupOracleKeeper("ATOM")
 	suite.RegisterValidator()
-	suite.app.GrowKeeper.ChangeGrowStatus()
+	s.app.GrowKeeper.ChangeDepositMethodStatus(s.ctx)
+	s.app.GrowKeeper.ChangeCollateralMethodStatus(s.ctx)
+	s.app.GrowKeeper.ChangeBorrowMethodStatus(s.ctx)
 	for _, tc := range testCases {
 		suite.app.GrowKeeper.AppendPosition(s.ctx, tc.position)
 		suite.Run(fmt.Sprintf("Case---%s", tc.name), func() {
@@ -177,7 +183,9 @@ func (suite *GrowKeeperTestSuite) TestLiquidatorPositionByCreator() {
 	}
 	suite.SetupOracleKeeper("ATOM")
 	suite.RegisterValidator()
-	suite.app.GrowKeeper.ChangeGrowStatus()
+	s.app.GrowKeeper.ChangeDepositMethodStatus(s.ctx)
+	s.app.GrowKeeper.ChangeCollateralMethodStatus(s.ctx)
+	s.app.GrowKeeper.ChangeBorrowMethodStatus(s.ctx)
 	for _, tc := range testCases {
 		suite.app.GrowKeeper.AppendLiquidatorPosition(s.ctx, tc.position)
 		suite.Run(fmt.Sprintf("Case---%s", tc.name), func() {
@@ -224,7 +232,9 @@ func (suite *GrowKeeperTestSuite) TestLiquidatorPositionById() {
 	}
 	suite.SetupOracleKeeper("ATOM")
 	suite.RegisterValidator()
-	suite.app.GrowKeeper.ChangeGrowStatus()
+	s.app.GrowKeeper.ChangeDepositMethodStatus(s.ctx)
+	s.app.GrowKeeper.ChangeCollateralMethodStatus(s.ctx)
+	s.app.GrowKeeper.ChangeBorrowMethodStatus(s.ctx)
 	for _, tc := range testCases {
 		suite.app.GrowKeeper.AppendLiquidatorPosition(s.ctx, tc.position)
 		suite.Run(fmt.Sprintf("Case---%s", tc.name), func() {
@@ -256,7 +266,9 @@ func (suite *GrowKeeperTestSuite) TestAllFundAddress() {
 		apptesting.CreateRandomAccounts(1)[0],
 	}
 
-	suite.app.GrowKeeper.ChangeGrowStatus()
+	s.app.GrowKeeper.ChangeDepositMethodStatus(s.ctx)
+	s.app.GrowKeeper.ChangeCollateralMethodStatus(s.ctx)
+	s.app.GrowKeeper.ChangeBorrowMethodStatus(s.ctx)
 	suite.app.GrowKeeper.SetUSQReserveAddress(s.ctx, address[0])
 	suite.app.GrowKeeper.SetGrowYieldReserveAddress(s.ctx, address[1])
 	suite.app.GrowKeeper.SetGrowStakingReserveAddress(s.ctx, address[2])
@@ -303,7 +315,9 @@ func (suite *GrowKeeperTestSuite) TestLoanById() {
 	}
 	suite.SetupOracleKeeper("ATOM")
 	suite.RegisterValidator()
-	suite.app.GrowKeeper.ChangeGrowStatus()
+	s.app.GrowKeeper.ChangeDepositMethodStatus(s.ctx)
+	s.app.GrowKeeper.ChangeCollateralMethodStatus(s.ctx)
+	s.app.GrowKeeper.ChangeBorrowMethodStatus(s.ctx)
 	for _, tc := range testCases {
 		suite.app.GrowKeeper.AppendLoan(s.ctx, tc.loan)
 		suite.Run(fmt.Sprintf("Case---%s", tc.name), func() {
@@ -330,18 +344,15 @@ func (suite *GrowKeeperTestSuite) TestYieldPercentage() {
 	suite.RegisterValidator()
 	s.ctx = s.ctx.WithBlockTime(time.Now())
 
-	err := suite.app.GrowKeeper.SetBorrowRate(s.ctx, sdk.NewInt(15))
-	suite.Require().NoError(err)
-	err = suite.app.GrowKeeper.SetRealRate(s.ctx, sdk.NewInt(15))
-	suite.Require().NoError(err)
-
 	address := []sdk.AccAddress{
 		apptesting.CreateRandomAccounts(1)[0],
 		apptesting.CreateRandomAccounts(1)[0],
 		apptesting.CreateRandomAccounts(1)[0],
 	}
 
-	suite.app.GrowKeeper.ChangeGrowStatus()
+	s.app.GrowKeeper.ChangeDepositMethodStatus(s.ctx)
+	s.app.GrowKeeper.ChangeCollateralMethodStatus(s.ctx)
+	s.app.GrowKeeper.ChangeBorrowMethodStatus(s.ctx)
 	suite.app.GrowKeeper.SetUSQReserveAddress(s.ctx, address[0])
 	suite.app.GrowKeeper.SetGrowYieldReserveAddress(s.ctx, address[1])
 	suite.app.GrowKeeper.SetGrowStakingReserveAddress(s.ctx, address[2])
@@ -351,16 +362,22 @@ func (suite *GrowKeeperTestSuite) TestYieldPercentage() {
 	suite.app.StableKeeper.AppendPair(s.ctx, s.GetNormalQStablePair(0))
 	suite.app.GrowKeeper.AppendPair(s.ctx, s.GetNormalGTokenPair(0))
 
-	suite.AddTestCoins(1000*1000000, s.GetNormalQStablePair(0).AmountInMetadata.Base)
-	suite.MintStable(1000*1000000, s.GetNormalQStablePair(0))
+	err := suite.app.GrowKeeper.SetBorrowRate(s.ctx, sdk.NewInt(15), s.GetNormalGTokenPair(0).DenomID)
+	suite.Require().NoError(err)
+	err = suite.app.GrowKeeper.SetRealRate(s.ctx, sdk.NewInt(15), s.GetNormalGTokenPair(0).DenomID)
+	suite.Require().NoError(err)
 
-	msg := types.NewMsgDeposit(
+	suite.AddTestCoins(1000*1000000, s.GetNormalQStablePair(0).AmountInMetadata.Base)
+	err = suite.MintStable(1000*1000000, s.GetNormalQStablePair(0))
+	suite.Require().NoError(err)
+
+	msg := types.NewMsgGrowDeposit(
 		s.Address.String(),
 		sdk.NewInt(1000*1000000).String()+"uusd",
 		s.GetNormalGTokenPair(0).GTokenMetadata.Base,
 	)
 	ctx := sdk.WrapSDKContext(suite.ctx)
-	_, err = suite.app.GrowKeeper.Deposit(ctx, msg)
+	_, err = suite.app.GrowKeeper.GrowDeposit(ctx, msg)
 	suite.Require().NoError(err)
 
 	suite.Run(fmt.Sprintf("Case---%s", "found all address"), func() {
@@ -413,7 +430,9 @@ func (suite *GrowKeeperTestSuite) TestPairByDenomId() {
 	}
 	suite.SetupOracleKeeper("ATOM")
 	suite.RegisterValidator()
-	suite.app.GrowKeeper.ChangeGrowStatus()
+	s.app.GrowKeeper.ChangeDepositMethodStatus(s.ctx)
+	s.app.GrowKeeper.ChangeCollateralMethodStatus(s.ctx)
+	s.app.GrowKeeper.ChangeBorrowMethodStatus(s.ctx)
 	for _, tc := range testCases {
 		suite.app.GrowKeeper.AppendPair(s.ctx, tc.pair)
 		suite.Run(fmt.Sprintf("Case---%s", tc.name), func() {
