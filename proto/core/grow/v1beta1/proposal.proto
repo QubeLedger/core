@@ -106,7 +106,19 @@ message RegisterChangeLendRateProposal {
   string id = 4;
 }
 
-message RegisterActivateGrowModuleProposal {
+message RegisterChangeDepositMethodStatusProposal {
+  option (gogoproto.equal) = false;
+  string title = 1;
+  string description = 2;
+}
+
+message RegisterChangeCollateralMethodStatusProposal {
+  option (gogoproto.equal) = false;
+  string title = 1;
+  string description = 2;
+}
+
+message RegisterChangeBorrowMethodStatusProposal {
   option (gogoproto.equal) = false;
   string title = 1;
   string description = 2;

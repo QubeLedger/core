@@ -12,5 +12,7 @@ message Params {
   string GrowStakingReserveAddress = 2;
   string USQReserveAddress = 3;
   string GrowYieldReserveAddress = 4;
-  bool GrowStatus = 5;
+  bool DepositMethodStatus = 5;
+  bool CollateralMethodStatus = 6;
+  bool BorrowMethodStatus = 7;
 }

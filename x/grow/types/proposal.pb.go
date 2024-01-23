@@ -716,23 +716,27 @@ func (m *RegisterChangeLendRateProposal) GetId() string {
 	return ""
 }
 
-type RegisterActivateGrowModuleProposal struct {
+type RegisterChangeDepositMethodStatusProposal struct {
 	Title       string `protobuf:"bytes,1,opt,name=title,proto3" json:"title,omitempty"`
 	Description string `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`
 }
 
-func (m *RegisterActivateGrowModuleProposal) Reset()         { *m = RegisterActivateGrowModuleProposal{} }
-func (m *RegisterActivateGrowModuleProposal) String() string { return proto.CompactTextString(m) }
-func (*RegisterActivateGrowModuleProposal) ProtoMessage()    {}
-func (*RegisterActivateGrowModuleProposal) Descriptor() ([]byte, []int) {
+func (m *RegisterChangeDepositMethodStatusProposal) Reset() {
+	*m = RegisterChangeDepositMethodStatusProposal{}
+}
+func (m *RegisterChangeDepositMethodStatusProposal) String() string {
+	return proto.CompactTextString(m)
+}
+func (*RegisterChangeDepositMethodStatusProposal) ProtoMessage() {}
+func (*RegisterChangeDepositMethodStatusProposal) Descriptor() ([]byte, []int) {
 	return fileDescriptor_210b7224e875a974, []int{10}
 }
-func (m *RegisterActivateGrowModuleProposal) XXX_Unmarshal(b []byte) error {
+func (m *RegisterChangeDepositMethodStatusProposal) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *RegisterActivateGrowModuleProposal) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *RegisterChangeDepositMethodStatusProposal) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_RegisterActivateGrowModuleProposal.Marshal(b, m, deterministic)
+		return xxx_messageInfo_RegisterChangeDepositMethodStatusProposal.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -742,26 +746,136 @@ func (m *RegisterActivateGrowModuleProposal) XXX_Marshal(b []byte, deterministic
 		return b[:n], nil
 	}
 }
-func (m *RegisterActivateGrowModuleProposal) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_RegisterActivateGrowModuleProposal.Merge(m, src)
+func (m *RegisterChangeDepositMethodStatusProposal) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_RegisterChangeDepositMethodStatusProposal.Merge(m, src)
 }
-func (m *RegisterActivateGrowModuleProposal) XXX_Size() int {
+func (m *RegisterChangeDepositMethodStatusProposal) XXX_Size() int {
 	return m.Size()
 }
-func (m *RegisterActivateGrowModuleProposal) XXX_DiscardUnknown() {
-	xxx_messageInfo_RegisterActivateGrowModuleProposal.DiscardUnknown(m)
+func (m *RegisterChangeDepositMethodStatusProposal) XXX_DiscardUnknown() {
+	xxx_messageInfo_RegisterChangeDepositMethodStatusProposal.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_RegisterActivateGrowModuleProposal proto.InternalMessageInfo
+var xxx_messageInfo_RegisterChangeDepositMethodStatusProposal proto.InternalMessageInfo
 
-func (m *RegisterActivateGrowModuleProposal) GetTitle() string {
+func (m *RegisterChangeDepositMethodStatusProposal) GetTitle() string {
 	if m != nil {
 		return m.Title
 	}
 	return ""
 }
 
-func (m *RegisterActivateGrowModuleProposal) GetDescription() string {
+func (m *RegisterChangeDepositMethodStatusProposal) GetDescription() string {
+	if m != nil {
+		return m.Description
+	}
+	return ""
+}
+
+type RegisterChangeCollateralMethodStatusProposal struct {
+	Title       string `protobuf:"bytes,1,opt,name=title,proto3" json:"title,omitempty"`
+	Description string `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`
+}
+
+func (m *RegisterChangeCollateralMethodStatusProposal) Reset() {
+	*m = RegisterChangeCollateralMethodStatusProposal{}
+}
+func (m *RegisterChangeCollateralMethodStatusProposal) String() string {
+	return proto.CompactTextString(m)
+}
+func (*RegisterChangeCollateralMethodStatusProposal) ProtoMessage() {}
+func (*RegisterChangeCollateralMethodStatusProposal) Descriptor() ([]byte, []int) {
+	return fileDescriptor_210b7224e875a974, []int{11}
+}
+func (m *RegisterChangeCollateralMethodStatusProposal) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *RegisterChangeCollateralMethodStatusProposal) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_RegisterChangeCollateralMethodStatusProposal.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *RegisterChangeCollateralMethodStatusProposal) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_RegisterChangeCollateralMethodStatusProposal.Merge(m, src)
+}
+func (m *RegisterChangeCollateralMethodStatusProposal) XXX_Size() int {
+	return m.Size()
+}
+func (m *RegisterChangeCollateralMethodStatusProposal) XXX_DiscardUnknown() {
+	xxx_messageInfo_RegisterChangeCollateralMethodStatusProposal.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_RegisterChangeCollateralMethodStatusProposal proto.InternalMessageInfo
+
+func (m *RegisterChangeCollateralMethodStatusProposal) GetTitle() string {
+	if m != nil {
+		return m.Title
+	}
+	return ""
+}
+
+func (m *RegisterChangeCollateralMethodStatusProposal) GetDescription() string {
+	if m != nil {
+		return m.Description
+	}
+	return ""
+}
+
+type RegisterChangeBorrowMethodStatusProposal struct {
+	Title       string `protobuf:"bytes,1,opt,name=title,proto3" json:"title,omitempty"`
+	Description string `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`
+}
+
+func (m *RegisterChangeBorrowMethodStatusProposal) Reset() {
+	*m = RegisterChangeBorrowMethodStatusProposal{}
+}
+func (m *RegisterChangeBorrowMethodStatusProposal) String() string { return proto.CompactTextString(m) }
+func (*RegisterChangeBorrowMethodStatusProposal) ProtoMessage()    {}
+func (*RegisterChangeBorrowMethodStatusProposal) Descriptor() ([]byte, []int) {
+	return fileDescriptor_210b7224e875a974, []int{12}
+}
+func (m *RegisterChangeBorrowMethodStatusProposal) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *RegisterChangeBorrowMethodStatusProposal) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_RegisterChangeBorrowMethodStatusProposal.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *RegisterChangeBorrowMethodStatusProposal) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_RegisterChangeBorrowMethodStatusProposal.Merge(m, src)
+}
+func (m *RegisterChangeBorrowMethodStatusProposal) XXX_Size() int {
+	return m.Size()
+}
+func (m *RegisterChangeBorrowMethodStatusProposal) XXX_DiscardUnknown() {
+	xxx_messageInfo_RegisterChangeBorrowMethodStatusProposal.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_RegisterChangeBorrowMethodStatusProposal proto.InternalMessageInfo
+
+func (m *RegisterChangeBorrowMethodStatusProposal) GetTitle() string {
+	if m != nil {
+		return m.Title
+	}
+	return ""
+}
+
+func (m *RegisterChangeBorrowMethodStatusProposal) GetDescription() string {
 	if m != nil {
 		return m.Description
 	}
@@ -778,7 +892,7 @@ func (m *RegisterRemoveLendAssetProposal) Reset()         { *m = RegisterRemoveL
 func (m *RegisterRemoveLendAssetProposal) String() string { return proto.CompactTextString(m) }
 func (*RegisterRemoveLendAssetProposal) ProtoMessage()    {}
 func (*RegisterRemoveLendAssetProposal) Descriptor() ([]byte, []int) {
-	return fileDescriptor_210b7224e875a974, []int{11}
+	return fileDescriptor_210b7224e875a974, []int{13}
 }
 func (m *RegisterRemoveLendAssetProposal) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -838,7 +952,7 @@ func (m *RegisterRemoveGTokenPairProposal) Reset()         { *m = RegisterRemove
 func (m *RegisterRemoveGTokenPairProposal) String() string { return proto.CompactTextString(m) }
 func (*RegisterRemoveGTokenPairProposal) ProtoMessage()    {}
 func (*RegisterRemoveGTokenPairProposal) Descriptor() ([]byte, []int) {
-	return fileDescriptor_210b7224e875a974, []int{12}
+	return fileDescriptor_210b7224e875a974, []int{14}
 }
 func (m *RegisterRemoveGTokenPairProposal) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -899,7 +1013,9 @@ func init() {
 	proto.RegisterType((*RegisterChangeRealRateProposal)(nil), "core.grow.v1beta1.RegisterChangeRealRateProposal")
 	proto.RegisterType((*RegisterChangeBorrowRateProposal)(nil), "core.grow.v1beta1.RegisterChangeBorrowRateProposal")
 	proto.RegisterType((*RegisterChangeLendRateProposal)(nil), "core.grow.v1beta1.RegisterChangeLendRateProposal")
-	proto.RegisterType((*RegisterActivateGrowModuleProposal)(nil), "core.grow.v1beta1.RegisterActivateGrowModuleProposal")
+	proto.RegisterType((*RegisterChangeDepositMethodStatusProposal)(nil), "core.grow.v1beta1.RegisterChangeDepositMethodStatusProposal")
+	proto.RegisterType((*RegisterChangeCollateralMethodStatusProposal)(nil), "core.grow.v1beta1.RegisterChangeCollateralMethodStatusProposal")
+	proto.RegisterType((*RegisterChangeBorrowMethodStatusProposal)(nil), "core.grow.v1beta1.RegisterChangeBorrowMethodStatusProposal")
 	proto.RegisterType((*RegisterRemoveLendAssetProposal)(nil), "core.grow.v1beta1.RegisterRemoveLendAssetProposal")
 	proto.RegisterType((*RegisterRemoveGTokenPairProposal)(nil), "core.grow.v1beta1.RegisterRemoveGTokenPairProposal")
 }
@@ -907,48 +1023,49 @@ func init() {
 func init() { proto.RegisterFile("core/grow/v1beta1/proposal.proto", fileDescriptor_210b7224e875a974) }
 
 var fileDescriptor_210b7224e875a974 = []byte{
-	// 645 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xbc, 0x96, 0x4f, 0x6f, 0xd3, 0x3e,
-	0x18, 0xc7, 0xeb, 0xac, 0xdb, 0x4f, 0x3f, 0xef, 0x8f, 0x44, 0x34, 0xa4, 0x30, 0xb1, 0x34, 0x8a,
-	0x90, 0xd8, 0x81, 0x25, 0x1a, 0xdc, 0x76, 0x6b, 0x41, 0x4c, 0x95, 0x98, 0xb6, 0x65, 0x70, 0x80,
-	0x9b, 0x93, 0x3c, 0xca, 0xac, 0x25, 0x71, 0x71, 0xdc, 0x8e, 0x1d, 0x87, 0x90, 0x10, 0x37, 0x5e,
-	0x02, 0x77, 0x5e, 0x00, 0x6f, 0x61, 0xc7, 0x1d, 0x39, 0x4d, 0xa8, 0xbb, 0x70, 0xe6, 0x15, 0xa0,
-	0x38, 0xf1, 0xd6, 0xd0, 0x02, 0x95, 0x5a, 0x7a, 0x8b, 0x1f, 0x3f, 0xfa, 0xfa, 0xf3, 0xf8, 0xeb,
-	0x3c, 0x36, 0xb6, 0x02, 0xc6, 0xc1, 0x8d, 0x38, 0x3b, 0x71, 0x7b, 0x5b, 0x3e, 0x08, 0xb2, 0xe5,
-	0x76, 0x38, 0xeb, 0xb0, 0x8c, 0xc4, 0x4e, 0x87, 0x33, 0xc1, 0xf4, 0x5b, 0x79, 0x86, 0x93, 0x67,
-	0x38, 0x65, 0xc6, 0xda, 0x6a, 0xc4, 0x22, 0x26, 0x67, 0xdd, 0xfc, 0xab, 0x48, 0x5c, 0x33, 0x03,
-	0x96, 0x25, 0x2c, 0x73, 0x7d, 0x92, 0x1e, 0x5f, 0x8b, 0xe5, 0x83, 0x62, 0xde, 0xee, 0x23, 0x7c,
-	0xc7, 0x83, 0x88, 0x66, 0x02, 0xf8, 0x33, 0x48, 0xc3, 0x66, 0x96, 0x81, 0xd8, 0x2f, 0x17, 0xd3,
-	0x57, 0xf1, 0xbc, 0xa0, 0x22, 0x06, 0x03, 0x59, 0x68, 0xe3, 0x7f, 0xaf, 0x18, 0xe8, 0x16, 0x5e,
-	0x0c, 0x21, 0x0b, 0x38, 0xed, 0x08, 0xca, 0x52, 0x43, 0x93, 0x73, 0x83, 0x21, 0x9d, 0xe0, 0x65,
-	0x92, 0x0b, 0xed, 0x82, 0x20, 0x21, 0x11, 0xc4, 0x98, 0xb3, 0xd0, 0xc6, 0xe2, 0xc3, 0x75, 0xa7,
-	0xa0, 0x71, 0x24, 0x40, 0x49, 0xe3, 0xa8, 0xa4, 0xd6, 0xdd, 0xf3, 0xcb, 0x46, 0xed, 0xc7, 0x65,
-	0x63, 0xf5, 0x94, 0x24, 0xf1, 0xb6, 0x5d, 0x51, 0xb0, 0xbd, 0xaa, 0xa2, 0x7e, 0x0f, 0x2f, 0x33,
-	0x4e, 0x82, 0x18, 0x24, 0x71, 0x3b, 0x34, 0xea, 0x12, 0xa3, 0x1a, 0xdc, 0xae, 0x7f, 0xff, 0xd4,
-	0xa8, 0xd9, 0x9f, 0x35, 0xbc, 0xa6, 0x8a, 0xdc, 0x79, 0xce, 0x8e, 0x21, 0xdd, 0x27, 0x94, 0x4f,
-	0x5c, 0x65, 0x80, 0x57, 0x22, 0xa9, 0x36, 0xcd, 0x32, 0x7f, 0x91, 0xcc, 0xeb, 0x7c, 0x7d, 0x28,
-	0x88, 0x1f, 0x43, 0xce, 0x7c, 0x53, 0x67, 0x25, 0x98, 0xc3, 0x26, 0x34, 0x6d, 0x26, 0xac, 0x9b,
-	0x8a, 0x76, 0x6a, 0xcc, 0x17, 0xb0, 0x03, 0x21, 0xdd, 0xc6, 0x4b, 0xd7, 0xc3, 0xbd, 0xae, 0x30,
-	0x16, 0x64, 0x4a, 0x25, 0x56, 0xee, 0xd6, 0x17, 0x84, 0x1f, 0xa8, 0xbd, 0x51, 0x18, 0x4f, 0x19,
-	0xff, 0xfd, 0x29, 0x19, 0x72, 0x1b, 0xfd, 0x7b, 0xb7, 0xb5, 0x11, 0x6e, 0xdb, 0x67, 0x1a, 0xde,
-	0xfc, 0x03, 0xf9, 0x08, 0xeb, 0xc3, 0x21, 0x0b, 0xc7, 0x62, 0x5f, 0x2f, 0xd9, 0x6f, 0x17, 0xec,
-	0x55, 0x89, 0x31, 0x3c, 0xd4, 0xc6, 0xf0, 0x70, 0xee, 0xef, 0x1e, 0xd6, 0x87, 0x3d, 0xb4, 0xdf,
-	0x23, 0xbc, 0xa9, 0x0a, 0x7e, 0x7c, 0x44, 0xd2, 0x08, 0x76, 0x38, 0x3b, 0x79, 0x49, 0x21, 0x0e,
-	0x3d, 0xc8, 0x80, 0xf7, 0xa0, 0x19, 0x86, 0x1c, 0xb2, 0x6c, 0xe2, 0xe3, 0x6f, 0xe0, 0xff, 0x48,
-	0x21, 0x55, 0xb2, 0xaa, 0x61, 0x79, 0x8e, 0xce, 0x10, 0xbe, 0x5f, 0x25, 0x79, 0x71, 0x78, 0x30,
-	0x63, 0x86, 0x0f, 0x08, 0xbb, 0xc3, 0xbb, 0x71, 0x28, 0xc8, 0x31, 0x4d, 0xa3, 0x19, 0xb3, 0xbc,
-	0x45, 0xd8, 0xac, 0xb2, 0x78, 0x40, 0x62, 0x8f, 0x08, 0x98, 0x78, 0x69, 0x1d, 0xd7, 0x39, 0x11,
-	0x20, 0xd7, 0xad, 0x7b, 0xf2, 0x5b, 0x5f, 0xc1, 0x1a, 0x55, 0xdd, 0x42, 0xa3, 0xaa, 0x15, 0xbe,
-	0x43, 0xd8, 0xaa, 0x42, 0xb4, 0x18, 0xe7, 0xec, 0x64, 0xc6, 0x18, 0xc3, 0x7b, 0x91, 0xb7, 0x95,
-	0x19, 0x43, 0xf8, 0xd8, 0x56, 0x0c, 0xcd, 0x40, 0xd0, 0x1e, 0x11, 0xf2, 0x74, 0xec, 0xb2, 0xb0,
-	0x1b, 0x4f, 0xcc, 0x71, 0xf3, 0x13, 0x34, 0xd4, 0x22, 0x1e, 0x24, 0xac, 0x07, 0xd3, 0xbb, 0x65,
-	0x2d, 0xbc, 0x18, 0x2b, 0xb1, 0x76, 0xa8, 0x1a, 0xc6, 0x40, 0x68, 0x84, 0xe7, 0x05, 0xc3, 0x14,
-	0x2f, 0x41, 0x1b, 0x2f, 0x45, 0xd7, 0x6a, 0xed, 0x27, 0x25, 0x45, 0x25, 0x56, 0x60, 0xb4, 0x5a,
-	0xe7, 0x7d, 0x13, 0x5d, 0xf4, 0x4d, 0xf4, 0xad, 0x6f, 0xa2, 0x8f, 0x57, 0x66, 0xed, 0xe2, 0xca,
-	0xac, 0x7d, 0xbd, 0x32, 0x6b, 0xaf, 0x36, 0x22, 0x2a, 0x8e, 0xba, 0xbe, 0x13, 0xb0, 0xc4, 0x3d,
-	0xe8, 0x92, 0x30, 0xf7, 0x6c, 0x8f, 0x47, 0xae, 0x7c, 0x06, 0xbd, 0x29, 0x1e, 0x42, 0xe2, 0xb4,
-	0x03, 0x99, 0xbf, 0x20, 0x5f, 0x2d, 0x8f, 0x7e, 0x06, 0x00, 0x00, 0xff, 0xff, 0xbf, 0xe1, 0x50,
-	0xb8, 0x22, 0x09, 0x00, 0x00,
+	// 670 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xbc, 0x96, 0xcd, 0x6e, 0xd3, 0x40,
+	0x10, 0xc7, 0xb3, 0x6e, 0x5a, 0xc4, 0xf4, 0x43, 0xc2, 0x2a, 0x92, 0xa9, 0xa8, 0x13, 0x59, 0x48,
+	0x04, 0xa9, 0xb5, 0x55, 0xb8, 0xf5, 0xd6, 0xb4, 0xa2, 0x8a, 0x04, 0x6a, 0xeb, 0xc0, 0x01, 0x6e,
+	0x9b, 0x78, 0xe4, 0xac, 0xea, 0x78, 0xcd, 0x7a, 0xd3, 0xd2, 0x63, 0x11, 0x12, 0xe2, 0xc6, 0x23,
+	0x70, 0xe7, 0x01, 0x78, 0x85, 0x1e, 0x7b, 0xe4, 0x54, 0xa1, 0xf4, 0xc2, 0x99, 0x27, 0x40, 0xfe,
+	0x2a, 0x5d, 0x12, 0x20, 0x52, 0xd2, 0xdc, 0xb2, 0xe3, 0xd1, 0x7f, 0x7e, 0xb3, 0xff, 0xd1, 0x64,
+	0xa1, 0xda, 0xe6, 0x02, 0x1d, 0x5f, 0xf0, 0x63, 0xe7, 0x68, 0xa3, 0x85, 0x92, 0x6e, 0x38, 0x91,
+	0xe0, 0x11, 0x8f, 0x69, 0x60, 0x47, 0x82, 0x4b, 0xae, 0xdf, 0x49, 0x32, 0xec, 0x24, 0xc3, 0xce,
+	0x33, 0x56, 0x96, 0x7d, 0xee, 0xf3, 0xf4, 0xab, 0x93, 0xfc, 0xca, 0x12, 0x57, 0xcc, 0x36, 0x8f,
+	0xbb, 0x3c, 0x76, 0x5a, 0x34, 0x3c, 0xbc, 0x12, 0x4b, 0x0e, 0xd9, 0x77, 0xab, 0x4f, 0xe0, 0x9e,
+	0x8b, 0x3e, 0x8b, 0x25, 0x8a, 0x67, 0x18, 0x7a, 0x5b, 0x71, 0x8c, 0x72, 0x3f, 0x2f, 0xa6, 0x2f,
+	0xc3, 0xac, 0x64, 0x32, 0x40, 0x83, 0x54, 0x49, 0xed, 0xb6, 0x9b, 0x1d, 0xf4, 0x2a, 0xcc, 0x7b,
+	0x18, 0xb7, 0x05, 0x8b, 0x24, 0xe3, 0xa1, 0xa1, 0xa5, 0xdf, 0xae, 0x87, 0x74, 0x0a, 0x8b, 0x34,
+	0x11, 0x7a, 0x8e, 0x92, 0x7a, 0x54, 0x52, 0x63, 0xa6, 0x4a, 0x6a, 0xf3, 0x8f, 0x57, 0xed, 0x8c,
+	0xc6, 0x4e, 0x01, 0x72, 0x1a, 0xbb, 0x48, 0xaa, 0xdf, 0x3f, 0xbb, 0xa8, 0x94, 0x7e, 0x5e, 0x54,
+	0x96, 0x4f, 0x68, 0x37, 0xd8, 0xb4, 0x14, 0x05, 0xcb, 0x55, 0x15, 0xf5, 0x07, 0xb0, 0xc8, 0x05,
+	0x6d, 0x07, 0x98, 0x12, 0x37, 0x3c, 0xa3, 0x9c, 0x62, 0xa8, 0xc1, 0xcd, 0xf2, 0x8f, 0xcf, 0x95,
+	0x92, 0xf5, 0x45, 0x83, 0x95, 0xa2, 0xc9, 0xdd, 0x17, 0xfc, 0x10, 0xc3, 0x7d, 0xca, 0xc4, 0xd8,
+	0x5d, 0xb6, 0x61, 0xc9, 0x4f, 0xd5, 0x26, 0xd9, 0xe6, 0x1f, 0x92, 0x49, 0x9f, 0x6f, 0x9a, 0x92,
+	0xb6, 0x02, 0x4c, 0x98, 0x7f, 0xf7, 0xa9, 0x04, 0x13, 0xd8, 0x2e, 0x0b, 0xb7, 0xba, 0xbc, 0x17,
+	0xca, 0x46, 0x68, 0xcc, 0x66, 0xb0, 0xd7, 0x42, 0xba, 0x05, 0x0b, 0x57, 0xc7, 0xbd, 0x9e, 0x34,
+	0xe6, 0xd2, 0x14, 0x25, 0x96, 0xdf, 0xd6, 0x57, 0x02, 0x6b, 0xc5, 0xdd, 0x14, 0x18, 0x4f, 0xb9,
+	0xf8, 0xfb, 0x94, 0x0c, 0xb8, 0x4d, 0x6e, 0xde, 0x6d, 0x6d, 0x88, 0xdb, 0xd6, 0xa9, 0x06, 0xeb,
+	0xff, 0x20, 0x1f, 0x62, 0xbd, 0x37, 0x60, 0xe1, 0x48, 0xec, 0xab, 0x39, 0xfb, 0xdd, 0x8c, 0x5d,
+	0x95, 0x18, 0xc1, 0x43, 0x6d, 0x04, 0x0f, 0x67, 0xfe, 0xef, 0x61, 0x79, 0xd0, 0x43, 0xeb, 0x03,
+	0x81, 0xf5, 0xa2, 0xe1, 0xed, 0x0e, 0x0d, 0x7d, 0xdc, 0x15, 0xfc, 0xf8, 0x15, 0xc3, 0xc0, 0x73,
+	0x31, 0x46, 0x71, 0x84, 0x5b, 0x9e, 0x27, 0x30, 0x8e, 0xc7, 0x1e, 0x7f, 0x03, 0x6e, 0xd1, 0x4c,
+	0x2a, 0x67, 0x2d, 0x8e, 0xf9, 0x1c, 0x9d, 0x12, 0x78, 0xa8, 0x92, 0xbc, 0x6c, 0x1e, 0x4c, 0x99,
+	0xe1, 0x23, 0x01, 0x67, 0xf0, 0x36, 0x9a, 0x92, 0x1e, 0xb2, 0xd0, 0x9f, 0x32, 0xcb, 0x3b, 0x02,
+	0xa6, 0xca, 0xe2, 0x22, 0x0d, 0x5c, 0x2a, 0x71, 0xec, 0xd2, 0x3a, 0x94, 0x05, 0x95, 0x98, 0xd6,
+	0x2d, 0xbb, 0xe9, 0x6f, 0x7d, 0x09, 0x34, 0x56, 0x6c, 0x0b, 0x8d, 0x15, 0xab, 0xf0, 0x3d, 0x81,
+	0xaa, 0x0a, 0x51, 0xe7, 0x42, 0xf0, 0xe3, 0x29, 0x63, 0x0c, 0xde, 0x45, 0xb2, 0x56, 0xa6, 0x0c,
+	0xc1, 0xe0, 0x91, 0xca, 0xb0, 0x83, 0x11, 0x8f, 0x59, 0xb2, 0x75, 0x3a, 0xdc, 0x6b, 0x4a, 0x2a,
+	0x7b, 0x63, 0x4f, 0x45, 0x5e, 0x2a, 0x80, 0x35, 0xb5, 0xd4, 0x36, 0x0f, 0x02, 0x2a, 0x51, 0xa4,
+	0x8b, 0x6a, 0xd2, 0xd5, 0x3a, 0x50, 0x1b, 0xe6, 0xf1, 0x0d, 0x54, 0x3a, 0x25, 0x50, 0x29, 0x4a,
+	0xb9, 0xd8, 0xe5, 0x47, 0x38, 0xb9, 0x47, 0x44, 0x15, 0xe6, 0x83, 0x42, 0xac, 0xe1, 0x15, 0xfb,
+	0xf0, 0x5a, 0x68, 0xc8, 0x48, 0x67, 0x0c, 0x13, 0xfc, 0x8f, 0xb7, 0x60, 0xc1, 0xbf, 0x52, 0x6b,
+	0xec, 0xe4, 0x14, 0x4a, 0x2c, 0xc3, 0xa8, 0xd7, 0xcf, 0xfa, 0x26, 0x39, 0xef, 0x9b, 0xe4, 0x7b,
+	0xdf, 0x24, 0x9f, 0x2e, 0xcd, 0xd2, 0xf9, 0xa5, 0x59, 0xfa, 0x76, 0x69, 0x96, 0x5e, 0xd7, 0x7c,
+	0x26, 0x3b, 0xbd, 0x96, 0xdd, 0xe6, 0x5d, 0xe7, 0xa0, 0x47, 0xbd, 0x64, 0x24, 0xf7, 0x84, 0xef,
+	0xa4, 0xaf, 0xbc, 0xb7, 0xd9, 0x3b, 0x4f, 0x9e, 0x44, 0x18, 0xb7, 0xe6, 0xd2, 0x47, 0xd9, 0x93,
+	0x5f, 0x01, 0x00, 0x00, 0xff, 0xff, 0xdb, 0x06, 0x1d, 0xc5, 0x01, 0x0a, 0x00, 0x00,
 }
 
 func (m *RegisterLendAssetProposal) Marshal() (dAtA []byte, err error) {
@@ -1446,7 +1563,7 @@ func (m *RegisterChangeLendRateProposal) MarshalToSizedBuffer(dAtA []byte) (int,
 	return len(dAtA) - i, nil
 }
 
-func (m *RegisterActivateGrowModuleProposal) Marshal() (dAtA []byte, err error) {
+func (m *RegisterChangeDepositMethodStatusProposal) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -1456,12 +1573,86 @@ func (m *RegisterActivateGrowModuleProposal) Marshal() (dAtA []byte, err error) 
 	return dAtA[:n], nil
 }
 
-func (m *RegisterActivateGrowModuleProposal) MarshalTo(dAtA []byte) (int, error) {
+func (m *RegisterChangeDepositMethodStatusProposal) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *RegisterActivateGrowModuleProposal) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *RegisterChangeDepositMethodStatusProposal) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.Description) > 0 {
+		i -= len(m.Description)
+		copy(dAtA[i:], m.Description)
+		i = encodeVarintProposal(dAtA, i, uint64(len(m.Description)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.Title) > 0 {
+		i -= len(m.Title)
+		copy(dAtA[i:], m.Title)
+		i = encodeVarintProposal(dAtA, i, uint64(len(m.Title)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *RegisterChangeCollateralMethodStatusProposal) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *RegisterChangeCollateralMethodStatusProposal) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *RegisterChangeCollateralMethodStatusProposal) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.Description) > 0 {
+		i -= len(m.Description)
+		copy(dAtA[i:], m.Description)
+		i = encodeVarintProposal(dAtA, i, uint64(len(m.Description)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.Title) > 0 {
+		i -= len(m.Title)
+		copy(dAtA[i:], m.Title)
+		i = encodeVarintProposal(dAtA, i, uint64(len(m.Title)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *RegisterChangeBorrowMethodStatusProposal) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *RegisterChangeBorrowMethodStatusProposal) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *RegisterChangeBorrowMethodStatusProposal) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -1809,7 +2000,41 @@ func (m *RegisterChangeLendRateProposal) Size() (n int) {
 	return n
 }
 
-func (m *RegisterActivateGrowModuleProposal) Size() (n int) {
+func (m *RegisterChangeDepositMethodStatusProposal) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Title)
+	if l > 0 {
+		n += 1 + l + sovProposal(uint64(l))
+	}
+	l = len(m.Description)
+	if l > 0 {
+		n += 1 + l + sovProposal(uint64(l))
+	}
+	return n
+}
+
+func (m *RegisterChangeCollateralMethodStatusProposal) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Title)
+	if l > 0 {
+		n += 1 + l + sovProposal(uint64(l))
+	}
+	l = len(m.Description)
+	if l > 0 {
+		n += 1 + l + sovProposal(uint64(l))
+	}
+	return n
+}
+
+func (m *RegisterChangeBorrowMethodStatusProposal) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -3523,7 +3748,7 @@ func (m *RegisterChangeLendRateProposal) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *RegisterActivateGrowModuleProposal) Unmarshal(dAtA []byte) error {
+func (m *RegisterChangeDepositMethodStatusProposal) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -3546,10 +3771,238 @@ func (m *RegisterActivateGrowModuleProposal) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: RegisterActivateGrowModuleProposal: wiretype end group for non-group")
+			return fmt.Errorf("proto: RegisterChangeDepositMethodStatusProposal: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: RegisterActivateGrowModuleProposal: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: RegisterChangeDepositMethodStatusProposal: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Title", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowProposal
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthProposal
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthProposal
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Title = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Description", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowProposal
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthProposal
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthProposal
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Description = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipProposal(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthProposal
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *RegisterChangeCollateralMethodStatusProposal) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowProposal
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: RegisterChangeCollateralMethodStatusProposal: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: RegisterChangeCollateralMethodStatusProposal: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Title", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowProposal
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthProposal
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthProposal
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Title = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Description", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowProposal
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthProposal
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthProposal
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Description = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipProposal(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthProposal
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *RegisterChangeBorrowMethodStatusProposal) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowProposal
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: RegisterChangeBorrowMethodStatusProposal: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: RegisterChangeBorrowMethodStatusProposal: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:

@@ -212,7 +212,9 @@ func getGovProposalHandlers() []govclient.ProposalHandler {
 		growclient.RegisterChangeUSQReserveAddressProposalHandler,
 		growclient.RegisterGTokenPairProposalHandler,
 		growclient.RegisterLendAssetProposalHandler,
-		growclient.RegisterActivateGrowModuleProposalHandler,
+		growclient.RegisterChangeDepositMethodStatusProposalHandler,
+		growclient.RegisterChangeCollateralMethodStatusProposalHandler,
+		growclient.RegisterChangeBorrowMethodStatusProposalHandler,
 		oracleclient.RegisterAddNewDenomProposal,
 	)
 
