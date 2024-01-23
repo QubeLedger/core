@@ -18,7 +18,10 @@ const (
 	EventRegisterChangeGrowStakingReserveAddressProposal = "register_change_grow_staking_reserve_address_proposal"
 	EventRegisterChangeRealRateProposal                  = "register_change_real_rate_proposal"
 	EventRegisterChangeBorrowRateProposal                = "register_change_borrow_rate_proposal"
-	EventRegisterActivateGrowModuleProposal              = "register_activate_grow_module_proposal"
 	EventRegisterRemoveLendAssetProposal                 = "register_remove_lend_asset_proposal"
 	EventRegisterRemoveGTokenPairProposal                = "register_remove_gToken_pair_proposal"
+
+	EventRegisterChangeDepositMethodStatusProposal    = "register_change_deposit_method_proposal"
+	EventRegisterChangeCollateralMethodStatusProposal = "register_change_collateral_method_proposal"
+	EventRegisterChangeBorrowMethodStatusProposal     = "register_change_borrow_method_proposal"
 )

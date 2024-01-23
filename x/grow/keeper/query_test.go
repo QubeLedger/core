@@ -36,7 +36,9 @@ func (suite *GrowKeeperTestSuite) TestLendAssetByLendAssetId() {
 	suite.Commit()
 	suite.SetupOracleKeeper("ATOM")
 	suite.RegisterValidator()
-	suite.app.GrowKeeper.ChangeGrowStatus()
+	s.app.GrowKeeper.ChangeDepositMethodStatus(s.ctx)
+	s.app.GrowKeeper.ChangeCollateralMethodStatus(s.ctx)
+	s.app.GrowKeeper.ChangeBorrowMethodStatus(s.ctx)
 	for _, tc := range testCases {
 		suite.app.GrowKeeper.AppendLendAsset(s.ctx, tc.lendAsset)
 		suite.Run(fmt.Sprintf("Case---%s", tc.name), func() {
@@ -83,7 +85,9 @@ func (suite *GrowKeeperTestSuite) TestPositionById() {
 	}
 	suite.SetupOracleKeeper("ATOM")
 	suite.RegisterValidator()
-	suite.app.GrowKeeper.ChangeGrowStatus()
+	s.app.GrowKeeper.ChangeDepositMethodStatus(s.ctx)
+	s.app.GrowKeeper.ChangeCollateralMethodStatus(s.ctx)
+	s.app.GrowKeeper.ChangeBorrowMethodStatus(s.ctx)
 	for _, tc := range testCases {
 		suite.app.GrowKeeper.AppendPosition(s.ctx, tc.position)
 		suite.Run(fmt.Sprintf("Case---%s", tc.name), func() {
@@ -130,7 +134,9 @@ func (suite *GrowKeeperTestSuite) TestPositionByCreator() {
 	}
 	suite.SetupOracleKeeper("ATOM")
 	suite.RegisterValidator()
-	suite.app.GrowKeeper.ChangeGrowStatus()
+	s.app.GrowKeeper.ChangeDepositMethodStatus(s.ctx)
+	s.app.GrowKeeper.ChangeCollateralMethodStatus(s.ctx)
+	s.app.GrowKeeper.ChangeBorrowMethodStatus(s.ctx)
 	for _, tc := range testCases {
 		suite.app.GrowKeeper.AppendPosition(s.ctx, tc.position)
 		suite.Run(fmt.Sprintf("Case---%s", tc.name), func() {
@@ -177,7 +183,9 @@ func (suite *GrowKeeperTestSuite) TestLiquidatorPositionByCreator() {
 	}
 	suite.SetupOracleKeeper("ATOM")
 	suite.RegisterValidator()
-	suite.app.GrowKeeper.ChangeGrowStatus()
+	s.app.GrowKeeper.ChangeDepositMethodStatus(s.ctx)
+	s.app.GrowKeeper.ChangeCollateralMethodStatus(s.ctx)
+	s.app.GrowKeeper.ChangeBorrowMethodStatus(s.ctx)
 	for _, tc := range testCases {
 		suite.app.GrowKeeper.AppendLiquidatorPosition(s.ctx, tc.position)
 		suite.Run(fmt.Sprintf("Case---%s", tc.name), func() {
@@ -224,7 +232,9 @@ func (suite *GrowKeeperTestSuite) TestLiquidatorPositionById() {
 	}
 	suite.SetupOracleKeeper("ATOM")
 	suite.RegisterValidator()
-	suite.app.GrowKeeper.ChangeGrowStatus()
+	s.app.GrowKeeper.ChangeDepositMethodStatus(s.ctx)
+	s.app.GrowKeeper.ChangeCollateralMethodStatus(s.ctx)
+	s.app.GrowKeeper.ChangeBorrowMethodStatus(s.ctx)
 	for _, tc := range testCases {
 		suite.app.GrowKeeper.AppendLiquidatorPosition(s.ctx, tc.position)
 		suite.Run(fmt.Sprintf("Case---%s", tc.name), func() {
@@ -256,7 +266,9 @@ func (suite *GrowKeeperTestSuite) TestAllFundAddress() {
 		apptesting.CreateRandomAccounts(1)[0],
 	}
 
-	suite.app.GrowKeeper.ChangeGrowStatus()
+	s.app.GrowKeeper.ChangeDepositMethodStatus(s.ctx)
+	s.app.GrowKeeper.ChangeCollateralMethodStatus(s.ctx)
+	s.app.GrowKeeper.ChangeBorrowMethodStatus(s.ctx)
 	suite.app.GrowKeeper.SetUSQReserveAddress(s.ctx, address[0])
 	suite.app.GrowKeeper.SetGrowYieldReserveAddress(s.ctx, address[1])
 	suite.app.GrowKeeper.SetGrowStakingReserveAddress(s.ctx, address[2])
@@ -303,7 +315,9 @@ func (suite *GrowKeeperTestSuite) TestLoanById() {
 	}
 	suite.SetupOracleKeeper("ATOM")
 	suite.RegisterValidator()
-	suite.app.GrowKeeper.ChangeGrowStatus()
+	s.app.GrowKeeper.ChangeDepositMethodStatus(s.ctx)
+	s.app.GrowKeeper.ChangeCollateralMethodStatus(s.ctx)
+	s.app.GrowKeeper.ChangeBorrowMethodStatus(s.ctx)
 	for _, tc := range testCases {
 		suite.app.GrowKeeper.AppendLoan(s.ctx, tc.loan)
 		suite.Run(fmt.Sprintf("Case---%s", tc.name), func() {
@@ -336,7 +350,9 @@ func (suite *GrowKeeperTestSuite) TestYieldPercentage() {
 		apptesting.CreateRandomAccounts(1)[0],
 	}
 
-	suite.app.GrowKeeper.ChangeGrowStatus()
+	s.app.GrowKeeper.ChangeDepositMethodStatus(s.ctx)
+	s.app.GrowKeeper.ChangeCollateralMethodStatus(s.ctx)
+	s.app.GrowKeeper.ChangeBorrowMethodStatus(s.ctx)
 	suite.app.GrowKeeper.SetUSQReserveAddress(s.ctx, address[0])
 	suite.app.GrowKeeper.SetGrowYieldReserveAddress(s.ctx, address[1])
 	suite.app.GrowKeeper.SetGrowStakingReserveAddress(s.ctx, address[2])
@@ -414,7 +430,9 @@ func (suite *GrowKeeperTestSuite) TestPairByDenomId() {
 	}
 	suite.SetupOracleKeeper("ATOM")
 	suite.RegisterValidator()
-	suite.app.GrowKeeper.ChangeGrowStatus()
+	s.app.GrowKeeper.ChangeDepositMethodStatus(s.ctx)
+	s.app.GrowKeeper.ChangeCollateralMethodStatus(s.ctx)
+	s.app.GrowKeeper.ChangeBorrowMethodStatus(s.ctx)
 	for _, tc := range testCases {
 		suite.app.GrowKeeper.AppendPair(s.ctx, tc.pair)
 		suite.Run(fmt.Sprintf("Case---%s", tc.name), func() {

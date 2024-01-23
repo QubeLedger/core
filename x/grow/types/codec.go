@@ -54,7 +54,9 @@ func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
 		&RegisterChangeGrowStakingReserveAddressProposal{},
 		&RegisterChangeRealRateProposal{},
 		&RegisterChangeBorrowRateProposal{},
-		&RegisterActivateGrowModuleProposal{},
+		&RegisterChangeDepositMethodStatusProposal{},
+		&RegisterChangeCollateralMethodStatusProposal{},
+		&RegisterChangeBorrowMethodStatusProposal{},
 		&RegisterRemoveLendAssetProposal{},
 		&RegisterRemoveGTokenPairProposal{},
 	)

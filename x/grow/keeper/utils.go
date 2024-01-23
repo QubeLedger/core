@@ -8,22 +8,49 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-var (
-	GrowStatus bool = false
-)
-
 /*
 Grow Helper
 */
-func (k Keeper) ChangeGrowStatus() {
-	if !GrowStatus {
-		GrowStatus = true
+func (k Keeper) ChangeDepositMethodStatus(ctx sdk.Context) {
+	params := k.GetParams(ctx)
+	params.DepositMethodStatus = !params.DepositMethodStatus
+	k.SetParams(ctx, params)
+}
+
+func (k Keeper) CheckDepositMethodStatus(ctx sdk.Context) error {
+	params := k.GetParams(ctx)
+	if !params.DepositMethodStatus {
+		return types.ErrDepositNotActivated
+	} else {
+		return nil
 	}
 }
 
-func (k Keeper) CheckGrowStatus(ctx sdk.Context) error {
-	if !GrowStatus {
-		return types.ErrGrowNotActivated
+func (k Keeper) ChangeBorrowMethodStatus(ctx sdk.Context) {
+	params := k.GetParams(ctx)
+	params.BorrowMethodStatus = !params.BorrowMethodStatus
+	k.SetParams(ctx, params)
+}
+
+func (k Keeper) CheckBorrowMethodStatus(ctx sdk.Context) error {
+	params := k.GetParams(ctx)
+	if !params.BorrowMethodStatus {
+		return types.ErrBorrowNotActivated
+	} else {
+		return nil
+	}
+}
+
+func (k Keeper) ChangeCollateralMethodStatus(ctx sdk.Context) {
+	params := k.GetParams(ctx)
+	params.CollateralMethodStatus = !params.CollateralMethodStatus
+	k.SetParams(ctx, params)
+}
+
+func (k Keeper) CheckCollateralMethodStatus(ctx sdk.Context) error {
+	params := k.GetParams(ctx)
+	if !params.CollateralMethodStatus {
+		return types.ErrCollateralNotActivated
 	} else {
 		return nil
 	}

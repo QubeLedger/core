@@ -26,8 +26,12 @@ func NewGrowProposalHandler(k *keeper.Keeper) govtypes.Handler {
 			return handleRegisterChangeRealRateProposal(ctx, k, c)
 		case *types.RegisterChangeBorrowRateProposal:
 			return handleRegisterChangeBorrowRateProposal(ctx, k, c)
-		case *types.RegisterActivateGrowModuleProposal:
-			return handelRegisterActivateGrowModuleProposal(ctx, k, c)
+		case *types.RegisterChangeDepositMethodStatusProposal:
+			return handelRegisterChangeDepositMethodStatusProposal(ctx, k, c)
+		case *types.RegisterChangeCollateralMethodStatusProposal:
+			return handelRegisterChangeCollateralMethodStatusProposal(ctx, k, c)
+		case *types.RegisterChangeBorrowMethodStatusProposal:
+			return handleRegisterChangeBorrowMethodStatusProposal(ctx, k, c)
 		case *types.RegisterRemoveLendAssetProposal:
 			return handleRegisterRemoveLendAssetProposal(ctx, k, c)
 		case *types.RegisterRemoveGTokenPairProposal:
@@ -152,16 +156,6 @@ func handleRegisterChangeBorrowRateProposal(ctx sdk.Context, k *keeper.Keeper, p
 	return nil
 }
 
-func handelRegisterActivateGrowModuleProposal(ctx sdk.Context, k *keeper.Keeper, p *types.RegisterActivateGrowModuleProposal) error {
-	k.ChangeGrowStatus()
-	ctx.EventManager().EmitEvent(
-		sdk.NewEvent(
-			types.EventRegisterChangeBorrowRateProposal,
-		),
-	)
-	return nil
-}
-
 func handleRegisterRemoveLendAssetProposal(ctx sdk.Context, k *keeper.Keeper, p *types.RegisterRemoveLendAssetProposal) error {
 	asset, found := k.GetLendAssetByLendAssetId(ctx, p.LendAssetId)
 	if !found {
@@ -185,6 +179,36 @@ func handleRegisterRemoveGTokenPairProposal(ctx sdk.Context, k *keeper.Keeper, p
 	ctx.EventManager().EmitEvent(
 		sdk.NewEvent(
 			types.EventRegisterRemoveGTokenPairProposal,
+		),
+	)
+	return nil
+}
+
+func handelRegisterChangeDepositMethodStatusProposal(ctx sdk.Context, k *keeper.Keeper, p *types.RegisterChangeDepositMethodStatusProposal) error {
+	k.ChangeDepositMethodStatus(ctx)
+	ctx.EventManager().EmitEvent(
+		sdk.NewEvent(
+			types.EventRegisterChangeDepositMethodStatusProposal,
+		),
+	)
+	return nil
+}
+
+func handelRegisterChangeCollateralMethodStatusProposal(ctx sdk.Context, k *keeper.Keeper, p *types.RegisterChangeCollateralMethodStatusProposal) error {
+	k.ChangeCollateralMethodStatus(ctx)
+	ctx.EventManager().EmitEvent(
+		sdk.NewEvent(
+			types.EventRegisterChangeCollateralMethodStatusProposal,
+		),
+	)
+	return nil
+}
+
+func handleRegisterChangeBorrowMethodStatusProposal(ctx sdk.Context, k *keeper.Keeper, p *types.RegisterChangeBorrowMethodStatusProposal) error {
+	k.ChangeBorrowMethodStatus(ctx)
+	ctx.EventManager().EmitEvent(
+		sdk.NewEvent(
+			types.EventRegisterChangeBorrowMethodStatusProposal,
 		),
 	)
 	return nil
