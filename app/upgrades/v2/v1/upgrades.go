@@ -2,6 +2,7 @@ package v1
 
 import (
 	growmodulekeeper "github.com/QuadrateOrg/core/x/grow/keeper"
+	growmoduletypes "github.com/QuadrateOrg/core/x/grow/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
@@ -18,11 +19,7 @@ func CreateUpgradeHandler(
 			return nil, err
 		}
 
-		growparams := growkeepers.GetParams(ctx)
-		growparams.DepositMethodStatus = false
-		growparams.CollateralMethodStatus = false
-		growparams.BorrowMethodStatus = false
-
+		growparams := growmoduletypes.DefaultParams()
 		growkeepers.SetParams(ctx, growparams)
 
 		return migrations, nil

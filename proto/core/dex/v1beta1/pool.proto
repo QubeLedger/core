@@ -1,9 +1,9 @@
 syntax = "proto3";
-package core.dex;
+package core.dex.v1beta1;
 
-option go_package = "coregithub.com/QuadrateOrg/core/x/dex/types";
+option go_package = "github.com/QuadrateOrg/core/x/dex/types";
 import "gogoproto/gogo.proto";
-import "core/dex/pool_reserves.proto";
+import "core/dex/v1beta1/pool_reserves.proto";
 
 // NOTE: This struct is never actually stored in the KV store. It is merely a convenience wrapper for holding both sides of a pool.
 
