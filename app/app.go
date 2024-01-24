@@ -1100,6 +1100,7 @@ func (app *QuadrateApp) setUpgradeHandlers() {
 		v1.CreateUpgradeHandler(
 			app.mm,
 			app.configurator,
+			app.GrowKeeper,
 		),
 	)
 
