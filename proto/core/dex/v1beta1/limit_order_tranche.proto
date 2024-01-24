@@ -1,12 +1,12 @@
 syntax = "proto3";
-package core.dex;
+package core.dex.v1beta1;
 
-option go_package = "coregithub.com/QuadrateOrg/core/x/dex/types";
+option go_package = "github.com/QuadrateOrg/core/x/dex/types";
 import "google/protobuf/timestamp.proto";
 
-import "core/dex/trade_pair_id.proto";
+import "core/dex/v1beta1/trade_pair_id.proto";
 import "gogoproto/gogo.proto";
-import "core/dex/pair_id.proto";
+import "core/dex/v1beta1/pair_id.proto";
 
 message LimitOrderTrancheKey {
   TradePairID tradePairID = 1;

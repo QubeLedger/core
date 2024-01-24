@@ -1,17 +1,17 @@
 syntax = "proto3";
 
-package core.dex;
+package core.dex.v1beta1;
 
 import "gogoproto/gogo.proto";
-import "core/dex/params.proto";
-import "core/dex/limit_order_tranche_user.proto";
-import "core/dex/limit_order_tranche.proto";
-import "core/dex/tick_liquidity.proto";
-import "core/dex/pool_metadata.proto";
+import "core/dex/v1beta1/params.proto";
+import "core/dex/v1beta1/limit_order_tranche_user.proto";
+import "core/dex/v1beta1/limit_order_tranche.proto";
+import "core/dex/v1beta1/tick_liquidity.proto";
+import "core/dex/v1beta1/pool_metadata.proto";
 
 // this line is used by starport scaffolding # genesis/proto/import
 
-option go_package = "coregithub.com/QuadrateOrg/core/x/dex/types";
+option go_package = "github.com/QuadrateOrg/core/x/dex/types";
 
 // GenesisState defines the dex module's genesis state.
 message GenesisState {
