@@ -59,7 +59,7 @@ func (s *UpgradeTestSuite) TestUpgrade() {
 	s.Setup()
 	s.App.StableKeeper.SetPair(s.ctx, stabletypes.Pair{
 		Id:     0,
-		PairId: fmt.Sprintf("%x", crypto.Sha256(append([]byte("uatom"+"uusd")))),
+		PairId: fmt.Sprintf("%x", crypto.Sha256(append([]byte("ibc/27394FB092D2ECCD56123C74F36E4C1F926001CEADA9CA97EA622B25F41E5EB2"+"uusd")))),
 		AmountInMetadata: banktypes.Metadata{
 			Description: "",
 			DenomUnits: []*banktypes.DenomUnit{
