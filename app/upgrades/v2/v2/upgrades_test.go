@@ -89,7 +89,7 @@ func (s *UpgradeTestSuite) TestUpgrade() {
 	s.ctx = s.ctx.WithBlockTime(s.ctx.BlockTime().Add(time.Hour * 24))
 	s.App.BeginBlocker(s.ctx, types.RequestBeginBlock{})
 
-	pair, _ := s.App.StableKeeper.GetPairByPairID(s.ctx, s.App.StableKeeper.GeneratePairIdHash("uatom", "uusd"))
+	pair, _ := s.App.StableKeeper.GetPairByPairID(s.ctx, s.App.StableKeeper.GeneratePairIdHash("ibc/27394FB092D2ECCD56123C74F36E4C1F926001CEADA9CA97EA622B25F41E5EB2", "uusd"))
 	s.Require().Equal("", pair.Model)
 	s.Require().Equal("", pair.MinAmountIn)
 
@@ -97,7 +97,7 @@ func (s *UpgradeTestSuite) TestUpgrade() {
 	s.ctx = s.ctx.WithBlockTime(s.ctx.BlockTime().Add(time.Hour * 24 * 7))
 	s.App.BeginBlocker(s.ctx, types.RequestBeginBlock{})
 
-	pair, _ = s.App.StableKeeper.GetPairByPairID(s.ctx, s.App.StableKeeper.GeneratePairIdHash("uatom", "uusd"))
+	pair, _ = s.App.StableKeeper.GetPairByPairID(s.ctx, s.App.StableKeeper.GeneratePairIdHash("ibc/27394FB092D2ECCD56123C74F36E4C1F926001CEADA9CA97EA622B25F41E5EB2", "uusd"))
 	s.Require().Equal("gmb", pair.Model)
 	s.Require().Equal("20ibc/27394FB092D2ECCD56123C74F36E4C1F926001CEADA9CA97EA622B25F41E5EB2", pair.MinAmountIn)
 }
