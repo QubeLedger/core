@@ -59,7 +59,6 @@ func (k Keeper) PairByPairId(goCtx context.Context, req *types.PairByPairIdReque
 		PairId:            pair.PairId,
 		AmountInMetadata:  pair.AmountInMetadata,
 		AmountOutMetadata: pair.AmountOutMetadata,
-		Model:             pair.Model,
 		Qm:                pair.Qm,
 		Ar:                pair.Ar,
 		MinAmountIn:       pair.MinAmountIn,
@@ -67,6 +66,7 @@ func (k Keeper) PairByPairId(goCtx context.Context, req *types.PairByPairIdReque
 		BackingRatio:      backing_ratio.Uint64(),
 		MintingFee:        mintingFee.Uint64(),
 		BurningFee:        burningFee.Uint64(),
+		Model:             pair.Model,
 	}, nil
 }
 
@@ -105,7 +105,6 @@ func (k Keeper) PairById(goCtx context.Context, req *types.PairByIdRequest) (*ty
 		PairId:            pair.PairId,
 		AmountInMetadata:  pair.AmountInMetadata,
 		AmountOutMetadata: pair.AmountOutMetadata,
-		Model:             pair.Model,
 		Qm:                pair.Qm,
 		Ar:                pair.Ar,
 		MinAmountIn:       pair.MinAmountIn,
@@ -113,6 +112,7 @@ func (k Keeper) PairById(goCtx context.Context, req *types.PairByIdRequest) (*ty
 		BackingRatio:      backing_ratio.Uint64(),
 		MintingFee:        mintingFee.Uint64(),
 		BurningFee:        burningFee.Uint64(),
+		Model:             pair.Model,
 	}, nil
 }
 
