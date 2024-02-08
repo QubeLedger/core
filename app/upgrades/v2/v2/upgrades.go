@@ -20,9 +20,9 @@ func CreateUpgradeHandler(
 			return nil, err
 		}
 
-		pair, found := stablekeepers.GetPairByPairID(ctx, stablekeepers.GeneratePairIdHash("uatom", "uusd"))
+		pair, found := stablekeepers.GetPairByPairID(ctx, stablekeepers.GeneratePairIdHash("ibc/27394FB092D2ECCD56123C74F36E4C1F926001CEADA9CA97EA622B25F41E5EB2", "uusd"))
 		if !found {
-			return nil, errors.New("gTokenPair not found")
+			return nil, errors.New("pair not found")
 		}
 
 		pair.Model = "gmb"
