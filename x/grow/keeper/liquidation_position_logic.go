@@ -5,7 +5,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-func (k Keeper) ExecuteCreateLiqPosition(ctx sdk.Context, msg *types.MsgOpenLiquidationPosition, LendAsset types.LendAsset) (error, string) {
+func (k Keeper) ExecuteCreateLiqPosition(ctx sdk.Context, msg *types.MsgOpenLiquidationPosition, Asset types.Asset) (error, string) {
 	amountInCoins, err := sdk.ParseCoinsNormalized(msg.AmountIn)
 	if err != nil {
 		return err, ""
@@ -20,8 +20,11 @@ func (k Keeper) ExecuteCreateLiqPosition(ctx sdk.Context, msg *types.MsgOpenLiqu
 		return err, ""
 	}
 
-	if err := CheckCoinDenom(amountInCoins, types.DefaultDenom); err != nil {
-		return err, ""
+	DenomIn := amountInCoins.GetDenomByIndex(0)
+
+	asset, found := k.GetAssetByAssetId(ctx, k.GenerateAssetIdHash(DenomIn))
+	if !found {
+		return types.ErrAssetNotFound, ""
 	}
 
 	premium, err := k.ParseAndCheckPremium(msg.Premium)
@@ -34,11 +37,12 @@ func (k Keeper) ExecuteCreateLiqPosition(ctx sdk.Context, msg *types.MsgOpenLiqu
 		return err, ""
 	}
 
-	liquidatorPositionId := k.GenerateLiquidatorPositionId(creator.String(), types.DefaultDenom, amountInCoins.String(), msg.Premium)
+	liquidatorPositionId := k.GenerateLiquidatorPositionId(creator.String(), DenomIn, Asset.OracleAssetId, amountInCoins.String(), msg.Premium)
 
 	liqPosition := types.LiquidatorPosition{
 		LiquidatorPositionId: liquidatorPositionId,
-		BorrowAssetId:        LendAsset.AssetMetadata.Name,
+		ProvidedAssetId:      asset.OracleAssetId,
+		WantAssetId:          Asset.OracleAssetId,
 		Liquidator:           creator.String(),
 		Amount:               amountInCoins.String(),
 		Premium:              premium.Uint64(),
@@ -74,7 +78,7 @@ func (k Keeper) ExecuteCloseLiqPosition(ctx sdk.Context, msg *types.MsgCloseLiqu
 		return err, sdk.Coin{}
 	}
 
-	amountInt := amountCoins.AmountOf(types.DefaultDenom)
+	amountInt := amountCoins.AmountOf(amountCoins.GetDenomByIndex(0))
 
 	err = k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, creator, amountCoins)
 	if err != nil {
@@ -83,5 +87,5 @@ func (k Keeper) ExecuteCloseLiqPosition(ctx sdk.Context, msg *types.MsgCloseLiqu
 
 	k.RemoveLiquidatorPosition(ctx, liqPosition.Id)
 
-	return err, sdk.NewCoin(types.DefaultDenom, amountInt)
+	return err, sdk.NewCoin(amountCoins.GetDenomByIndex(0), amountInt)
 }

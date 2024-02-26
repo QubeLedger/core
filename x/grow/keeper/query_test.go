@@ -9,24 +9,24 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-func (suite *GrowKeeperTestSuite) TestLendAssetByLendAssetId() {
+func (suite *GrowKeeperTestSuite) TestAssetByAssetId() {
 	testCases := []struct {
 		name      string
-		lendAsset types.LendAsset
+		Asset     types.Asset
 		id        string
 		err       bool
 		errString string
 	}{
 		{
 			"ok-get lend asset",
-			s.GetNormalLendAsset(0),
-			s.GetNormalLendAsset(0).LendAssetId,
+			s.GetNormalAsset(0),
+			s.GetNormalAsset(0).AssetId,
 			false,
 			"",
 		},
 		{
 			"false-lend asset not found",
-			s.GetNormalLendAsset(0),
+			s.GetNormalAsset(0),
 			"test",
 			true,
 			"not found",
@@ -40,15 +40,15 @@ func (suite *GrowKeeperTestSuite) TestLendAssetByLendAssetId() {
 	s.app.GrowKeeper.ChangeCollateralMethodStatus(s.ctx)
 	s.app.GrowKeeper.ChangeBorrowMethodStatus(s.ctx)
 	for _, tc := range testCases {
-		suite.app.GrowKeeper.AppendLendAsset(s.ctx, tc.lendAsset)
+		suite.app.GrowKeeper.AppendAsset(s.ctx, tc.Asset)
 		suite.Run(fmt.Sprintf("Case---%s", tc.name), func() {
 			ctx := sdk.WrapSDKContext(suite.ctx)
 
-			req := types.QueryLendAssetByLendAssetIdRequest{
+			req := types.QueryAssetByAssetIdRequest{
 				Id: tc.id,
 			}
 
-			_, err := suite.app.GrowKeeper.LendAssetByLendAssetId(ctx, &req)
+			_, err := suite.app.GrowKeeper.AssetByAssetId(ctx, &req)
 			if !tc.err {
 				suite.Require().NoError(err)
 			} else {
@@ -254,40 +254,6 @@ func (suite *GrowKeeperTestSuite) TestLiquidatorPositionById() {
 	}
 }
 
-func (suite *GrowKeeperTestSuite) TestAllFundAddress() {
-	suite.Setup()
-	suite.Commit()
-	suite.SetupOracleKeeper("ATOM")
-	suite.RegisterValidator()
-
-	address := []sdk.AccAddress{
-		apptesting.CreateRandomAccounts(1)[0],
-		apptesting.CreateRandomAccounts(1)[0],
-		apptesting.CreateRandomAccounts(1)[0],
-	}
-
-	s.app.GrowKeeper.ChangeDepositMethodStatus(s.ctx)
-	s.app.GrowKeeper.ChangeCollateralMethodStatus(s.ctx)
-	s.app.GrowKeeper.ChangeBorrowMethodStatus(s.ctx)
-	suite.app.GrowKeeper.SetUSQReserveAddress(s.ctx, address[0])
-	suite.app.GrowKeeper.SetGrowYieldReserveAddress(s.ctx, address[1])
-	suite.app.GrowKeeper.SetGrowStakingReserveAddress(s.ctx, address[2])
-
-	suite.Run(fmt.Sprintf("Case---%s", "found all address"), func() {
-		ctx := sdk.WrapSDKContext(suite.ctx)
-
-		req := types.QueryAllFundAddressRequest{}
-
-		res, err := suite.app.GrowKeeper.AllFundAddress(ctx, &req)
-		suite.Require().NoError(err)
-
-		suite.Require().Equal(res.USQReserveAddress, address[0].String())
-		suite.Require().Equal(res.GrowYieldReserveAddress, address[1].String())
-		suite.Require().Equal(res.GrowStakingReserveAddress, address[2].String())
-
-	})
-}
-
 func (suite *GrowKeeperTestSuite) TestLoanById() {
 	suite.Setup()
 	suite.Commit()
@@ -485,6 +451,43 @@ func (suite *GrowKeeperTestSuite) TestAllPairs() {
 			suite.NoError(err)
 
 			s.Require().Equal(len(res.Pairs), int(tc.amount))
+		})
+	}
+}
+
+func (suite *GrowKeeperTestSuite) TestAllAsset() {
+	testCases := []struct {
+		name   string
+		asset  types.Asset
+		amount uint64
+	}{
+		{
+			"ok",
+			s.GetNormalAsset(0),
+			1,
+		},
+		{
+			"ok",
+			s.GetNormalAsset(0),
+			2,
+		},
+	}
+
+	for _, tc := range testCases {
+		suite.Run(fmt.Sprintf("Case---%s", tc.name), func() {
+			suite.Setup()
+			suite.Commit()
+			ctx := sdk.WrapSDKContext(suite.ctx)
+			for i := 0; i < int(tc.amount); i++ {
+				suite.app.GrowKeeper.AppendAsset(suite.ctx, tc.asset)
+			}
+
+			req := types.QueryGetAllAssetsRequest{}
+
+			res, err := suite.app.GrowKeeper.GetAllAssets(ctx, &req)
+			suite.NoError(err)
+
+			s.Require().Equal(len(res.Assets), int(tc.amount))
 		})
 	}
 }

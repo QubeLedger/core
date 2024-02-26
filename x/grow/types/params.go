@@ -13,6 +13,7 @@ const (
 	DefaultUSQReserveAddress         = "qube1nx9scnpdnp5wsw88at9e35fng56788h7yz9srs"
 	DefaultGrowYieldReserveAddress   = "qube1zzplgm7kqwe3vwqynzkvewrrhuffwhd7a77j7j"
 	DefaultStatus                    = false
+	DefaultInt                       = uint64(1)
 )
 
 var (
@@ -25,6 +26,11 @@ var (
 	KeyDepositMethodStatus       = []byte("DepositMethodStatus")
 	KeyCollateralMethodStatus    = []byte("CollateralMethodStatus")
 	KeyBorrowMethodStatus        = []byte("BorrowMethodStatus")
+	KeyUStaticVolatile           = []byte("UStaticVolatile")
+	KeyUStaticStable             = []byte("UStaticStable")
+	KeyMaxRateVolatile           = []byte("MaxRateVolatile")
+	KeyMaxRateStable             = []byte("MaxRateStable")
+	KeySlope                     = []byte("Slope")
 )
 
 // ParamKeyTable the param key table for launch module
@@ -42,6 +48,11 @@ func DefaultParams() Params {
 		DepositMethodStatus:       DefaultStatus,
 		CollateralMethodStatus:    DefaultStatus,
 		BorrowMethodStatus:        DefaultStatus,
+		UStaticVolatile:           DefaultInt,
+		UStaticStable:             DefaultInt,
+		MaxRateVolatile:           DefaultInt,
+		MaxRateStable:             DefaultInt,
+		Slope:                     DefaultInt,
 	}
 }
 
@@ -55,6 +66,11 @@ func (p *Params) ParamSetPairs() paramtypes.ParamSetPairs {
 		paramtypes.NewParamSetPair(KeyDepositMethodStatus, &p.DepositMethodStatus, validate),
 		paramtypes.NewParamSetPair(KeyCollateralMethodStatus, &p.CollateralMethodStatus, validate),
 		paramtypes.NewParamSetPair(KeyBorrowMethodStatus, &p.BorrowMethodStatus, validate),
+		paramtypes.NewParamSetPair(KeyUStaticVolatile, &p.UStaticVolatile, validate),
+		paramtypes.NewParamSetPair(KeyUStaticStable, &p.UStaticStable, validate),
+		paramtypes.NewParamSetPair(KeyMaxRateVolatile, &p.MaxRateVolatile, validate),
+		paramtypes.NewParamSetPair(KeyMaxRateStable, &p.MaxRateStable, validate),
+		paramtypes.NewParamSetPair(KeySlope, &p.Slope, validate),
 	}
 }
 

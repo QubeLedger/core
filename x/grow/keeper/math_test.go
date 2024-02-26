@@ -32,11 +32,11 @@ func (s *GrowKeeperTestSuite) TestCalculateGTokenAPY() {
 	s.Require().Equal(res.Int64(), int64(1161321))
 }
 
-func (s *GrowKeeperTestSuite) TestCalculateCreateLendAmountOut() {
+func (s *GrowKeeperTestSuite) TestCalculateAmountByPriceAndAmountIn() {
 	s.Setup()
 	amt := sdk.NewInt(100 * 1000000)
 	price := sdk.NewInt(5 * 10000)
-	res := s.app.GrowKeeper.CalculateCreateLendAmountOut(amt, price)
+	res := s.app.GrowKeeper.CalculateAmountByPriceAndAmountIn(amt, price)
 	s.Require().Equal(res.Int64(), int64(500*1000000))
 }
 func (s *GrowKeeperTestSuite) TestCalculateDeleteLendAmountOut() {
@@ -56,39 +56,37 @@ func (s *GrowKeeperTestSuite) TestCalculateNeedAmountToGet() {
 func (s *GrowKeeperTestSuite) TestCalculateRiskRate() {
 	s.Setup()
 	collateral := sdk.NewInt(100 * 1000000)
-	price := sdk.NewInt(1 * 10000)
 	borrow := sdk.NewInt(60 * 1000000)
-	res, err := s.app.GrowKeeper.CalculateRiskRate(collateral, price, borrow)
+	res, err := s.app.GrowKeeper.CalculateRiskRate(collateral, borrow)
 	s.Require().NoError(err)
 	s.Require().Equal(res.Int64(), int64(100))
 }
 func (s *GrowKeeperTestSuite) TestCheckRiskRate() {
 	s.Setup()
 	collateral := sdk.NewInt(100 * 1000000)
-	price := sdk.NewInt(1 * 10000)
 	borrow := sdk.NewInt(20 * 1000000)
 	desired := sdk.NewInt(5 * 1000000)
-	err := s.app.GrowKeeper.CheckRiskRate(collateral, price, borrow, desired)
+	err := s.app.GrowKeeper.CheckRiskRate(collateral, borrow, desired)
 	s.Require().NoError(err)
 
 	borrow = sdk.NewInt(50 * 1000000)
 	desired = sdk.NewInt(20 * 1000000)
-	err = s.app.GrowKeeper.CheckRiskRate(collateral, price, borrow, desired)
+	err = s.app.GrowKeeper.CheckRiskRate(collateral, borrow, desired)
 	s.Require().Error(err)
 }
 func (s *GrowKeeperTestSuite) TestCalculateAmountLiquidate() {
 	s.Setup()
 	collateral := sdk.NewInt(100 * 1000000)
 	borrow := sdk.NewInt(60 * 1000000)
-	res := s.app.GrowKeeper.CalculateAmountLiquidate(s.ctx, collateral, borrow)
+	res := s.app.GrowKeeper.CalculateAmountLiquidate(s.ctx, collateral.Int64(), borrow.Int64())
 	s.Require().Equal(res.Int64(), int64(6976744))
 }
 func (s *GrowKeeperTestSuite) TestCalculatePremiumAmount() {
 	s.Setup()
 	amt := sdk.NewInt(100 * 1000000)
 	price := sdk.NewInt(5 * 10000)
+	price1 := sdk.NewInt(5 * 10000)
 	premium := int64(3)
-	res1, res2 := s.app.GrowKeeper.CalculatePremiumAmount(s.ctx, amt, price, premium)
+	res1, _ := s.app.GrowKeeper.CalculatePremiumAmount(s.ctx, amt, premium, price, price1)
 	s.Require().Equal(res1.Int64(), int64(103000000))
-	s.Require().Equal(res2.Int64(), int64(20600000))
 }

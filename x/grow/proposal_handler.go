@@ -13,7 +13,7 @@ func NewGrowProposalHandler(k *keeper.Keeper) govtypes.Handler {
 	return func(ctx sdk.Context, content govtypes.Content) error {
 		switch c := content.(type) {
 		case *types.RegisterLendAssetProposal:
-			return handleRegisterLendAssetProposal(ctx, k, c)
+			return handleRegisterAssetProposal(ctx, k, c)
 		case *types.RegisterGTokenPairProposal:
 			return handleRegisterGTokenPairProposal(ctx, k, c)
 		case *types.RegisterChangeUSQReserveAddressProposal:
@@ -33,7 +33,7 @@ func NewGrowProposalHandler(k *keeper.Keeper) govtypes.Handler {
 		case *types.RegisterChangeBorrowMethodStatusProposal:
 			return handleRegisterChangeBorrowMethodStatusProposal(ctx, k, c)
 		case *types.RegisterRemoveLendAssetProposal:
-			return handleRegisterRemoveLendAssetProposal(ctx, k, c)
+			return handleRegisterRemoveAssetProposal(ctx, k, c)
 		case *types.RegisterRemoveGTokenPairProposal:
 			return handleRegisterRemoveGTokenPairProposal(ctx, k, c)
 		default:
@@ -42,19 +42,19 @@ func NewGrowProposalHandler(k *keeper.Keeper) govtypes.Handler {
 	}
 }
 
-func handleRegisterLendAssetProposal(ctx sdk.Context, k *keeper.Keeper, p *types.RegisterLendAssetProposal) error {
-	la := types.LendAsset{
-		LendAssetId:   k.GenerateLendAssetIdHash(p.AssetMetadata.Base),
+func handleRegisterAssetProposal(ctx sdk.Context, k *keeper.Keeper, p *types.RegisterLendAssetProposal) error {
+	la := types.Asset{
+		AssetId:       k.GenerateAssetIdHash(p.AssetMetadata.Base),
 		AssetMetadata: p.AssetMetadata,
 		OracleAssetId: p.OracleAssetId,
 	}
-	err := k.RegisterLendAsset(ctx, la)
+	err := k.RegisterAsset(ctx, la)
 	if err != nil {
 		return err
 	}
 	ctx.EventManager().EmitEvent(
 		sdk.NewEvent(
-			types.EventRegisterLendAssetProposal,
+			types.EventRegisterAssetProposal,
 		),
 	)
 	return nil
@@ -156,15 +156,15 @@ func handleRegisterChangeBorrowRateProposal(ctx sdk.Context, k *keeper.Keeper, p
 	return nil
 }
 
-func handleRegisterRemoveLendAssetProposal(ctx sdk.Context, k *keeper.Keeper, p *types.RegisterRemoveLendAssetProposal) error {
-	asset, found := k.GetLendAssetByLendAssetId(ctx, p.LendAssetId)
+func handleRegisterRemoveAssetProposal(ctx sdk.Context, k *keeper.Keeper, p *types.RegisterRemoveLendAssetProposal) error {
+	asset, found := k.GetAssetByAssetId(ctx, p.LendAssetId)
 	if !found {
-		return types.ErrLendAssetNotFound
+		return types.ErrAssetNotFound
 	}
-	k.RemoveLendAsset(ctx, asset.Id)
+	k.RemoveAsset(ctx, asset.Id)
 	ctx.EventManager().EmitEvent(
 		sdk.NewEvent(
-			types.EventRegisterRemoveLendAssetProposal,
+			types.EventRegisterRemoveAssetProposal,
 		),
 	)
 	return nil

@@ -19,40 +19,44 @@ service Query {
     option (google.api.http).get = "/core/grow/v1beta1/params";
   }
 
-  rpc LendAssetByLendAssetId(QueryLendAssetByLendAssetIdRequest) returns (QueryLendAssetByLendAssetIdResponse) {
-    option (google.api.http).get = "/core/grow/v1beta1/lendasset/{id}";
+  rpc AssetByAssetId(QueryAssetByAssetIdRequest) returns (QueryAssetByAssetIdResponse) {
+    option (google.api.http).get = "/core/grow/v1beta1/asset/{id}";
   }
 
-  rpc PositionById(QueryPositionByIdRequest) returns (QueryPositionResponse) {
-    option (google.api.http).get = "/core/grow/v1beta1/positionById/{id}";
-  }
-
-  rpc PositionByCreator(QueryPositionByCreatorRequest) returns (QueryPositionResponse) {
-    option (google.api.http).get = "/core/grow/v1beta1/positionByCreator/{creator}";
+  rpc GetAllAssets(QueryGetAllAssetsRequest) returns (QueryGetAllAssetsResponse) {
+    option (google.api.http).get = "/core/grow/v1beta1/assets";
   }
 
   rpc AllPosition(QueryAllPositionRequest) returns (QueryAllPositionResponse) {
-    option (google.api.http).get = "/core/grow/v1beta1/position";
+    option (google.api.http).get = "/core/grow/v1beta1/positions";
+  }
+
+  rpc PositionById(QueryPositionByIdRequest) returns (QueryPositionResponse) {
+    option (google.api.http).get = "/core/grow/v1beta1/position/{id}";
+  }
+
+  rpc PositionByCreator(QueryPositionByCreatorRequest) returns (QueryPositionResponse) {
+    option (google.api.http).get = "/core/grow/v1beta1/position_creator/{creator}";
   }
 
   rpc AllLiquidatorPosition(QueryAllLiquidatorPositionRequest) returns (QueryAllLiquidatorPositionResponse) {
-    option (google.api.http).get = "/core/grow/v1beta1/liquidatorposition";
+    option (google.api.http).get = "/core/grow/v1beta1/liquidator_positions";
   }
 
   rpc LiquidatorPositionByCreator(QueryLiquidatorPositionByCreatorRequest) returns (QueryLiquidatorPositionByCreatorResponse) {
-    option (google.api.http).get = "/core/grow/v1beta1/liquidatorPositionByCreator/{creator}";
+    option (google.api.http).get = "/core/grow/v1beta1/liquidator_position_by_creator/{creator}";
   }
 
-  rpc LiquidatorPositionById(QueryLiquidatorPositionByIdRequest) returns (QueryLiquidatorPositionByCreatorResponse) {
-    option (google.api.http).get = "/core/grow/v1beta1/liquidatorPositionById/{id}";
+  rpc LiquidatorPositionById(QueryLiquidatorPositionByIdRequest) returns (QueryLiquidatorPositionByIdResponse) {
+    option (google.api.http).get = "/core/grow/v1beta1/liquidator_position_by_id/{id}";
   }
 
-  rpc AllFundAddress(QueryAllFundAddressRequest) returns (QueryAllFundAddressResponse) {
-    option (google.api.http).get = "/core/grow/v1beta1/fundAddress";
+  rpc LendById(QueryLendByIdRequest) returns (QueryLendByIdResponse) {
+    option (google.api.http).get = "/core/grow/v1beta1/lend/{id}";
   }
-
+  
   rpc LoanById(QueryLoanByIdRequest) returns (QueryLoanByIdResponse) {
-    option (google.api.http).get = "/core/grow/v1beta1/loanById/{id}";
+    option (google.api.http).get = "/core/grow/v1beta1/loan/{id}";
   }
 
   rpc YieldPercentage(QueryYieldPercentageRequest) returns (QueryYieldPercentageResponse) {
@@ -74,92 +78,111 @@ message QueryParamsResponse {
   Params params = 1;
 }
 
-/* LendAssetByLendAssetId */
-message QueryLendAssetByLendAssetIdRequest {
+
+/* 
+AssetByAssetId 
+*/
+message QueryAssetByAssetIdRequest {
   string id = 1;
 }
 
-message QueryLendAssetByLendAssetIdResponse {
-  string LendAssetId = 1;
-  cosmos.bank.v1beta1.Metadata assetMetadata = 2 [ (gogoproto.moretags) = "yaml:\"assetMetadata\"", (gogoproto.nullable)   = false ];
-  string oracleAssetId = 3;
-  uint64 LendRate = 4;
+message QueryAssetByAssetIdResponse {
+  Asset asset = 1 [(gogoproto.nullable) = false];
 }
 
-/* PositionById */
+
+/*
+GetAllAssets
+*/
+message QueryGetAllAssetsRequest {}
+
+message QueryGetAllAssetsResponse {
+  repeated Asset assets = 1 [(gogoproto.nullable) = false];
+}
+
+/* 
+PositionById 
+*/
 message QueryPositionByIdRequest {
   string id = 1;
 }
 
 message QueryPositionResponse {
-  string creator = 1; 
-  string depositId = 2;
-  string collateral = 3;
-  string oracleTicker = 4; 
-  uint64 borrowedAmountInUSD = 5;
-  repeated string loanIds = 6;
+  Position position = 1 [(gogoproto.nullable) = false]; 
 }
 
-/* PositionByCreator */
+/* 
+PositionByCreator 
+*/
 message QueryPositionByCreatorRequest {
   string creator = 1;
 }
 
-/* AllPosition */
+/* 
+AllPosition 
+*/
 message QueryAllPositionRequest {}
 
 message QueryAllPositionResponse {
-  repeated Position Positions = 1 [(gogoproto.nullable) = false];
+  repeated Position positions = 1 [(gogoproto.nullable) = false];
 }
 
-/* AllLiquidatorPosition */
+/* 
+AllLiquidatorPosition 
+*/
 message QueryAllLiquidatorPositionRequest {}
 
 message QueryAllLiquidatorPositionResponse {
-  repeated LiquidatorPosition LiquidatorsPosition = 1 [(gogoproto.nullable) = false];
+  repeated LiquidatorPosition liquidators_position = 1 [(gogoproto.nullable) = false];
 }
 
-/* LiquidatorPositionByCreator */
+/* 
+LiquidatorPositionByCreator 
+*/
 message QueryLiquidatorPositionByCreatorRequest {
   string creator = 1;
 }
 
 message QueryLiquidatorPositionByCreatorResponse {
-  string liquidatorPositionId = 1;
-  string borrowAssetId = 2;
-  string liquidator = 3;
-  string amount = 4;
-  uint64 premium = 5;
+  repeated LiquidatorPosition position = 1 [(gogoproto.nullable) = false];
 }
 
-/* LiquidatorPositionById */
+/* 
+LiquidatorPositionById 
+*/
 message QueryLiquidatorPositionByIdRequest {
   string id = 1;
 }
 
-/* AllFundAddress */
-message QueryAllFundAddressRequest {}
-
-message QueryAllFundAddressResponse {
-  string USQReserveAddress = 1;
-  string GrowYieldReserveAddress = 2;
-  string GrowStakingReserveAddress = 3;
+message QueryLiquidatorPositionByIdResponse {
+  LiquidatorPosition liquidators_position = 1 [(gogoproto.nullable) = false];
 }
 
-/* LoanById */
+/* 
+LoanById 
+*/
 message QueryLoanByIdRequest {
   string id = 1;
 }
 
 message QueryLoanByIdResponse {
-  string loanId = 1;
-  string borrower = 2; 
-  string amountOut = 3;
-  uint64 startTime = 4; 
-  string oracleTicker = 5; 
+  Loan loan = 1 [(gogoproto.nullable) = false];
 }
 
-/* YieldPercentage */
+/* 
+LendById 
+*/
+message QueryLendByIdRequest {
+  string id = 1;
+}
+
+message QueryLendByIdResponse {
+  Lend lend = 1 [(gogoproto.nullable) = false];
+}
+
+/* 
+YieldPercentage 
+*/
 message QueryYieldPercentageRequest {
   string id = 1;
 }
@@ -173,33 +196,20 @@ message QueryYieldPercentageResponse {
   int64 Difference = 6;
 }
 
-/* PairByDenomId */
+/* 
+PairByDenomId 
+*/
 message PairByDenomIdRequest {
   string denomId = 1;
 }
 
 message PairByDenomIdResponse {
-  string denomID = 1;
-  string qStablePairId = 2;
-  cosmos.bank.v1beta1.Metadata gTokenMetadata = 3 [ (gogoproto.moretags) = "yaml:\"gTokenMetadata\"", (gogoproto.nullable)   = false ];
-  string minAmountIn = 4;
-  string minAmountOut = 5;
-  string gTokenLastPrice = 6 [
-          (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
-          (gogoproto.moretags) = "yaml:\"gTokenLastPrice\"",
-          (gogoproto.nullable) = false
-  ];
-  uint64 gTokenLatestPriceUpdateTime = 7;
-  string st = 8 [
-          (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
-          (gogoproto.moretags) = "yaml:\"st\"",
-          (gogoproto.nullable) = false
-  ];
-  uint64 RealRate = 11;
-  uint64 BorrowRate = 12;
+  gTokenPair pair = 1;
 }
 
-/* AllPairs */
+/* 
+AllPairs 
+*/
 message AllPairsRequest {}
 
 message AllPairsResponse {

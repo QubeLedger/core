@@ -1,8 +1,6 @@
 package keeper
 
 import (
-	"strconv"
-
 	"github.com/QuadrateOrg/core/x/grow/types"
 	stabletypes "github.com/QuadrateOrg/core/x/stable/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -135,10 +133,10 @@ func (k Keeper) CheckWithdrawalAmount(msgAmountIn string, pair types.GTokenPair)
 /*
 Lend Helpers
 */
-func (k Keeper) CheckOracleAssetId(ctx sdk.Context, LendAsset types.LendAsset) error {
+func (k Keeper) CheckOracleAssetId(ctx sdk.Context, Asset types.Asset) error {
 	denomList := k.oracleKeeper.Whitelist(ctx)
 	for _, dl := range denomList {
-		if dl.Name == LendAsset.OracleAssetId {
+		if dl.Name == Asset.OracleAssetId {
 			return nil
 		}
 	}
@@ -184,15 +182,11 @@ func (k Keeper) ParseAndCheckPremium(amount string) (sdk.Int, error) {
 
 }
 
-func (k Keeper) CheckLiquidator(liq sdk.Address, pos types.LiquidatorPosition) error {
-	if pos.Liquidator != liq.String() {
-		return types.ErrLiquidatorAddresesNotEqual
+func (k Keeper) CheckLiquidator(address sdk.Address, pos types.LiquidatorPosition) error {
+	if pos.Liquidator == address.String() {
+		return nil
 	}
-	liqPosId := k.GenerateLiquidatorPositionId(liq.String(), types.DefaultDenom, pos.Amount, strconv.FormatUint(pos.Premium, 10))
-	if pos.LiquidatorPositionId != liqPosId {
-		return types.ErrLiquidatorPositionIdNotEqual
-	}
-	return nil
+	return types.ErrLiquidatorAddresesNotEqual
 }
 
 /*

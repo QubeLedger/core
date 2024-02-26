@@ -96,7 +96,7 @@ func (k Keeper) GrowWithdrawal(goCtx context.Context, msg *types.MsgGrowWithdraw
 }
 
 // Msg of deposit collateral for borrowing money from x/grow
-func (k Keeper) DepositCollateral(goCtx context.Context, msg *types.MsgDepositCollateral) (*types.MsgDepositCollateralResponse, error) {
+func (k Keeper) CreateLend(goCtx context.Context, msg *types.MsgCreateLend) (*types.MsgCreateLendResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	err := k.CheckCollateralMethodStatus(ctx)
@@ -104,21 +104,21 @@ func (k Keeper) DepositCollateral(goCtx context.Context, msg *types.MsgDepositCo
 		return nil, err
 	}
 
-	LendAssetId, err := k.GetLendAssetIdByCoins(msg.AmountIn)
+	AssetId, err := k.GetAssetIdByCoins(msg.AmountIn)
 	if err != nil {
 		return nil, err
 	}
-	LendAsset, found := k.GetLendAssetByLendAssetId(ctx, LendAssetId)
+	Asset, found := k.GetAssetByAssetId(ctx, AssetId)
 	if !found {
-		return nil, types.ErrLendAssetNotFound
+		return nil, types.ErrAssetNotFound
 	}
 
-	err = k.CheckOracleAssetId(ctx, LendAsset)
+	err = k.CheckOracleAssetId(ctx, Asset)
 	if err != nil {
 		return nil, err
 	}
 
-	err, depositId := k.ExecuteDepositCollateral(ctx, msg, LendAsset)
+	err, depositId := k.ExecuteCreateLend(ctx, msg, Asset)
 	if err != nil {
 		return nil, err
 	}
@@ -131,14 +131,14 @@ func (k Keeper) DepositCollateral(goCtx context.Context, msg *types.MsgDepositCo
 			sdk.NewAttribute(sdk.AttributeKeyAction, types.AttributeKeyActionDepositColletaral),
 		),
 	})
-	return &types.MsgDepositCollateralResponse{
+	return &types.MsgCreateLendResponse{
 		Depositor:  msg.Depositor,
 		PositionId: depositId,
 	}, nil
 }
 
 // Msg of withdrawal collateral from x/grow
-func (k Keeper) WithdrawalCollateral(goCtx context.Context, msg *types.MsgWithdrawalCollateral) (*types.MsgWithdrawalCollateralResponse, error) {
+func (k Keeper) WithdrawalLend(goCtx context.Context, msg *types.MsgWithdrawalLend) (*types.MsgWithdrawalLendResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	err := k.CheckCollateralMethodStatus(ctx)
@@ -146,21 +146,21 @@ func (k Keeper) WithdrawalCollateral(goCtx context.Context, msg *types.MsgWithdr
 		return nil, err
 	}
 
-	LendAssetId := k.GenerateLendAssetIdHash(msg.Denom)
+	AssetId := k.GenerateAssetIdHash(msg.DenomOut)
 	if err != nil {
 		return nil, err
 	}
-	LendAsset, found := k.GetLendAssetByLendAssetId(ctx, LendAssetId)
+	Asset, found := k.GetAssetByAssetId(ctx, AssetId)
 	if !found {
-		return nil, types.ErrLendAssetNotFound
+		return nil, types.ErrAssetNotFound
 	}
 
-	err = k.CheckOracleAssetId(ctx, LendAsset)
+	err = k.CheckOracleAssetId(ctx, Asset)
 	if err != nil {
 		return nil, err
 	}
 
-	err, amountOut := k.ExecuteWithdrawalCollateral(ctx, msg, LendAsset)
+	err, amountOut := k.ExecuteWithdrawalLend(ctx, msg, Asset)
 	if err != nil {
 		return nil, err
 	}
@@ -173,14 +173,14 @@ func (k Keeper) WithdrawalCollateral(goCtx context.Context, msg *types.MsgWithdr
 			sdk.NewAttribute(sdk.AttributeKeyAction, types.AttributeKeyActionWithdrawalColletaral),
 		),
 	})
-	return &types.MsgWithdrawalCollateralResponse{
+	return &types.MsgWithdrawalLendResponse{
 		Depositor: msg.Depositor,
 		AmountOut: amountOut.String(),
 	}, nil
 }
 
 // Msg for lend asset
-func (k Keeper) CreateLend(goCtx context.Context, msg *types.MsgCreateLend) (*types.MsgCreateLendResponse, error) {
+func (k Keeper) CreateBorrow(goCtx context.Context, msg *types.MsgCreateBorrow) (*types.MsgCreateBorrowResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	err := k.CheckBorrowMethodStatus(ctx)
@@ -188,22 +188,22 @@ func (k Keeper) CreateLend(goCtx context.Context, msg *types.MsgCreateLend) (*ty
 		return nil, err
 	}
 
-	LendAssetId := k.GenerateLendAssetIdHash(msg.DenomIn)
+	AssetId := k.GenerateAssetIdHash(msg.DenomIn)
 	if err != nil {
 		return nil, err
 	}
 
-	LendAsset, found := k.GetLendAssetByLendAssetId(ctx, LendAssetId)
+	Asset, found := k.GetAssetByAssetId(ctx, AssetId)
 	if !found {
-		return nil, types.ErrLendAssetNotFound
+		return nil, types.ErrAssetNotFound
 	}
 
-	err = k.CheckOracleAssetId(ctx, LendAsset)
+	err = k.CheckOracleAssetId(ctx, Asset)
 	if err != nil {
 		return nil, err
 	}
 
-	err, amountOut, loanId := k.ExecuteLend(ctx, msg, LendAsset)
+	err, amountOut, loanId := k.ExecuteCreateBorrow(ctx, msg, Asset)
 	if err != nil {
 		return nil, err
 	}
@@ -217,7 +217,7 @@ func (k Keeper) CreateLend(goCtx context.Context, msg *types.MsgCreateLend) (*ty
 		),
 	})
 
-	return &types.MsgCreateLendResponse{
+	return &types.MsgCreateBorrowResponse{
 		Borrower:  msg.Borrower,
 		DenomIn:   msg.DenomIn,
 		AmountOut: amountOut.String(),
@@ -226,7 +226,7 @@ func (k Keeper) CreateLend(goCtx context.Context, msg *types.MsgCreateLend) (*ty
 }
 
 // Msg for delete lend
-func (k Keeper) DeleteLend(goCtx context.Context, msg *types.MsgDeleteLend) (*types.MsgDeleteLendResponse, error) {
+func (k Keeper) DeleteBorrow(goCtx context.Context, msg *types.MsgDeleteBorrow) (*types.MsgDeleteBorrowResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	err := k.CheckBorrowMethodStatus(ctx)
@@ -234,22 +234,22 @@ func (k Keeper) DeleteLend(goCtx context.Context, msg *types.MsgDeleteLend) (*ty
 		return nil, err
 	}
 
-	LendAssetId := k.GenerateLendAssetIdHash(msg.DenomOut)
+	AssetId := k.GenerateAssetIdHash(msg.DenomOut)
 	if err != nil {
 		return nil, err
 	}
 
-	LendAsset, found := k.GetLendAssetByLendAssetId(ctx, LendAssetId)
+	Asset, found := k.GetAssetByAssetId(ctx, AssetId)
 	if !found {
-		return nil, types.ErrLendAssetNotFound
+		return nil, types.ErrAssetNotFound
 	}
 
-	err = k.CheckOracleAssetId(ctx, LendAsset)
+	err = k.CheckOracleAssetId(ctx, Asset)
 	if err != nil {
 		return nil, err
 	}
 
-	err, loanId := k.ExecuteDeleteLend(ctx, msg, LendAsset)
+	err, loanId := k.ExecuteDeleteBorrow(ctx, msg, Asset)
 	if err != nil {
 		return nil, err
 	}
@@ -263,7 +263,7 @@ func (k Keeper) DeleteLend(goCtx context.Context, msg *types.MsgDeleteLend) (*ty
 		),
 	})
 
-	return &types.MsgDeleteLendResponse{
+	return &types.MsgDeleteBorrowResponse{
 		Borrower: msg.Borrower,
 		LoanId:   loanId,
 	}, nil
@@ -278,17 +278,17 @@ func (k Keeper) OpenLiquidationPosition(goCtx context.Context, msg *types.MsgOpe
 		return nil, err
 	}
 
-	LendAsset, err := k.GetLendAssetByOracleAssetId(ctx, msg.Asset)
+	Asset, err := k.GetAssetByOracleAssetId(ctx, msg.Asset)
 	if err != nil {
 		return nil, err
 	}
 
-	err = k.CheckOracleAssetId(ctx, LendAsset)
+	err = k.CheckOracleAssetId(ctx, Asset)
 	if err != nil {
 		return nil, err
 	}
 
-	err, id := k.ExecuteCreateLiqPosition(ctx, msg, LendAsset)
+	err, id := k.ExecuteCreateLiqPosition(ctx, msg, Asset)
 	if err != nil {
 		return nil, err
 	}

@@ -9,16 +9,33 @@ message Position {
         uint64 id = 1;
         string creator = 2; 
         string depositId = 3;
-        string collateral = 4;
-        string oracleTicker = 5; 
+        uint64 lendAmountInUSD = 5;
         uint64 borrowedAmountInUSD = 6;
-        repeated string loanIds = 7;
+        repeated string lend_id = 7;
+        repeated string loan_id = 8;
 }
 
-message LendAsset {
+message Lend {
         uint64 id = 1;
-        string LendAssetId = 2;
+        string lendId = 2;
+        string borrower = 3; 
+        string amountIn = 4;
+        string amountIn_amount = 5 [
+          (gogoproto.moretags)   = "yaml:\"amountIn_amount\"",
+          (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+          (gogoproto.nullable)   = false
+        ];
+        string amountIn_denom = 6;
+        uint64 startTime = 7; 
+        string oracleTicker = 8;
+}
+
+message Asset {
+        uint64 id = 1;
+        string AssetId = 2;
         cosmos.bank.v1beta1.Metadata assetMetadata = 3 [ (gogoproto.moretags) = "yaml:\"assetMetadata\"", (gogoproto.nullable)   = false ];
         string oracleAssetId = 4;
-        uint64 LendRate = 5;
+        uint64 provide_value = 5;
+        uint64 collectively_borrow_value = 6;
+        string type = 7;
 }

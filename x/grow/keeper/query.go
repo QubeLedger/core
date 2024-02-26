@@ -21,21 +21,31 @@ func (k Keeper) Params(goCtx context.Context, req *types.QueryParamsRequest) (*t
 	return &types.QueryParamsResponse{Params: &params}, nil
 }
 
-func (k Keeper) LendAssetByLendAssetId(goCtx context.Context, req *types.QueryLendAssetByLendAssetIdRequest) (*types.QueryLendAssetByLendAssetIdResponse, error) {
+func (k Keeper) AssetByAssetId(goCtx context.Context, req *types.QueryAssetByAssetIdRequest) (*types.QueryAssetByAssetIdResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	lendAsset, found := k.GetLendAssetByLendAssetId(ctx, req.Id)
+	Asset, found := k.GetAssetByAssetId(ctx, req.Id)
 	if !found {
 		return nil, status.Error(codes.NotFound, "not found")
 	}
 
-	return &types.QueryLendAssetByLendAssetIdResponse{
-		LendAssetId:   lendAsset.LendAssetId,
-		AssetMetadata: lendAsset.AssetMetadata,
-		OracleAssetId: lendAsset.OracleAssetId,
+	return &types.QueryAssetByAssetIdResponse{
+		Asset: Asset,
+	}, nil
+}
+
+func (k Keeper) GetAllAssets(goCtx context.Context, req *types.QueryGetAllAssetsRequest) (*types.QueryGetAllAssetsResponse, error) {
+	if req == nil {
+		return nil, status.Error(codes.InvalidArgument, "invalid request")
+	}
+	ctx := sdk.UnwrapSDKContext(goCtx)
+	assets := k.GetAllAsset(ctx)
+
+	return &types.QueryGetAllAssetsResponse{
+		Assets: assets,
 	}, nil
 }
 
@@ -51,12 +61,7 @@ func (k Keeper) PositionById(goCtx context.Context, req *types.QueryPositionById
 	}
 
 	return &types.QueryPositionResponse{
-		Creator:             pos.Creator,
-		DepositId:           pos.DepositId,
-		Collateral:          pos.Collateral,
-		OracleTicker:        pos.OracleTicker,
-		BorrowedAmountInUSD: pos.BorrowedAmountInUSD,
-		LoanIds:             pos.LoanIds,
+		Position: pos,
 	}, nil
 }
 
@@ -81,12 +86,7 @@ func (k Keeper) PositionByCreator(goCtx context.Context, req *types.QueryPositio
 	}
 
 	return &types.QueryPositionResponse{
-		Creator:             pos.Creator,
-		DepositId:           pos.DepositId,
-		Collateral:          pos.Collateral,
-		OracleTicker:        pos.OracleTicker,
-		BorrowedAmountInUSD: pos.BorrowedAmountInUSD,
-		LoanIds:             pos.LoanIds,
+		Position: pos,
 	}, nil
 }
 
@@ -127,11 +127,11 @@ func (k Keeper) LiquidatorPositionByCreator(goCtx context.Context, req *types.Qu
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	allPos := k.GetAllLiquidatorPosition(ctx)
-	var pos types.LiquidatorPosition
+	var pos []types.LiquidatorPosition
 	var found = false
 	for _, ps := range allPos {
 		if ps.Liquidator == req.Creator {
-			pos = ps
+			pos = append(pos, ps)
 			found = true
 		}
 	}
@@ -141,15 +141,11 @@ func (k Keeper) LiquidatorPositionByCreator(goCtx context.Context, req *types.Qu
 	}
 
 	return &types.QueryLiquidatorPositionByCreatorResponse{
-		LiquidatorPositionId: pos.LiquidatorPositionId,
-		BorrowAssetId:        pos.BorrowAssetId,
-		Liquidator:           pos.Liquidator,
-		Amount:               pos.Amount,
-		Premium:              pos.Premium,
+		Position: pos,
 	}, nil
 }
 
-func (k Keeper) LiquidatorPositionById(goCtx context.Context, req *types.QueryLiquidatorPositionByIdRequest) (*types.QueryLiquidatorPositionByCreatorResponse, error) {
+func (k Keeper) LiquidatorPositionById(goCtx context.Context, req *types.QueryLiquidatorPositionByIdRequest) (*types.QueryLiquidatorPositionByIdResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
@@ -160,28 +156,8 @@ func (k Keeper) LiquidatorPositionById(goCtx context.Context, req *types.QueryLi
 		return nil, status.Error(codes.NotFound, "not found")
 	}
 
-	return &types.QueryLiquidatorPositionByCreatorResponse{
-		LiquidatorPositionId: pos.LiquidatorPositionId,
-		BorrowAssetId:        pos.BorrowAssetId,
-		Liquidator:           pos.Liquidator,
-		Amount:               pos.Amount,
-		Premium:              pos.Premium,
-	}, nil
-}
-
-func (k Keeper) AllFundAddress(goCtx context.Context, req *types.QueryAllFundAddressRequest) (*types.QueryAllFundAddressResponse, error) {
-	if req == nil {
-		return nil, status.Error(codes.InvalidArgument, "invalid request")
-	}
-	ctx := sdk.UnwrapSDKContext(goCtx)
-	USQReserveAddress := k.GetUSQReserveAddress(ctx)
-	GrowYieldReserveAddress := k.GetGrowYieldReserveAddress(ctx)
-	GrowStakingReserveAddress := k.GetGrowStakingReserveAddress(ctx)
-
-	return &types.QueryAllFundAddressResponse{
-		USQReserveAddress:         USQReserveAddress.String(),
-		GrowYieldReserveAddress:   GrowYieldReserveAddress.String(),
-		GrowStakingReserveAddress: GrowStakingReserveAddress.String(),
+	return &types.QueryLiquidatorPositionByIdResponse{
+		LiquidatorsPosition: pos,
 	}, nil
 }
 
@@ -191,17 +167,13 @@ func (k Keeper) LoanById(goCtx context.Context, req *types.QueryLoanByIdRequest)
 	}
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	loan, found := k.GetLoadByLoadId(ctx, req.Id)
+	loan, found := k.GetLoadByLoanId(ctx, req.Id)
 	if !found {
 		return nil, status.Error(codes.NotFound, "not found")
 	}
 
 	return &types.QueryLoanByIdResponse{
-		LoanId:       loan.LoanId,
-		Borrower:     loan.Borrower,
-		AmountOut:    loan.AmountOut,
-		StartTime:    loan.StartTime,
-		OracleTicker: loan.OracleTicker,
+		Loan: loan,
 	}, nil
 }
 
@@ -252,14 +224,7 @@ func (k Keeper) PairByDenomId(goCtx context.Context, req *types.PairByDenomIdReq
 	}
 
 	return &types.PairByDenomIdResponse{
-		DenomID:                     pair.DenomID,
-		QStablePairId:               pair.QStablePairId,
-		GTokenMetadata:              pair.GTokenMetadata,
-		MinAmountIn:                 pair.MinAmountIn,
-		MinAmountOut:                pair.MinAmountOut,
-		GTokenLastPrice:             pair.GTokenLastPrice,
-		GTokenLatestPriceUpdateTime: pair.GTokenLatestPriceUpdateTime,
-		St:                          pair.St,
+		Pair: &pair,
 	}, nil
 }
 
@@ -283,5 +248,21 @@ func (k Keeper) AllPairs(goCtx context.Context, req *types.AllPairsRequest) (*ty
 
 	return &types.AllPairsResponse{
 		Pairs: pairs,
+	}, nil
+}
+
+func (k Keeper) LendById(goCtx context.Context, req *types.QueryLendByIdRequest) (*types.QueryLendByIdResponse, error) {
+	if req == nil {
+		return nil, status.Error(codes.InvalidArgument, "invalid request")
+	}
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	lend, found := k.GetLendByLendId(ctx, req.Id)
+	if !found {
+		return nil, status.Error(codes.NotFound, "not found")
+	}
+
+	return &types.QueryLendByIdResponse{
+		Lend: lend,
 	}, nil
 }

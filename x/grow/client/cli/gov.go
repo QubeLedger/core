@@ -17,7 +17,7 @@ import (
 )
 
 //nolint:all
-func NewRegisterLendAssetProposalCmd() *cobra.Command {
+func NewRegisterAssetProposalCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "register-lend-asset [metadata]",
 		Args:  cobra.ExactArgs(1),
@@ -72,7 +72,7 @@ func NewRegisterLendAssetProposalCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			assetMetadata, oracleAssetId, err := ParseMetadataForLendAssetProposal(clientCtx.Codec, args[0])
+			assetMetadata, oracleAssetId, err := ParseMetadataForAssetProposal(clientCtx.Codec, args[0])
 			if err != nil {
 				return err
 			}
@@ -557,7 +557,7 @@ func NewRegisterChangeLendRateProposalCmd() *cobra.Command {
 	return cmd
 }
 
-func NewRegisterRemoveLendAssetProposalCmd() *cobra.Command {
+func NewRegisterRemoveAssetProposalCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "remove-lend-asset [id]",
 		Args:  cobra.ExactArgs(1),
