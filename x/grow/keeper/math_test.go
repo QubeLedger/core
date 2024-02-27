@@ -55,11 +55,11 @@ func (s *GrowKeeperTestSuite) TestCalculateNeedAmountToGet() {
 }
 func (s *GrowKeeperTestSuite) TestCalculateRiskRate() {
 	s.Setup()
-	collateral := sdk.NewInt(100 * 1000000)
-	borrow := sdk.NewInt(60 * 1000000)
+	collateral := sdk.NewInt(10000 * 1000000)
+	borrow := sdk.NewInt(5500 * 1000000)
 	res, err := s.app.GrowKeeper.CalculateRiskRate(collateral, borrow)
 	s.Require().NoError(err)
-	s.Require().Equal(res.Int64(), int64(100))
+	s.Require().Equal(int64(100), res.Int64())
 }
 func (s *GrowKeeperTestSuite) TestCheckRiskRate() {
 	s.Setup()

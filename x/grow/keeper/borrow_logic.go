@@ -130,6 +130,11 @@ func (k Keeper) ExecuteDeleteBorrow(ctx sdk.Context, msg *types.MsgDeleteBorrow,
 		return types.ErrLoanNotFoundInPosition, ""
 	}
 
+	err = k.bankKeeper.SendCoinsFromAccountToModule(ctx, borrower, types.ModuleName, amountInCoins)
+	if err != nil {
+		return err, ""
+	}
+
 	if amountInInt.GTE(loan.AmountOutAmount.RoundInt()) {
 		k.RemoveLoan(ctx, loan.Id)
 		position = k.RemoveLoanInPosition(ctx, loan.LoanId, position)
@@ -144,11 +149,6 @@ func (k Keeper) ExecuteDeleteBorrow(ctx sdk.Context, msg *types.MsgDeleteBorrow,
 			OracleTicker:    Asset.OracleAssetId,
 		}
 		k.SetLoan(ctx, new_loan)
-	}
-
-	err = k.bankKeeper.SendCoinsFromAccountToModule(ctx, borrower, types.ModuleName, amountInCoins)
-	if err != nil {
-		return err, ""
 	}
 
 	Asset.CollectivelyBorrowValue -= amountInCoins.AmountOf(DenomIn).Uint64()

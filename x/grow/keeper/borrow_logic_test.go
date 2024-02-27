@@ -153,6 +153,8 @@ func (suite *GrowKeeperTestSuite) TestExecuteCreateBorrow() {
 			asset, _ := s.app.GrowKeeper.GetAssetByAssetId(s.ctx, s.GetNormalAsset(0).AssetId)
 			suite.Require().Equal(ProvideValue, int(asset.ProvideValue))
 
+			old_balance := s.app.BankKeeper.GetBalance(s.ctx, s.Address, tc.Asset[0].Asset.AssetMetadata.Base)
+
 			for _, borrow_type := range tc.borrows {
 				msg := types.NewMsgCreateBorrow(
 					s.Address.String(),
@@ -188,6 +190,10 @@ func (suite *GrowKeeperTestSuite) TestExecuteCreateBorrow() {
 
 				asset, _ := s.app.GrowKeeper.GetAssetByAssetId(s.ctx, s.GetNormalAsset(0).AssetId)
 				suite.Require().Equal(BorrowValue, int(asset.CollectivelyBorrowValue))
+
+				new_balance := s.app.BankKeeper.GetBalance(s.ctx, s.Address, tc.Asset[0].Asset.AssetMetadata.Base)
+
+				suite.Require().Equal(new_balance.Amount.Sub(old_balance.Amount), sdk.NewInt(int64(BorrowValue)))
 			}
 		})
 	}
@@ -422,6 +428,8 @@ func (suite *GrowKeeperTestSuite) TestExecuteDeleteBorrow() {
 				suite.Require().Equal(BorrowValue, int(asset.CollectivelyBorrowValue))
 			}
 
+			old_balance := s.app.BankKeeper.GetBalance(s.ctx, s.Address, tc.Asset[0].Asset.AssetMetadata.Base)
+
 			for _, w_type := range tc.withdrawals {
 				loan_id := s.app.GrowKeeper.GenerateLoanIdHash(w_type.denom, s.Address.String())
 				old_loan, _ := s.app.GrowKeeper.GetLoadByLoanId(s.ctx, loan_id)
@@ -454,16 +462,23 @@ func (suite *GrowKeeperTestSuite) TestExecuteDeleteBorrow() {
 				position, found := s.app.GrowKeeper.GetPositionByPositionId(s.ctx, s.app.GrowKeeper.CalculateDepositId(s.Address.String()))
 				suite.Require().Equal(true, found)
 
+				temp_borrow_value := 0
+
 				for _, w_type := range tc.withdrawals {
 					price, _ := s.app.GrowKeeper.GetPriceByDenom(s.ctx, w_type.OracleDenom)
 					BorrowAmountInUsd -= (int(w_type.amount) * int(price.Int64())) / 10000
 					BorrowValue -= int(w_type.amount)
+					temp_borrow_value += int(w_type.amount)
 				}
 
 				suite.Require().Equal(BorrowAmountInUsd, int(position.BorrowedAmountInUSD))
 
 				asset, _ := s.app.GrowKeeper.GetAssetByAssetId(s.ctx, s.GetNormalAsset(0).AssetId)
 				suite.Require().Equal(BorrowValue, int(asset.CollectivelyBorrowValue))
+
+				new_balance := s.app.BankKeeper.GetBalance(s.ctx, s.Address, tc.Asset[0].Asset.AssetMetadata.Base)
+
+				suite.Require().Equal(old_balance.Amount.Sub(new_balance.Amount), sdk.NewInt(int64(temp_borrow_value)))
 			}
 		})
 	}
@@ -615,6 +630,11 @@ func (suite *GrowKeeperTestSuite) TestExecuteCreateBorrowInAnotherToken() {
 
 				asset, _ := s.app.GrowKeeper.GetAssetByAssetId(s.ctx, s.GetNormalAsset(0).AssetId)
 				suite.Require().Equal(BorrowValue, int(asset.CollectivelyBorrowValue))
+			}
+
+			for _, borrow_type := range tc.borrows {
+				balance := s.app.BankKeeper.GetBalance(s.ctx, borrow_type.Address, borrow_type.denom)
+				suite.Require().Equal(balance.Amount, sdk.NewInt(borrow_type.amount))
 			}
 		})
 	}

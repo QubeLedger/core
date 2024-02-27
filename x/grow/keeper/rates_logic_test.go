@@ -14,6 +14,7 @@ import (
 func (suite *GrowKeeperTestSuite) TestExecuteCalculateUtilizationRate() {
 	main_address := apptesting.CreateRandomAccounts(1)[0]
 	second_address := apptesting.CreateRandomAccounts(1)[0]
+	third_address := apptesting.CreateRandomAccounts(1)[0]
 
 	testCases := []struct {
 		name         string
@@ -52,30 +53,42 @@ func (suite *GrowKeeperTestSuite) TestExecuteCalculateUtilizationRate() {
 			},
 			[]Lend_type_with_address{
 				{
-					amount:      100 * 1000000,
+					amount:      10000 * 1000000,
 					Address:     main_address,
+					denom:       "uusdc",
+					OracleDenom: "USDC",
+				},
+				{
+					amount:      10000 * 1000000,
+					Address:     second_address,
+					denom:       "uwbtc",
+					OracleDenom: "WBTC",
+				},
+				{
+					amount:      10000 * 1000000,
+					Address:     third_address,
+					denom:       "uusdc",
+					OracleDenom: "USDC",
+				},
+			},
+			[]Borrow_type_with_address{
+				{
+					amount:      5000 * 1000000,
+					Address:     main_address,
+					denom:       "uwbtc",
+					OracleDenom: "WBTC",
+				},
+				{
+					amount:      5000 * 1000000,
+					Address:     second_address,
 					denom:       "uusdc",
 					OracleDenom: "USDC",
 				},
 				{
 					amount:      1000 * 1000000,
-					Address:     second_address,
+					Address:     third_address,
 					denom:       "uwbtc",
 					OracleDenom: "WBTC",
-				},
-			},
-			[]Borrow_type_with_address{
-				{
-					amount:      1 * 1000000,
-					Address:     main_address,
-					denom:       "uwbtc",
-					OracleDenom: "WBTC",
-				},
-				{
-					amount:      1 * 1000000,
-					Address:     second_address,
-					denom:       "uusdc",
-					OracleDenom: "USDC",
 				},
 			},
 			false,
@@ -97,7 +110,9 @@ func (suite *GrowKeeperTestSuite) TestExecuteCalculateUtilizationRate() {
 		params := s.app.GrowKeeper.GetParams(s.ctx)
 		params.LastTimeUpdateReserve = uint64(s.ctx.BlockTime().Unix())
 		params.UStaticVolatile = 60
-		params.MaxRateVolatile = 300
+		params.MaxRateVolatile = 200
+		params.UStaticStable = 80
+		params.MaxRateStable = 100
 		params.Slope = 7
 		s.app.GrowKeeper.SetParams(s.ctx, params)
 
@@ -148,7 +163,18 @@ func (suite *GrowKeeperTestSuite) TestExecuteCalculateUtilizationRate() {
 				suite.Require().Equal(loan.StartTime, uint64(s.ctx.BlockTime().Unix()))
 			}
 
-			s.ctx = s.ctx.WithBlockTime(time.Unix((s.ctx.BlockTime().Unix() + 31536000), 0))
+			for _, asset := range tc.Asset {
+				asset, _ := s.app.GrowKeeper.GetAssetByAssetId(s.ctx, asset.Asset.AssetId)
+				utilization_rate := (float64(asset.CollectivelyBorrowValue) / float64(asset.ProvideValue))
+				bir, sir, _ := s.app.GrowKeeper.GetRatesByUtilizationRate(s.ctx, utilization_rate, asset)
+				fmt.Printf("Asset Ticker:  %v\n", asset.OracleAssetId)
+				fmt.Printf("UR:  %f\n", utilization_rate)
+				fmt.Printf("Borrow Interest Rate:  %f\n", bir)
+				fmt.Printf("Supply Interest Rate: %f\n", sir)
+				fmt.Printf("\n")
+			}
+
+			s.ctx = s.ctx.WithBlockTime(time.Unix((s.ctx.BlockTime().Unix() + (2419200)), 0))
 
 			err := grow.EndBlocker(s.ctx, s.app.GrowKeeper)
 			s.Require().NoError(err)
@@ -156,6 +182,8 @@ func (suite *GrowKeeperTestSuite) TestExecuteCalculateUtilizationRate() {
 			position, _ := s.app.GrowKeeper.GetPositionByPositionId(s.ctx, s.app.GrowKeeper.CalculateDepositId(main_address.String()))
 			fmt.Printf("position.LendAmountInUSD: %v\n", position.LendAmountInUSD)
 			fmt.Printf("position.BorrowedAmountInUSD: %v\n", position.BorrowedAmountInUSD)
+			fmt.Printf("\n")
+
 		})
 	}
 }

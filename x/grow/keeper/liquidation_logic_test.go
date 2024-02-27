@@ -486,28 +486,36 @@ func (suite *GrowKeeperTestSuite) TestLiquidatePositionFull() {
 			}
 			suite.OracleAggregateExchangeRateFromInput(new_oracle_denom)
 
-			err := grow.EndBlocker(s.ctx, s.app.GrowKeeper)
-			suite.Require().NoError(err)
+			old_balances_liquidator := []int64{}
 
-			err = grow.EndBlocker(s.ctx, s.app.GrowKeeper)
+			for _, liq_pos_id := range liq_pos_ids {
+				liq_pos, _ := s.app.GrowKeeper.GetLiquidatorPositionByLiquidatorPositionId(s.ctx, liq_pos_id)
+				liq_pos_amount_int, _ := sdk.ParseCoinNormalized(liq_pos.Amount)
+				old_balances_liquidator = append(old_balances_liquidator, liq_pos_amount_int.Amount.Int64())
+			}
+
+			old_position, _ := s.app.GrowKeeper.GetPositionByPositionId(s.ctx, s.app.GrowKeeper.CalculateDepositId(main_address.String()))
+
+			err := grow.EndBlocker(s.ctx, s.app.GrowKeeper)
 			suite.Require().NoError(err)
 
 			position, _ := s.app.GrowKeeper.GetPositionByPositionId(s.ctx, s.app.GrowKeeper.CalculateDepositId(main_address.String()))
 			rr, _ := s.app.GrowKeeper.CalculateRiskRate(sdk.NewIntFromUint64(position.LendAmountInUSD), sdk.NewIntFromUint64(position.BorrowedAmountInUSD))
-			_ = rr
-			/*
-				fmt.Printf("Position LendAmountInUSD:: %v\n", position.LendAmountInUSD)
-				fmt.Printf("Position BorrowedAmountInUSD:: %v\n", position.BorrowedAmountInUSD)
-				fmt.Printf("Position RR: %v\n\n", rr)
 
-				for _, liq_pos_id := range liq_pos_ids {
-					liq_pos, _ := s.app.GrowKeeper.GetLiquidatorPositionByLiquidatorPositionId(s.ctx, liq_pos_id)
-					asset, _ := s.app.GrowKeeper.GetAssetByOracleAssetId(s.ctx, liq_pos.WantAssetId)
-					liqBalance1 := s.app.BankKeeper.GetBalance(s.ctx, sdk.AccAddress(liq_pos.Liquidator), asset.AssetMetadata.Base)
-					fmt.Printf("Liquidator Position Ampunt: %s\n", liq_pos.Amount)
-					fmt.Printf("Liquidator Balance: %s\n\n", liqBalance1.String())
-				}
-			*/
+			suite.Require().NotEqual(old_position.LendAmountInUSD, position.LendAmountInUSD)
+			suite.Require().NotEqual(old_position.BorrowedAmountInUSD, position.BorrowedAmountInUSD)
+			suite.Require().LessOrEqual(rr.Int64(), int64(95))
+
+			for i, liq_pos_id := range liq_pos_ids {
+				liq_pos, _ := s.app.GrowKeeper.GetLiquidatorPositionByLiquidatorPositionId(s.ctx, liq_pos_id)
+				liq_pos_amount_int, _ := sdk.ParseCoinNormalized(liq_pos.Amount)
+
+				asset, _ := s.app.GrowKeeper.GetAssetByOracleAssetId(s.ctx, liq_pos.WantAssetId)
+				liqBalance1 := s.app.BankKeeper.GetBalance(s.ctx, sdk.AccAddress(liq_pos.Liquidator), asset.AssetMetadata.Base)
+
+				suite.Require().Equal(old_balances_liquidator[i], (liq_pos_amount_int.Amount.Add(liqBalance1.Amount)).Int64())
+			}
+
 		})
 	}
 

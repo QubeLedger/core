@@ -87,5 +87,5 @@ func (k Keeper) ExecuteCloseLiqPosition(ctx sdk.Context, msg *types.MsgCloseLiqu
 
 	k.RemoveLiquidatorPosition(ctx, liqPosition.Id)
 
-	return err, sdk.NewCoin(amountCoins.GetDenomByIndex(0), amountInt)
+	return nil, sdk.NewCoin(amountCoins.GetDenomByIndex(0), amountInt)
 }

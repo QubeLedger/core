@@ -506,13 +506,12 @@ func (suite *GrowKeeperTestSuite) TestExecuteCreateLendWithDifferentToken() {
 				position, found := s.app.GrowKeeper.GetPositionByPositionId(s.ctx, s.app.GrowKeeper.CalculateDepositId(s.Address.String()))
 				suite.Require().Equal(true, found)
 				LendAmountInUsd := 0
-				ProvideValue := 0
 
 				for _, lend_type := range tc.lends {
 					price, _ := s.app.GrowKeeper.GetPriceByDenom(s.ctx, lend_type.OracleDenom)
 					LendAmountInUsd += (int(lend_type.amount) * int(price.Int64())) / 10000
-					ProvideValue += int(lend_type.amount)
 				}
+
 				suite.Require().Equal(LendAmountInUsd, int(position.LendAmountInUSD))
 			}
 

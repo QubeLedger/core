@@ -74,13 +74,13 @@ func (k Keeper) ExecuteCreateLend(ctx sdk.Context, msg *types.MsgCreateLend, Ass
 		k.SetLend(ctx, lend)
 	}
 
-	position.LendAmountInUSD += k.CalculateAmountByPriceAndAmountIn(AmountInCoins.AmountOf(DenomIn), price).Uint64()
-	k.SetPosition(ctx, position)
-
 	err = k.bankKeeper.SendCoinsFromAccountToModule(ctx, depositor, types.ModuleName, AmountInCoins)
 	if err != nil {
 		return err, ""
 	}
+
+	position.LendAmountInUSD += k.CalculateAmountByPriceAndAmountIn(AmountInCoins.AmountOf(DenomIn), price).Uint64()
+	k.SetPosition(ctx, position)
 
 	Asset.ProvideValue += (AmountInCoins.AmountOf(DenomIn)).Uint64()
 	k.SetAsset(ctx, Asset)
@@ -140,13 +140,13 @@ func (k Keeper) ExecuteWithdrawalLend(ctx sdk.Context, msg *types.MsgWithdrawalL
 		k.SetLend(ctx, new_lend)
 	}
 
-	position.LendAmountInUSD -= k.CalculateAmountByPriceAndAmountIn(amountInCoins.AmountOf(DenomIn), price).Uint64()
-	k.SetPosition(ctx, position)
-
 	err = k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, depositor, amountInCoins)
 	if err != nil {
 		return err, sdk.Coin{}
 	}
+
+	position.LendAmountInUSD -= k.CalculateAmountByPriceAndAmountIn(amountInCoins.AmountOf(DenomIn), price).Uint64()
+	k.SetPosition(ctx, position)
 
 	Asset.ProvideValue -= (amountInCoins.AmountOf(DenomIn)).Uint64()
 	k.SetAsset(ctx, Asset)
