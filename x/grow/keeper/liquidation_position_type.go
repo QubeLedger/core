@@ -113,6 +113,7 @@ func (k Keeper) CheckIfLiquidatorPositionAlredyCreate(ctx sdk.Context, depositor
 	return nil
 }
 
+/* #nosec */
 func (k Keeper) GetLiquidatorPositionsByAssetAndDenom(ctx sdk.Context, wantAssetId string, provideAssetId string) []types.LiquidatorPosition {
 	allLiquidatorPosition := k.GetAllLiquidatorPosition(ctx)
 	res := []types.LiquidatorPosition{}

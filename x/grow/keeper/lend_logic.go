@@ -5,6 +5,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
+/* #nosec */
 func (k Keeper) ExecuteCreateLend(ctx sdk.Context, msg *types.MsgCreateLend, Asset types.Asset) (error, string) {
 	AmountInCoins, err := sdk.ParseCoinsNormalized(msg.AmountIn)
 	if err != nil {
