@@ -113,7 +113,8 @@ func (suite *GrowKeeperTestSuite) TestExecuteCalculateUtilizationRate() {
 		params.MaxRateVolatile = 200
 		params.UStaticStable = 80
 		params.MaxRateStable = 100
-		params.Slope = 7
+		params.Slope_1 = 1
+		params.Slope_2 = 8
 		s.app.GrowKeeper.SetParams(s.ctx, params)
 
 		oracle_denom := ""

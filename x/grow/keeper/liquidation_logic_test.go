@@ -404,7 +404,8 @@ func (suite *GrowKeeperTestSuite) TestLiquidatePositionFull() {
 		params.LastTimeUpdateReserve = uint64(s.ctx.BlockTime().Unix())
 		params.UStaticVolatile = 60
 		params.MaxRateVolatile = 300
-		params.Slope = 7
+		params.Slope_1 = 1
+		params.Slope_2 = 8
 		s.app.GrowKeeper.SetParams(s.ctx, params)
 
 		oracle_denom := ""

@@ -30,7 +30,8 @@ var (
 	KeyUStaticStable             = []byte("UStaticStable")
 	KeyMaxRateVolatile           = []byte("MaxRateVolatile")
 	KeyMaxRateStable             = []byte("MaxRateStable")
-	KeySlope                     = []byte("Slope")
+	KeySlope1                    = []byte("Slope1")
+	KeySlope2                    = []byte("Slope2")
 )
 
 // ParamKeyTable the param key table for launch module
@@ -52,7 +53,8 @@ func DefaultParams() Params {
 		UStaticStable:             DefaultInt,
 		MaxRateVolatile:           DefaultInt,
 		MaxRateStable:             DefaultInt,
-		Slope:                     DefaultInt,
+		Slope_1:                   DefaultInt,
+		Slope_2:                   DefaultInt,
 	}
 }
 
@@ -70,7 +72,8 @@ func (p *Params) ParamSetPairs() paramtypes.ParamSetPairs {
 		paramtypes.NewParamSetPair(KeyUStaticStable, &p.UStaticStable, validate),
 		paramtypes.NewParamSetPair(KeyMaxRateVolatile, &p.MaxRateVolatile, validate),
 		paramtypes.NewParamSetPair(KeyMaxRateStable, &p.MaxRateStable, validate),
-		paramtypes.NewParamSetPair(KeySlope, &p.Slope, validate),
+		paramtypes.NewParamSetPair(KeySlope1, &p.Slope_1, validate),
+		paramtypes.NewParamSetPair(KeySlope2, &p.Slope_2, validate),
 	}
 }
 

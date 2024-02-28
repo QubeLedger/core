@@ -24,10 +24,19 @@ func (k Keeper) GetRatesByUtilizationRate(ctx sdk.Context, utilization_rate floa
 		max_rate = float64(params.MaxRateStable) / 100
 	}
 
-	slope := float64(params.Slope) / 100
+	borrow_interest_rate := 0.0
+	supply_interest_rate := 0.0
 
-	borrow_interest_rate := slope + ((utilization_rate-u_static)/(1-u_static))*max_rate
-	supply_interest_rate := (borrow_interest_rate) * utilization_rate
+	slope_1 := float64(params.Slope_1) / 100
+	slope_2 := float64(params.Slope_2) / 100
+
+	if utilization_rate < u_static {
+		borrow_interest_rate = slope_1 + (utilization_rate * ((slope_2 - slope_1) / u_static))
+		supply_interest_rate = (borrow_interest_rate) * utilization_rate
+	} else {
+		borrow_interest_rate = slope_1 + ((utilization_rate - u_static) * ((max_rate - slope_2) / (1 - u_static)))
+		supply_interest_rate = (borrow_interest_rate) * utilization_rate
+	}
 
 	return borrow_interest_rate, supply_interest_rate, nil
 }
