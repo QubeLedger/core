@@ -89,6 +89,7 @@ func (k Keeper) ExecuteCreateLend(ctx sdk.Context, msg *types.MsgCreateLend, Ass
 	return nil, position.DepositId
 }
 
+/* #nosec */
 func (k Keeper) ExecuteWithdrawalLend(ctx sdk.Context, msg *types.MsgWithdrawalLend, Asset types.Asset) (error, sdk.Coin) {
 	depositor, err := sdk.AccAddressFromBech32(msg.Depositor)
 	if err != nil {

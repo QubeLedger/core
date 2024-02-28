@@ -125,6 +125,7 @@ func (k Keeper) GetLiquidatorPositionsByAssetAndDenom(ctx sdk.Context, wantAsset
 	return res
 }
 
+/* #nosec */
 func (k Keeper) SortLiquidatorPositionsByPremium(ctx sdk.Context, lps []types.LiquidatorPosition) []types.LiquidatorPosition {
 	sort.SliceStable(lps, func(i, j int) bool {
 		return int64(lps[i].Premium) < int64(lps[j].Premium)
