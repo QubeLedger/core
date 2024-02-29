@@ -31,10 +31,10 @@ func GetTxCmd() *cobra.Command {
 
 	cmd.AddCommand(CmdDeposit())
 	cmd.AddCommand(CmdWithdrawal())
-	cmd.AddCommand(CmdDepositCollateral())
-	cmd.AddCommand(CmdWithdrawalCollateral())
 	cmd.AddCommand(CmdCreateLend())
-	cmd.AddCommand(CmdDeleteLend())
+	cmd.AddCommand(CmdWithdrawalLend())
+	cmd.AddCommand(CmdCreateBorrow())
+	cmd.AddCommand(CmdDeleteBorrow())
 	cmd.AddCommand(CmdCreateLiqPosition())
 	cmd.AddCommand(CmdCloseLiqPosition())
 	// this line is used by starport scaffolding # 1
@@ -42,10 +42,10 @@ func GetTxCmd() *cobra.Command {
 	return cmd
 }
 
-func CmdCreateLend() *cobra.Command {
+func CmdCreateBorrow() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "create-lend [amount] [denom-out]",
-		Short: "Broadcast message create-lend",
+		Use:   "create-borrow [amount] [denom-out]",
+		Short: "Broadcast message create-borrow",
 		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			argAmount := args[0]
@@ -56,7 +56,7 @@ func CmdCreateLend() *cobra.Command {
 				return err
 			}
 
-			msg := types.NewMsgCreateLend(
+			msg := types.NewMsgCreateBorrow(
 				clientCtx.GetFromAddress().String(),
 				argAmount,
 				argDenomOut,
@@ -73,25 +73,24 @@ func CmdCreateLend() *cobra.Command {
 	return cmd
 }
 
-func CmdDeleteLend() *cobra.Command {
+func CmdDeleteBorrow() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "delete-lend [amount] [loan-id] [denom-out]",
-		Short: "Broadcast message delete-lend",
+		Use:   "delete-borrow [amount] [denom-out]",
+		Short: "Broadcast message delete-borrow",
 		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			argAmount := args[0]
-			argLoanId := args[1]
+			argDenomOut := args[1]
 
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
 			}
 
-			msg := types.NewMsgDeleteLend(
+			msg := types.NewMsgDeleteBorrow(
 				clientCtx.GetFromAddress().String(),
 				argAmount,
-				argLoanId,
-				args[2],
+				argDenomOut,
 			)
 			if err := msg.ValidateBasic(); err != nil {
 				return err
@@ -165,10 +164,10 @@ func CmdWithdrawal() *cobra.Command {
 	return cmd
 }
 
-func CmdDepositCollateral() *cobra.Command {
+func CmdCreateLend() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "deposit-collateral [amountIn]",
-		Short: "Broadcast message deposit collateral",
+		Use:   "create-lend [amountIn]",
+		Short: "Broadcast message create lend",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			argAmountIn := args[0]
@@ -178,7 +177,7 @@ func CmdDepositCollateral() *cobra.Command {
 				return err
 			}
 
-			msg := types.NewMsgDepositCollateral(
+			msg := types.NewMsgCreateLend(
 				clientCtx.GetFromAddress().String(),
 				argAmountIn,
 			)
@@ -194,22 +193,23 @@ func CmdDepositCollateral() *cobra.Command {
 	return cmd
 }
 
-func CmdWithdrawalCollateral() *cobra.Command {
+func CmdWithdrawalLend() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "withdrawal-collateral [denom]",
-		Short: "Broadcast message withdrawal collateral",
+		Use:   "withdrawal-lend [amountIn]",
+		Short: "Broadcast message withdrawal lend",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
-			argDenom := args[0]
+			argAmountIn := args[0]
 
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
 			}
 
-			msg := types.NewMsgWithdrawalCollateral(
+			msg := types.NewMsgWithdrawalLend(
 				clientCtx.GetFromAddress().String(),
-				argDenom,
+				argAmountIn,
+				"",
 			)
 			if err := msg.ValidateBasic(); err != nil {
 				return err

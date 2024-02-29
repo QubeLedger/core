@@ -14,7 +14,7 @@ import (
 	"github.com/QuadrateOrg/core/x/grow/types"
 )
 
-type RegisterLendAssetProposal struct {
+type RegisterAssetProposal struct {
 	BaseReq       rest.BaseReq       `json:"base_req" yaml:"base_req"`
 	Title         string             `json:"title" yaml:"title"`
 	Description   string             `json:"description" yaml:"description"`
@@ -83,12 +83,12 @@ type RegisterChangeLendRateProposal struct {
 	Id          string       `json:"id" yaml:"id"`
 }
 
-type RegisterRemoveLendAssetProposal struct {
+type RegisterRemoveAssetProposal struct {
 	BaseReq     rest.BaseReq `json:"base_req" yaml:"base_req"`
 	Title       string       `json:"title" yaml:"title"`
 	Description string       `json:"description" yaml:"description"`
 	Deposit     sdk.Coins    `json:"deposit" yaml:"deposit"`
-	LendAssetId string       `json:"lendAssetId" yaml:"lendAssetId"`
+	AssetId     string       `json:"AssetId" yaml:"AssetId"`
 }
 
 type RegisterRemoveGTokenPairProposal struct {
@@ -96,7 +96,7 @@ type RegisterRemoveGTokenPairProposal struct {
 	Title        string       `json:"title" yaml:"title"`
 	Description  string       `json:"description" yaml:"description"`
 	Deposit      sdk.Coins    `json:"deposit" yaml:"deposit"`
-	GTokenPairID string       `json:"lendAssetId" yaml:"lendAssetId"`
+	GTokenPairID string       `json:"AssetId" yaml:"AssetId"`
 }
 
 type RegisterChangeDepositMethodStatusProposal struct {
@@ -120,16 +120,16 @@ type RegisterChangeBorrowMethodStatusProposal struct {
 	Deposit     sdk.Coins    `json:"deposit" yaml:"deposit"`
 }
 
-func RegisterLendAssetProposalRESTHandler(clientCtx client.Context) govrest.ProposalRESTHandler {
+func RegisterAssetProposalRESTHandler(clientCtx client.Context) govrest.ProposalRESTHandler {
 	return govrest.ProposalRESTHandler{
 		SubRoute: types.ModuleName,
-		Handler:  newRegisterLendAssetProposal(clientCtx),
+		Handler:  newRegisterAssetProposal(clientCtx),
 	}
 }
 
-func newRegisterLendAssetProposal(clientCtx client.Context) http.HandlerFunc {
+func newRegisterAssetProposal(clientCtx client.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var req RegisterLendAssetProposal
+		var req RegisterAssetProposal
 
 		if !rest.ReadRESTReq(w, r, clientCtx.LegacyAmino, &req) {
 			return
@@ -432,16 +432,16 @@ func newRegisterChangeLendRateProposal(clientCtx client.Context) http.HandlerFun
 	}
 }
 
-func RegisterRemoveLendAssetProposalRESTHandler(clientCtx client.Context) govrest.ProposalRESTHandler {
+func RegisterRemoveAssetProposalRESTHandler(clientCtx client.Context) govrest.ProposalRESTHandler {
 	return govrest.ProposalRESTHandler{
 		SubRoute: types.ModuleName,
-		Handler:  newRegisterRemoveLendAssetProposal(clientCtx),
+		Handler:  newRegisterRemoveAssetProposal(clientCtx),
 	}
 }
 
-func newRegisterRemoveLendAssetProposal(clientCtx client.Context) http.HandlerFunc {
+func newRegisterRemoveAssetProposal(clientCtx client.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var req RegisterRemoveLendAssetProposal
+		var req RegisterRemoveAssetProposal
 
 		if !rest.ReadRESTReq(w, r, clientCtx.LegacyAmino, &req) {
 			return
@@ -457,7 +457,7 @@ func newRegisterRemoveLendAssetProposal(clientCtx client.Context) http.HandlerFu
 			return
 		}
 
-		content := types.NewRegisterRemoveLendAssetProposal(req.Title, req.Description, req.LendAssetId)
+		content := types.NewRegisterRemoveLendAssetProposal(req.Title, req.Description, req.AssetId)
 		msg, err := govtypes.NewMsgSubmitProposal(content, req.Deposit, fromAddr)
 		if rest.CheckBadRequestError(w, err) {
 			return

@@ -12,9 +12,9 @@ func RegisterCodec(cdc *codec.LegacyAmino) {
 	cdc.RegisterConcrete(&MsgGrowDeposit{}, "grow/GrowDeposit", nil)
 	cdc.RegisterConcrete(&MsgGrowWithdrawal{}, "grow/GrowWithdrawal", nil)
 	cdc.RegisterConcrete(&MsgCreateLend{}, "grow/CreateLend", nil)
-	cdc.RegisterConcrete(&MsgDeleteLend{}, "grow/DeleteLend", nil)
-	cdc.RegisterConcrete(&MsgDepositCollateral{}, "grow/DepositCollateral", nil)
-	cdc.RegisterConcrete(&MsgWithdrawalCollateral{}, "grow/WithdrawalCollateral", nil)
+	cdc.RegisterConcrete(&MsgWithdrawalLend{}, "grow/WithdrawalLend", nil)
+	cdc.RegisterConcrete(&MsgCreateBorrow{}, "grow/CreateBorrow", nil)
+	cdc.RegisterConcrete(&MsgDeleteBorrow{}, "grow/DeleteBorrow", nil)
 	cdc.RegisterConcrete(&MsgOpenLiquidationPosition{}, "grow/CreateLiquidationPosition", nil)
 	cdc.RegisterConcrete(&MsgCloseLiquidationPosition{}, "grow/CloseLiquidationPosition", nil)
 
@@ -31,13 +31,13 @@ func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
 		&MsgCreateLend{},
 	)
 	registry.RegisterImplementations((*sdk.Msg)(nil),
-		&MsgDeleteLend{},
+		&MsgWithdrawalLend{},
 	)
 	registry.RegisterImplementations((*sdk.Msg)(nil),
-		&MsgDepositCollateral{},
+		&MsgCreateBorrow{},
 	)
 	registry.RegisterImplementations((*sdk.Msg)(nil),
-		&MsgWithdrawalCollateral{},
+		&MsgDeleteBorrow{},
 	)
 	registry.RegisterImplementations((*sdk.Msg)(nil),
 		&MsgOpenLiquidationPosition{},

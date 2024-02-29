@@ -8,11 +8,12 @@ import (
 var _ paramtypes.ParamSet = &Params{}
 
 const (
-	DefaultLastTimeUpdateReserve     = uint64(1)
+	DefaultLastTimeUpdateReserve     = uint64(0)
 	DefaultGrowStakingReserveAddress = "qube13zq340zzjgua9h98pltzwv0ga5r0kkn0ryjz4v"
 	DefaultUSQReserveAddress         = "qube1nx9scnpdnp5wsw88at9e35fng56788h7yz9srs"
 	DefaultGrowYieldReserveAddress   = "qube1zzplgm7kqwe3vwqynzkvewrrhuffwhd7a77j7j"
 	DefaultStatus                    = false
+	DefaultInt                       = uint64(0)
 )
 
 var (
@@ -25,6 +26,12 @@ var (
 	KeyDepositMethodStatus       = []byte("DepositMethodStatus")
 	KeyCollateralMethodStatus    = []byte("CollateralMethodStatus")
 	KeyBorrowMethodStatus        = []byte("BorrowMethodStatus")
+	KeyUStaticVolatile           = []byte("UStaticVolatile")
+	KeyUStaticStable             = []byte("UStaticStable")
+	KeyMaxRateVolatile           = []byte("MaxRateVolatile")
+	KeyMaxRateStable             = []byte("MaxRateStable")
+	KeySlope1                    = []byte("Slope1")
+	KeySlope2                    = []byte("Slope2")
 )
 
 // ParamKeyTable the param key table for launch module
@@ -42,6 +49,12 @@ func DefaultParams() Params {
 		DepositMethodStatus:       DefaultStatus,
 		CollateralMethodStatus:    DefaultStatus,
 		BorrowMethodStatus:        DefaultStatus,
+		UStaticVolatile:           DefaultInt,
+		UStaticStable:             DefaultInt,
+		MaxRateVolatile:           DefaultInt,
+		MaxRateStable:             DefaultInt,
+		Slope_1:                   DefaultInt,
+		Slope_2:                   DefaultInt,
 	}
 }
 
@@ -55,6 +68,12 @@ func (p *Params) ParamSetPairs() paramtypes.ParamSetPairs {
 		paramtypes.NewParamSetPair(KeyDepositMethodStatus, &p.DepositMethodStatus, validate),
 		paramtypes.NewParamSetPair(KeyCollateralMethodStatus, &p.CollateralMethodStatus, validate),
 		paramtypes.NewParamSetPair(KeyBorrowMethodStatus, &p.BorrowMethodStatus, validate),
+		paramtypes.NewParamSetPair(KeyUStaticVolatile, &p.UStaticVolatile, validate),
+		paramtypes.NewParamSetPair(KeyUStaticStable, &p.UStaticStable, validate),
+		paramtypes.NewParamSetPair(KeyMaxRateVolatile, &p.MaxRateVolatile, validate),
+		paramtypes.NewParamSetPair(KeyMaxRateStable, &p.MaxRateStable, validate),
+		paramtypes.NewParamSetPair(KeySlope1, &p.Slope_1, validate),
+		paramtypes.NewParamSetPair(KeySlope2, &p.Slope_2, validate),
 	}
 }
 

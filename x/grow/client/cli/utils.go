@@ -10,7 +10,7 @@ import (
 )
 
 // ParseRegisterCoinProposal reads and parses a ParseRegisterCoinProposal from a file.
-func ParseMetadataForLendAssetProposal(cdc codec.JSONCodec, metadataFile string) (banktypes.Metadata, string, error) {
+func ParseMetadataForAssetProposal(cdc codec.JSONCodec, metadataFile string) (banktypes.Metadata, string, error) {
 	proposalMetadata := types.ProposalMetadataForRegisterLendAssetProposal{}
 
 	contents, err := os.ReadFile(filepath.Clean(metadataFile))

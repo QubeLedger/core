@@ -49,6 +49,57 @@ type NormalTestConfig struct {
 	lendTokenDenom   string
 }
 
+type Lend_type struct {
+	amount      int64
+	denom       string
+	OracleDenom string
+}
+
+type Lend_type_with_address struct {
+	amount      int64
+	Address     sdk.AccAddress
+	denom       string
+	OracleDenom string
+}
+
+type Borrow_type struct {
+	amount      int64
+	denom       string
+	OracleDenom string
+}
+
+type Borrow_type_with_address struct {
+	amount      int64
+	Address     sdk.AccAddress
+	denom       string
+	OracleDenom string
+}
+
+type Withdrawal_Borrow_type struct {
+	amount      int64
+	denom       string
+	OracleDenom string
+}
+
+type Withdrawal_type struct {
+	amount      int64
+	denom       string
+	OracleDenom string
+}
+
+type Asset_type struct {
+	Asset types.Asset
+	Price string
+}
+
+type Liquidation_msg_data struct {
+	address    sdk.AccAddress
+	asset      string
+	sendDenom  string
+	sendAmount int64
+	premium    string
+}
+
 var s *GrowKeeperTestSuite
 
 func (s *GrowKeeperTestSuite) Setup() {
@@ -68,6 +119,12 @@ func (s *GrowKeeperTestSuite) Setup() {
 
 	s.app.StableKeeper.SetBurningFundAddress(s.ctx, apptesting.CreateRandomAccounts(1)[0])
 	s.app.StableKeeper.SetReserveFundAddress(s.ctx, apptesting.CreateRandomAccounts(1)[0])
+
+	params := s.app.OracleKeeper.GetParams(s.ctx)
+	params.VotePeriod = 1
+	params.SlashWindow = 100
+	params.RewardDistributionWindow = 100
+	s.app.OracleKeeper.SetParams(s.ctx, params)
 }
 
 func TestGrowKeeperTestSuite(t *testing.T) {
@@ -158,29 +215,76 @@ func (s *GrowKeeperTestSuite) GetNormalGTokenPair(id uint64) types.GTokenPair {
 	return pair
 }
 
-func (s *GrowKeeperTestSuite) GetNormalLendAsset(id uint64) types.LendAsset {
-	ba := types.LendAsset{
-		Id:          id,
-		LendAssetId: fmt.Sprintf("%x", crypto.Sha256(append([]byte("uosmo")))),
+func (s *GrowKeeperTestSuite) GetNormalAsset(id uint64) types.Asset {
+	ba := types.Asset{
+		Id:      id,
+		AssetId: fmt.Sprintf("%x", crypto.Sha256(append([]byte("uwbtc")))),
 		AssetMetadata: banktypes.Metadata{
 			Description: "",
 			DenomUnits: []*banktypes.DenomUnit{
-				{Denom: "uosmo", Exponent: uint32(0), Aliases: []string{"microosmo"}},
+				{Denom: "uwbtc", Exponent: uint32(0), Aliases: []string{"microwbtc"}},
+			},
+			Base:    "uwbtc",
+			Display: "WBTC",
+			Name:    "WBTC",
+			Symbol:  "WBTC",
+		},
+		OracleAssetId:           "WBTC",
+		ProvideValue:            0,
+		CollectivelyBorrowValue: 0,
+		Type:                    "volatile",
+	}
+	return ba
+}
+
+func (s *GrowKeeperTestSuite) GetSecondStableNormalAsset(id uint64) types.Asset {
+	ba := types.Asset{
+		Id:      id,
+		AssetId: fmt.Sprintf("%x", crypto.Sha256(append([]byte("uusdc")))),
+		AssetMetadata: banktypes.Metadata{
+			Description: "",
+			DenomUnits: []*banktypes.DenomUnit{
+				{Denom: "uusdc", Exponent: uint32(0), Aliases: []string{"microuusdc"}},
+			},
+			Base:    "uusdc",
+			Display: "USDC",
+			Name:    "USDC",
+			Symbol:  "USDC",
+		},
+		OracleAssetId:           "USDC",
+		ProvideValue:            0,
+		CollectivelyBorrowValue: 0,
+		Type:                    "stable",
+	}
+	return ba
+}
+
+func (s *GrowKeeperTestSuite) GetThirdVolatileNormalAsset(id uint64) types.Asset {
+	ba := types.Asset{
+		Id:      id,
+		AssetId: fmt.Sprintf("%x", crypto.Sha256(append([]byte("uosmo")))),
+		AssetMetadata: banktypes.Metadata{
+			Description: "",
+			DenomUnits: []*banktypes.DenomUnit{
+				{Denom: "uosmo", Exponent: uint32(0), Aliases: []string{"microuosmo"}},
 			},
 			Base:    "uosmo",
 			Display: "OSMO",
 			Name:    "OSMO",
 			Symbol:  "OSMO",
 		},
-		OracleAssetId: "OSMO",
+		OracleAssetId:           "OSMO",
+		ProvideValue:            0,
+		CollectivelyBorrowValue: 0,
+		Type:                    "volatile",
 	}
 	return ba
 }
 
-func (s *GrowKeeperTestSuite) GetWrongLendAsset(id uint64) types.LendAsset {
-	ba := types.LendAsset{
-		Id:          id,
-		LendAssetId: fmt.Sprintf("%x", crypto.Sha256(append([]byte("uosmo")))),
+func (s *GrowKeeperTestSuite) GetWrongAsset(id uint64) types.Asset {
+	ba := types.Asset{
+		Id:      id,
+		AssetId: fmt.Sprintf("%x", crypto.Sha256(append([]byte("uosmo")))),
 		AssetMetadata: banktypes.Metadata{
 			Description: "",
 			DenomUnits: []*banktypes.DenomUnit{
@@ -210,27 +314,28 @@ func (s *GrowKeeperTestSuite) GetNormalConfig() NormalTestConfig {
 func (s *GrowKeeperTestSuite) GetNormalPosition() types.Position {
 	return types.Position{
 		Creator:             s.Address.String(),
-		DepositId:           s.app.GrowKeeper.CalculateDepositId(s.Address.String(), "btc"),
-		Collateral:          s.app.GrowKeeper.FastCoins("btc", sdk.NewInt(1)).String(),
-		OracleTicker:        "BTC",
+		DepositId:           s.app.GrowKeeper.CalculateDepositId(s.Address.String()),
+		LendAmountInUSD:     0,
 		BorrowedAmountInUSD: 0,
-		LoanIds:             []string{},
+		LendId:              []string{},
+		LoanId:              []string{},
 	}
 }
 
 func (s *GrowKeeperTestSuite) GetNormalLiqPosition() types.LiquidatorPosition {
 	return types.LiquidatorPosition{
 		Liquidator:           s.Address.String(),
-		LiquidatorPositionId: s.app.GrowKeeper.GenerateLiquidatorPositionId(s.Address.String(), "btc", s.app.GrowKeeper.FastCoins("btc", sdk.NewInt(1)).String(), "5"),
+		LiquidatorPositionId: s.app.GrowKeeper.GenerateLiquidatorPositionId(s.Address.String(), "btc", "BTC", s.app.GrowKeeper.FastCoins("btc", sdk.NewInt(1)).String(), "5"),
 		Amount:               s.app.GrowKeeper.FastCoins("btc", sdk.NewInt(1)).String(),
-		BorrowAssetId:        "BTC",
+		WantAssetId:          "",
+		ProvidedAssetId:      "BTC",
 		Premium:              5,
 	}
 }
 
 func (s *GrowKeeperTestSuite) GetNormalLoan() types.Loan {
 	return types.Loan{
-		LoanId:       s.app.GrowKeeper.GenerateLoadIdHash("uusd", "btc", s.app.GrowKeeper.FastCoins("btc", sdk.NewInt(1)).String(), s.Address.String(), "test"),
+		LoanId:       s.app.GrowKeeper.GenerateLoanIdHash("uwbtc", s.Address.String()),
 		Borrower:     s.Address.String(),
 		AmountOut:    s.app.GrowKeeper.FastCoins("btc", sdk.NewInt(1)).String(),
 		StartTime:    uint64(s.ctx.BlockTime().Unix()),
@@ -334,20 +439,13 @@ func (s *GrowKeeperTestSuite) OracleAggregateExchangeRateFromNet() {
 	s.Require().NoError(err)
 }
 
-func (s *GrowKeeperTestSuite) OracleAggregateExchangeRateFromInput(price string, denom string) {
-	err := s.PrevoteVotePrice(price + denom)
+func (s *GrowKeeperTestSuite) OracleAggregateExchangeRateFromInput(denom string) {
+	err := s.PrevoteVotePrice(denom)
 	s.Require().NoError(err)
 }
 
 func (s *GrowKeeperTestSuite) SetupOracleKeeper(denom string) {
 	params := s.app.OracleKeeper.GetParams(s.ctx)
-	params.Whitelist = oracletypes.DenomList{
-		{
-			Name: denom,
-		},
-	}
-	params.VotePeriod = 1
-	params.SlashWindow = 100
-	params.RewardDistributionWindow = 100
+	params.Whitelist = append(params.Whitelist, oracletypes.Denom{Name: denom})
 	s.app.OracleKeeper.SetParams(s.ctx, params)
 }

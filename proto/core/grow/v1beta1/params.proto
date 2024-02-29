@@ -15,4 +15,10 @@ message Params {
   bool DepositMethodStatus = 5;
   bool CollateralMethodStatus = 6;
   bool BorrowMethodStatus = 7;
+  uint64 u_static_volatile = 8;
+  uint64 u_static_stable = 9;
+  uint64 max_rate_volatile = 10;
+  uint64 max_rate_stable = 11;
+  uint64 slope_1 = 12;
+  uint64 slope_2 = 13;
 }

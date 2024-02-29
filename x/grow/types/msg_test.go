@@ -9,21 +9,21 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestMsgCreateLend_ValidateBasic(t *testing.T) {
+func TestMsgCreateBorrow_ValidateBasic(t *testing.T) {
 	tests := []struct {
 		name string
-		msg  types.MsgCreateLend
+		msg  types.MsgCreateBorrow
 		err  error
 	}{
 		{
 			name: "invalid address",
-			msg: types.MsgCreateLend{
+			msg: types.MsgCreateBorrow{
 				Borrower: "invalid_address",
 			},
 			err: sdkerrors.ErrInvalidAddress,
 		}, {
 			name: "valid address",
-			msg: types.MsgCreateLend{
+			msg: types.MsgCreateBorrow{
 				Borrower: apptesting.CreateRandomAccounts(1)[0].String(),
 			},
 		},
@@ -40,21 +40,21 @@ func TestMsgCreateLend_ValidateBasic(t *testing.T) {
 	}
 }
 
-func TestMsgDeleteLend_ValidateBasic(t *testing.T) {
+func TestMsgDeleteBorrow_ValidateBasic(t *testing.T) {
 	tests := []struct {
 		name string
-		msg  types.MsgDeleteLend
+		msg  types.MsgDeleteBorrow
 		err  error
 	}{
 		{
 			name: "invalid address",
-			msg: types.MsgDeleteLend{
+			msg: types.MsgDeleteBorrow{
 				Borrower: "invalid_address",
 			},
 			err: sdkerrors.ErrInvalidAddress,
 		}, {
 			name: "valid address",
-			msg: types.MsgDeleteLend{
+			msg: types.MsgDeleteBorrow{
 				Borrower: apptesting.CreateRandomAccounts(1)[0].String(),
 			},
 		},
@@ -133,22 +133,22 @@ func TestMsgWithdrawal_ValidateBasic(t *testing.T) {
 	}
 }
 
-func TestMsgDepositCollateral_ValidateBasic(t *testing.T) {
+func TestMsgCreateLend_ValidateBasic(t *testing.T) {
 	tests := []struct {
 		name string
-		msg  types.MsgDepositCollateral
+		msg  types.MsgCreateLend
 		err  error
 	}{
 		{
 			name: "invalid address",
-			msg: types.MsgDepositCollateral{
+			msg: types.MsgCreateLend{
 				Depositor: "invalid_address",
 				AmountIn:  "100uosmo",
 			},
 			err: sdkerrors.ErrInvalidAddress,
 		}, {
 			name: "valid",
-			msg: types.MsgDepositCollateral{
+			msg: types.MsgCreateLend{
 				Depositor: apptesting.CreateRandomAccounts(1)[0].String(),
 				AmountIn:  "100uosmo",
 			},
@@ -166,24 +166,24 @@ func TestMsgDepositCollateral_ValidateBasic(t *testing.T) {
 	}
 }
 
-func TestMsgWithdrawalCollateral_ValidateBasic(t *testing.T) {
+func TestMsgWithdrawalLend_ValidateBasic(t *testing.T) {
 	tests := []struct {
 		name string
-		msg  types.MsgWithdrawalCollateral
+		msg  types.MsgWithdrawalLend
 		err  error
 	}{
 		{
 			name: "invalid address",
-			msg: types.MsgWithdrawalCollateral{
+			msg: types.MsgWithdrawalLend{
 				Depositor: "invalid_address",
-				Denom:     "uosmo",
+				DenomOut:  "uosmo",
 			},
 			err: sdkerrors.ErrInvalidAddress,
 		}, {
 			name: "valid",
-			msg: types.MsgWithdrawalCollateral{
+			msg: types.MsgWithdrawalLend{
 				Depositor: apptesting.CreateRandomAccounts(1)[0].String(),
-				Denom:     "uosmo",
+				DenomOut:  "uosmo",
 			},
 		},
 	}
