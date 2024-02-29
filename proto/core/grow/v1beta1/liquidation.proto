@@ -8,9 +8,10 @@ option go_package = "github.com/QuadrateOrg/core/x/grow/types";
 message LiquidatorPosition {
         uint64 id = 1;
         string liquidatorPositionId = 2;
-        string borrowAssetId = 3;
-        string liquidator = 4;
-        string amount = 5;
-        uint64 premium = 6;
+        string wantAssetId = 3;
+        string providedAssetId = 4;
+        string liquidator = 5;
+        string amount = 6;
+        uint64 premium = 7;
 }
 

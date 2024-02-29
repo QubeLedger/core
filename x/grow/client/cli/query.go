@@ -29,14 +29,14 @@ func GetQueryCmd(queryRoute string) *cobra.Command {
 	}
 
 	cmd.AddCommand(CmdQueryParams())
-	cmd.AddCommand(CmdQueryLendAssetByLendAssetId())
+	cmd.AddCommand(CmdQueryAssetByAssetId())
 	cmd.AddCommand(CmdQueryPositionById())
 	cmd.AddCommand(CmdQueryPositionByCreator())
 	cmd.AddCommand(CmdQueryAllPosition())
 	cmd.AddCommand(CmdQueryAllLiquidatorPosition())
 	cmd.AddCommand(CmdQueryLiquidatorPositionByCreator())
 	cmd.AddCommand(CmdQueryLiquidatorPositionById())
-	cmd.AddCommand(CmdQueryAllFundAddress())
+	cmd.AddCommand(CmdQueryGetAllAsset())
 	cmd.AddCommand(CmdQueryLoanById())
 	cmd.AddCommand(CmdQueryYieldPercentage())
 
@@ -67,17 +67,41 @@ func CmdQueryParams() *cobra.Command {
 	return cmd
 }
 
-func CmdQueryLendAssetByLendAssetId() *cobra.Command {
+func CmdQueryAssetByAssetId() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "lendAsset-by-lendAssetId [id]",
-		Short: "Get lend asset by ID",
+		Use:   "asset-by-assetId [id]",
+		Short: "Get asset by ID",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
 
 			queryClient := types.NewQueryClient(clientCtx)
 
-			res, err := queryClient.LendAssetByLendAssetId(context.Background(), &types.QueryLendAssetByLendAssetIdRequest{Id: args[0]})
+			res, err := queryClient.AssetByAssetId(context.Background(), &types.QueryAssetByAssetIdRequest{Id: args[0]})
+			if err != nil {
+				return err
+			}
+
+			return clientCtx.PrintProto(res)
+		},
+	}
+
+	flags.AddQueryFlagsToCmd(cmd)
+
+	return cmd
+}
+
+func CmdQueryGetAllAsset() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "all-assets",
+		Short: "Get all assets",
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx := client.GetClientContextFromCmd(cmd)
+
+			queryClient := types.NewQueryClient(clientCtx)
+
+			res, err := queryClient.GetAllAssets(context.Background(), &types.QueryGetAllAssetsRequest{})
 			if err != nil {
 				return err
 			}
@@ -222,30 +246,6 @@ func CmdQueryLiquidatorPositionById() *cobra.Command {
 			queryClient := types.NewQueryClient(clientCtx)
 
 			res, err := queryClient.LiquidatorPositionById(context.Background(), &types.QueryLiquidatorPositionByIdRequest{Id: args[0]})
-			if err != nil {
-				return err
-			}
-
-			return clientCtx.PrintProto(res)
-		},
-	}
-
-	flags.AddQueryFlagsToCmd(cmd)
-
-	return cmd
-}
-
-func CmdQueryAllFundAddress() *cobra.Command {
-	cmd := &cobra.Command{
-		Use:   "fund-address",
-		Short: "Get all fund address",
-		Args:  cobra.NoArgs,
-		RunE: func(cmd *cobra.Command, args []string) error {
-			clientCtx := client.GetClientContextFromCmd(cmd)
-
-			queryClient := types.NewQueryClient(clientCtx)
-
-			res, err := queryClient.AllFundAddress(context.Background(), &types.QueryAllFundAddressRequest{})
 			if err != nil {
 				return err
 			}

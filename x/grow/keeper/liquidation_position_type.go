@@ -3,6 +3,7 @@ package keeper
 import (
 	"encoding/binary"
 	"fmt"
+	"sort"
 
 	"github.com/QuadrateOrg/core/x/grow/types"
 	"github.com/cosmos/cosmos-sdk/store/prefix"
@@ -78,8 +79,8 @@ func GetLiquidatorPositionIDFromBytes(bz []byte) uint64 {
 }
 
 //nolint:all
-func (k Keeper) GenerateLiquidatorPositionId(address string, denom string, amount string, premium string) string {
-	return fmt.Sprintf("%x", crypto.Sha256(append([]byte(address+denom+amount+premium))))
+func (k Keeper) GenerateLiquidatorPositionId(address string, denom1 string, asset1 string, amount string, premium string) string {
+	return fmt.Sprintf("%x", crypto.Sha256(append([]byte(address+denom1+asset1+amount+premium))))
 }
 
 func (k Keeper) GetLiquidatorPositionByLiquidatorPositionId(ctx sdk.Context, LiquidatorPositionId string) (val types.LiquidatorPosition, found bool) {
@@ -105,9 +106,29 @@ func (k Keeper) GetLiquidatorPositionByID(ctx sdk.Context, id uint64) (val types
 func (k Keeper) CheckIfLiquidatorPositionAlredyCreate(ctx sdk.Context, depositor string, denom string) error {
 	allLiquidatorPosition := k.GetAllLiquidatorPosition(ctx)
 	for _, v := range allLiquidatorPosition {
-		if v.Liquidator == depositor && v.LiquidatorPositionId == k.CalculateDepositId(depositor, denom) {
+		if v.Liquidator == depositor && v.LiquidatorPositionId == k.CalculateDepositId(depositor) {
 			return types.ErrUserAlredyDepositCollateral
 		}
 	}
 	return nil
+}
+
+/* #nosec */
+func (k Keeper) GetLiquidatorPositionsByAssetAndDenom(ctx sdk.Context, wantAssetId string, provideAssetId string) []types.LiquidatorPosition {
+	allLiquidatorPosition := k.GetAllLiquidatorPosition(ctx)
+	res := []types.LiquidatorPosition{}
+	for _, v := range allLiquidatorPosition {
+		if v.WantAssetId == wantAssetId && v.ProvidedAssetId == provideAssetId {
+			res = append(res, v)
+		}
+	}
+	return res
+}
+
+/* #nosec */
+func (k Keeper) SortLiquidatorPositionsByPremium(ctx sdk.Context, lps []types.LiquidatorPosition) []types.LiquidatorPosition {
+	sort.SliceStable(lps, func(i, j int) bool {
+		return int64(lps[i].Premium) < int64(lps[j].Premium)
+	})
+	return lps
 }

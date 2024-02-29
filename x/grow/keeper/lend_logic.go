@@ -6,81 +6,8 @@ import (
 )
 
 /* #nosec */
-func (k Keeper) ExecuteLend(ctx sdk.Context, msg *types.MsgCreateLend, LendAsset types.LendAsset) (error, sdk.Coin, string) {
-
-	borrower, err := sdk.AccAddressFromBech32(msg.Borrower)
-	if err != nil {
-		return err, sdk.Coin{}, ""
-	}
-
-	if k.AddressEmptyCheck(ctx) {
-		return types.ErrReserveAddressEmpty, sdk.Coin{}, ""
-	}
-
-	if err := k.CheckIfPositionAlredyCreate(ctx, borrower.String(), msg.DenomIn); err == nil {
-		return err, sdk.Coin{}, ""
-	}
-
-	position, found := k.GetPositionByPositionId(ctx, k.CalculateDepositId(borrower.String(), msg.DenomIn))
-	if !found {
-		return types.ErrPositionNotFound, sdk.Coin{}, ""
-	}
-
-	amountPositionCoins, err := sdk.ParseCoinsNormalized(position.Collateral)
-	if err != nil {
-		return err, sdk.Coin{}, ""
-	}
-	amountPositionInt := amountPositionCoins.AmountOf(msg.DenomIn)
-
-	desiredAmountInt, b := sdk.NewIntFromString(msg.DesiredAmount)
-	if !b {
-		return types.ErrSdkIntError, sdk.Coin{}, ""
-	}
-	desiredAmountCoin := sdk.NewCoin(types.DefaultDenom, desiredAmountInt)
-
-	desiredAmountCoins := sdk.NewCoins(desiredAmountCoin)
-
-	price, err := k.GetPriceByDenom(ctx, position.OracleTicker)
-	if err != nil {
-		return err, sdk.Coin{}, ""
-	}
-
-	err = k.CheckRiskRate(amountPositionInt, price, sdk.NewIntFromUint64(position.BorrowedAmountInUSD), desiredAmountInt)
-	if err != nil {
-		return err, sdk.Coin{}, ""
-	}
-
-	err = k.bankKeeper.SendCoinsFromAccountToModule(ctx, k.GetGrowStakingReserveAddress(ctx), types.ModuleName, desiredAmountCoins)
-	if err != nil {
-		return err, sdk.Coin{}, ""
-	}
-
-	err = k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, borrower, desiredAmountCoins)
-	if err != nil {
-		return err, sdk.Coin{}, ""
-	}
-
-	loanId := k.GenerateLoadIdHash(msg.DenomIn, types.DefaultDenom, desiredAmountCoins.String(), borrower.String(), ctx.BlockTime().Format(""))
-
-	loan := types.Loan{
-		LoanId:       k.GenerateLoadIdHash(msg.DenomIn, types.DefaultDenom, desiredAmountCoins.String(), borrower.String(), ctx.BlockTime().Format("")),
-		Borrower:     borrower.String(),
-		AmountOut:    desiredAmountCoins.String(),
-		StartTime:    uint64(ctx.BlockTime().Unix()),
-		OracleTicker: position.OracleTicker,
-	}
-
-	k.AppendLoan(ctx, loan)
-	position = k.PushLoanToPosition(ctx, loanId, position)
-	position = k.IncreaseBorrowedAmountInUSDInPosition(ctx, position, desiredAmountInt)
-	k.SetPosition(ctx, position)
-
-	return nil, desiredAmountCoin, loanId
-}
-
-/* #nosec */
-func (k Keeper) ExecuteDeleteLend(ctx sdk.Context, msg *types.MsgDeleteLend, LendAsset types.LendAsset) (error, string) {
-	amountInCoins, err := sdk.ParseCoinsNormalized(msg.AmountIn)
+func (k Keeper) ExecuteCreateLend(ctx sdk.Context, msg *types.MsgCreateLend, Asset types.Asset) (error, string) {
+	AmountInCoins, err := sdk.ParseCoinsNormalized(msg.AmountIn)
 	if err != nil {
 		return err, ""
 	}
@@ -89,92 +16,142 @@ func (k Keeper) ExecuteDeleteLend(ctx sdk.Context, msg *types.MsgDeleteLend, Len
 		return types.ErrReserveAddressEmpty, ""
 	}
 
-	borrower, err := sdk.AccAddressFromBech32(msg.Borrower)
+	depositor, err := sdk.AccAddressFromBech32(msg.Depositor)
 	if err != nil {
 		return err, ""
 	}
 
-	if err := CheckCoinsLen(amountInCoins, 1); err != nil {
+	if err := CheckCoinsLen(AmountInCoins, 1); err != nil {
 		return err, ""
 	}
 
-	if amountInCoins.GetDenomByIndex(0) != types.DefaultDenom {
-		return types.ErrNeedSendUSQ, ""
+	DenomIn := AmountInCoins.GetDenomByIndex(0)
+
+	PositionId := k.CalculateDepositId(depositor.String())
+
+	if _, found := k.GetPositionByPositionId(ctx, PositionId); !found {
+		position := types.Position{
+			Creator:             depositor.String(),
+			DepositId:           k.CalculateDepositId(depositor.String()),
+			LendId:              []string{},
+			LendAmountInUSD:     0,
+			BorrowedAmountInUSD: 0,
+			LoanId:              []string{},
+		}
+
+		k.AppendPosition(ctx, position)
 	}
 
-	amountInInt := amountInCoins.AmountOf(types.DefaultDenom)
+	price, err := k.GetPriceByDenom(ctx, Asset.OracleAssetId)
+	if err != nil {
+		return err, ""
+	}
 
-	loan, found := k.GetLoadByLoadId(ctx, msg.LoanId)
+	position, _ := k.GetPositionByPositionId(ctx, PositionId)
+	found := k.CheckLendIdInPosition(ctx, k.CalculateLendId(depositor.String(), DenomIn, PositionId), position)
 	if !found {
-		return types.ErrLoanNotFound, ""
+		lend := types.Lend{
+			LendId:         k.CalculateLendId(depositor.String(), DenomIn, PositionId),
+			Borrower:       depositor.String(),
+			AmountIn:       msg.AmountIn,
+			AmountInAmount: sdk.NewDecFromInt(AmountInCoins.AmountOf(DenomIn)),
+			AmountInDenom:  DenomIn,
+			StartTime:      uint64(ctx.BlockTime().Unix()),
+			OracleTicker:   Asset.OracleAssetId,
+		}
+		k.AppendLend(ctx, lend)
+		position = k.PushLendToPosition(ctx, lend.LendId, position)
+	} else {
+		old_lend, _ := k.GetLendByLendId(ctx, k.CalculateLendId(depositor.String(), DenomIn, PositionId))
+		lend := types.Lend{
+			LendId:         k.CalculateLendId(depositor.String(), DenomIn, PositionId),
+			Borrower:       depositor.String(),
+			AmountIn:       msg.AmountIn,
+			AmountInAmount: old_lend.AmountInAmount.Add(sdk.NewDecFromInt(AmountInCoins.AmountOf(DenomIn))),
+			AmountInDenom:  DenomIn,
+			StartTime:      uint64(ctx.BlockTime().Unix()),
+			OracleTicker:   Asset.OracleAssetId,
+		}
+		k.SetLend(ctx, lend)
 	}
 
-	position, found := k.GetPositionByPositionId(ctx, k.CalculateDepositId(borrower.String(), msg.DenomOut))
-	if !found {
-		return types.ErrPositionNotFound, ""
-	}
-
-	found = k.CheckLoanIdInPosition(ctx, loan.LoanId, position)
-	if !found {
-		return types.ErrLoanNotFoundInPosition, ""
-	}
-
-	price, err := k.GetPriceByDenom(ctx, position.OracleTicker)
+	err = k.bankKeeper.SendCoinsFromAccountToModule(ctx, depositor, types.ModuleName, AmountInCoins)
 	if err != nil {
 		return err, ""
 	}
 
-	borrowAmountCoins, err := sdk.ParseCoinsNormalized(loan.AmountOut)
-	if err != nil {
-		return err, ""
-	}
-
-	borrowTime := sdk.NewInt(ctx.BlockTime().Unix() - int64(loan.StartTime))
-	if borrowTime.IsNil() || borrowTime.IsZero() {
-		return types.ErrIntNegativeOrZero, ""
-	}
-
-	borrowAmountInt := borrowAmountCoins.AmountOf(types.DefaultDenom)
-
-	rightAmount := k.CalculateNeedAmountToGet(borrowAmountInt, borrowTime)
-	if rightAmount.IsNil() || rightAmount.IsZero() {
-		return types.ErrIntNegativeOrZero, ""
-	}
-
-	if !amountInInt.GTE(rightAmount) {
-		return types.ErrNotEnoughAmountIn, ""
-	}
-
-	rightAmountInCollateral := k.CalculateAmountForRemoveFromCollateral(rightAmount.Sub(borrowAmountInt), price)
-	if rightAmountInCollateral.IsNil() || rightAmountInCollateral.IsZero() {
-		return types.ErrIntNegativeOrZero, ""
-	}
-
-	err = k.bankKeeper.SendCoinsFromAccountToModule(ctx, borrower, types.ModuleName, borrowAmountCoins)
-	if err != nil {
-		return err, ""
-	}
-
-	amtToReserves := (rightAmount.Sub(borrowAmountInt)).QuoRaw(2)
-	if amtToReserves.IsNil() || amtToReserves.IsZero() {
-		return types.ErrIntNegativeOrZero, ""
-	}
-
-	err = k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, k.GetUSQReserveAddress(ctx), k.FastCoins(types.DefaultDenom, amtToReserves))
-	if err != nil {
-		return err, ""
-	}
-
-	err = k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, k.stableKeeper.GetBurningFundAddress(ctx), k.FastCoins(types.DefaultDenom, amtToReserves))
-	if err != nil {
-		return err, ""
-	}
-
-	k.RemoveLoan(ctx, loan.Id)
-	position = k.RemoveLoanInPosition(ctx, loan.LoanId, position)
-	position = k.ReduceBorrowedAmountInUSDInPosition(ctx, position, borrowAmountInt)
-	position = k.ReduceCollateralInPosition(ctx, position, rightAmountInCollateral)
+	position.LendAmountInUSD += k.CalculateAmountByPriceAndAmountIn(AmountInCoins.AmountOf(DenomIn), price).Uint64()
 	k.SetPosition(ctx, position)
 
-	return nil, loan.LoanId
+	Asset.ProvideValue += (AmountInCoins.AmountOf(DenomIn)).Uint64()
+	k.SetAsset(ctx, Asset)
+
+	return nil, position.DepositId
+}
+
+/* #nosec */
+func (k Keeper) ExecuteWithdrawalLend(ctx sdk.Context, msg *types.MsgWithdrawalLend, Asset types.Asset) (error, sdk.Coin) {
+	depositor, err := sdk.AccAddressFromBech32(msg.Depositor)
+	if err != nil {
+		return err, sdk.Coin{}
+	}
+
+	if k.AddressEmptyCheck(ctx) {
+		return types.ErrReserveAddressEmpty, sdk.Coin{}
+	}
+
+	amountInCoins, err := sdk.ParseCoinsNormalized(msg.AmountIn)
+	if err != nil {
+		return err, sdk.Coin{}
+	}
+
+	price, err := k.GetPriceByDenom(ctx, Asset.OracleAssetId)
+	if err != nil {
+		return err, sdk.Coin{}
+	}
+
+	DenomIn := amountInCoins.GetDenomByIndex(0)
+	amountInInt := amountInCoins.AmountOf(DenomIn)
+
+	position, found := k.GetPositionByPositionId(ctx, k.CalculateDepositId(depositor.String()))
+	if !found {
+		return types.ErrPositionNotFound, sdk.Coin{}
+	}
+
+	lend, found := k.GetLendByLendId(ctx, k.CalculateLendId(depositor.String(), DenomIn, position.DepositId))
+	if !found {
+		return types.ErrLendNotFound, sdk.Coin{}
+	}
+
+	if amountInInt.GTE(lend.AmountInAmount.RoundInt()) {
+		if position.BorrowedAmountInUSD != 0 {
+			return types.ErrRiskRatioMustBeZero, sdk.Coin{}
+		}
+		k.RemoveLend(ctx, lend.Id)
+		position = k.RemoveLendInPosition(ctx, lend.LendId, position)
+	} else {
+		new_lend := types.Lend{
+			LendId:         lend.LendId,
+			Borrower:       depositor.String(),
+			AmountIn:       lend.AmountIn,
+			AmountInAmount: lend.AmountInAmount.Sub(sdk.NewDecFromInt(amountInCoins.AmountOf(DenomIn))),
+			AmountInDenom:  DenomIn,
+			StartTime:      uint64(ctx.BlockTime().Unix()),
+			OracleTicker:   Asset.OracleAssetId,
+		}
+		k.SetLend(ctx, new_lend)
+	}
+
+	err = k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, depositor, amountInCoins)
+	if err != nil {
+		return err, sdk.Coin{}
+	}
+
+	position.LendAmountInUSD -= k.CalculateAmountByPriceAndAmountIn(amountInCoins.AmountOf(DenomIn), price).Uint64()
+	k.SetPosition(ctx, position)
+
+	Asset.ProvideValue -= (amountInCoins.AmountOf(DenomIn)).Uint64()
+	k.SetAsset(ctx, Asset)
+
+	return nil, sdk.NewCoin(DenomIn, amountInCoins.AmountOf(DenomIn))
 }

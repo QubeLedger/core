@@ -5,44 +5,44 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
-const TypeMsgCreateLend = "create_lend"
-const TypeMsgDeleteLend = "delete_lend"
+const TypeMsgCreateBorrow = "create_borrow"
+const TypeMsgDeleteBorrow = "delete_borrow"
 const TypeMsgGrowDeposit = "grow_deposit"
 const TypeMsgGrowWithdrawal = "grow_withdrawal"
-const TypeMsgDepositCollateral = "deposit_collateral"
-const TypeMsgWithdrawalCollateral = "withdrawal_collateral"
+const TypeMsgCreateLend = "create_lend"
+const TypeMsgWithdrawalLend = "withdrawal_lend"
 const TypeMsgOpenLiquidationPosition = "create_liquidation_position"
 const TypeMsgCloseLiquidationPosition = "close_liquidation_position"
 
 var _ sdk.Msg = &MsgCreateLend{}
-var _ sdk.Msg = &MsgDeleteLend{}
+var _ sdk.Msg = &MsgWithdrawalLend{}
 var _ sdk.Msg = &MsgGrowDeposit{}
 var _ sdk.Msg = &MsgGrowWithdrawal{}
 var _ sdk.Msg = &MsgOpenLiquidationPosition{}
 var _ sdk.Msg = &MsgCloseLiquidationPosition{}
-var _ sdk.Msg = &MsgDepositCollateral{}
-var _ sdk.Msg = &MsgWithdrawalCollateral{}
+var _ sdk.Msg = &MsgCreateBorrow{}
+var _ sdk.Msg = &MsgDeleteBorrow{}
 
 /*
-create_lend
+create_borrow
 */
-func NewMsgCreateLend(creator string, denomIn string, desiredAmount string) *MsgCreateLend {
-	return &MsgCreateLend{
+func NewMsgCreateBorrow(creator string, denomIn string, desiredAmount string) *MsgCreateBorrow {
+	return &MsgCreateBorrow{
 		Borrower:      creator,
 		DenomIn:       denomIn,
 		DesiredAmount: desiredAmount,
 	}
 }
 
-func (msg *MsgCreateLend) Route() string {
+func (msg *MsgCreateBorrow) Route() string {
 	return RouterKey
 }
 
-func (msg *MsgCreateLend) Type() string {
-	return TypeMsgCreateLend
+func (msg *MsgCreateBorrow) Type() string {
+	return TypeMsgCreateBorrow
 }
 
-func (msg *MsgCreateLend) GetSigners() []sdk.AccAddress {
+func (msg *MsgCreateBorrow) GetSigners() []sdk.AccAddress {
 	creator, err := sdk.AccAddressFromBech32(msg.Borrower)
 	if err != nil {
 		panic(err)
@@ -50,12 +50,12 @@ func (msg *MsgCreateLend) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{creator}
 }
 
-func (msg *MsgCreateLend) GetSignBytes() []byte {
+func (msg *MsgCreateBorrow) GetSignBytes() []byte {
 	bz := ModuleCdc.MustMarshalJSON(msg)
 	return sdk.MustSortJSON(bz)
 }
 
-func (msg *MsgCreateLend) ValidateBasic() error {
+func (msg *MsgCreateBorrow) ValidateBasic() error {
 	_, err := sdk.AccAddressFromBech32(msg.Borrower)
 	if err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
@@ -64,27 +64,26 @@ func (msg *MsgCreateLend) ValidateBasic() error {
 }
 
 /*
-delete_lend
+delete_borrow
 */
 
-func NewMsgDeleteLend(creator string, amount string, loadId string, denomOut string) *MsgDeleteLend {
-	return &MsgDeleteLend{
+func NewMsgDeleteBorrow(creator string, denomOut string, amount string) *MsgDeleteBorrow {
+	return &MsgDeleteBorrow{
 		Borrower: creator,
-		AmountIn: amount,
-		LoanId:   loadId,
 		DenomOut: denomOut,
+		AmountIn: amount,
 	}
 }
 
-func (msg *MsgDeleteLend) Route() string {
+func (msg *MsgDeleteBorrow) Route() string {
 	return RouterKey
 }
 
-func (msg *MsgDeleteLend) Type() string {
-	return TypeMsgDeleteLend
+func (msg *MsgDeleteBorrow) Type() string {
+	return TypeMsgDeleteBorrow
 }
 
-func (msg *MsgDeleteLend) GetSigners() []sdk.AccAddress {
+func (msg *MsgDeleteBorrow) GetSigners() []sdk.AccAddress {
 	creator, err := sdk.AccAddressFromBech32(msg.Borrower)
 	if err != nil {
 		panic(err)
@@ -92,12 +91,12 @@ func (msg *MsgDeleteLend) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{creator}
 }
 
-func (msg *MsgDeleteLend) GetSignBytes() []byte {
+func (msg *MsgDeleteBorrow) GetSignBytes() []byte {
 	bz := ModuleCdc.MustMarshalJSON(msg)
 	return sdk.MustSortJSON(bz)
 }
 
-func (msg *MsgDeleteLend) ValidateBasic() error {
+func (msg *MsgDeleteBorrow) ValidateBasic() error {
 	_, err := sdk.AccAddressFromBech32(msg.Borrower)
 	if err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
@@ -189,22 +188,22 @@ func (msg *MsgGrowWithdrawal) ValidateBasic() error {
 /*
 deposit collateral
 */
-func NewMsgDepositCollateral(creator string, amountIn string) *MsgDepositCollateral {
-	return &MsgDepositCollateral{
+func NewMsgCreateLend(creator string, amountIn string) *MsgCreateLend {
+	return &MsgCreateLend{
 		Depositor: creator,
 		AmountIn:  amountIn,
 	}
 }
 
-func (msg *MsgDepositCollateral) Route() string {
+func (msg *MsgCreateLend) Route() string {
 	return RouterKey
 }
 
-func (msg *MsgDepositCollateral) Type() string {
-	return TypeMsgDepositCollateral
+func (msg *MsgCreateLend) Type() string {
+	return TypeMsgCreateLend
 }
 
-func (msg *MsgDepositCollateral) GetSigners() []sdk.AccAddress {
+func (msg *MsgCreateLend) GetSigners() []sdk.AccAddress {
 	creator, err := sdk.AccAddressFromBech32(msg.Depositor)
 	if err != nil {
 		panic(err)
@@ -212,12 +211,12 @@ func (msg *MsgDepositCollateral) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{creator}
 }
 
-func (msg *MsgDepositCollateral) GetSignBytes() []byte {
+func (msg *MsgCreateLend) GetSignBytes() []byte {
 	bz := ModuleCdc.MustMarshalJSON(msg)
 	return sdk.MustSortJSON(bz)
 }
 
-func (msg *MsgDepositCollateral) ValidateBasic() error {
+func (msg *MsgCreateLend) ValidateBasic() error {
 	_, err := sdk.AccAddressFromBech32(msg.Depositor)
 	if err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid depositor address (%s)", err)
@@ -229,22 +228,23 @@ func (msg *MsgDepositCollateral) ValidateBasic() error {
 withdrawal collateral
 */
 
-func NewMsgWithdrawalCollateral(creator string, denom string) *MsgWithdrawalCollateral {
-	return &MsgWithdrawalCollateral{
+func NewMsgWithdrawalLend(creator string, amountIn string, denom string) *MsgWithdrawalLend {
+	return &MsgWithdrawalLend{
 		Depositor: creator,
-		Denom:     denom,
+		AmountIn:  amountIn,
+		DenomOut:  denom,
 	}
 }
 
-func (msg *MsgWithdrawalCollateral) Route() string {
+func (msg *MsgWithdrawalLend) Route() string {
 	return RouterKey
 }
 
-func (msg *MsgWithdrawalCollateral) Type() string {
-	return TypeMsgWithdrawalCollateral
+func (msg *MsgWithdrawalLend) Type() string {
+	return TypeMsgWithdrawalLend
 }
 
-func (msg *MsgWithdrawalCollateral) GetSigners() []sdk.AccAddress {
+func (msg *MsgWithdrawalLend) GetSigners() []sdk.AccAddress {
 	creator, err := sdk.AccAddressFromBech32(msg.Depositor)
 	if err != nil {
 		panic(err)
@@ -252,12 +252,12 @@ func (msg *MsgWithdrawalCollateral) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{creator}
 }
 
-func (msg *MsgWithdrawalCollateral) GetSignBytes() []byte {
+func (msg *MsgWithdrawalLend) GetSignBytes() []byte {
 	bz := ModuleCdc.MustMarshalJSON(msg)
 	return sdk.MustSortJSON(bz)
 }
 
-func (msg *MsgWithdrawalCollateral) ValidateBasic() error {
+func (msg *MsgWithdrawalLend) ValidateBasic() error {
 	_, err := sdk.AccAddressFromBech32(msg.Depositor)
 	if err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid depositor address (%s)", err)

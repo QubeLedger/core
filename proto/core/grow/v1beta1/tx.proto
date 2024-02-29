@@ -9,11 +9,11 @@ service Msg {
   rpc GrowDeposit    (MsgGrowDeposit) returns (MsgGrowDepositResponse);
   rpc GrowWithdrawal (MsgGrowWithdrawal) returns (MsgGrowWithdrawalResponse);
 
-  rpc DepositCollateral (MsgDepositCollateral) returns (MsgDepositCollateralResponse);
-  rpc WithdrawalCollateral (MsgWithdrawalCollateral) returns (MsgWithdrawalCollateralResponse);
-
   rpc CreateLend (MsgCreateLend) returns (MsgCreateLendResponse);
-  rpc DeleteLend (MsgDeleteLend) returns (MsgDeleteLendResponse);
+  rpc WithdrawalLend (MsgWithdrawalLend) returns (MsgWithdrawalLendResponse);
+
+  rpc CreateBorrow (MsgCreateBorrow) returns (MsgCreateBorrowResponse);
+  rpc DeleteBorrow (MsgDeleteBorrow) returns (MsgDeleteBorrowResponse);
 
   rpc OpenLiquidationPosition (MsgOpenLiquidationPosition) returns (MsgOpenLiquidationPositionResponse);
   rpc CloseLiquidationPosition (MsgCloseLiquidationPosition) returns (MsgCloseLiquidationPositionResponse);
@@ -44,54 +44,57 @@ message MsgGrowWithdrawalResponse {
 }
 //
 
-// Lend Logic
+// Borrow Logic
 
-message MsgCreateLend {
+message MsgCreateBorrow {
   string borrower = 1;
   string denomIn  = 2;
   string desiredAmount = 3;
-  // string denomOut = 4;
 }
 
-message MsgCreateLendResponse {
+message MsgCreateBorrowResponse {
   string borrower = 1;
   string denomIn = 2;
   string amountOut = 3;
   string loanId = 4;
 }
 
-message MsgDeleteLend {
+message MsgDeleteBorrow {
   string borrower = 1;
   string amountIn  = 2;
-  string LoanId = 3;
-  string denomOut = 4;
+  string denomOut = 3;
 }
 
-message MsgDeleteLendResponse {
+message MsgDeleteBorrowResponse {
   string borrower = 1;
   string amountOut = 2;
   string LoanId = 3;
 }
 
-message MsgDepositCollateral {
+// Lend Logic
+
+message MsgCreateLend {
   string depositor = 1;
   string amountIn = 2;
 }
 
-message MsgDepositCollateralResponse  {
+message MsgCreateLendResponse  {
   string depositor = 1;
   string positionId = 2;
 }
 
-message MsgWithdrawalCollateral {
+message MsgWithdrawalLend {
   string depositor = 1;
-  string denom = 2;
+  string amountIn  = 2;
+  string denomOut = 3;
 }
 
-message MsgWithdrawalCollateralResponse {
+message MsgWithdrawalLendResponse {
   string depositor = 1;
   string amountOut = 2;
 }
+
+// Liquidation
 
 message MsgOpenLiquidationPosition {
   string creator = 1;

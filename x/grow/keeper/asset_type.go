@@ -10,9 +10,9 @@ import (
 	"github.com/tendermint/tendermint/crypto"
 )
 
-func (k Keeper) GetLendAssetCount(ctx sdk.Context) uint64 {
+func (k Keeper) GetAssetCount(ctx sdk.Context) uint64 {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), []byte{})
-	byteKey := types.KeyPrefix(types.LendAssetCountKey)
+	byteKey := types.KeyPrefix(types.AssetCountKey)
 	bz := store.Get(byteKey)
 	if bz == nil {
 		return 0
@@ -20,46 +20,46 @@ func (k Keeper) GetLendAssetCount(ctx sdk.Context) uint64 {
 	return binary.BigEndian.Uint64(bz)
 }
 
-func (k Keeper) SetLendAssetCount(ctx sdk.Context, count uint64) {
+func (k Keeper) SetAssetCount(ctx sdk.Context, count uint64) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), []byte{})
-	byteKey := types.KeyPrefix(types.LendAssetCountKey)
+	byteKey := types.KeyPrefix(types.AssetCountKey)
 	bz := make([]byte, 8)
 	binary.BigEndian.PutUint64(bz, count)
 	store.Set(byteKey, bz)
 }
 
-func (k Keeper) AppendLendAsset(
+func (k Keeper) AppendAsset(
 	ctx sdk.Context,
-	LendAsset types.LendAsset,
+	Asset types.Asset,
 ) uint64 {
-	count := k.GetLendAssetCount(ctx)
-	LendAsset.Id = count
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.LendAssetKey))
-	appendedValue := k.cdc.MustMarshal(&LendAsset)
-	store.Set(GetLendAssetIDBytes(LendAsset.Id), appendedValue)
-	k.SetLendAssetCount(ctx, count+1)
+	count := k.GetAssetCount(ctx)
+	Asset.Id = count
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.AssetKey))
+	appendedValue := k.cdc.MustMarshal(&Asset)
+	store.Set(GetAssetIDBytes(Asset.Id), appendedValue)
+	k.SetAssetCount(ctx, count+1)
 	return count
 }
 
-func (k Keeper) SetLendAsset(ctx sdk.Context, LendAsset types.LendAsset) {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.LendAssetKey))
-	b := k.cdc.MustMarshal(&LendAsset)
-	store.Set(GetLendAssetIDBytes(LendAsset.Id), b)
+func (k Keeper) SetAsset(ctx sdk.Context, Asset types.Asset) {
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.AssetKey))
+	b := k.cdc.MustMarshal(&Asset)
+	store.Set(GetAssetIDBytes(Asset.Id), b)
 }
 
-func (k Keeper) RemoveLendAsset(ctx sdk.Context, id uint64) {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.LendAssetKey))
-	store.Delete(GetLendAssetIDBytes(id))
+func (k Keeper) RemoveAsset(ctx sdk.Context, id uint64) {
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.AssetKey))
+	store.Delete(GetAssetIDBytes(id))
 }
 
-func (k Keeper) GetAllLendAsset(ctx sdk.Context) (list []types.LendAsset) {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.LendAssetKey))
+func (k Keeper) GetAllAsset(ctx sdk.Context) (list []types.Asset) {
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.AssetKey))
 	iterator := sdk.KVStorePrefixIterator(store, []byte{})
 
 	defer iterator.Close()
 
 	for ; iterator.Valid(); iterator.Next() {
-		var val types.LendAsset
+		var val types.Asset
 		k.cdc.MustUnmarshal(iterator.Value(), &val)
 		list = append(list, val)
 	}
@@ -67,29 +67,29 @@ func (k Keeper) GetAllLendAsset(ctx sdk.Context) (list []types.LendAsset) {
 	return
 }
 
-func GetLendAssetIDBytes(id uint64) []byte {
+func GetAssetIDBytes(id uint64) []byte {
 	bz := make([]byte, 8)
 	binary.BigEndian.PutUint64(bz, id)
 	return bz
 }
 
-func GetLendAssetIDFromBytes(bz []byte) uint64 {
+func GetAssetIDFromBytes(bz []byte) uint64 {
 	return binary.BigEndian.Uint64(bz)
 }
 
 //nolint:all
-func (k Keeper) GenerateLendAssetIdHash(denom1 string) string {
+func (k Keeper) GenerateAssetIdHash(denom1 string) string {
 	return fmt.Sprintf("%x", crypto.Sha256(append([]byte(denom1))))
 }
 
 // func for gov proposal
-func (k Keeper) RegisterLendAsset(ctx sdk.Context, p types.LendAsset) error {
-	LendAsset := types.LendAsset{
-		LendAssetId:   k.GenerateLendAssetIdHash(p.AssetMetadata.Base),
+func (k Keeper) RegisterAsset(ctx sdk.Context, p types.Asset) error {
+	Asset := types.Asset{
+		AssetId:       k.GenerateAssetIdHash(p.AssetMetadata.Base),
 		AssetMetadata: p.AssetMetadata,
 		OracleAssetId: p.OracleAssetId,
 	}
-	_ = k.AppendLendAsset(ctx, LendAsset)
+	_ = k.AppendAsset(ctx, Asset)
 	return nil
 }
 
@@ -97,37 +97,43 @@ func (k Keeper) RegisterLendAsset(ctx sdk.Context, p types.LendAsset) error {
 functions for get lend asset
 */
 
-func (k Keeper) GetLendAssetIdByCoins(amountIn string) (string, error) {
+func (k Keeper) GetAssetIdByCoins(amountIn string) (string, error) {
 	amountInCoins, err := sdk.ParseCoinsNormalized(amountIn)
 	if err != nil {
 		return "", err
 	}
-	return k.GenerateLendAssetIdHash(amountInCoins.GetDenomByIndex(0)), nil
+	return k.GenerateAssetIdHash(amountInCoins.GetDenomByIndex(0)), nil
 }
 
-func (k Keeper) GetLendAssetByOracleAssetId(ctx sdk.Context, oracleAssetId string) (val types.LendAsset, err error) {
-	allLendAsset := k.GetAllLendAsset(ctx)
-	for _, v := range allLendAsset {
+func (k Keeper) GetAssetByDenom(ctx sdk.Context, denom string) (types.Asset, bool) {
+	assetId := k.GenerateAssetIdHash(denom)
+	asset, found := k.GetAssetByAssetId(ctx, assetId)
+	return asset, found
+}
+
+func (k Keeper) GetAssetByOracleAssetId(ctx sdk.Context, oracleAssetId string) (val types.Asset, err error) {
+	allAsset := k.GetAllAsset(ctx)
+	for _, v := range allAsset {
 		if v.OracleAssetId == oracleAssetId {
 			return v, nil
 		}
 	}
-	return val, types.ErrLendAssetNotFound
+	return val, types.ErrAssetNotFound
 }
 
-func (k Keeper) GetLendAssetByLendAssetId(ctx sdk.Context, LendAssetId string) (val types.LendAsset, found bool) {
-	allLendAsset := k.GetAllLendAsset(ctx)
-	for _, v := range allLendAsset {
-		if v.LendAssetId == LendAssetId {
+func (k Keeper) GetAssetByAssetId(ctx sdk.Context, AssetId string) (val types.Asset, found bool) {
+	allAsset := k.GetAllAsset(ctx)
+	for _, v := range allAsset {
+		if v.AssetId == AssetId {
 			return v, true
 		}
 	}
 	return val, false
 }
 
-func (k Keeper) GetLendAssetByID(ctx sdk.Context, id uint64) (val types.LendAsset, found bool) {
-	allLendAsset := k.GetAllLendAsset(ctx)
-	for _, v := range allLendAsset {
+func (k Keeper) GetAssetByID(ctx sdk.Context, id uint64) (val types.Asset, found bool) {
+	allAsset := k.GetAllAsset(ctx)
+	for _, v := range allAsset {
 		if v.Id == id {
 			return v, true
 		}

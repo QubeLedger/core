@@ -108,14 +108,14 @@ func GetLoanIDFromBytes(bz []byte) uint64 {
 }
 
 //nolint:all
-func (k Keeper) GenerateLoadIdHash(denom1 string, denom2 string, amount string, borrower string, time string) string {
-	return fmt.Sprintf("%x", crypto.Sha256(append([]byte(denom1))))
+func (k Keeper) GenerateLoanIdHash(denom string, borrower string) string {
+	return fmt.Sprintf("%x", crypto.Sha256(append([]byte(denom+borrower))))
 }
 
-func (k Keeper) GetLoadByLoadId(ctx sdk.Context, loadId string) (val types.Loan, found bool) {
+func (k Keeper) GetLoadByLoanId(ctx sdk.Context, loanId string) (val types.Loan, found bool) {
 	allLoan := k.GetAllLoan(ctx)
 	for _, v := range allLoan {
-		if v.LoanId == loadId {
+		if v.LoanId == loanId {
 			return v, true
 		}
 	}
