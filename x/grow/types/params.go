@@ -8,12 +8,12 @@ import (
 var _ paramtypes.ParamSet = &Params{}
 
 const (
-	DefaultLastTimeUpdateReserve     = uint64(1)
+	DefaultLastTimeUpdateReserve     = uint64(0)
 	DefaultGrowStakingReserveAddress = "qube13zq340zzjgua9h98pltzwv0ga5r0kkn0ryjz4v"
 	DefaultUSQReserveAddress         = "qube1nx9scnpdnp5wsw88at9e35fng56788h7yz9srs"
 	DefaultGrowYieldReserveAddress   = "qube1zzplgm7kqwe3vwqynzkvewrrhuffwhd7a77j7j"
 	DefaultStatus                    = false
-	DefaultInt                       = uint64(1)
+	DefaultInt                       = uint64(0)
 )
 
 var (

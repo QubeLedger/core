@@ -28,7 +28,7 @@ func (suite *GrowKeeperTestSuite) TestSetLastTimeUpdateReserve() {
 	suite.Setup()
 	suite.Commit()
 
-	s.Require().Equal(s.app.GrowKeeper.GetLastTimeUpdateReserve(s.ctx).Int64(), int64(1))
+	s.Require().Equal(s.app.GrowKeeper.GetLastTimeUpdateReserve(s.ctx).Int64(), int64(0))
 	s.app.GrowKeeper.SetLastTimeUpdateReserve(s.ctx, sdk.NewInt(15))
 	s.Require().Equal(s.app.GrowKeeper.GetLastTimeUpdateReserve(s.ctx).Int64(), int64(15))
 }
