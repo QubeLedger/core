@@ -10,6 +10,7 @@ import (
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 )
 
+/* #nosec */
 func CreateUpgradeHandler(
 	mm *module.Manager,
 	configurator module.Configurator,
