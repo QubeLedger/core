@@ -16,6 +16,7 @@ func TestRegisterLendAssetProposal(t *testing.T) {
 		description   string
 		assetMetadata banktypes.Metadata
 		OracleAssetId string
+		type_s        string
 		expectedErr   bool
 	}{
 		{
@@ -32,6 +33,7 @@ func TestRegisterLendAssetProposal(t *testing.T) {
 				Symbol:  "gUSQ",
 			},
 			"ATOM",
+			"volatile",
 			false,
 		},
 		{
@@ -48,6 +50,7 @@ func TestRegisterLendAssetProposal(t *testing.T) {
 				Symbol:  "gUSQ",
 			},
 			"",
+			"volatile",
 			true,
 		},
 		{
@@ -57,6 +60,7 @@ func TestRegisterLendAssetProposal(t *testing.T) {
 				Name: "",
 			},
 			"ATOM",
+			"volatile",
 			true,
 		},
 		{
@@ -67,6 +71,7 @@ func TestRegisterLendAssetProposal(t *testing.T) {
 				Symbol: "",
 			},
 			"ATOM",
+			"volatile",
 			true,
 		},
 		{
@@ -78,6 +83,7 @@ func TestRegisterLendAssetProposal(t *testing.T) {
 				Base:   "",
 			},
 			"ATOM",
+			"volatile",
 			true,
 		},
 		{
@@ -90,12 +96,13 @@ func TestRegisterLendAssetProposal(t *testing.T) {
 				Display: "",
 			},
 			"ATOM",
+			"volatile",
 			true,
 		},
 	}
 
 	for _, tc := range tests {
-		msg := types.NewRegisterLendAssetProposal(tc.title, tc.description, tc.assetMetadata, tc.OracleAssetId)
+		msg := types.NewRegisterLendAssetProposal(tc.title, tc.description, tc.assetMetadata, tc.OracleAssetId, tc.type_s)
 		err := msg.ValidateBasic()
 		if tc.expectedErr {
 			require.Error(t, err)

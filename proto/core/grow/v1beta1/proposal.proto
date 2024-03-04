@@ -13,6 +13,7 @@ message RegisterLendAssetProposal {
   // metadata slice of the native Cosmos coins
   cosmos.bank.v1beta1.Metadata assetMetadata = 3 [ (gogoproto.moretags) = "yaml:\"assetMetadata\"", (gogoproto.nullable)   = false ];
   string oracleAssetId = 4;
+  string type = 5;
 }
 
 message RegisterGTokenPairProposal {
@@ -31,6 +32,7 @@ message RegisterGTokenPairProposal {
 message ProposalMetadataForRegisterLendAssetProposal {
   cosmos.bank.v1beta1.Metadata assetMetadata = 1 [ (gogoproto.moretags) = "yaml:\"assetMetadata\"", (gogoproto.nullable)   = false ];
   string oracleAssetId = 2;
+  string type = 3;
 }
 
 message ProposalMetadataForRegisterGTokenPairProposal {

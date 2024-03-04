@@ -90,12 +90,13 @@ func init() {
 RegisterLendAssetProposal
 */
 
-func NewRegisterLendAssetProposal(title, description string, assetMetadata banktypes.Metadata, oracleId string) govtypes.Content {
+func NewRegisterLendAssetProposal(title, description string, assetMetadata banktypes.Metadata, oracleId string, type_s string) govtypes.Content {
 	return &RegisterLendAssetProposal{
 		Title:         title,
 		Description:   description,
 		AssetMetadata: assetMetadata,
 		OracleAssetId: oracleId,
+		Type:          type_s,
 	}
 }
 

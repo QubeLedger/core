@@ -21,6 +21,7 @@ type RegisterAssetProposal struct {
 	Deposit       sdk.Coins          `json:"deposit" yaml:"deposit"`
 	AssetMetadata banktypes.Metadata `json:"assetMetadata" yaml:"assetMetadata"`
 	OracleAssetId string             `json:"oracleAssetId" yaml:"oracleAssetId"`
+	Type          string             `json:"type" yaml:"type"`
 }
 
 type RegisterGTokenPairProposal struct {
@@ -145,7 +146,7 @@ func newRegisterAssetProposal(clientCtx client.Context) http.HandlerFunc {
 			return
 		}
 
-		content := types.NewRegisterLendAssetProposal(req.Title, req.Description, req.AssetMetadata, req.OracleAssetId)
+		content := types.NewRegisterLendAssetProposal(req.Title, req.Description, req.AssetMetadata, req.OracleAssetId, req.Type)
 		msg, err := govtypes.NewMsgSubmitProposal(content, req.Deposit, fromAddr)
 		if rest.CheckBadRequestError(w, err) {
 			return
