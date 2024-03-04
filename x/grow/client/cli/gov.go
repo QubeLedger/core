@@ -46,6 +46,7 @@ func NewRegisterAssetProposalCmd() *cobra.Command {
 				"symbol": "ATOM"
 			},
 			"oracleAssetId": "ATOM",
+			'type": "volatile",
 		}`,
 		),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
@@ -72,13 +73,13 @@ func NewRegisterAssetProposalCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			assetMetadata, oracleAssetId, err := ParseMetadataForAssetProposal(clientCtx.Codec, args[0])
+			assetMetadata, oracleAssetId, type_s, err := ParseMetadataForAssetProposal(clientCtx.Codec, args[0])
 			if err != nil {
 				return err
 			}
 			from := clientCtx.GetFromAddress()
 
-			content := types.NewRegisterLendAssetProposal(title, description, assetMetadata, oracleAssetId)
+			content := types.NewRegisterLendAssetProposal(title, description, assetMetadata, oracleAssetId, type_s)
 
 			msg, err := govtypes.NewMsgSubmitProposal(content, deposit, from)
 			if err != nil {
