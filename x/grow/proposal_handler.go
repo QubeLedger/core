@@ -44,9 +44,12 @@ func NewGrowProposalHandler(k *keeper.Keeper) govtypes.Handler {
 
 func handleRegisterAssetProposal(ctx sdk.Context, k *keeper.Keeper, p *types.RegisterLendAssetProposal) error {
 	la := types.Asset{
-		AssetId:       k.GenerateAssetIdHash(p.AssetMetadata.Base),
-		AssetMetadata: p.AssetMetadata,
-		OracleAssetId: p.OracleAssetId,
+		AssetId:                 k.GenerateAssetIdHash(p.AssetMetadata.Base),
+		AssetMetadata:           p.AssetMetadata,
+		OracleAssetId:           p.OracleAssetId,
+		ProvideValue:            0,
+		CollectivelyBorrowValue: 0,
+		Type:                    p.Type,
 	}
 	err := k.RegisterAsset(ctx, la)
 	if err != nil {

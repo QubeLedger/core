@@ -85,9 +85,12 @@ func (k Keeper) GenerateAssetIdHash(denom1 string) string {
 // func for gov proposal
 func (k Keeper) RegisterAsset(ctx sdk.Context, p types.Asset) error {
 	Asset := types.Asset{
-		AssetId:       k.GenerateAssetIdHash(p.AssetMetadata.Base),
-		AssetMetadata: p.AssetMetadata,
-		OracleAssetId: p.OracleAssetId,
+		AssetId:                 k.GenerateAssetIdHash(p.AssetMetadata.Base),
+		AssetMetadata:           p.AssetMetadata,
+		OracleAssetId:           p.OracleAssetId,
+		ProvideValue:            p.ProvideValue,
+		CollectivelyBorrowValue: p.CollectivelyBorrowValue,
+		Type:                    p.Type,
 	}
 	_ = k.AppendAsset(ctx, Asset)
 	return nil
