@@ -182,6 +182,7 @@ func EndBlocker(ctx sdk.Context, k keeper.Keeper) error {
 	}
 
 	params.LastTimeUpdateReserve = uint64(ctx.BlockTime().Unix())
+	k.SetParams(ctx, params)
 
 	return nil
 }
