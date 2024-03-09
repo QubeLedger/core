@@ -151,10 +151,23 @@ func (k Keeper) ExecuteDeleteBorrow(ctx sdk.Context, msg *types.MsgDeleteBorrow,
 		k.SetLoan(ctx, new_loan)
 	}
 
-	Asset.CollectivelyBorrowValue -= amountInCoins.AmountOf(DenomIn).Uint64()
+	reduceCollectivelyBorrowValue := amountInCoins.AmountOf(DenomIn).Uint64()
+
+	if reduceCollectivelyBorrowValue >= Asset.CollectivelyBorrowValue {
+		Asset.CollectivelyBorrowValue = uint64(0)
+	} else {
+		Asset.CollectivelyBorrowValue -= reduceCollectivelyBorrowValue
+	}
 	k.SetAsset(ctx, Asset)
 
-	position.BorrowedAmountInUSD -= k.CalculateAmountByPriceAndAmountIn(amountInCoins.AmountOf(DenomIn), price).Uint64()
+	reduceAmount := k.CalculateAmountByPriceAndAmountIn(amountInCoins.AmountOf(DenomIn), price).Uint64()
+
+	if reduceAmount >= position.BorrowedAmountInUSD {
+		position.BorrowedAmountInUSD = uint64(0)
+	} else {
+		position.BorrowedAmountInUSD -= reduceAmount
+	}
+
 	k.SetPosition(ctx, position)
 
 	return nil, loan.LoanId

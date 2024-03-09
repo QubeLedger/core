@@ -18,6 +18,8 @@ func EndBlocker(ctx sdk.Context, k keeper.Keeper) error {
 
 	params := k.GetParams(ctx)
 
+	oldTime := params.LastTimeUpdateReserve
+
 	err := k.CheckDepositMethodStatus(ctx)
 	if err == nil {
 		allGTokenPair := k.GetAllPair(ctx)
@@ -47,6 +49,9 @@ func EndBlocker(ctx sdk.Context, k keeper.Keeper) error {
 			}
 		}
 	}
+
+	params.LastTimeUpdateReserve = uint64(ctx.BlockTime().Unix())
+	k.SetParams(ctx, params)
 
 	if k.CheckCollateralMethodStatus(ctx) == nil && k.CheckBorrowMethodStatus(ctx) == nil {
 		allPosition := k.GetAllPosition(ctx)
@@ -89,11 +94,11 @@ func EndBlocker(ctx sdk.Context, k keeper.Keeper) error {
 					sir = sir_temp
 				}
 
-				time := ctx.BlockTime().Unix() - int64(params.LastTimeUpdateReserve)
+				time := ctx.BlockTime().Unix() - int64(oldTime)
 				result := collateral_amount + ((collateral_amount * sir * float64(time)) / 31536000)
 				if sir <= 0 {
 					lend.AmountInAmount = sdk.MustNewDecFromStr(fmt.Sprintf("%f", collateral_amount))
-					NewLendAmountInUSD += result * (float64(price.Int64()) / 10000)
+					NewLendAmountInUSD += collateral_amount * (float64(price.Int64()) / 10000)
 				} else {
 					lend.AmountInAmount = sdk.MustNewDecFromStr(fmt.Sprintf("%f", result))
 					NewLendAmountInUSD += result * (float64(price.Int64()) / 10000)
@@ -135,7 +140,7 @@ func EndBlocker(ctx sdk.Context, k keeper.Keeper) error {
 					bir = bir_temp
 				}
 
-				time := ctx.BlockTime().Unix() - int64(params.LastTimeUpdateReserve)
+				time := ctx.BlockTime().Unix() - int64(oldTime)
 				result := borrow_amount + ((borrow_amount * bir * float64(time)) / 31536000)
 				if bir <= 0 {
 					loan.AmountOutAmount = sdk.MustNewDecFromStr(fmt.Sprintf("%f", borrow_amount))
@@ -180,9 +185,6 @@ func EndBlocker(ctx sdk.Context, k keeper.Keeper) error {
 			}
 		}
 	}
-
-	params.LastTimeUpdateReserve = uint64(ctx.BlockTime().Unix())
-	k.SetParams(ctx, params)
 
 	return nil
 }
