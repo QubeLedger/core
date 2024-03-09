@@ -147,10 +147,21 @@ func (k Keeper) ExecuteWithdrawalLend(ctx sdk.Context, msg *types.MsgWithdrawalL
 		return err, sdk.Coin{}
 	}
 
-	position.LendAmountInUSD -= k.CalculateAmountByPriceAndAmountIn(amountInCoins.AmountOf(DenomIn), price).Uint64()
+	reduceLendAmountInUSD := k.CalculateAmountByPriceAndAmountIn(amountInCoins.AmountOf(DenomIn), price).Uint64()
+
+	if reduceLendAmountInUSD >= position.LendAmountInUSD {
+		position.LendAmountInUSD = uint64(0)
+	} else {
+		position.LendAmountInUSD -= reduceLendAmountInUSD
+	}
 	k.SetPosition(ctx, position)
 
-	Asset.ProvideValue -= (amountInCoins.AmountOf(DenomIn)).Uint64()
+	reduceProvideValue := (amountInCoins.AmountOf(DenomIn)).Uint64()
+	if reduceProvideValue >= Asset.ProvideValue {
+		Asset.ProvideValue = uint64(0)
+	} else {
+		Asset.ProvideValue -= (amountInCoins.AmountOf(DenomIn)).Uint64()
+	}
 	k.SetAsset(ctx, Asset)
 
 	return nil, sdk.NewCoin(DenomIn, amountInCoins.AmountOf(DenomIn))
