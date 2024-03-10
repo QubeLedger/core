@@ -119,6 +119,7 @@ import (
 	tokenfactorytypes "github.com/QuadrateOrg/core/x/tokenfactory/types"
 
 	tfupgrades "github.com/QuadrateOrg/core/app/upgrades/TF"
+	gadget "github.com/QuadrateOrg/core/app/upgrades/gadget"
 	trinity "github.com/QuadrateOrg/core/app/upgrades/trinity"
 	v4 "github.com/QuadrateOrg/core/app/upgrades/v1/v4"
 	v4rc0 "github.com/QuadrateOrg/core/app/upgrades/v1/v4rc0"
@@ -1154,6 +1155,15 @@ func (app *QuadrateApp) setUpgradeHandlers() {
 		),
 	)
 
+	app.UpgradeKeeper.SetUpgradeHandler(
+		gadget.UpgradeName,
+		gadget.CreateUpgradeHandler(
+			app.mm,
+			app.configurator,
+			app.GrowKeeper,
+		),
+	)
+
 	// When a planned update height is reached, the old binary will panic
 	// writing on disk the height and name of the update that triggered it
 	// This will read that value, and execute the preparations for the upgrade.
@@ -1180,6 +1190,7 @@ func (app *QuadrateApp) setUpgradeHandlers() {
 	case v025rc0.UpgradeName:
 	case v025rc02.UpgradeName:
 	case trinity.UpgradeName:
+	case gadget.UpgradeName:
 	}
 
 	for _, storeUpgrade := range storeUpgrades {
