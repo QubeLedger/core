@@ -57,6 +57,17 @@ func CreateUpgradeHandler(
 
 		ctx.Logger().Info("qLabs: Trinity: remove: all position")
 
+		all_asset := growkeeper.GetAllAsset(ctx)
+
+		for _, asset := range all_asset {
+			asset.ProvideValue = uint64(0)
+			asset.CollectivelyBorrowValue = uint64(0)
+			growkeeper.SetAsset(ctx, asset)
+			ctx.Logger().Info("qLabs: Trinity: update: asset: id: %v", asset.AssetId)
+		}
+
+		ctx.Logger().Info("qLabs: Trinity: update: all asset")
+
 		return migrations, nil
 	}
 }
