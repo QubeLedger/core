@@ -4,7 +4,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-const (
+var (
 	// Bech32Prefix defines the Bech32 prefix used for EthAccounts
 	Bech32Prefix = "qube"
 

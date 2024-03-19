@@ -7,8 +7,8 @@ require (
 	github.com/CosmWasm/wasmvm v1.2.3
 	github.com/armon/go-metrics v0.4.1 // indirect
 	github.com/buger/jsonparser v1.1.1
-	github.com/cosmos/cosmos-sdk v0.45.15
-	github.com/cosmos/ibc-go/v4 v4.3.1
+	github.com/cosmos/cosmos-sdk v0.45.16
+	github.com/cosmos/ibc-go/v4 v4.5.1
 	github.com/gogo/protobuf v1.3.3
 	github.com/golang/protobuf v1.5.3
 	github.com/gorilla/mux v1.8.0
@@ -29,12 +29,17 @@ require (
 require gopkg.in/yaml.v2 v2.4.0
 
 require (
+	github.com/cosmos/cosmos-proto v1.0.0-beta.2
 	github.com/cosmos/gogoproto v1.4.6
 	github.com/google/gofuzz v1.2.0
+	github.com/iancoleman/orderedmap v0.2.0
 	github.com/onsi/ginkgo/v2 v2.1.4
 	github.com/onsi/gomega v1.20.1
 	github.com/pkg/errors v0.9.1
 	github.com/regen-network/cosmos-proto v0.3.1
+	github.com/spf13/pflag v1.0.5
+	golang.org/x/exp v0.0.0-20230321023759-10a507213a29
+	google.golang.org/protobuf v1.30.0
 )
 
 require (
@@ -60,10 +65,9 @@ require (
 	github.com/cockroachdb/redact v1.1.3 // indirect
 	github.com/coinbase/rosetta-sdk-go v0.7.9 // indirect
 	github.com/cometbft/cometbft-db v0.7.0 // indirect
-	github.com/confio/ics23/go v0.9.0 // indirect
+	github.com/confio/ics23/go v0.9.1 // indirect
 	github.com/cosmos/btcutil v1.0.4 // indirect
 	github.com/cosmos/cosmos-db v0.0.0-20221226095112-f3c38ecb5e32 // indirect
-	github.com/cosmos/cosmos-proto v1.0.0-beta.2 // indirect
 	github.com/cosmos/go-bip39 v1.0.0 // indirect
 	github.com/cosmos/gorocksdb v1.2.0 // indirect
 	github.com/cosmos/iavl v0.19.5 // indirect
@@ -102,7 +106,6 @@ require (
 	github.com/hashicorp/golang-lru v0.5.5-0.20210104140557-80c98217689d // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/hdevalence/ed25519consensus v0.0.0-20220222234857-c00d1f31bab3 // indirect
-	github.com/iancoleman/orderedmap v0.2.0 // indirect
 	github.com/improbable-eng/grpc-web v0.15.0 // indirect
 	github.com/inconshreveable/mousetrap v1.0.1 // indirect
 	github.com/jmhodges/levigo v1.0.0 // indirect
@@ -136,7 +139,6 @@ require (
 	github.com/sasha-s/go-deadlock v0.3.1 // indirect
 	github.com/spf13/afero v1.9.2 // indirect
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
-	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/subosito/gotenv v1.4.1 // indirect
 	github.com/syndtr/goleveldb v1.0.1-0.20210819022825-2ae1ddf74ef7 // indirect
 	github.com/tecbot/gorocksdb v0.0.0-20191217155057-f0fad39f321c // indirect
@@ -146,12 +148,10 @@ require (
 	github.com/zondax/ledger-go v0.14.1 // indirect
 	go.etcd.io/bbolt v1.3.7 // indirect
 	golang.org/x/crypto v0.14.0 // indirect
-	golang.org/x/exp v0.0.0-20230321023759-10a507213a29 // indirect
 	golang.org/x/net v0.17.0 // indirect
 	golang.org/x/sys v0.13.0 // indirect
 	golang.org/x/term v0.13.0 // indirect
 	golang.org/x/text v0.13.0 // indirect
-	google.golang.org/protobuf v1.30.0 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	nhooyr.io/websocket v1.8.7 // indirect
@@ -159,6 +159,7 @@ require (
 
 replace (
 	github.com/confio/ics23/go => github.com/cosmos/cosmos-sdk/ics23/go v0.8.0
+	github.com/cosmos/cosmos-sdk => github.com/QubeLedger/cosmos-sdk v0.45.16-ics-lsm-qube
 	github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.3-alpha.regen.1
 	github.com/tendermint/tendermint => github.com/cometbft/cometbft v0.34.27
 	google.golang.org/grpc => google.golang.org/grpc v1.33.2
