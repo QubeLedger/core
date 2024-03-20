@@ -2,7 +2,7 @@ package types
 
 import (
 	"fmt"
-	"strings"
+	ss "strings"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/bech32"
@@ -14,11 +14,11 @@ import (
 )
 
 func IsLiquidStakingDenom(denom string) bool {
-	return strings.HasPrefix(denom, fmt.Sprintf("%s/", LiquidStakeDenomPrefix))
+	return ss.HasPrefix(denom, fmt.Sprintf("%s/", LiquidStakeDenomPrefix))
 }
 
 func MintDenomToHostDenom(mintDenom string) (string, bool) {
-	return strings.CutPrefix(mintDenom, fmt.Sprintf("%s/", LiquidStakeDenomPrefix))
+	return ss.CutPrefix(mintDenom, fmt.Sprintf("%s/", LiquidStakeDenomPrefix))
 }
 
 func HostDenomToMintDenom(hostDenom string) string {
@@ -79,7 +79,7 @@ func (hc *HostChain) Validate() error {
 	if hc.CValue.LT(sdk.ZeroDec()) { // GT limits should be checked by module level params, invariants.
 		return fmt.Errorf("host chain %s has c value out of bounds: %d", hc.ChainId, hc.CValue)
 	}
-	if strings.TrimSpace(hc.ChainId) == "" {
+	if ss.TrimSpace(hc.ChainId) == "" {
 		return fmt.Errorf("chain_id must be non-empty")
 	}
 	if len(hc.ChainId) > types.MaxChainIDLen {
