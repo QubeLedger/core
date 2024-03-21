@@ -311,6 +311,7 @@ func initGenFiles(
 	return nil
 }
 
+//nolint:all
 func collectGenFiles(
 	clientCtx client.Context, nodeConfig *tmconfig.Config, chainID string,
 	nodeIDs []string, valPubKeys []cryptotypes.PubKey, numValidators int,
