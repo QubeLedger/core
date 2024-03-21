@@ -6,8 +6,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/server"
 	svrcmd "github.com/cosmos/cosmos-sdk/server/cmd"
 
+	"github.com/QuadrateOrg/core/app/simapp/simd/cmd"
 	"github.com/cosmos/ibc-go/v4/testing/simapp"
-	"github.com/cosmos/ibc-go/v4/testing/simapp/simd/cmd"
 )
 
 //nolint:all
