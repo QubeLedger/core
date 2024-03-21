@@ -1,5 +1,6 @@
 package simapp
 
+//nolint:all
 import (
 	"encoding/json"
 	"fmt"

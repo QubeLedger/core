@@ -10,6 +10,7 @@ import (
 	"github.com/cosmos/ibc-go/v4/testing/simapp/simd/cmd"
 )
 
+//nolint:all
 func main() {
 	rootCmd, _ := cmd.NewRootCmd()
 

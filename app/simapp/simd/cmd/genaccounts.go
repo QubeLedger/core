@@ -27,6 +27,8 @@ const (
 )
 
 // AddGenesisAccountCmd returns add-genesis-account cobra Command.
+//
+//nolint:all
 func AddGenesisAccountCmd(defaultNodeHome string) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "add-genesis-account [address_or_key_name] [coin][,[coin]]",

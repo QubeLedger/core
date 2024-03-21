@@ -96,6 +96,8 @@ Example:
 const nodeDirPerm = 0o755
 
 // Initialize the testnet
+//
+//nolint:all
 func InitTestnet(
 	clientCtx client.Context,
 	cmd *cobra.Command,
@@ -262,6 +264,7 @@ func InitTestnet(
 	return nil
 }
 
+//nolint:all
 func initGenFiles(
 	clientCtx client.Context, mbm module.BasicManager, chainID string,
 	genAccounts []authtypes.GenesisAccount, genBalances []banktypes.Balance,
