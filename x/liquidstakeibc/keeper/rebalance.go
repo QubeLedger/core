@@ -134,12 +134,3 @@ func sortDelegationListAsc(idealDelegationList []delegation) []delegation {
 	})
 	return idealDelegationList
 }
-
-// remove when go updates to 1.21, and use slices package.
-// Reverse reverses the elements of the slice in place.
-/* #nosec */
-func Reverse[S ~[]E, E any](s S) { // #nosec
-	for i, j := 0, len(s)-1; i < j; i, j = i+1, j-1 {
-		s[i], s[j] = s[j], s[i]
-	}
-}
