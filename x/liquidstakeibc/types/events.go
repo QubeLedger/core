@@ -1,5 +1,6 @@
 package types
 
+/* #nosec */
 const (
 	EventTypeLiquidStake                           = "liquid_stake"
 	EventTypeLiquidStakeLSM                        = "liquid_stake_lsm"

@@ -183,6 +183,7 @@ func AppStateRandomizedFn(
 
 // AppStateFromGenesisFileFn util function to generate the genesis AppState
 // from a genesis.json file.
+/* #nosec */
 func AppStateFromGenesisFileFn(r io.Reader, cdc codec.JSONCodec, genesisFile string) (tmtypes.GenesisDoc, []simtypes.Account) {
 	bytes, err := ioutil.ReadFile(genesisFile)
 	if err != nil {

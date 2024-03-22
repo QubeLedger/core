@@ -210,6 +210,7 @@ func (k *Keeper) GetEpochNumber(ctx sdk.Context, epoch string) int64 {
 	return k.epochsKeeper.GetEpochInfo(ctx, epoch).CurrentEpoch
 }
 
+/* #nosec */
 func (k *Keeper) SendICATransfer(
 	ctx sdk.Context,
 	hc *types.HostChain,

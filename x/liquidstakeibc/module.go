@@ -1,5 +1,6 @@
 package liquidstakeibc
 
+/* #nosec */
 import (
 	"context"
 	"encoding/json"

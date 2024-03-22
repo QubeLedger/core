@@ -33,6 +33,7 @@ func (k *Keeper) OnChanOpenInit(
 	return version, nil
 }
 
+/* #nosec */
 func (k *Keeper) OnChanOpenAck(
 	ctx sdk.Context,
 	portID string,

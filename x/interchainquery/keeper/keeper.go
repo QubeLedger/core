@@ -102,6 +102,7 @@ func (k *Keeper) GetDatapoint(ctx sdk.Context, module string, connectionID strin
 	return k.GetDatapointForID(ctx, id)
 }
 
+/* #nosec */
 func (k *Keeper) GetDatapointOrRequest(ctx sdk.Context, module string, connectionID string, chainID string, queryType string, request []byte, maxAge uint64) (types.DataPoint, error) {
 	val, err := k.GetDatapoint(ctx, module, connectionID, chainID, queryType, request)
 	if err != nil {

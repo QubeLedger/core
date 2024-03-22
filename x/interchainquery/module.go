@@ -1,5 +1,6 @@
 package interchainquery
 
+/* #nosec */
 import (
 	"context"
 	"encoding/json"

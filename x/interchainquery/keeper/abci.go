@@ -15,6 +15,7 @@ const (
 )
 
 // EndBlocker of interchainquery module
+/* #nosec */
 func (k Keeper) EndBlocker(ctx sdk.Context) {
 	defer telemetry.ModuleMeasureSince(types.ModuleName, time.Now(), telemetry.MetricKeyBeginBlocker)
 

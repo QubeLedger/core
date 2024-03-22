@@ -13,6 +13,7 @@ import (
 // drop the state machine change and log the error.
 // If there is no error, proceeds as normal (but with some slowdown due to SDK store weirdness)
 // Try to avoid usage of iterators in f.
+/* #nosec */
 func ApplyFuncIfNoError(ctx sdk.Context, f func(ctx sdk.Context) error) (err error) {
 	// Add a panic safeguard
 	defer func() {

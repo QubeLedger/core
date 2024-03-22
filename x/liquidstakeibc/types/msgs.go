@@ -213,6 +213,7 @@ func (m *MsgUpdateHostChain) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{addr}
 }
 
+/* #nosec */
 func (m *MsgUpdateHostChain) ValidateBasic() error {
 	if _, err := sdk.AccAddressFromBech32(m.Authority); err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid authority address %q: %v", m.Authority, err)

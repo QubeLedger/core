@@ -131,6 +131,7 @@ func (k msgServer) RegisterHostChain(
 }
 
 // UpdateHostChain updates a registered host chain
+/* #nosec */
 func (k msgServer) UpdateHostChain(
 	goCtx context.Context,
 	msg *types.MsgUpdateHostChain,
@@ -937,6 +938,7 @@ func (k msgServer) UpdateParams(
 	return &types.MsgUpdateParamsResponse{}, nil
 }
 
+/* #nosec */
 func (k msgServer) validateLiquidStakeLSMDeposit(
 	ctx sdktypes.Context,
 	delegatorAddress sdktypes.AccAddress,

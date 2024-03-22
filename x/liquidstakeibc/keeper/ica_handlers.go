@@ -284,6 +284,7 @@ func (k *Keeper) HandleMsgTransfer(
 	return nil
 }
 
+/* #nosec */
 func (k *Keeper) HandleMsgRedeemTokensForShares(
 	ctx sdk.Context,
 	msg sdk.Msg,

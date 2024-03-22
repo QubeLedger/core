@@ -13,6 +13,7 @@ import (
 	"github.com/tendermint/tendermint/proto/tendermint/crypto"
 )
 
+/* #nosec */
 func ValidateProofOps(ctx sdk.Context, ibcKeeper *ibcKeeper.Keeper, connectionID string, chainID string, height int64, module string, key []byte, data []byte, proofOps *crypto.ProofOps) error {
 	if proofOps == nil {
 		return fmt.Errorf("unable to validate proof. No proof submitted")

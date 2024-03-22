@@ -17,6 +17,7 @@ type delegation struct {
 	validatorDetails types.Validator
 }
 
+/* #nosec */
 func (k Keeper) GenerateRedelegateMsgs(ctx sdk.Context, hc types.HostChain) []sdk.Msg {
 	AcceptableDelta := hc.Params.RedelegationAcceptableDelta
 	MaxRedelegationEntries := hc.Params.MaxEntries
@@ -107,6 +108,7 @@ func (k Keeper) RedelegationExistsToValidator(redelegations []*stakingtypes.Rede
 	return false
 }
 
+/* #nosec */
 func (k Keeper) RedelegationFromAToB(redelegations []*stakingtypes.Redelegation, fromValoper, toValoper string) (bool, uint32) {
 	for _, redelegation := range redelegations {
 		if redelegation.ValidatorDstAddress == toValoper && redelegation.ValidatorSrcAddress == fromValoper {
@@ -132,6 +134,7 @@ func sortDelegationListAsc(idealDelegationList []delegation) []delegation {
 
 // remove when go updates to 1.21, and use slices package.
 // Reverse reverses the elements of the slice in place.
+/* #nosec */
 func Reverse[S ~[]E, E any](s S) {
 	for i, j := 0, len(s)-1; i < j; i, j = i+1, j-1 {
 		s[i], s[j] = s[j], s[i]

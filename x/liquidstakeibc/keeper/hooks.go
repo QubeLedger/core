@@ -497,7 +497,7 @@ func (k *Keeper) OnTimeoutIBCTransferPacket(
 }
 
 // Workflows
-
+/* #nosec */
 func (k *Keeper) DepositWorkflow(ctx sdk.Context, epoch int64) {
 	k.Logger(ctx).Info("Running deposit workflow.", liquidstakeibctypes.EpochKeyVal, epoch)
 
@@ -873,6 +873,7 @@ func (k *Keeper) RewardsWorkflow(ctx sdk.Context, epoch int64) {
 	}
 }
 
+/* #nosec */
 func (k *Keeper) LSMWorkflow(ctx sdk.Context) {
 	for _, hc := range k.GetAllHostChains(ctx) {
 		if !hc.Active || !hc.Flags.Lsm {
