@@ -48,7 +48,10 @@ func (k Keeper) GenerateRedelegateMsgs(ctx sdk.Context, hc types.HostChain) []sd
 	revIdealList := make([]delegation, len(idealDelegationList))
 	copy(revIdealList, idealDelegationList)
 	// positive diffs first (descending)
-	Reverse(revIdealList)
+	//Reverse(revIdealList)
+	for i, j := 0, len(revIdealList)-1; i < j; i, j = i+1, j-1 {
+		revIdealList[i], revIdealList[j] = revIdealList[j], revIdealList[i]
+	}
 	redelegations, ok := k.GetRedelegations(ctx, hc.ChainId)
 	if !ok {
 		redelegations = &types.Redelegations{
@@ -136,7 +139,7 @@ func sortDelegationListAsc(idealDelegationList []delegation) []delegation {
 // Reverse reverses the elements of the slice in place.
 /* #nosec */
 func Reverse[S ~[]E, E any](s S) { // #nosec
-	for i, j := 0, len(s)-1; i < j; i, j = i+1, j-1 { // #nosec
-		s[i], s[j] = s[j], s[i] // #nosec
-	} // #nosec
-} // #nosec
+	for i, j := 0, len(s)-1; i < j; i, j = i+1, j-1 {
+		s[i], s[j] = s[j], s[i]
+	}
+}

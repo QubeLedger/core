@@ -1,6 +1,7 @@
 package keeper_test
 
 import (
+	"sort"
 	"testing"
 	"time"
 
@@ -11,7 +12,6 @@ import (
 	simapp "github.com/QuadrateOrg/core/app/helpers"
 	apptypes "github.com/QuadrateOrg/core/types"
 	"github.com/QuadrateOrg/core/x/epochs/types"
-	"github.com/QuadrateOrg/core/x/epochs/utils"
 )
 
 // This test is responsible for testing how epochs increment based off
@@ -94,7 +94,9 @@ func (suite *KeeperTestSuite) TestEpochInfoBeginBlockChanges() {
 
 			// get sorted heights
 			heights := maps.Keys(test.blockHeightTimePairs)
-			utils.SortSlice(heights)
+			sort.Slice(heights, func(i, j int) bool {
+				return heights[i] < heights[j]
+			})
 			for _, h := range heights {
 				// for each height in order, run begin block
 				suite.Ctx = suite.Ctx.WithBlockHeight(int64(h)).WithBlockTime(test.blockHeightTimePairs[h])
