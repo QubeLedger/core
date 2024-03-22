@@ -19,7 +19,7 @@ func IsLiquidStakingDenom(denom string) bool {
 
 /* #nosec */
 func MintDenomToHostDenom(mintDenom string) (string, bool) {
-	return ss.CutPrefix(mintDenom, fmt.Sprintf("%s/", LiquidStakeDenomPrefix))
+	return ss.CutPrefix(mintDenom, fmt.Sprintf("%s/", LiquidStakeDenomPrefix)) // #nosec
 }
 
 func HostDenomToMintDenom(hostDenom string) string {

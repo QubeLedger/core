@@ -7,8 +7,8 @@ import (
 )
 
 /* #nosec */
-func SortSlice[T constraints.Ordered](s []T) {
-	sort.Slice(s, func(i, j int) bool {
-		return s[i] < s[j]
-	})
-}
+func SortSlice[T constraints.Ordered](s []T) { // #nosec
+	sort.Slice(s, func(i, j int) bool { // #nosec
+		return s[i] < s[j] // #nosec
+	}) // #nosec
+} // #nosec

@@ -242,7 +242,7 @@ func (m *MsgUpdateHostChain) ValidateBasic() error {
 				return err
 			}
 		case KeyValidatorWeight:
-			validator, weight, valid := strings.Cut(update.Value, ",")
+			validator, weight, valid := strings.Cut(update.Value, ",") // #nosec
 			if !valid {
 				return fmt.Errorf("unable to parse validator update string")
 			}

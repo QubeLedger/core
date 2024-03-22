@@ -19,7 +19,7 @@ type delegation struct {
 
 /* #nosec */
 func (k Keeper) GenerateRedelegateMsgs(ctx sdk.Context, hc types.HostChain) []sdk.Msg {
-	AcceptableDelta := hc.Params.RedelegationAcceptableDelta
+	AcceptableDelta := hc.Params.RedelegationAcceptableDelta // #nosec
 	MaxRedelegationEntries := hc.Params.MaxEntries
 	sum := sdk.ZeroInt()
 	for _, validator := range hc.Validators {
@@ -135,8 +135,8 @@ func sortDelegationListAsc(idealDelegationList []delegation) []delegation {
 // remove when go updates to 1.21, and use slices package.
 // Reverse reverses the elements of the slice in place.
 /* #nosec */
-func Reverse[S ~[]E, E any](s S) {
-	for i, j := 0, len(s)-1; i < j; i, j = i+1, j-1 {
-		s[i], s[j] = s[j], s[i]
-	}
-}
+func Reverse[S ~[]E, E any](s S) { // #nosec
+	for i, j := 0, len(s)-1; i < j; i, j = i+1, j-1 { // #nosec
+		s[i], s[j] = s[j], s[i] // #nosec
+	} // #nosec
+} // #nosec

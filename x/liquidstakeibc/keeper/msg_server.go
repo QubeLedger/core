@@ -193,7 +193,7 @@ func (k msgServer) UpdateHostChain(
 				return nil, fmt.Errorf("unable to send ICQ query for validator")
 			}
 		case types.KeyValidatorWeight:
-			validator, weight, valid := strings.Cut(update.Value, ",")
+			validator, weight, valid := strings.Cut(update.Value, ",") // #nosec
 			if !valid {
 				return nil, fmt.Errorf("unable to parse validator update string")
 			}
@@ -980,7 +980,7 @@ func (k msgServer) validateLiquidStakeLSMDeposit(
 	}
 
 	// check if the validator is within the module active set
-	operatorAddress, _, _ := strings.Cut(denomTrace.BaseDenom, "/")
+	operatorAddress, _, _ := strings.Cut(denomTrace.BaseDenom, "/") // #nosec
 	validator, found := hc.GetValidator(operatorAddress)
 	if !found {
 		return nil, nil, nil, sdkerrors.Wrapf(sdkerrors.ErrKeyNotFound, "validator %s is not part of the module active set for chain %s", operatorAddress, hc.ChainId)

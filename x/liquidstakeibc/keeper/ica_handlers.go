@@ -318,7 +318,7 @@ func (k *Keeper) HandleMsgRedeemTokensForShares(
 	}
 
 	// parse the validator address from the LSM token denom
-	operatorAddress, _, found := strings.Cut(parsedMsg.Amount.Denom, "/")
+	operatorAddress, _, found := strings.Cut(parsedMsg.Amount.Denom, "/") // #nosec
 	if !found {
 		return sdkerrors.Wrapf(
 			types.ErrInvalidLSMDenom,

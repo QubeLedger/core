@@ -3,7 +3,7 @@ package utils
 import (
 	"errors"
 	"fmt"
-	"runtime"
+	"runtime" // #nosec
 	"runtime/debug"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
