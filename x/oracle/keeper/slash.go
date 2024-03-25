@@ -2,6 +2,7 @@ package keeper
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 )
 
 // SlashAndResetMissCounters do slash any operator who over criteria & clear all operators miss counter to zero
@@ -38,6 +39,7 @@ func (k Keeper) SlashAndResetMissCounters(ctx sdk.Context) {
 				k.SlashingKeeper.Slash(
 					ctx, consAddr, slashFraction,
 					validator.GetConsensusPower(powerReduction), distributionHeight,
+					stakingtypes.InfractionEmpty,
 				)
 				k.SlashingKeeper.Jail(ctx, consAddr)
 			}

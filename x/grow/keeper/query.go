@@ -32,8 +32,23 @@ func (k Keeper) AssetByAssetId(goCtx context.Context, req *types.QueryAssetByAss
 		return nil, status.Error(codes.NotFound, "not found")
 	}
 
+	sir := 0.0
+	bir := 0.0
+
+	utilization_rate := (float64(Asset.CollectivelyBorrowValue) / float64(Asset.ProvideValue))
+	if utilization_rate > 0 {
+		bir_temp, sir_temp, err := k.GetRatesByUtilizationRate(ctx, utilization_rate, Asset)
+		if err != nil {
+			return nil, types.ErrCalculateBIROrSIR
+		}
+		sir = sir_temp
+		bir = bir_temp
+	}
+
 	return &types.QueryAssetByAssetIdResponse{
-		Asset: Asset,
+		Asset:              Asset,
+		SupplyInterestRate: sir,
+		BorrowInterestRate: bir,
 	}, nil
 }
 

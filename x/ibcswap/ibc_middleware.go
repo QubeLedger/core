@@ -299,7 +299,7 @@ func (im IBCMiddleware) handleNoRefund(
 	if !ok {
 		wrappedErr := sdkerrors.Wrapf(
 			transfertypes.ErrInvalidAmount,
-			"unable to parse transfer amount (%s) into math.Int",
+			"unable to parse transfer amount (%s) into sdk.Int",
 			data.Amount,
 		)
 		wrappedErr = sdkerrors.Wrap(swapErr, wrappedErr.Error())

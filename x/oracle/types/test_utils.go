@@ -124,8 +124,9 @@ func (DummyStakingKeeper) PowerReduction(ctx sdk.Context) (res sdk.Int) {
 
 // MockValidator nolint
 type MockValidator struct {
-	power    int64
-	operator sdk.ValAddress
+	power        int64
+	operator     sdk.ValAddress
+	LiquidShares sdk.Dec
 }
 
 var _ stakingtypes.ValidatorI = MockValidator{}
@@ -161,6 +162,7 @@ func (v MockValidator) SharesFromTokens(amt sdk.Int) (sdk.Dec, error)  { return 
 func (v MockValidator) SharesFromTokensTruncated(amt sdk.Int) (sdk.Dec, error) {
 	return sdk.ZeroDec(), nil
 }
+func (v MockValidator) GetLiquidShares() sdk.Dec { return v.LiquidShares }
 
 func NewMockValidator(valAddr sdk.ValAddress, power int64) MockValidator {
 	return MockValidator{

@@ -9,8 +9,8 @@ import (
 
 // StakingKeeper is expected keeper for staking module
 type SlashingKeeper interface {
-	Slash(sdk.Context, sdk.ConsAddress, sdk.Dec, int64, int64) // slash the validator and delegators of the validator, specifying slash fraction, offence power and offence height
-	Jail(sdk.Context, sdk.ConsAddress)                         // jail a validator
+	Slash(sdk.Context, sdk.ConsAddress, sdk.Dec, int64, int64, stakingtypes.InfractionType) // slash the validator and delegators of the validator, specifying slash fraction, offence power and offence height
+	Jail(sdk.Context, sdk.ConsAddress)                                                      // jail a validator
 }
 
 // StakingKeeper is expected keeper for staking module
