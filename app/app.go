@@ -131,6 +131,7 @@ import (
 	v022 "github.com/QuadrateOrg/core/app/upgrades/v2/v2"
 	v025 "github.com/QuadrateOrg/core/app/upgrades/v2/v5"
 	v025rc0 "github.com/QuadrateOrg/core/app/upgrades/v2/v5rc0"
+	v030 "github.com/QuadrateOrg/core/app/upgrades/v3/v0"
 
 	oraclemodule "github.com/QuadrateOrg/core/x/oracle"
 	oracleclient "github.com/QuadrateOrg/core/x/oracle/client"
@@ -1264,6 +1265,17 @@ func (app *QuadrateApp) setUpgradeHandlers() {
 		),
 	)
 
+	app.UpgradeKeeper.SetUpgradeHandler(
+		v030.UpgradeName,
+		v030.CreateUpgradeHandler(
+			app.mm,
+			app.configurator,
+			app.StableKeeper,
+			app.GrowKeeper,
+			app.LiquidStakeIBCKeeper,
+		),
+	)
+
 	// When a planned update height is reached, the old binary will panic
 	// writing on disk the height and name of the update that triggered it
 	// This will read that value, and execute the preparations for the upgrade.
@@ -1288,6 +1300,8 @@ func (app *QuadrateApp) setUpgradeHandlers() {
 		storeUpgrades = append(storeUpgrades, &v1.Upgrade.StoreUpgrades)
 	case v025.UpgradeName:
 	case v025rc0.UpgradeName:
+	case v030.UpgradeName:
+		storeUpgrades = append(storeUpgrades, &v030.Upgrade.StoreUpgrades)
 	}
 
 	for _, storeUpgrade := range storeUpgrades {
