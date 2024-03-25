@@ -88,6 +88,8 @@ message QueryAssetByAssetIdRequest {
 
 message QueryAssetByAssetIdResponse {
   Asset asset = 1 [(gogoproto.nullable) = false];
+  double supply_interest_rate = 2;
+  double borrow_interest_rate = 3;
 }
 
 
