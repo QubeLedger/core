@@ -113,7 +113,7 @@ func (k Keeper) RefundPacketToken(
 	if !ok {
 		return sdkerrors.Wrapf(
 			transfertypes.ErrInvalidAmount,
-			"unable to parse transfer amount (%s) into math.Int",
+			"unable to parse transfer amount (%s) into sdk.Int",
 			data.Amount,
 		)
 	}
