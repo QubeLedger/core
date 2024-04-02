@@ -1,0 +1,45 @@
+syntax = "proto3";
+package core.perpetual.v1beta1;
+
+import "gogoproto/gogo.proto";
+import "core/perpetual/v1beta1/vault.proto";
+
+option go_package = "github.com/QuadrateOrg/core/x/perpetual/types";
+
+// Msg defines the Msg service.
+service Msg {
+        rpc PerpetualDeposit(MsgPerpetualDeposit) returns (MsgPerpetualDepositResponse);
+        rpc PerpetualWithdraw(MsgPerpetualWithdraw) returns (MsgPerpetualWithdrawResponse);
+        rpc CreatePosition(MsgCreatePosition) returns (MsgCreatePositionResponse);
+        rpc ClosePosition(MsgClosePosition) returns (MsgClosePositionResponse);
+}
+
+message MsgPerpetualDeposit {
+        string trader = 1;
+        string amountIn = 2; 
+}
+
+message MsgPerpetualDepositResponse {}
+
+message MsgPerpetualWithdraw {
+        string trader = 1;
+        string deposit_id = 2; 
+}
+
+message MsgPerpetualWithdrawResponse {}
+      
+message MsgCreatePosition {
+        string trader = 1;
+        string amountIn = 2;
+        uint64 leverage = 3;
+        PerpetualTradeType trade_type = 4;
+}
+
+message MsgCreatePositionResponse {}
+
+message MsgClosePosition {
+        string trader = 1;
+        string position_id = 2;
+}
+
+message MsgClosePositionResponse {}

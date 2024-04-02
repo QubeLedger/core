@@ -1,0 +1,20 @@
+syntax = "proto3";
+package core.perpetual.v1beta1;
+
+import "gogoproto/gogo.proto";
+import "core/perpetual/v1beta1/params.proto";
+import "google/api/annotations.proto";
+option go_package = "github.com/QuadrateOrg/core/x/perpetual/types";
+
+// Query defines the gRPC querier service.
+service Query {
+        rpc Params(QueryParamsRequest) returns (QueryParamsResponse) {
+                option (google.api.http).get = "/core/perpetual/v1beta1/params";
+        }
+}
+
+message QueryParamsRequest {}
+
+message QueryParamsResponse {
+        Params params = 1;
+}

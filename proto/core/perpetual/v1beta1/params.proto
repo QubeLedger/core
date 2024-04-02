@@ -1,0 +1,13 @@
+syntax = "proto3";
+package core.perpetual.v1beta1;
+
+import "gogoproto/gogo.proto";
+import "core/perpetual/v1beta1/vault.proto";
+
+option go_package = "github.com/QuadrateOrg/core/x/perpetual/types";
+
+// Params defines the parameters for the module.
+message Params {
+        option (gogoproto.goproto_stringer) = false;
+        repeated Vault vaults = 1;
+}
