@@ -2,44 +2,34 @@ syntax = "proto3";
 package core.perpetual.v1beta1;
 
 import "gogoproto/gogo.proto";
-import "core/perpetual/v1beta1/vault.proto";
+import "core/perpetual/v1beta1/perpetual.proto";
 
 option go_package = "github.com/QuadrateOrg/core/x/perpetual/types";
 
 // Msg defines the Msg service.
 service Msg {
-        rpc PerpetualDeposit(MsgPerpetualDeposit) returns (MsgPerpetualDepositResponse);
-        rpc PerpetualWithdraw(MsgPerpetualWithdraw) returns (MsgPerpetualWithdrawResponse);
-        rpc CreatePosition(MsgCreatePosition) returns (MsgCreatePositionResponse);
-        rpc ClosePosition(MsgClosePosition) returns (MsgClosePositionResponse);
+        rpc Open(MsgOpen) returns (MsgOpenResponse);
+        rpc Close(MsgClose) returns (MsgCloseResponse);
 }
 
-message MsgPerpetualDeposit {
-        string trader = 1;
-        string amountIn = 2; 
+message MsgOpen {
+        string creator = 1;
+        PerpetualTradeType trade_type = 2;
+        string leverage = 3 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec", (gogoproto.nullable) = false];
+        string trading_asset = 4;
+        string collateral = 5;
+        string take_profit_price = 6 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec", (gogoproto.nullable) = false];
 }
 
-message MsgPerpetualDepositResponse {}
+message MsgOpenResponse {}
 
-message MsgPerpetualWithdraw {
-        string trader = 1;
-        string deposit_id = 2; 
+message MsgClose {
+        string creator = 1;
+        uint64 id = 2;
+        string amount = 3 [
+                (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
+                (gogoproto.nullable) = false
+        ];
 }
 
-message MsgPerpetualWithdrawResponse {}
-      
-message MsgCreatePosition {
-        string trader = 1;
-        string amountIn = 2;
-        uint64 leverage = 3;
-        PerpetualTradeType trade_type = 4;
-}
-
-message MsgCreatePositionResponse {}
-
-message MsgClosePosition {
-        string trader = 1;
-        string position_id = 2;
-}
-
-message MsgClosePositionResponse {}
+message MsgCloseResponse {}

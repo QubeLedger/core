@@ -8,6 +8,6 @@ import (
 
 // x/perpetual module sentinel errors
 var (
-	ErrSample         = sdkerrors.Register(ModuleName, 1100, "sample error")
-	ErrDepositIdEmpty = sdkerrors.Register(ModuleName, 1101, "ErrDepositIdEmpty err")
+	ErrSample            = sdkerrors.Register(ModuleName, 1100, "sample error")
+	ErrTradingAssetEmpty = sdkerrors.Register(ModuleName, 1101, "ErrTradingAssetEmpty err")
 )

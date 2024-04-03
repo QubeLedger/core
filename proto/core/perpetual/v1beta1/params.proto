@@ -2,7 +2,7 @@ syntax = "proto3";
 package core.perpetual.v1beta1;
 
 import "gogoproto/gogo.proto";
-import "core/perpetual/v1beta1/vault.proto";
+import "core/perpetual/v1beta1/perpetual.proto";
 
 option go_package = "github.com/QuadrateOrg/core/x/perpetual/types";
 

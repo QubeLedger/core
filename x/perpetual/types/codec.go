@@ -8,24 +8,16 @@ import (
 )
 
 func RegisterCodec(cdc *codec.LegacyAmino) {
-	cdc.RegisterConcrete(&MsgPerpetualDeposit{}, "perpetual/PerpetualDeposit", nil)
-	cdc.RegisterConcrete(&MsgPerpetualWithdraw{}, "perpetual/PerpetualWithdraw", nil)
-	cdc.RegisterConcrete(&MsgCreatePosition{}, "perpetual/CreatePosition", nil)
-	cdc.RegisterConcrete(&MsgClosePosition{}, "perpetual/ClosePosition", nil)
+	cdc.RegisterConcrete(&MsgOpen{}, "perpetual/Open", nil)
+	cdc.RegisterConcrete(&MsgClose{}, "perpetual/Close", nil)
 }
 
 func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
 	registry.RegisterImplementations((*sdk.Msg)(nil),
-		&MsgPerpetualDeposit{},
+		&MsgOpen{},
 	)
 	registry.RegisterImplementations((*sdk.Msg)(nil),
-		&MsgPerpetualWithdraw{},
-	)
-	registry.RegisterImplementations((*sdk.Msg)(nil),
-		&MsgCreatePosition{},
-	)
-	registry.RegisterImplementations((*sdk.Msg)(nil),
-		&MsgClosePosition{},
+		&MsgOpen{},
 	)
 
 	msgservice.RegisterMsgServiceDesc(registry, &_Msg_serviceDesc)

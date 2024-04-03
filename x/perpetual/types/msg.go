@@ -5,164 +5,97 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
-const TypeMsgPerpetualDeposit = "perpetual_deposit"
-const TypeMsgPerpetualWithdraw = "perpetual_withdraw"
-const TypeMsgCreatePosition = "create_position"
-const TypeMsgClosePosition = "close_position"
+const TypeMsgOpen = "perpetual_open"
+const TypeMsgClose = "perpetual_close"
 
-var _ sdk.Msg = &MsgPerpetualDeposit{}
+var _ sdk.Msg = &MsgOpen{}
 
-func NewMsgPerpetualDeposit(trader string, amountIn string) *MsgPerpetualDeposit {
-	return &MsgPerpetualDeposit{
-		Trader:   trader,
-		AmountIn: amountIn,
+func NewMsgOpen(Creator string, TradeType PerpetualTradeType, Leverage sdk.Dec, TradingAsset string, Collateral string, TakeProfitPrice sdk.Dec) *MsgOpen {
+	return &MsgOpen{
+		Creator:         Creator,
+		TradeType:       TradeType,
+		Leverage:        Leverage,
+		TradingAsset:    TradingAsset,
+		Collateral:      Collateral,
+		TakeProfitPrice: TakeProfitPrice,
 	}
 }
 
-func (msg *MsgPerpetualDeposit) Route() string {
+func (msg *MsgOpen) Route() string {
 	return RouterKey
 }
 
-func (msg *MsgPerpetualDeposit) Type() string {
-	return TypeMsgPerpetualDeposit
+func (msg *MsgOpen) Type() string {
+	return TypeMsgOpen
 }
 
-func (msg *MsgPerpetualDeposit) GetSigners() []sdk.AccAddress {
-	creator, err := sdk.AccAddressFromBech32(msg.Trader)
+func (msg *MsgOpen) GetSigners() []sdk.AccAddress {
+	creator, err := sdk.AccAddressFromBech32(msg.Creator)
 	if err != nil {
 		panic(err)
 	}
 	return []sdk.AccAddress{creator}
 }
 
-func (msg *MsgPerpetualDeposit) GetSignBytes() []byte {
+func (msg *MsgOpen) GetSignBytes() []byte {
 	bz := ModuleCdc.MustMarshalJSON(msg)
 	return sdk.MustSortJSON(bz)
 }
 
-func (msg *MsgPerpetualDeposit) ValidateBasic() error {
-	_, err := sdk.AccAddressFromBech32(msg.Trader)
+func (msg *MsgOpen) ValidateBasic() error {
+	_, err := sdk.AccAddressFromBech32(msg.Creator)
 	if err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
 	}
+
+	_, err = sdk.ParseCoinsNormalized(msg.Collateral)
+	if err != nil {
+		return err
+	}
+
+	if msg.TradingAsset == "" {
+		return sdkerrors.Wrapf(ErrTradingAssetEmpty, "TradingAsset emprty (%s)", err)
+	}
+
 	return nil
 }
 
-var _ sdk.Msg = &MsgPerpetualWithdraw{}
+var _ sdk.Msg = &MsgClose{}
 
-func NewMsgPerpetualWithdraw(trader string, deposit_id string) *MsgPerpetualWithdraw {
-	return &MsgPerpetualWithdraw{
-		Trader:    trader,
-		DepositId: deposit_id,
+func NewMsgClose(Creator string, id uint64, amount sdk.Int) *MsgClose {
+	return &MsgClose{
+		Creator: Creator,
+		Id:      id,
+		Amount:  amount,
 	}
 }
 
-func (msg *MsgPerpetualWithdraw) Route() string {
+func (msg *MsgClose) Route() string {
 	return RouterKey
 }
 
-func (msg *MsgPerpetualWithdraw) Type() string {
-	return TypeMsgPerpetualWithdraw
+func (msg *MsgClose) Type() string {
+	return TypeMsgClose
 }
 
-func (msg *MsgPerpetualWithdraw) GetSigners() []sdk.AccAddress {
-	creator, err := sdk.AccAddressFromBech32(msg.Trader)
+func (msg *MsgClose) GetSigners() []sdk.AccAddress {
+	creator, err := sdk.AccAddressFromBech32(msg.Creator)
 	if err != nil {
 		panic(err)
 	}
 	return []sdk.AccAddress{creator}
 }
 
-func (msg *MsgPerpetualWithdraw) GetSignBytes() []byte {
+func (msg *MsgClose) GetSignBytes() []byte {
 	bz := ModuleCdc.MustMarshalJSON(msg)
 	return sdk.MustSortJSON(bz)
 }
 
-func (msg *MsgPerpetualWithdraw) ValidateBasic() error {
-	_, err := sdk.AccAddressFromBech32(msg.Trader)
+func (msg *MsgClose) ValidateBasic() error {
+	_, err := sdk.AccAddressFromBech32(msg.Creator)
 	if err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
 	}
-	if msg.DepositId == "" {
-		return sdkerrors.Wrapf(ErrDepositIdEmpty, "deposit id empty (%s)", ErrDepositIdEmpty)
-	}
-	return nil
-}
 
-var _ sdk.Msg = &MsgCreatePosition{}
-
-func NewMsgCreatePosition(trader string, amountIn string, leverage uint64, tradeType PerpetualTradeType) *MsgCreatePosition {
-	return &MsgCreatePosition{
-		Trader:    trader,
-		AmountIn:  amountIn,
-		Leverage:  leverage,
-		TradeType: tradeType,
-	}
-}
-
-func (msg *MsgCreatePosition) Route() string {
-	return RouterKey
-}
-
-func (msg *MsgCreatePosition) Type() string {
-	return TypeMsgCreatePosition
-}
-
-func (msg *MsgCreatePosition) GetSigners() []sdk.AccAddress {
-	creator, err := sdk.AccAddressFromBech32(msg.Trader)
-	if err != nil {
-		panic(err)
-	}
-	return []sdk.AccAddress{creator}
-}
-
-func (msg *MsgCreatePosition) GetSignBytes() []byte {
-	bz := ModuleCdc.MustMarshalJSON(msg)
-	return sdk.MustSortJSON(bz)
-}
-
-func (msg *MsgCreatePosition) ValidateBasic() error {
-	_, err := sdk.AccAddressFromBech32(msg.Trader)
-	if err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
-	}
-	return nil
-}
-
-var _ sdk.Msg = &MsgClosePosition{}
-
-func NewMsgClosePosition(trader string, pos_id string) *MsgClosePosition {
-	return &MsgClosePosition{
-		Trader:     trader,
-		PositionId: pos_id,
-	}
-}
-
-func (msg *MsgClosePosition) Route() string {
-	return RouterKey
-}
-
-func (msg *MsgClosePosition) Type() string {
-	return TypeMsgClosePosition
-}
-
-func (msg *MsgClosePosition) GetSigners() []sdk.AccAddress {
-	creator, err := sdk.AccAddressFromBech32(msg.Trader)
-	if err != nil {
-		panic(err)
-	}
-	return []sdk.AccAddress{creator}
-}
-
-func (msg *MsgClosePosition) GetSignBytes() []byte {
-	bz := ModuleCdc.MustMarshalJSON(msg)
-	return sdk.MustSortJSON(bz)
-}
-
-func (msg *MsgClosePosition) ValidateBasic() error {
-	_, err := sdk.AccAddressFromBech32(msg.Trader)
-	if err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
-	}
 	return nil
 }
