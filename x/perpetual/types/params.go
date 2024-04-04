@@ -5,7 +5,11 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-var _ paramtypes.ParamSet = (*Params)(nil)
+var _ paramtypes.ParamSet = &Params{}
+
+var (
+	KeyVaults = []byte("Vaults")
+)
 
 // ParamKeyTable the param key table for launch module
 func ParamKeyTable() paramtypes.KeyTable {
@@ -14,7 +18,9 @@ func ParamKeyTable() paramtypes.KeyTable {
 
 // NewParams creates a new Params instance
 func NewParams() Params {
-	return Params{}
+	return Params{
+		Vaults: []*Vault{},
+	}
 }
 
 // DefaultParams returns a default set of parameters
@@ -24,7 +30,9 @@ func DefaultParams() Params {
 
 // ParamSetPairs get the params.ParamSet
 func (p *Params) ParamSetPairs() paramtypes.ParamSetPairs {
-	return paramtypes.ParamSetPairs{}
+	return paramtypes.ParamSetPairs{
+		paramtypes.NewParamSetPair(KeyVaults, &p.Vaults, validate),
+	}
 }
 
 // Validate validates the set of params
@@ -36,4 +44,9 @@ func (p Params) Validate() error {
 func (p Params) String() string {
 	out, _ := yaml.Marshal(p)
 	return string(out)
+}
+
+// TODO
+func validate(i interface{}) error {
+	return nil
 }

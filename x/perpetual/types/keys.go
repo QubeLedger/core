@@ -17,3 +17,13 @@ const (
 func KeyPrefix(p string) []byte {
 	return []byte(p)
 }
+
+const (
+	PositionKey      = "Position/value/"
+	PositionCountKey = "Position/count/"
+)
+
+const (
+	VaultKey      = "Vault/value/"
+	VaultCountKey = "Vault/count/"
+)

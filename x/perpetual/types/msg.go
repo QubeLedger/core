@@ -10,14 +10,13 @@ const TypeMsgClose = "perpetual_close"
 
 var _ sdk.Msg = &MsgOpen{}
 
-func NewMsgOpen(Creator string, TradeType PerpetualTradeType, Leverage sdk.Dec, TradingAsset string, Collateral string, TakeProfitPrice sdk.Dec) *MsgOpen {
+func NewMsgOpen(Creator string, TradeType PerpetualTradeType, Leverage sdk.Dec, TradingAsset string, Collateral string) *MsgOpen {
 	return &MsgOpen{
-		Creator:         Creator,
-		TradeType:       TradeType,
-		Leverage:        Leverage,
-		TradingAsset:    TradingAsset,
-		Collateral:      Collateral,
-		TakeProfitPrice: TakeProfitPrice,
+		Creator:      Creator,
+		TradeType:    TradeType,
+		Leverage:     Leverage,
+		TradingAsset: TradingAsset,
+		Collateral:   Collateral,
 	}
 }
 

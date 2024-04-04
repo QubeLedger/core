@@ -23,7 +23,11 @@ message TradePosition {
                 (gogoproto.nullable) = false
         ];
         string collateral_denom = 8;
-        string take_profit_price = 9 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec", (gogoproto.nullable) = false];
+        string return_amount = 9 [
+                (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
+                (gogoproto.nullable) = false
+        ];
+        string return_denom = 10;
 }
 
 message Vault {
@@ -31,9 +35,18 @@ message Vault {
         string vault_id = 2;
         cosmos.bank.v1beta1.Metadata amountXMetadata = 3 [ (gogoproto.moretags) = "yaml:\"amountXMetadata\"", (gogoproto.nullable)   = false ];
         cosmos.bank.v1beta1.Metadata amountYMetadata = 4 [ (gogoproto.moretags) = "yaml:\"amountYMetadata\"", (gogoproto.nullable)   = false ];
-        uint64 x = 5;
-        uint64 y = 6;
-        uint64 k = 7;
+        string x = 5 [
+                (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
+                (gogoproto.nullable) = false
+        ];
+        string y = 6 [
+                (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
+                (gogoproto.nullable) = false
+        ];
+        string k = 7 [
+                (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
+                (gogoproto.nullable) = false
+        ];
         string OracleAssetId = 8;
         repeated TradePosition long_position = 9 [(gogoproto.nullable) = false]; 
         repeated TradePosition short_position = 10 [(gogoproto.nullable) = false]; 

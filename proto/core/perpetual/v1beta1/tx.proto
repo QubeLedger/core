@@ -18,7 +18,6 @@ message MsgOpen {
         string leverage = 3 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec", (gogoproto.nullable) = false];
         string trading_asset = 4;
         string collateral = 5;
-        string take_profit_price = 6 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec", (gogoproto.nullable) = false];
 }
 
 message MsgOpenResponse {}
