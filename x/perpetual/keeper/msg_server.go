@@ -21,5 +21,12 @@ func (k Keeper) Open(goCtx context.Context, msg *types.MsgOpen) (*types.MsgOpenR
 }
 
 func (k Keeper) Close(goCtx context.Context, msg *types.MsgClose) (*types.MsgCloseResponse, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	err := k.ClosePosition(ctx, msg)
+	if err != nil {
+		return nil, err
+	}
+
 	return &types.MsgCloseResponse{}, nil
 }

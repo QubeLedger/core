@@ -12,7 +12,7 @@ func (k Keeper) CreateNewPosition(ctx sdk.Context, msg *types.MsgOpen, vault typ
 		return err
 	}
 
-	vault, return_amount, err := k.UpdateVaultByTradeType(ctx, vault, msg.Leverage, collateral_coins.AmountOf(vault.AmountXMetadata.Base), msg.TradeType)
+	vault, return_amount, err := k.UpdateVaultByTradeTypeWhenOpenPosition(ctx, vault, msg.Leverage, collateral_coins.AmountOf(vault.AmountXMetadata.Base), msg.TradeType)
 	if err != nil {
 		return err
 	}
@@ -35,14 +35,66 @@ func (k Keeper) CreateNewPosition(ctx sdk.Context, msg *types.MsgOpen, vault typ
 
 	_ = k.AppendPosition(ctx, position)
 
-	switch msg.TradeType {
+	/*switch msg.TradeType {
 	case types.PerpetualTradeType_PERPETUAL_LONG_POSITION:
 		vault.LongPosition = append(vault.LongPosition, position)
 	case types.PerpetualTradeType_PERPETUAL_SHORT_POSITION:
 		vault.ShortPosition = append(vault.ShortPosition, position)
-	}
+	}*/
 
 	k.SetVault(ctx, vault)
 
+	return nil
+}
+
+func (k Keeper) CloseOrDecreasePosition(ctx sdk.Context, msg *types.MsgClose, vault types.Vault, position types.TradePosition) error {
+
+	sender, err := sdk.AccAddressFromBech32(msg.Creator)
+	if err != nil {
+		return err
+	}
+
+	if msg.Amount.GT(position.ReturnAmount) {
+		return types.ErrAmountGreaterThanPositionSize
+	}
+
+	vault, return_amount, err := k.UpdateVaultByTradeTypeWhenClosePosition(ctx, vault, msg.Amount, position)
+	if err != nil {
+		return err
+	}
+
+	if return_amount.IsNil() {
+		return types.ErrInCalculationUpdateVault
+	}
+
+	if msg.Amount.Equal(position.ReturnAmount) {
+
+		/*switch position.TradeType {
+		case types.PerpetualTradeType_PERPETUAL_LONG_POSITION:
+			vault = k.RemoveLongFromVault(ctx, position.TradePositionId, vault)
+		case types.PerpetualTradeType_PERPETUAL_SHORT_POSITION:
+			vault = k.RemoveShortFromVault(ctx, position.TradePositionId, vault)
+		}*/
+
+		return_coins := sdk.NewCoins(
+			sdk.NewCoin(
+				position.CollateralDenom,
+				return_amount.Quo(position.Leverage.RoundInt()),
+			),
+		)
+
+		err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, sender, return_coins)
+		if err != nil {
+			return err
+		}
+
+		k.RemovePosition(ctx, position.Id)
+	} else {
+		position.ReturnAmount = position.ReturnAmount.Sub(msg.Amount)
+		position.CollateralAmount = position.CollateralAmount.Add(return_amount.Sub(position.CollateralAmount))
+		k.SetPosition(ctx, position)
+	}
+
+	k.SetVault(ctx, vault)
 	return nil
 }

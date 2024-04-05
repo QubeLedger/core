@@ -13,6 +13,7 @@ func (suite *PerpetualKeeperTestSuite) TestOpenLongPosition() {
 		name            string
 		sendTokenDenom  string
 		sendTokenAmount int64
+		leverage        sdk.Dec
 		oracleAssetId   string
 		price           string
 		err             bool
@@ -22,6 +23,7 @@ func (suite *PerpetualKeeperTestSuite) TestOpenLongPosition() {
 			"ok-open",
 			TestDefaultXDenom,
 			2000,
+			sdk.NewDec(2),
 			TestDefaultOracleAssetId,
 			"8",
 			false,
@@ -47,7 +49,7 @@ func (suite *PerpetualKeeperTestSuite) TestOpenLongPosition() {
 			msg := types.NewMsgOpen(
 				suite.Address.String(),
 				types.PerpetualTradeType_PERPETUAL_LONG_POSITION,
-				sdk.NewDec(2),
+				tc.leverage,
 				s.app.PerpetualKeeper.GenerateVaultIdHash(TestDefaultXDenom, TestDefaultYDenom),
 				sdk.NewInt(tc.sendTokenAmount).String()+tc.sendTokenDenom,
 			)

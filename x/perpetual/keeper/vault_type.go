@@ -87,3 +87,21 @@ func (k Keeper) GetVaultByVaultId(ctx sdk.Context, vault_id string) (val types.V
 	}
 	return val, false
 }
+
+func (k Keeper) RemoveLongFromVault(ctx sdk.Context, pos_id string, vault types.Vault) types.Vault {
+	for i, lid := range vault.LongPosition {
+		if lid.TradePositionId == pos_id {
+			vault.LongPosition = append(vault.LongPosition[:i], vault.LongPosition[i+1:]...)
+		}
+	}
+	return vault
+}
+
+func (k Keeper) RemoveShortFromVault(ctx sdk.Context, pos_id string, vault types.Vault) types.Vault {
+	for i, lid := range vault.ShortPosition {
+		if lid.TradePositionId == pos_id {
+			vault.ShortPosition = append(vault.ShortPosition[:i], vault.ShortPosition[i+1:]...)
+		}
+	}
+	return vault
+}

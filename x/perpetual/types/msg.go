@@ -61,7 +61,7 @@ func (msg *MsgOpen) ValidateBasic() error {
 
 var _ sdk.Msg = &MsgClose{}
 
-func NewMsgClose(Creator string, id uint64, amount sdk.Int) *MsgClose {
+func NewMsgClose(Creator string, id string, amount sdk.Int) *MsgClose {
 	return &MsgClose{
 		Creator: Creator,
 		Id:      id,
