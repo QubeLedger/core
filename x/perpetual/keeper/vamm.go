@@ -46,14 +46,14 @@ func (k Keeper) UpdateVaultByTradeTypeWhenClosePosition(ctx sdk.Context, vault t
 }
 
 func (k Keeper) UpdateVaultWhenCloseLong(ctx sdk.Context, vault types.Vault, amount sdk.Int, position types.TradePosition) (types.Vault, sdk.Int) {
-	vault.Y = vault.Y.Add(position.ReturnAmount)
+	vault.Y = vault.Y.Add(amount)
 	return_amount := k.CalculateLongCloseAmountByAmount(ctx, vault, amount)
 	vault.X = vault.X.Sub(return_amount)
 	return vault, return_amount
 }
 
 func (k Keeper) UpdateVaultWhenCloseShort(ctx sdk.Context, vault types.Vault, amount sdk.Int, position types.TradePosition) (types.Vault, sdk.Int) {
-	vault.Y = vault.Y.Sub(position.ReturnAmount)
+	vault.Y = vault.Y.Sub(amount)
 	return_amount := k.CalculateShortCloseAmountByAmount(ctx, vault, amount)
 	vault.X = vault.X.Add(return_amount)
 	return vault, return_amount

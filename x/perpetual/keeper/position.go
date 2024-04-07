@@ -67,8 +67,9 @@ func (k Keeper) CloseOrDecreasePosition(ctx sdk.Context, msg *types.MsgClose, va
 		return types.ErrInCalculationUpdateVault
 	}
 
-	if msg.Amount.Equal(position.ReturnAmount) {
+	position.ProfitAmount = position.ProfitAmount.Add(return_amount)
 
+	if msg.Amount.Equal(position.ReturnAmount) {
 		/*switch position.TradeType {
 		case types.PerpetualTradeType_PERPETUAL_LONG_POSITION:
 			vault = k.RemoveLongFromVault(ctx, position.TradePositionId, vault)
@@ -76,10 +77,17 @@ func (k Keeper) CloseOrDecreasePosition(ctx sdk.Context, msg *types.MsgClose, va
 			vault = k.RemoveShortFromVault(ctx, position.TradePositionId, vault)
 		}*/
 
+		if position.ProfitAmount.GT(position.CollateralAmount) {
+			return_amount_plus := position.ProfitAmount.Sub(position.CollateralAmount.Mul(position.Leverage.RoundInt()))
+			return_amount = position.CollateralAmount.Add(return_amount_plus)
+		} else {
+			return_amount = position.ProfitAmount.Quo(position.Leverage.RoundInt())
+		}
+
 		return_coins := sdk.NewCoins(
 			sdk.NewCoin(
 				position.CollateralDenom,
-				return_amount.Quo(position.Leverage.RoundInt()),
+				return_amount,
 			),
 		)
 
@@ -91,7 +99,6 @@ func (k Keeper) CloseOrDecreasePosition(ctx sdk.Context, msg *types.MsgClose, va
 		k.RemovePosition(ctx, position.Id)
 	} else {
 		position.ReturnAmount = position.ReturnAmount.Sub(msg.Amount)
-		position.CollateralAmount = position.CollateralAmount.Add(return_amount.Sub(position.CollateralAmount))
 		k.SetPosition(ctx, position)
 	}
 
