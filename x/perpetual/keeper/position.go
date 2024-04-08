@@ -70,33 +70,53 @@ func (k Keeper) CloseOrDecreasePosition(ctx sdk.Context, msg *types.MsgClose, va
 	position.ProfitAmount = position.ProfitAmount.Add(return_amount)
 
 	if msg.Amount.Equal(position.ReturnAmount) {
-		/*switch position.TradeType {
-		case types.PerpetualTradeType_PERPETUAL_LONG_POSITION:
-			vault = k.RemoveLongFromVault(ctx, position.TradePositionId, vault)
-		case types.PerpetualTradeType_PERPETUAL_SHORT_POSITION:
-			vault = k.RemoveShortFromVault(ctx, position.TradePositionId, vault)
-		}*/
 
-		if position.ProfitAmount.GT(position.CollateralAmount) {
-			return_amount_plus := position.ProfitAmount.Sub(position.CollateralAmount.Mul(position.Leverage.RoundInt()))
-			return_amount = position.CollateralAmount.Add(return_amount_plus)
-		} else {
-			return_amount = position.ProfitAmount.Quo(position.Leverage.RoundInt())
+		if position.TradeType == types.PerpetualTradeType_PERPETUAL_LONG_POSITION {
+			if position.ProfitAmount.GT(position.CollateralAmount) {
+				return_amount_plus := position.ProfitAmount.Sub(position.CollateralAmount.Mul(position.Leverage.RoundInt()))
+				return_amount = position.CollateralAmount.Add(return_amount_plus)
+			} else {
+				return_amount = position.ProfitAmount.Quo(position.Leverage.RoundInt())
+			}
+
+			return_coins := sdk.NewCoins(
+				sdk.NewCoin(
+					position.CollateralDenom,
+					return_amount,
+				),
+			)
+
+			err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, sender, return_coins)
+			if err != nil {
+				return err
+			}
+
+			k.RemovePosition(ctx, position.Id)
+		} else if position.TradeType == types.PerpetualTradeType_PERPETUAL_SHORT_POSITION {
+
+			if position.ProfitAmount.GT(position.CollateralAmount) {
+				return_amount_plus := position.ProfitAmount.Sub(position.CollateralAmount.Mul(position.Leverage.RoundInt()))
+				return_amount = position.CollateralAmount.Sub(return_amount_plus)
+			} else {
+
+				return_amount_plus := (position.CollateralAmount.Mul(position.Leverage.RoundInt())).Sub(position.ProfitAmount)
+				return_amount = position.CollateralAmount.Add(return_amount_plus)
+			}
+
+			return_coins := sdk.NewCoins(
+				sdk.NewCoin(
+					position.CollateralDenom,
+					return_amount,
+				),
+			)
+
+			err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, sender, return_coins)
+			if err != nil {
+				return err
+			}
+
+			k.RemovePosition(ctx, position.Id)
 		}
-
-		return_coins := sdk.NewCoins(
-			sdk.NewCoin(
-				position.CollateralDenom,
-				return_amount,
-			),
-		)
-
-		err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, sender, return_coins)
-		if err != nil {
-			return err
-		}
-
-		k.RemovePosition(ctx, position.Id)
 	} else {
 		position.ReturnAmount = position.ReturnAmount.Sub(msg.Amount)
 		k.SetPosition(ctx, position)

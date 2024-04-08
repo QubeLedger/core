@@ -74,8 +74,8 @@ func (k Keeper) CalculateLongReturnAmountByVaultAndInput(ctx sdk.Context, vault 
 
 func (k Keeper) CalculateShortReturnAmountByVaultAndInput(ctx sdk.Context, vault types.Vault, amount sdk.Int) sdk.Int {
 
-	// (x + amount) * (y - return_amount) = k
-	// return_amount = (k / (x + amount)) - y * -1
+	// (x - amount) * (y - return_amount) = k
+	// return_amount = (k / (x - amount)) - y * -1
 
 	x_value := vault.X
 	y_value := vault.Y
@@ -100,13 +100,13 @@ func (k Keeper) CalculateLongCloseAmountByAmount(ctx sdk.Context, vault types.Va
 
 func (k Keeper) CalculateShortCloseAmountByAmount(ctx sdk.Context, vault types.Vault, amount sdk.Int) sdk.Int {
 
-	// (x + return_amount) * (y - amount) = k
-	// (k / (y + amount)) - x * -1
+	// (x + return_amount) * (y + amount) = k
+	// (k / (y + amount)) - x
 
 	x_value := vault.X
 	y_value := vault.Y
 	k_value := vault.K
 
-	return_amount := (k_value.Quo(y_value).Sub(x_value)).MulRaw(-1)
+	return_amount := (k_value.Quo(y_value).Sub(x_value))
 	return return_amount
 }
