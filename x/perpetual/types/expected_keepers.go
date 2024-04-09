@@ -1,6 +1,7 @@
 package types
 
 import (
+	oracletypes "github.com/QuadrateOrg/core/x/oracle/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/auth/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
@@ -25,4 +26,9 @@ type BankKeeper interface {
 	GetDenomMetaData(ctx sdk.Context, denom string) (banktypes.Metadata, bool)
 	SetDenomMetaData(ctx sdk.Context, denomMetaData banktypes.Metadata)
 	GetBalance(ctx sdk.Context, addr sdk.AccAddress, denom string) sdk.Coin
+}
+
+type OracleKeeper interface {
+	GetExchangeRate(ctx sdk.Context, denom string) (sdk.Dec, error)
+	Whitelist(ctx sdk.Context) (res oracletypes.DenomList)
 }

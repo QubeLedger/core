@@ -116,7 +116,7 @@ func (suite *PerpetualKeeperTestSuite) TestOpenAndCloseLongDifferenceUsers() {
 					),
 				)
 				suite.Require().Equal(true, f)
-				suite.Require().Greater(position.ReturnAmount.Int64(), int64(0))
+				suite.Require().Greater(position.ReturnAmount.RoundInt().Int64(), int64(0))
 			}
 
 			for _, close_position := range tc.close_long {
@@ -130,7 +130,7 @@ func (suite *PerpetualKeeperTestSuite) TestOpenAndCloseLongDifferenceUsers() {
 				msg := types.NewMsgClose(
 					close_position.user.String(),
 					close_position.id,
-					position.ReturnAmount,
+					position.ReturnAmount.RoundInt(),
 				)
 				ctx := sdk.WrapSDKContext(suite.ctx)
 				_, err := suite.app.PerpetualKeeper.Close(ctx, msg)
@@ -261,7 +261,7 @@ func (suite *PerpetualKeeperTestSuite) TestOpenAndCloseLongDifferenceUsersWithNo
 					),
 				)
 				suite.Require().Equal(true, f)
-				suite.Require().Greater(position.ReturnAmount.Int64(), int64(0))
+				suite.Require().Greater(position.ReturnAmount.RoundInt().Int64(), int64(0))
 			}
 
 			for _, close_position := range tc.close_long {
@@ -512,7 +512,7 @@ func (suite *PerpetualKeeperTestSuite) TestOpenAndCloseShortDifferenceUsersWithM
 					),
 				)
 				suite.Require().Equal(true, f)
-				suite.Require().Greater(position.ReturnAmount.Int64(), int64(0))
+				suite.Require().Greater(position.ReturnAmount.RoundInt().Int64(), int64(0))
 			}
 
 			for _, close_position := range tc.close_long {
@@ -526,7 +526,7 @@ func (suite *PerpetualKeeperTestSuite) TestOpenAndCloseShortDifferenceUsersWithM
 				msg := types.NewMsgClose(
 					close_position.user.String(),
 					close_position.id,
-					position.ReturnAmount,
+					position.ReturnAmount.RoundInt(),
 				)
 				ctx := sdk.WrapSDKContext(suite.ctx)
 				_, err := suite.app.PerpetualKeeper.Close(ctx, msg)

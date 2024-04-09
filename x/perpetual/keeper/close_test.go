@@ -92,7 +92,7 @@ func (suite *PerpetualKeeperTestSuite) TestCloseLongPosition() {
 					),
 				)
 				suite.Require().Equal(true, f)
-				suite.Require().Greater(position.ReturnAmount.Int64(), int64(0))
+				suite.Require().Greater(position.ReturnAmount.RoundInt().Int64(), int64(0))
 
 				vault, _ := s.app.PerpetualKeeper.GetVaultByVaultId(s.ctx, s.GetNormalTestVault().VaultId)
 				fmt.Printf("price in vAMM: %f\n", float64(vault.X.MulRaw(10000).Quo(vault.Y).Int64())/10000)

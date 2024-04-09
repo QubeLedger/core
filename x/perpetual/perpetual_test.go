@@ -1,4 +1,4 @@
-package keeper_test
+package perpetual_test
 
 import (
 	"testing"
@@ -23,7 +23,7 @@ import (
 	"github.com/stretchr/testify/suite"
 )
 
-type PerpetualKeeperTestSuite struct {
+type PerpetualTestSuite struct {
 	suite.Suite
 	ctx        sdk.Context
 	app        *app.QuadrateApp
@@ -32,16 +32,16 @@ type PerpetualKeeperTestSuite struct {
 	ValPubKeys []cryptotypes.PubKey
 }
 
-var s *PerpetualKeeperTestSuite
+var s *PerpetualTestSuite
 
 const (
-	TestDefaultYDenom        = "uatom"
-	TestDefaultXDenom        = "uusq"
-	TestDefaultOracleAssetId = "ATOM/USQ"
+	TestDefaultXDenom        = "uatom"
+	TestDefaultYDenom        = "uusq"
+	TestDefaultOracleAssetId = "USQ/ATOM"
 	TestInitXLiq             = 100000
 )
 
-func (s *PerpetualKeeperTestSuite) Setup() {
+func (s *PerpetualTestSuite) Setup() {
 	apptypes.SetConfig()
 	s.app = quadrateapptest.Setup(s.T(), "qube-1", false, 1)
 	s.Address = apptesting.CreateRandomAccounts(1)[0]
@@ -50,24 +50,23 @@ func (s *PerpetualKeeperTestSuite) Setup() {
 }
 
 func TestPerpetualKeeperTestSuite(t *testing.T) {
-	s = new(PerpetualKeeperTestSuite)
+	s = new(PerpetualTestSuite)
 	suite.Run(t, s)
 	// Run Ginkgo integration tests
 	RegisterFailHandler(Fail)
 	RunSpecs(t, "Keeper Suite")
 }
 
-func (suite *PerpetualKeeperTestSuite) Commit() {
+func (suite *PerpetualTestSuite) Commit() {
 	header := suite.ctx.BlockHeader()
 	suite.ctx = suite.app.BaseApp.NewContext(false, header)
 }
 
-func (suite *PerpetualKeeperTestSuite) GetNormalTestVault() *types.Vault {
+func (suite *PerpetualTestSuite) GetNormalTestVault() *types.Vault {
 	price, _ := s.app.OracleKeeper.GetExchangeRate(s.ctx, TestDefaultOracleAssetId)
-	priceInt := price.MulInt64(10000).RoundInt()
 	return &types.Vault{
 		VaultId: s.app.PerpetualKeeper.GenerateVaultIdHash(TestDefaultXDenom, TestDefaultYDenom),
-		AmountYMetadata: banktypes.Metadata{
+		AmountXMetadata: banktypes.Metadata{
 			Description: "",
 			DenomUnits: []*banktypes.DenomUnit{
 				{Denom: "uatom", Exponent: uint32(0), Aliases: []string{"microatom"}},
@@ -77,7 +76,7 @@ func (suite *PerpetualKeeperTestSuite) GetNormalTestVault() *types.Vault {
 			Name:    "ATOM",
 			Symbol:  "ATOM",
 		},
-		AmountXMetadata: banktypes.Metadata{
+		AmountYMetadata: banktypes.Metadata{
 			Description: "",
 			DenomUnits: []*banktypes.DenomUnit{
 				{Denom: "uusq", Exponent: uint32(0), Aliases: []string{"microuusq"}},
@@ -88,15 +87,15 @@ func (suite *PerpetualKeeperTestSuite) GetNormalTestVault() *types.Vault {
 			Symbol:  "USQ",
 		},
 		X:               sdk.NewInt(TestInitXLiq),
-		Y:               sdk.NewInt(TestInitXLiq).MulRaw(10000).Quo(priceInt),
-		K:               sdk.NewInt(TestInitXLiq).Mul(sdk.NewInt(TestInitXLiq).MulRaw(10000).Quo(priceInt)),
+		Y:               (sdk.NewDec(TestInitXLiq).Mul(price)).RoundInt(),
+		K:               sdk.NewInt(TestInitXLiq).Mul((sdk.NewDec(TestInitXLiq).Mul(price)).RoundInt()),
 		OracleAssetId:   TestDefaultOracleAssetId,
 		LongPositionId:  []string{},
 		ShortPositionId: []string{},
 	}
 }
 
-func (s *PerpetualKeeperTestSuite) SetupOracleKeeper(denom string) {
+func (s *PerpetualTestSuite) SetupOracleKeeper(denom string) {
 	params := s.app.OracleKeeper.GetParams(s.ctx)
 	params.Whitelist = append(params.Whitelist, oracletypes.Denom{Name: denom})
 	params.VotePeriod = 1
@@ -105,7 +104,7 @@ func (s *PerpetualKeeperTestSuite) SetupOracleKeeper(denom string) {
 	s.app.OracleKeeper.SetParams(s.ctx, params)
 }
 
-func (s *PerpetualKeeperTestSuite) PrevoteVotePrice(exchangeRatesStr string) error {
+func (s *PerpetualTestSuite) PrevoteVotePrice(exchangeRatesStr string) error {
 	salt := "1"
 	hash := oracletypes.GetAggregateVoteHash(salt, exchangeRatesStr, sdk.ValAddress(s.ValPubKeys[0].Address()))
 
@@ -130,7 +129,7 @@ func (s *PerpetualKeeperTestSuite) PrevoteVotePrice(exchangeRatesStr string) err
 	return nil
 }
 
-func (s *PerpetualKeeperTestSuite) AddTestCoinsToCustomAccount(amount sdk.Int, denom string, acc sdk.AccAddress) {
+func (s *PerpetualTestSuite) AddTestCoinsToCustomAccount(amount sdk.Int, denom string, acc sdk.AccAddress) {
 	s.app.BankKeeper.MintCoins(s.ctx, types.ModuleName, sdk.NewCoins(sdk.NewCoin(denom, amount)))
 	s.app.BankKeeper.SendCoinsFromModuleToAccount(s.ctx, types.ModuleName, acc, sdk.NewCoins(sdk.NewCoin(denom, amount)))
 }
@@ -146,7 +145,7 @@ func NewTestMsgCreateValidator(address sdk.ValAddress, pubKey cryptotypes.PubKey
 	return msg
 }
 
-func (s *PerpetualKeeperTestSuite) RegisterValidator() error {
+func (s *PerpetualTestSuite) RegisterValidator() error {
 	for _, vp := range s.ValPubKeys {
 		s.AddTestCoinsToCustomAccount(sdk.TokensFromConsensusPower(10, sdk.DefaultPowerReduction), "stake", sdk.AccAddress(vp.Address()))
 	}
@@ -162,7 +161,7 @@ func (s *PerpetualKeeperTestSuite) RegisterValidator() error {
 	return nil
 }
 
-func (s *PerpetualKeeperTestSuite) OracleAggregateExchangeRateFromInput(denom string) {
+func (s *PerpetualTestSuite) OracleAggregateExchangeRateFromInput(denom string) {
 	err := s.PrevoteVotePrice(denom)
 	s.Require().NoError(err)
 }

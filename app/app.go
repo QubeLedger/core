@@ -641,6 +641,7 @@ func NewQuadrateApp(
 		keys[perpetualmoduletypes.MemStoreKey],
 		app.GetSubspace(perpetualmoduletypes.ModuleName),
 		app.BankKeeper,
+		app.OracleKeeper,
 	)
 
 	// register the proposal types

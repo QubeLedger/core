@@ -66,7 +66,7 @@ func (suite *PerpetualKeeperTestSuite) TestOpenLongPosition() {
 				),
 			)
 			suite.Require().Equal(true, f)
-			suite.Require().Greater(position.ReturnAmount.Int64(), int64(0))
+			suite.Require().Greater(position.ReturnAmount.RoundInt().Int64(), int64(0))
 
 			vault, _ = s.app.PerpetualKeeper.GetVaultByVaultId(s.ctx, s.GetNormalTestVault().VaultId)
 			fmt.Printf("price in vAMM after LONG: %f\n", float64(vault.X.MulRaw(10000).Quo(vault.Y).Int64())/10000)
@@ -130,7 +130,7 @@ func (suite *PerpetualKeeperTestSuite) TestOpenShortPosition() {
 				),
 			)
 			suite.Require().Equal(true, f)
-			suite.Require().Greater(position.ReturnAmount.Int64(), int64(0))
+			suite.Require().Greater(position.ReturnAmount.RoundInt().Int64(), int64(0))
 
 			vault, _ = s.app.PerpetualKeeper.GetVaultByVaultId(s.ctx, s.GetNormalTestVault().VaultId)
 			fmt.Printf("price in vAMM after SHORT: %f\n", float64(vault.X.MulRaw(10000).Quo(vault.Y).Int64())/10000)

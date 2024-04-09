@@ -19,17 +19,17 @@ message TradePosition {
         string leverage = 5 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec", (gogoproto.nullable) = false];
         string trading_asset = 6;
         string collateral_amount = 7 [
-                (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
+                (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
                 (gogoproto.nullable) = false
         ];
         string collateral_denom = 8;
         string return_amount = 9 [
-                (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
+                (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
                 (gogoproto.nullable) = false
         ];
         string return_denom = 10;
         string profit_amount = 11 [
-                (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
+                (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
                 (gogoproto.nullable) = false
         ];
 }
@@ -52,6 +52,6 @@ message Vault {
                 (gogoproto.nullable) = false
         ];
         string OracleAssetId = 8;
-        repeated TradePosition long_position = 9 [(gogoproto.nullable) = false]; 
-        repeated TradePosition short_position = 10 [(gogoproto.nullable) = false]; 
+        repeated string long_position_id = 9; 
+        repeated string short_position_id = 10; 
 }
