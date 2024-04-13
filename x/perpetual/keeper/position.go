@@ -32,7 +32,7 @@ func (k Keeper) CreateNewPosition(ctx sdk.Context, msg *types.MsgOpen, vault typ
 	}
 
 	position := types.TradePosition{
-		TradePositionId:  k.GenerateTraderPositionId(msg.Creator, vault.AmountXMetadata.Base, msg.TradingAsset, msg.TradeType),
+		TradePositionId:  k.GenerateTraderPositionId(msg.Creator, vault.AmountXMetadata.Base, msg.TradingAsset, msg.TradeType, msg.Leverage),
 		Creator:          msg.Creator,
 		TradeType:        msg.TradeType,
 		Leverage:         msg.Leverage,
@@ -52,6 +52,41 @@ func (k Keeper) CreateNewPosition(ctx sdk.Context, msg *types.MsgOpen, vault typ
 		vault.ShortPositionId = append(vault.ShortPositionId, position.TradePositionId)
 	}
 
+	k.SetVault(ctx, vault)
+
+	return nil
+}
+
+func (k Keeper) IncreasePosition(ctx sdk.Context, msg *types.MsgOpen, vault types.Vault, position types.TradePosition) error {
+
+	sender, err := sdk.AccAddressFromBech32(msg.Creator)
+	if err != nil {
+		return err
+	}
+
+	collateral_coins, err := sdk.ParseCoinsNormalized(msg.Collateral)
+	if err != nil {
+		return err
+	}
+
+	vault, return_amount, err := k.UpdateVaultByTradeTypeWhenOpenPosition(ctx, vault, msg.Leverage, collateral_coins.AmountOf(vault.AmountXMetadata.Base), msg.TradeType)
+	if err != nil {
+		return err
+	}
+
+	if return_amount.IsNil() {
+		return types.ErrInCalculationUpdateVault
+	}
+
+	err = k.BankKeeper.SendCoinsFromAccountToModule(ctx, sender, types.ModuleName, collateral_coins)
+	if err != nil {
+		return err
+	}
+
+	position.CollateralAmount = position.CollateralAmount.Add((collateral_coins.AmountOf(vault.AmountXMetadata.Base)).ToDec())
+	position.ReturnAmount = position.ReturnAmount.Add(return_amount.ToDec())
+
+	k.SetPosition(ctx, position)
 	k.SetVault(ctx, vault)
 
 	return nil

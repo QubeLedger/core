@@ -48,6 +48,7 @@ func (suite *PerpetualKeeperTestSuite) TestCloseLongPosition() {
 						TestDefaultXDenom,
 						s.app.PerpetualKeeper.GenerateVaultIdHash(TestDefaultXDenom, TestDefaultYDenom),
 						types.PerpetualTradeType_PERPETUAL_LONG_POSITION,
+						sdk.NewDec(2),
 					),
 					sendTokenAmount: 385,
 				},
@@ -89,6 +90,7 @@ func (suite *PerpetualKeeperTestSuite) TestCloseLongPosition() {
 						open_position.sendTokenDenom,
 						s.app.PerpetualKeeper.GenerateVaultIdHash(TestDefaultXDenom, TestDefaultYDenom),
 						types.PerpetualTradeType_PERPETUAL_LONG_POSITION,
+						sdk.NewDec(2),
 					),
 				)
 				suite.Require().Equal(true, f)
@@ -117,6 +119,7 @@ func (suite *PerpetualKeeperTestSuite) TestCloseLongPosition() {
 						TestDefaultXDenom,
 						s.app.PerpetualKeeper.GenerateVaultIdHash(TestDefaultXDenom, TestDefaultYDenom),
 						types.PerpetualTradeType_PERPETUAL_LONG_POSITION,
+						sdk.NewDec(2),
 					),
 				)
 				suite.Require().Equal(false, f)

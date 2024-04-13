@@ -62,6 +62,7 @@ func (suite *PerpetualKeeperTestSuite) TestOpenAndCloseLongDifferenceUsers() {
 						TestDefaultXDenom,
 						s.app.PerpetualKeeper.GenerateVaultIdHash(TestDefaultXDenom, TestDefaultYDenom),
 						types.PerpetualTradeType_PERPETUAL_LONG_POSITION,
+						sdk.NewDec(2),
 					),
 					user: user_1,
 				},
@@ -71,6 +72,7 @@ func (suite *PerpetualKeeperTestSuite) TestOpenAndCloseLongDifferenceUsers() {
 						TestDefaultXDenom,
 						s.app.PerpetualKeeper.GenerateVaultIdHash(TestDefaultXDenom, TestDefaultYDenom),
 						types.PerpetualTradeType_PERPETUAL_LONG_POSITION,
+						sdk.NewDec(1),
 					),
 					user: user_2,
 				},
@@ -113,13 +115,14 @@ func (suite *PerpetualKeeperTestSuite) TestOpenAndCloseLongDifferenceUsers() {
 						open_position.sendTokenDenom,
 						s.app.PerpetualKeeper.GenerateVaultIdHash(TestDefaultXDenom, TestDefaultYDenom),
 						types.PerpetualTradeType_PERPETUAL_LONG_POSITION,
+						open_position.leverage,
 					),
 				)
 				suite.Require().Equal(true, f)
 				suite.Require().Greater(position.ReturnAmount.RoundInt().Int64(), int64(0))
 			}
 
-			for _, close_position := range tc.close_long {
+			for i, close_position := range tc.close_long {
 
 				position, f := s.app.PerpetualKeeper.GetPositionByPositionId(
 					s.ctx,
@@ -143,6 +146,7 @@ func (suite *PerpetualKeeperTestSuite) TestOpenAndCloseLongDifferenceUsers() {
 						TestDefaultXDenom,
 						s.app.PerpetualKeeper.GenerateVaultIdHash(TestDefaultXDenom, TestDefaultYDenom),
 						types.PerpetualTradeType_PERPETUAL_LONG_POSITION,
+						tc.open_long[i].leverage,
 					),
 				)
 				suite.Require().Equal(false, f)
@@ -195,6 +199,7 @@ func (suite *PerpetualKeeperTestSuite) TestOpenAndCloseLongDifferenceUsersWithNo
 						TestDefaultXDenom,
 						s.app.PerpetualKeeper.GenerateVaultIdHash(TestDefaultXDenom, TestDefaultYDenom),
 						types.PerpetualTradeType_PERPETUAL_LONG_POSITION,
+						sdk.NewDec(2),
 					),
 					sendTokenAmount: 50,
 					user:            user_1,
@@ -205,6 +210,7 @@ func (suite *PerpetualKeeperTestSuite) TestOpenAndCloseLongDifferenceUsersWithNo
 						TestDefaultXDenom,
 						s.app.PerpetualKeeper.GenerateVaultIdHash(TestDefaultXDenom, TestDefaultYDenom),
 						types.PerpetualTradeType_PERPETUAL_LONG_POSITION,
+						sdk.NewDec(2),
 					),
 					sendTokenAmount: 335,
 					user:            user_1,
@@ -215,6 +221,7 @@ func (suite *PerpetualKeeperTestSuite) TestOpenAndCloseLongDifferenceUsersWithNo
 						TestDefaultXDenom,
 						s.app.PerpetualKeeper.GenerateVaultIdHash(TestDefaultXDenom, TestDefaultYDenom),
 						types.PerpetualTradeType_PERPETUAL_LONG_POSITION,
+						sdk.NewDec(1),
 					),
 					sendTokenAmount: 356,
 					user:            user_2,
@@ -258,6 +265,7 @@ func (suite *PerpetualKeeperTestSuite) TestOpenAndCloseLongDifferenceUsersWithNo
 						open_position.sendTokenDenom,
 						s.app.PerpetualKeeper.GenerateVaultIdHash(TestDefaultXDenom, TestDefaultYDenom),
 						types.PerpetualTradeType_PERPETUAL_LONG_POSITION,
+						open_position.leverage,
 					),
 				)
 				suite.Require().Equal(true, f)
@@ -323,6 +331,7 @@ func (suite *PerpetualKeeperTestSuite) TestOpenAndCloseShortDifferenceUsersWithM
 						TestDefaultXDenom,
 						s.app.PerpetualKeeper.GenerateVaultIdHash(TestDefaultXDenom, TestDefaultYDenom),
 						types.PerpetualTradeType_PERPETUAL_SHORT_POSITION,
+						sdk.NewDec(2),
 					),
 					user: user_1,
 				},
@@ -332,6 +341,7 @@ func (suite *PerpetualKeeperTestSuite) TestOpenAndCloseShortDifferenceUsersWithM
 						TestDefaultXDenom,
 						s.app.PerpetualKeeper.GenerateVaultIdHash(TestDefaultXDenom, TestDefaultYDenom),
 						types.PerpetualTradeType_PERPETUAL_LONG_POSITION,
+						sdk.NewDec(3),
 					),
 					user: user_2,
 				},
@@ -366,6 +376,7 @@ func (suite *PerpetualKeeperTestSuite) TestOpenAndCloseShortDifferenceUsersWithM
 						TestDefaultXDenom,
 						s.app.PerpetualKeeper.GenerateVaultIdHash(TestDefaultXDenom, TestDefaultYDenom),
 						types.PerpetualTradeType_PERPETUAL_LONG_POSITION,
+						sdk.NewDec(2),
 					),
 					user: user_1,
 				},
@@ -375,6 +386,7 @@ func (suite *PerpetualKeeperTestSuite) TestOpenAndCloseShortDifferenceUsersWithM
 						TestDefaultXDenom,
 						s.app.PerpetualKeeper.GenerateVaultIdHash(TestDefaultXDenom, TestDefaultYDenom),
 						types.PerpetualTradeType_PERPETUAL_SHORT_POSITION,
+						sdk.NewDec(3),
 					),
 					user: user_2,
 				},
@@ -409,6 +421,7 @@ func (suite *PerpetualKeeperTestSuite) TestOpenAndCloseShortDifferenceUsersWithM
 						TestDefaultXDenom,
 						s.app.PerpetualKeeper.GenerateVaultIdHash(TestDefaultXDenom, TestDefaultYDenom),
 						types.PerpetualTradeType_PERPETUAL_LONG_POSITION,
+						sdk.NewDec(2),
 					),
 					user: user_1,
 				},
@@ -418,6 +431,7 @@ func (suite *PerpetualKeeperTestSuite) TestOpenAndCloseShortDifferenceUsersWithM
 						TestDefaultXDenom,
 						s.app.PerpetualKeeper.GenerateVaultIdHash(TestDefaultXDenom, TestDefaultYDenom),
 						types.PerpetualTradeType_PERPETUAL_SHORT_POSITION,
+						sdk.NewDec(2),
 					),
 					user: user_2,
 				},
@@ -452,6 +466,7 @@ func (suite *PerpetualKeeperTestSuite) TestOpenAndCloseShortDifferenceUsersWithM
 						TestDefaultXDenom,
 						s.app.PerpetualKeeper.GenerateVaultIdHash(TestDefaultXDenom, TestDefaultYDenom),
 						types.PerpetualTradeType_PERPETUAL_LONG_POSITION,
+						sdk.NewDec(2),
 					),
 					user: user_1,
 				},
@@ -461,6 +476,7 @@ func (suite *PerpetualKeeperTestSuite) TestOpenAndCloseShortDifferenceUsersWithM
 						TestDefaultXDenom,
 						s.app.PerpetualKeeper.GenerateVaultIdHash(TestDefaultXDenom, TestDefaultYDenom),
 						types.PerpetualTradeType_PERPETUAL_SHORT_POSITION,
+						sdk.NewDec(1),
 					),
 					user: user_2,
 				},
@@ -509,6 +525,7 @@ func (suite *PerpetualKeeperTestSuite) TestOpenAndCloseShortDifferenceUsersWithM
 						open_position.sendTokenDenom,
 						s.app.PerpetualKeeper.GenerateVaultIdHash(TestDefaultXDenom, TestDefaultYDenom),
 						open_position.type_trade,
+						open_position.leverage,
 					),
 				)
 				suite.Require().Equal(true, f)

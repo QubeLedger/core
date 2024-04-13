@@ -85,6 +85,7 @@ func (suite *PerpetualTestSuite) TestCalculateFundingPaymentByBlock() {
 			TestDefaultXDenom,
 			s.app.PerpetualKeeper.GenerateVaultIdHash(TestDefaultXDenom, TestDefaultYDenom),
 			types.PerpetualTradeType_PERPETUAL_LONG_POSITION,
+			sdk.NewDec(10),
 		),
 	)
 	suite.Require().Equal(true, f)
@@ -96,6 +97,7 @@ func (suite *PerpetualTestSuite) TestCalculateFundingPaymentByBlock() {
 			TestDefaultXDenom,
 			s.app.PerpetualKeeper.GenerateVaultIdHash(TestDefaultXDenom, TestDefaultYDenom),
 			types.PerpetualTradeType_PERPETUAL_LONG_POSITION,
+			sdk.NewDec(2),
 		),
 	)
 	suite.Require().Equal(true, f)
@@ -107,6 +109,7 @@ func (suite *PerpetualTestSuite) TestCalculateFundingPaymentByBlock() {
 			TestDefaultXDenom,
 			s.app.PerpetualKeeper.GenerateVaultIdHash(TestDefaultXDenom, TestDefaultYDenom),
 			types.PerpetualTradeType_PERPETUAL_SHORT_POSITION,
+			sdk.NewDec(3),
 		),
 	)
 	suite.Require().Equal(true, f)
@@ -118,6 +121,7 @@ func (suite *PerpetualTestSuite) TestCalculateFundingPaymentByBlock() {
 			TestDefaultXDenom,
 			s.app.PerpetualKeeper.GenerateVaultIdHash(TestDefaultXDenom, TestDefaultYDenom),
 			types.PerpetualTradeType_PERPETUAL_SHORT_POSITION,
+			sdk.NewDec(2),
 		),
 	)
 	suite.Require().Equal(true, f)
@@ -138,6 +142,7 @@ func (suite *PerpetualTestSuite) TestCalculateFundingPaymentByBlock() {
 			TestDefaultXDenom,
 			s.app.PerpetualKeeper.GenerateVaultIdHash(TestDefaultXDenom, TestDefaultYDenom),
 			types.PerpetualTradeType_PERPETUAL_LONG_POSITION,
+			sdk.NewDec(10),
 		),
 	)
 	suite.Require().Equal(true, f)
@@ -149,6 +154,7 @@ func (suite *PerpetualTestSuite) TestCalculateFundingPaymentByBlock() {
 			TestDefaultXDenom,
 			s.app.PerpetualKeeper.GenerateVaultIdHash(TestDefaultXDenom, TestDefaultYDenom),
 			types.PerpetualTradeType_PERPETUAL_LONG_POSITION,
+			sdk.NewDec(2),
 		),
 	)
 	suite.Require().Equal(true, f)
@@ -160,6 +166,7 @@ func (suite *PerpetualTestSuite) TestCalculateFundingPaymentByBlock() {
 			TestDefaultXDenom,
 			s.app.PerpetualKeeper.GenerateVaultIdHash(TestDefaultXDenom, TestDefaultYDenom),
 			types.PerpetualTradeType_PERPETUAL_SHORT_POSITION,
+			sdk.NewDec(3),
 		),
 	)
 	suite.Require().Equal(true, f)
@@ -171,6 +178,7 @@ func (suite *PerpetualTestSuite) TestCalculateFundingPaymentByBlock() {
 			TestDefaultXDenom,
 			s.app.PerpetualKeeper.GenerateVaultIdHash(TestDefaultXDenom, TestDefaultYDenom),
 			types.PerpetualTradeType_PERPETUAL_SHORT_POSITION,
+			sdk.NewDec(2),
 		),
 	)
 	suite.Require().Equal(true, f)

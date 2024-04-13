@@ -11,8 +11,11 @@ func (k Keeper) OpenPosition(ctx sdk.Context, msg *types.MsgOpen) error {
 		return types.ErrVaultNotFound
 	}
 
-	if position := k.CheckSamePosition(ctx, msg); position != nil {
-		// if position already create - update
+	if position := k.CheckSamePosition(ctx, msg, vault); position != nil {
+		err := k.IncreasePosition(ctx, msg, vault, *position)
+		if err != nil {
+			return err
+		}
 	} else {
 		err := k.CreateNewPosition(ctx, msg, vault)
 		if err != nil {
@@ -21,7 +24,7 @@ func (k Keeper) OpenPosition(ctx sdk.Context, msg *types.MsgOpen) error {
 	}
 
 	event := sdk.NewEvent(types.EventOpen,
-		sdk.NewAttribute("id", k.GenerateTraderPositionId(msg.Creator, vault.AmountXMetadata.Base, msg.TradingAsset, msg.TradeType)),
+		sdk.NewAttribute("id", k.GenerateTraderPositionId(msg.Creator, vault.AmountXMetadata.Base, msg.TradingAsset, msg.TradeType, msg.Leverage)),
 		sdk.NewAttribute("Creator", msg.Creator),
 		sdk.NewAttribute("collateral", msg.Collateral),
 		sdk.NewAttribute("leverage", msg.Leverage.String()),
