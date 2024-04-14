@@ -1,0 +1,34 @@
+syntax = "proto3";
+package core.perpetual.v1beta1;
+
+import "gogoproto/gogo.proto";
+import "core/perpetual/v1beta1/perpetual.proto";
+
+option go_package = "github.com/QuadrateOrg/core/x/perpetual/types";
+
+// Msg defines the Msg service.
+service Msg {
+        rpc Open(MsgOpen) returns (MsgOpenResponse);
+        rpc Close(MsgClose) returns (MsgCloseResponse);
+}
+
+message MsgOpen {
+        string creator = 1;
+        PerpetualTradeType trade_type = 2;
+        string leverage = 3 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec", (gogoproto.nullable) = false];
+        string trading_asset = 4;
+        string collateral = 5;
+}
+
+message MsgOpenResponse {}
+
+message MsgClose {
+        string creator = 1;
+        string id = 2;
+        string amount = 3 [
+                (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
+                (gogoproto.nullable) = false
+        ];
+}
+
+message MsgCloseResponse {}
