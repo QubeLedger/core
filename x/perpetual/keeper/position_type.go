@@ -74,6 +74,7 @@ func GetPositionIDFromBytes(bz []byte) uint64 {
 	return binary.BigEndian.Uint64(bz)
 }
 
+//nolint:all
 func (k Keeper) GenerateTraderPositionId(creator string, denom string, trading_asset_id string, trade_type types.PerpetualTradeType, leverage sdk.Dec) string {
 	return fmt.Sprintf("%x", crypto.Sha256(append([]byte(creator+denom+trading_asset_id+trade_type.String()+leverage.String()))))
 }

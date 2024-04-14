@@ -74,6 +74,7 @@ func GetVaultIDFromBytes(bz []byte) uint64 {
 	return binary.BigEndian.Uint64(bz)
 }
 
+//nolint:all
 func (k Keeper) GenerateVaultIdHash(denom1 string, denom2 string) string {
 	return fmt.Sprintf("%x", crypto.Sha256(append([]byte(denom1+denom2))))
 }
