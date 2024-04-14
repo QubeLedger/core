@@ -52,6 +52,10 @@ func (msg *MsgOpen) ValidateBasic() error {
 		return err
 	}
 
+	if msg.Leverage.Equal(sdk.NewDec(0)) {
+		return sdkerrors.Wrapf(ErrLeverageEqualZero, "leverage zero (%s)", err)
+	}
+
 	if msg.TradingAsset == "" {
 		return sdkerrors.Wrapf(ErrTradingAssetEmpty, "TradingAsset emprty (%s)", err)
 	}
