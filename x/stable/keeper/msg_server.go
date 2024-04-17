@@ -32,6 +32,8 @@ func (k Keeper) Mint(goCtx context.Context, msg *types.MsgMint) (*types.MsgMintR
 	switch pair.Model {
 	case "gmb":
 		mint_err, amountOut = k.GMB_ExecuteMint(ctx, msg, pair)
+	case "delta":
+		mint_err, amountOut = k.DeltaMint(ctx, msg, pair)
 	}
 
 	if mint_err != nil {

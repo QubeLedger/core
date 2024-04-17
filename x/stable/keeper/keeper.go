@@ -7,6 +7,7 @@ import (
 	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	capabilitykeeper "github.com/cosmos/cosmos-sdk/x/capability/keeper"
 	capabilitytypes "github.com/cosmos/cosmos-sdk/x/capability/types"
 	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
@@ -31,6 +32,12 @@ type (
 		bankKeeper types.BankKeeper
 
 		oracleKeeper types.OracleKeeper
+
+		dexKeeper types.DexKeeper
+
+		perpetualKeeper types.PerpetualKeeper
+
+		accountKeeper types.AccountKeeper
 	}
 )
 
@@ -44,6 +51,9 @@ func NewKeeper(
 	scopedKeeper capabilitykeeper.ScopedKeeper,
 	bankKeeper types.BankKeeper,
 	oracleKeeper types.OracleKeeper,
+	dexKeeper types.DexKeeper,
+	perpetualKeeper types.PerpetualKeeper,
+	accountKeeper types.AccountKeeper,
 ) *Keeper {
 	// set KeyTable if it has not already been set
 	if !ps.HasKeyTable() {
@@ -60,8 +70,11 @@ func NewKeeper(
 		portKeeper:    portKeeper,
 		scopedKeeper:  scopedKeeper,
 
-		bankKeeper:   bankKeeper,
-		oracleKeeper: oracleKeeper,
+		bankKeeper:      bankKeeper,
+		oracleKeeper:    oracleKeeper,
+		dexKeeper:       dexKeeper,
+		perpetualKeeper: perpetualKeeper,
+		accountKeeper:   accountKeeper,
 	}
 }
 
@@ -117,4 +130,8 @@ func (k Keeper) ClaimCapability(ctx sdk.Context, cap *capabilitytypes.Capability
 
 func (k Keeper) Logger(ctx sdk.Context) log.Logger {
 	return ctx.Logger().With("module", fmt.Sprintf("x/%s", types.ModuleName))
+}
+
+func (k *Keeper) GetSystemModuleAccount(ctx sdk.Context) authtypes.ModuleAccountI {
+	return k.accountKeeper.GetModuleAccount(ctx, types.SystemModuleAccount)
 }

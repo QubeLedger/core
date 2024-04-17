@@ -603,6 +603,8 @@ func NewQuadrateApp(
 		scopedStableKeeper,
 		app.BankKeeper,
 		app.OracleKeeper,
+		app.DexKeeper,
+		app.PerpetualKeeper,
 	)
 	stableModule := stablemodule.NewAppModule(appCodec, app.StableKeeper, app.AccountKeeper, app.BankKeeper, app.OracleKeeper)
 	stableIBCModule := stablemodule.NewIBCModule(app.StableKeeper)
