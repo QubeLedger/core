@@ -214,7 +214,7 @@ func (k Keeper) WithdrawCore(
 }
 
 func (k Keeper) MultiHopSwapCore(
-	goCtx context.Context,
+	ctx sdk.Context,
 	amountIn sdk.Int,
 	routes []*types.MultiHopRoute,
 	exitLimitPrice math_utils.PrecDec,
@@ -222,7 +222,6 @@ func (k Keeper) MultiHopSwapCore(
 	callerAddr sdk.AccAddress,
 	receiverAddr sdk.AccAddress,
 ) (coinOut sdk.Coin, err error) {
-	ctx := sdk.UnwrapSDKContext(goCtx)
 	var routeErrors []error
 	initialInCoin := sdk.NewCoin(routes[0].Hops[0], amountIn)
 	stepCache := make(map[multihopCacheKey]StepResult)

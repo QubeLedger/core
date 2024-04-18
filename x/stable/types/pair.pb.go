@@ -26,15 +26,20 @@ var _ = math.Inf
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
 type Pair struct {
-	Id                uint64                                 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
-	PairId            string                                 `protobuf:"bytes,2,opt,name=pairId,proto3" json:"pairId,omitempty"`
-	AmountInMetadata  types.Metadata                         `protobuf:"bytes,3,opt,name=amountInMetadata,proto3" json:"amountInMetadata" yaml:"amountInMetadata"`
-	AmountOutMetadata types.Metadata                         `protobuf:"bytes,4,opt,name=amountOutMetadata,proto3" json:"amountOutMetadata" yaml:"amountOutMetadata"`
-	Qm                github_com_cosmos_cosmos_sdk_types.Int `protobuf:"bytes,5,opt,name=qm,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Int" json:"qm" yaml:"qm"`
-	Ar                github_com_cosmos_cosmos_sdk_types.Int `protobuf:"bytes,6,opt,name=ar,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Int" json:"ar" yaml:"ar"`
-	MinAmountIn       string                                 `protobuf:"bytes,7,opt,name=minAmountIn,proto3" json:"minAmountIn,omitempty"`
-	MinAmountOut      string                                 `protobuf:"bytes,8,opt,name=minAmountOut,proto3" json:"minAmountOut,omitempty"`
-	Model             string                                 `protobuf:"bytes,9,opt,name=model,proto3" json:"model,omitempty"`
+	Id                     uint64                                 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	PairId                 string                                 `protobuf:"bytes,2,opt,name=pairId,proto3" json:"pairId,omitempty"`
+	AmountInMetadata       types.Metadata                         `protobuf:"bytes,3,opt,name=amountInMetadata,proto3" json:"amountInMetadata" yaml:"amountInMetadata"`
+	TokenStakeMetadata     types.Metadata                         `protobuf:"bytes,4,opt,name=tokenStakeMetadata,proto3" json:"tokenStakeMetadata" yaml:"tokenStakeMetadata"`
+	TokenYMetadata         types.Metadata                         `protobuf:"bytes,5,opt,name=tokenYMetadata,proto3" json:"tokenYMetadata" yaml:"tokenYMetadata"`
+	AmountOutMetadata      types.Metadata                         `protobuf:"bytes,6,opt,name=amountOutMetadata,proto3" json:"amountOutMetadata" yaml:"amountOutMetadata"`
+	Qm                     github_com_cosmos_cosmos_sdk_types.Int `protobuf:"bytes,7,opt,name=qm,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Int" json:"qm" yaml:"qm"`
+	Ar                     github_com_cosmos_cosmos_sdk_types.Int `protobuf:"bytes,8,opt,name=ar,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Int" json:"ar" yaml:"ar"`
+	OracleAssetId          string                                 `protobuf:"bytes,9,opt,name=oracleAssetId,proto3" json:"oracleAssetId,omitempty"`
+	PerpetualOracleAssetId string                                 `protobuf:"bytes,10,opt,name=perpetualOracleAssetId,proto3" json:"perpetualOracleAssetId,omitempty"`
+	StakePriceOracleId     string                                 `protobuf:"bytes,11,opt,name=stakePriceOracleId,proto3" json:"stakePriceOracleId,omitempty"`
+	MinAmountIn            string                                 `protobuf:"bytes,12,opt,name=minAmountIn,proto3" json:"minAmountIn,omitempty"`
+	MinAmountOut           string                                 `protobuf:"bytes,13,opt,name=minAmountOut,proto3" json:"minAmountOut,omitempty"`
+	Model                  string                                 `protobuf:"bytes,14,opt,name=model,proto3" json:"model,omitempty"`
 }
 
 func (m *Pair) Reset()         { *m = Pair{} }
@@ -91,11 +96,46 @@ func (m *Pair) GetAmountInMetadata() types.Metadata {
 	return types.Metadata{}
 }
 
+func (m *Pair) GetTokenStakeMetadata() types.Metadata {
+	if m != nil {
+		return m.TokenStakeMetadata
+	}
+	return types.Metadata{}
+}
+
+func (m *Pair) GetTokenYMetadata() types.Metadata {
+	if m != nil {
+		return m.TokenYMetadata
+	}
+	return types.Metadata{}
+}
+
 func (m *Pair) GetAmountOutMetadata() types.Metadata {
 	if m != nil {
 		return m.AmountOutMetadata
 	}
 	return types.Metadata{}
+}
+
+func (m *Pair) GetOracleAssetId() string {
+	if m != nil {
+		return m.OracleAssetId
+	}
+	return ""
+}
+
+func (m *Pair) GetPerpetualOracleAssetId() string {
+	if m != nil {
+		return m.PerpetualOracleAssetId
+	}
+	return ""
+}
+
+func (m *Pair) GetStakePriceOracleId() string {
+	if m != nil {
+		return m.StakePriceOracleId
+	}
+	return ""
 }
 
 func (m *Pair) GetMinAmountIn() string {
@@ -126,32 +166,39 @@ func init() {
 func init() { proto.RegisterFile("core/stable/v1beta1/pair.proto", fileDescriptor_7e43a29cf406037d) }
 
 var fileDescriptor_7e43a29cf406037d = []byte{
-	// 399 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xa4, 0x92, 0xcf, 0xaa, 0xd3, 0x40,
-	0x14, 0x87, 0x93, 0xf4, 0x8f, 0x76, 0x2a, 0xa2, 0x63, 0xd1, 0xa1, 0xe0, 0x24, 0x64, 0x21, 0x45,
-	0x70, 0x86, 0xea, 0x4e, 0x57, 0x16, 0x37, 0x45, 0xa4, 0x9a, 0xa5, 0xbb, 0x49, 0x13, 0x62, 0x6c,
-	0x27, 0xd3, 0x4e, 0x26, 0x62, 0xdf, 0xc2, 0xc7, 0xea, 0xb2, 0x4b, 0x71, 0x11, 0xa4, 0x7d, 0x83,
-	0xbe, 0xc0, 0xbd, 0x64, 0x26, 0x2d, 0xb9, 0xb7, 0x9b, 0x0b, 0x77, 0x95, 0x9c, 0xf3, 0x3b, 0x7c,
-	0xdf, 0x64, 0x72, 0x00, 0x9e, 0x0b, 0x19, 0xd3, 0x5c, 0xb1, 0x70, 0x19, 0xd3, 0x5f, 0xe3, 0x30,
-	0x56, 0x6c, 0x4c, 0x57, 0x2c, 0x95, 0x64, 0x25, 0x85, 0x12, 0xf0, 0x59, 0x95, 0x13, 0x93, 0x93,
-	0x3a, 0x1f, 0x0e, 0x12, 0x91, 0x08, 0x9d, 0xd3, 0xea, 0xcd, 0x8c, 0x0e, 0xf1, 0x5c, 0xe4, 0x5c,
-	0xe4, 0x34, 0x64, 0xd9, 0xe2, 0x8c, 0xaa, 0x0a, 0x93, 0xfb, 0x57, 0x2d, 0xd0, 0xfe, 0xca, 0x52,
-	0x09, 0x1f, 0x03, 0x27, 0x8d, 0x90, 0xed, 0xd9, 0xa3, 0x76, 0xe0, 0xa4, 0x11, 0x7c, 0x0e, 0xba,
-	0x95, 0x71, 0x1a, 0x21, 0xc7, 0xb3, 0x47, 0xbd, 0xa0, 0xae, 0xe0, 0x4f, 0xf0, 0x84, 0x71, 0x51,
-	0x64, 0x6a, 0x9a, 0x7d, 0x89, 0x15, 0x8b, 0x98, 0x62, 0xa8, 0xe5, 0xd9, 0xa3, 0xfe, 0xdb, 0x97,
-	0xc4, 0xb8, 0x88, 0xc6, 0xd7, 0x2e, 0x72, 0x1a, 0x9a, 0xb8, 0xdb, 0xd2, 0xb5, 0x8e, 0xa5, 0xfb,
-	0x62, 0xc3, 0xf8, 0xf2, 0xbd, 0x7f, 0x1b, 0xe2, 0x07, 0x17, 0x5c, 0xc8, 0xc1, 0x53, 0xd3, 0x9b,
-	0x15, 0xea, 0x2c, 0x6b, 0xdf, 0x45, 0xe6, 0xd5, 0x32, 0xd4, 0x94, 0x35, 0x28, 0x7e, 0x70, 0x49,
-	0x86, 0x9f, 0x81, 0xb3, 0xe6, 0xa8, 0x53, 0x7d, 0xee, 0xe4, 0x43, 0x05, 0xf8, 0x57, 0xba, 0xaf,
-	0x92, 0x54, 0xfd, 0x28, 0x42, 0x32, 0x17, 0x9c, 0xd6, 0x57, 0x69, 0x1e, 0x6f, 0xf2, 0x68, 0x41,
-	0xd5, 0x66, 0x15, 0xe7, 0x64, 0x9a, 0xa9, 0x63, 0xe9, 0xf6, 0x8c, 0x6a, 0xcd, 0xfd, 0xc0, 0x59,
-	0xf3, 0x0a, 0xc6, 0x24, 0xea, 0xde, 0x0f, 0xc6, 0xa4, 0x1f, 0x38, 0x4c, 0x42, 0x0f, 0xf4, 0x79,
-	0x9a, 0x7d, 0xac, 0xef, 0x07, 0x3d, 0xd0, 0x7f, 0xa4, 0xd9, 0x82, 0x3e, 0x78, 0x74, 0x2e, 0x67,
-	0x85, 0x42, 0x0f, 0xf5, 0xc8, 0x8d, 0x1e, 0x1c, 0x80, 0x0e, 0x17, 0x51, 0xbc, 0x44, 0x3d, 0x1d,
-	0x9a, 0x62, 0xf2, 0x69, 0xbb, 0xc7, 0xf6, 0x6e, 0x8f, 0xed, 0xff, 0x7b, 0x6c, 0xff, 0x39, 0x60,
-	0x6b, 0x77, 0xc0, 0xd6, 0xdf, 0x03, 0xb6, 0xbe, 0xbf, 0x6e, 0x1c, 0xf7, 0x5b, 0xc1, 0x22, 0xc9,
-	0x54, 0x3c, 0x93, 0x09, 0xd5, 0xdb, 0xf9, 0xfb, 0xb4, 0x9f, 0xfa, 0xd8, 0x61, 0x57, 0xaf, 0xd3,
-	0xbb, 0xeb, 0x00, 0x00, 0x00, 0xff, 0xff, 0x3c, 0xd6, 0x8a, 0x6d, 0xbb, 0x02, 0x00, 0x00,
+	// 506 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xa4, 0x94, 0xc1, 0x6e, 0xd3, 0x30,
+	0x18, 0xc7, 0x9b, 0xb0, 0x15, 0xea, 0x6e, 0x15, 0x98, 0x31, 0xcc, 0xa4, 0x25, 0x21, 0x42, 0xa8,
+	0x42, 0x22, 0xd1, 0x40, 0xe2, 0x00, 0xa7, 0x55, 0x5c, 0x22, 0x84, 0x3a, 0xc2, 0x69, 0xdc, 0x9c,
+	0xd8, 0x2a, 0xa1, 0x71, 0x9c, 0x3a, 0x0e, 0x62, 0x6f, 0xc1, 0x63, 0xed, 0xb8, 0x23, 0xe2, 0x50,
+	0xa1, 0x56, 0xbc, 0xc0, 0x9e, 0x00, 0xc5, 0xce, 0x42, 0xba, 0x0e, 0xa9, 0x12, 0xa7, 0xf6, 0xfb,
+	0xfe, 0x5f, 0x7e, 0x3f, 0xc5, 0x76, 0x0c, 0xac, 0x98, 0x0b, 0xea, 0x17, 0x12, 0x47, 0x29, 0xf5,
+	0xbf, 0x1e, 0x45, 0x54, 0xe2, 0x23, 0x3f, 0xc7, 0x89, 0xf0, 0x72, 0xc1, 0x25, 0x87, 0xf7, 0xab,
+	0xdc, 0xd3, 0xb9, 0x57, 0xe7, 0x07, 0x7b, 0x13, 0x3e, 0xe1, 0x2a, 0xf7, 0xab, 0x7f, 0x7a, 0xf4,
+	0xc0, 0x8a, 0x79, 0xc1, 0x78, 0xe1, 0x47, 0x38, 0x9b, 0x36, 0xa8, 0xaa, 0xd0, 0xb9, 0xfb, 0xbb,
+	0x0b, 0xb6, 0x4e, 0x70, 0x22, 0xe0, 0x00, 0x98, 0x09, 0x41, 0x86, 0x63, 0x0c, 0xb7, 0x42, 0x33,
+	0x21, 0x70, 0x1f, 0x74, 0x2b, 0x63, 0x40, 0x90, 0xe9, 0x18, 0xc3, 0x5e, 0x58, 0x57, 0xf0, 0x0b,
+	0xb8, 0x8b, 0x19, 0x2f, 0x33, 0x19, 0x64, 0xef, 0xa9, 0xc4, 0x04, 0x4b, 0x8c, 0x6e, 0x39, 0xc6,
+	0xb0, 0xff, 0xe2, 0xd0, 0xd3, 0x2e, 0x4f, 0xe1, 0x6b, 0x97, 0x77, 0x35, 0x34, 0xb2, 0xcf, 0xe7,
+	0x76, 0xe7, 0x72, 0x6e, 0x3f, 0x3c, 0xc3, 0x2c, 0x7d, 0xed, 0x5e, 0x87, 0xb8, 0xe1, 0x1a, 0x17,
+	0xe6, 0x00, 0x4a, 0x3e, 0xa5, 0xd9, 0x47, 0x89, 0xa7, 0xb4, 0xb1, 0x6d, 0x6d, 0x62, 0x7b, 0x5c,
+	0xdb, 0x1e, 0x69, 0xdb, 0x3a, 0xc6, 0x0d, 0x6f, 0x60, 0x43, 0x02, 0x06, 0xaa, 0x7b, 0xda, 0xd8,
+	0xb6, 0x37, 0xb1, 0x1d, 0xd6, 0xb6, 0x07, 0x2d, 0xdb, 0xe9, 0x5f, 0xd3, 0x35, 0x26, 0x64, 0xe0,
+	0x9e, 0x7e, 0xd7, 0x71, 0x29, 0x1b, 0x51, 0x77, 0x13, 0x91, 0x53, 0x8b, 0x50, 0x7b, 0x11, 0x5b,
+	0x14, 0x37, 0x5c, 0x27, 0xc3, 0x77, 0xc0, 0x9c, 0x31, 0x74, 0xbb, 0xda, 0xc6, 0xd1, 0x9b, 0x0a,
+	0xf0, 0x73, 0x6e, 0x3f, 0x9d, 0x24, 0xf2, 0x73, 0x19, 0x79, 0x31, 0x67, 0x7e, 0x7d, 0x44, 0xf4,
+	0xcf, 0xf3, 0x82, 0x4c, 0x7d, 0x79, 0x96, 0xd3, 0xc2, 0x0b, 0x32, 0x79, 0x39, 0xb7, 0x7b, 0x5a,
+	0x35, 0x63, 0x6e, 0x68, 0xce, 0x58, 0x05, 0xc3, 0x02, 0xdd, 0xf9, 0x3f, 0x18, 0x16, 0x6e, 0x68,
+	0x62, 0x01, 0x9f, 0x80, 0x5d, 0x2e, 0x70, 0x9c, 0xd2, 0xe3, 0xa2, 0xa0, 0x32, 0x20, 0xa8, 0xa7,
+	0xce, 0xda, 0x6a, 0x13, 0xbe, 0x02, 0xfb, 0x39, 0x15, 0x39, 0x95, 0x25, 0x4e, 0xc7, 0x2b, 0xe3,
+	0x40, 0x8d, 0xff, 0x23, 0x85, 0x1e, 0x80, 0x45, 0xb5, 0xbb, 0x27, 0x22, 0x89, 0xa9, 0x8e, 0x02,
+	0x82, 0xfa, 0xea, 0x99, 0x1b, 0x12, 0xe8, 0x80, 0x3e, 0x4b, 0xb2, 0xe3, 0xfa, 0x14, 0xa2, 0x1d,
+	0x35, 0xd8, 0x6e, 0x41, 0x17, 0xec, 0x34, 0xe5, 0xb8, 0x94, 0x68, 0x57, 0x8d, 0xac, 0xf4, 0xe0,
+	0x1e, 0xd8, 0x66, 0x9c, 0xd0, 0x14, 0x0d, 0x54, 0xa8, 0x8b, 0xd1, 0xdb, 0xf3, 0x85, 0x65, 0x5c,
+	0x2c, 0x2c, 0xe3, 0xd7, 0xc2, 0x32, 0xbe, 0x2f, 0xad, 0xce, 0xc5, 0xd2, 0xea, 0xfc, 0x58, 0x5a,
+	0x9d, 0x4f, 0xcf, 0x5a, 0x8b, 0xf7, 0xa1, 0xc4, 0x44, 0x60, 0x49, 0xc7, 0x62, 0xe2, 0xab, 0x3b,
+	0xe0, 0xdb, 0xd5, 0x2d, 0xa0, 0x16, 0x31, 0xea, 0xaa, 0x8f, 0xf6, 0xe5, 0x9f, 0x00, 0x00, 0x00,
+	0xff, 0xff, 0x45, 0xc2, 0x87, 0xf1, 0x21, 0x04, 0x00, 0x00,
 }
 
 func (m *Pair) Marshal() (dAtA []byte, err error) {
@@ -179,21 +226,42 @@ func (m *Pair) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		copy(dAtA[i:], m.Model)
 		i = encodeVarintPair(dAtA, i, uint64(len(m.Model)))
 		i--
-		dAtA[i] = 0x4a
+		dAtA[i] = 0x72
 	}
 	if len(m.MinAmountOut) > 0 {
 		i -= len(m.MinAmountOut)
 		copy(dAtA[i:], m.MinAmountOut)
 		i = encodeVarintPair(dAtA, i, uint64(len(m.MinAmountOut)))
 		i--
-		dAtA[i] = 0x42
+		dAtA[i] = 0x6a
 	}
 	if len(m.MinAmountIn) > 0 {
 		i -= len(m.MinAmountIn)
 		copy(dAtA[i:], m.MinAmountIn)
 		i = encodeVarintPair(dAtA, i, uint64(len(m.MinAmountIn)))
 		i--
-		dAtA[i] = 0x3a
+		dAtA[i] = 0x62
+	}
+	if len(m.StakePriceOracleId) > 0 {
+		i -= len(m.StakePriceOracleId)
+		copy(dAtA[i:], m.StakePriceOracleId)
+		i = encodeVarintPair(dAtA, i, uint64(len(m.StakePriceOracleId)))
+		i--
+		dAtA[i] = 0x5a
+	}
+	if len(m.PerpetualOracleAssetId) > 0 {
+		i -= len(m.PerpetualOracleAssetId)
+		copy(dAtA[i:], m.PerpetualOracleAssetId)
+		i = encodeVarintPair(dAtA, i, uint64(len(m.PerpetualOracleAssetId)))
+		i--
+		dAtA[i] = 0x52
+	}
+	if len(m.OracleAssetId) > 0 {
+		i -= len(m.OracleAssetId)
+		copy(dAtA[i:], m.OracleAssetId)
+		i = encodeVarintPair(dAtA, i, uint64(len(m.OracleAssetId)))
+		i--
+		dAtA[i] = 0x4a
 	}
 	{
 		size := m.Ar.Size()
@@ -204,7 +272,7 @@ func (m *Pair) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i = encodeVarintTx(dAtA, i, uint64(size))
 	}
 	i--
-	dAtA[i] = 0x32
+	dAtA[i] = 0x42
 	{
 		size := m.Qm.Size()
 		i -= size
@@ -214,9 +282,29 @@ func (m *Pair) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i = encodeVarintTx(dAtA, i, uint64(size))
 	}
 	i--
-	dAtA[i] = 0x2a
+	dAtA[i] = 0x3a
 	{
 		size, err := m.AmountOutMetadata.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintPair(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0x32
+	{
+		size, err := m.TokenYMetadata.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintPair(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0x2a
+	{
+		size, err := m.TokenStakeMetadata.MarshalToSizedBuffer(dAtA[:i])
 		if err != nil {
 			return 0, err
 		}
@@ -276,12 +364,28 @@ func (m *Pair) Size() (n int) {
 	}
 	l = m.AmountInMetadata.Size()
 	n += 1 + l + sovPair(uint64(l))
+	l = m.TokenStakeMetadata.Size()
+	n += 1 + l + sovPair(uint64(l))
+	l = m.TokenYMetadata.Size()
+	n += 1 + l + sovPair(uint64(l))
 	l = m.AmountOutMetadata.Size()
 	n += 1 + l + sovPair(uint64(l))
 	l = m.Qm.Size()
 	n += 1 + l + sovPair(uint64(l))
 	l = m.Ar.Size()
 	n += 1 + l + sovPair(uint64(l))
+	l = len(m.OracleAssetId)
+	if l > 0 {
+		n += 1 + l + sovPair(uint64(l))
+	}
+	l = len(m.PerpetualOracleAssetId)
+	if l > 0 {
+		n += 1 + l + sovPair(uint64(l))
+	}
+	l = len(m.StakePriceOracleId)
+	if l > 0 {
+		n += 1 + l + sovPair(uint64(l))
+	}
 	l = len(m.MinAmountIn)
 	if l > 0 {
 		n += 1 + l + sovPair(uint64(l))
@@ -418,6 +522,72 @@ func (m *Pair) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 4:
 			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field TokenStakeMetadata", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowPair
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthPair
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthPair
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.TokenStakeMetadata.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 5:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field TokenYMetadata", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowPair
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthPair
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthPair
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.TokenYMetadata.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 6:
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field AmountOutMetadata", wireType)
 			}
 			var msglen int
@@ -449,7 +619,7 @@ func (m *Pair) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
-		case 5:
+		case 7:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Qm", wireType)
 			}
@@ -483,7 +653,7 @@ func (m *Pair) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
-		case 6:
+		case 8:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Ar", wireType)
 			}
@@ -517,7 +687,103 @@ func (m *Pair) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
-		case 7:
+		case 9:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field OracleAssetId", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowPair
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthPair
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthPair
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.OracleAssetId = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 10:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field PerpetualOracleAssetId", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowPair
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthPair
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthPair
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.PerpetualOracleAssetId = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 11:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field StakePriceOracleId", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowPair
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthPair
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthPair
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.StakePriceOracleId = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 12:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field MinAmountIn", wireType)
 			}
@@ -549,7 +815,7 @@ func (m *Pair) Unmarshal(dAtA []byte) error {
 			}
 			m.MinAmountIn = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
-		case 8:
+		case 13:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field MinAmountOut", wireType)
 			}
@@ -581,7 +847,7 @@ func (m *Pair) Unmarshal(dAtA []byte) error {
 			}
 			m.MinAmountOut = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
-		case 9:
+		case 14:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Model", wireType)
 			}

@@ -246,9 +246,9 @@ func (suite *StableKeeperTestSuite) TestMintGetPriceFromOracle() {
 	suite.Setup()
 	suite.Commit()
 	suite.app.StableKeeper.SetTestingMode(false)
-	suite.SetupOracleKeeper()
 	suite.RegisterValidator()
 	for _, tc := range testCases {
+		suite.SetupOracleKeeper(tc.pair.AmountInMetadata.Base)
 		suite.app.StableKeeper.AppendPair(s.ctx, tc.pair)
 		suite.OracleAggregateExchangeRateFromNet()
 		price, _ := suite.app.StableKeeper.GetAtomPrice(suite.ctx, tc.pair)
@@ -306,9 +306,9 @@ func (suite *StableKeeperTestSuite) TestBurnGetPriceFromOracle() {
 	suite.Setup()
 	suite.Commit()
 	suite.app.StableKeeper.SetTestingMode(false)
-	suite.SetupOracleKeeper()
 	suite.RegisterValidator()
 	for _, tc := range testCases {
+		suite.SetupOracleKeeper(tc.pair.AmountInMetadata.Base)
 		suite.OracleAggregateExchangeRateFromNet()
 		suite.app.StableKeeper.AppendPair(suite.ctx, tc.pair)
 		suite.AddTestCoins(10000, tc.pair.AmountInMetadata.Base)

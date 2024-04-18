@@ -18,6 +18,8 @@ const (
 
 	// PortID is the default port id that module binds to
 	PortID = "stable"
+
+	SystemModuleAccount = ModuleName + "_system_account"
 )
 
 var (

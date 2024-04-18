@@ -1,8 +1,6 @@
 syntax = "proto3";
 package core.stable.v1beta1;
 import "gogoproto/gogo.proto";
-
-
 import "cosmos/bank/v1beta1/bank.proto";
 option go_package = "github.com/QuadrateOrg/core/x/stable/types";
 
@@ -10,18 +8,23 @@ message Pair {
         uint64 id = 1;
         string pairId = 2;
         cosmos.bank.v1beta1.Metadata amountInMetadata = 3 [ (gogoproto.moretags) = "yaml:\"amountInMetadata\"", (gogoproto.nullable)   = false ];
-        cosmos.bank.v1beta1.Metadata amountOutMetadata = 4 [ (gogoproto.moretags) = "yaml:\"amountOutMetadata\"", (gogoproto.nullable)   = false ];
-        string qm = 5 [
+        cosmos.bank.v1beta1.Metadata tokenStakeMetadata = 4 [ (gogoproto.moretags) = "yaml:\"tokenStakeMetadata\"", (gogoproto.nullable)   = false ];
+        cosmos.bank.v1beta1.Metadata tokenYMetadata = 5 [ (gogoproto.moretags) = "yaml:\"tokenYMetadata\"", (gogoproto.nullable)   = false ];
+        cosmos.bank.v1beta1.Metadata amountOutMetadata = 6 [ (gogoproto.moretags) = "yaml:\"amountOutMetadata\"", (gogoproto.nullable)   = false ];
+        string qm = 7 [
                 (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
                 (gogoproto.moretags) = "yaml:\"qm\"",
                 (gogoproto.nullable) = false
         ];
-        string ar = 6 [
+        string ar = 8 [
                 (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
                 (gogoproto.moretags) = "yaml:\"ar\"",
                 (gogoproto.nullable) = false
         ];
-        string minAmountIn = 7;
-        string minAmountOut = 8;
-        string model = 9;
+        string oracleAssetId = 9;
+        string perpetualOracleAssetId = 10;
+        string stakePriceOracleId = 11;
+        string minAmountIn = 12;
+        string minAmountOut = 13;
+        string model = 14;
 }

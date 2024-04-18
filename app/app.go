@@ -172,6 +172,10 @@ import (
 	ibchookerkeeper "github.com/QuadrateOrg/core/x/ibchooker/keeper"
 	ibchookertypes "github.com/QuadrateOrg/core/x/ibchooker/types"
 
+	perpetualmodule "github.com/QuadrateOrg/core/x/perpetual"
+	perpetualmodulekeeper "github.com/QuadrateOrg/core/x/perpetual/keeper"
+	perpetualmoduletypes "github.com/QuadrateOrg/core/x/perpetual/types"
+
 	gmpmiddleware "github.com/QuadrateOrg/core/x/gmp"
 
 	// unnamed import of statik for swagger UI support
@@ -279,6 +283,7 @@ var (
 		oraclemodule.AppModuleBasic{},
 		stablemodule.AppModuleBasic{},
 		growmodule.AppModuleBasic{},
+		perpetualmodule.AppModuleBasic{},
 		dexmodule.AppModuleBasic{},
 		epochs.AppModuleBasic{},
 		liquidstakeibc.AppModuleBasic{},
@@ -304,11 +309,14 @@ var (
 		liquidstakeibctypes.ModuleName:                {authtypes.Minter, authtypes.Burner},
 		liquidstakeibctypes.DepositModuleAccount:      nil,
 		liquidstakeibctypes.UndelegationModuleAccount: {authtypes.Burner},
+		perpetualmoduletypes.ModuleName:               {authtypes.Minter, authtypes.Burner},
+		stablemoduletypes.SystemModuleAccount:         {authtypes.Minter, authtypes.Burner},
 	}
 
 	receiveAllowedMAcc = map[string]bool{
 		liquidstakeibctypes.DepositModuleAccount:      true,
 		liquidstakeibctypes.UndelegationModuleAccount: true,
+		stablemoduletypes.SystemModuleAccount:         true,
 	}
 )
 
@@ -363,6 +371,7 @@ type QuadrateApp struct { // nolint: golint
 	ICAControllerKeeper   icacontrollerkeeper.Keeper
 	InterchainQueryKeeper interchainquerykeeper.Keeper
 	TransferHooksKeeper   ibchookerkeeper.Keeper
+	PerpetualKeeper       perpetualmodulekeeper.Keeper
 
 	// make scoped keepers public for test purposes
 	ScopedIBCKeeper            capabilitykeeper.ScopedKeeper
@@ -428,7 +437,7 @@ func NewQuadrateApp(
 		stablemoduletypes.StoreKey, growmoduletypes.StoreKey,
 		dexmoduletypes.StoreKey, epochstypes.StoreKey,
 		liquidstakeibctypes.StoreKey, interchainquerytypes.StoreKey,
-		icacontrollertypes.StoreKey,
+		icacontrollertypes.StoreKey, perpetualmoduletypes.StoreKey,
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
 	memKeys := sdk.NewMemoryStoreKeys(capabilitytypes.MemStoreKey)
@@ -586,6 +595,24 @@ func NewQuadrateApp(
 	)
 	oracleModule := oraclemodule.NewAppModule(appCodec, app.OracleKeeper, app.AccountKeeper, app.BankKeeper)
 
+	app.DexKeeper = *dexmodulekeeper.NewKeeper(
+		appCodec,
+		keys[dexmoduletypes.StoreKey],
+		keys[dexmoduletypes.MemStoreKey],
+		app.GetSubspace(dexmoduletypes.ModuleName),
+		app.BankKeeper,
+	)
+	dexModule := dexmodule.NewAppModule(appCodec, app.DexKeeper, app.BankKeeper)
+
+	app.PerpetualKeeper = *perpetualmodulekeeper.NewKeeper(
+		appCodec,
+		keys[perpetualmoduletypes.StoreKey],
+		keys[perpetualmoduletypes.MemStoreKey],
+		app.GetSubspace(perpetualmoduletypes.ModuleName),
+		app.BankKeeper,
+		app.OracleKeeper,
+	)
+
 	app.StableKeeper = *stablemodulekeeper.NewKeeper(
 		appCodec,
 		keys[stablemoduletypes.StoreKey],
@@ -596,6 +623,9 @@ func NewQuadrateApp(
 		scopedStableKeeper,
 		app.BankKeeper,
 		app.OracleKeeper,
+		app.DexKeeper,
+		app.PerpetualKeeper,
+		app.AccountKeeper,
 	)
 	stableModule := stablemodule.NewAppModule(appCodec, app.StableKeeper, app.AccountKeeper, app.BankKeeper, app.OracleKeeper)
 	stableIBCModule := stablemodule.NewIBCModule(app.StableKeeper)
@@ -609,15 +639,6 @@ func NewQuadrateApp(
 		app.OracleKeeper,
 		app.StableKeeper,
 	)
-
-	app.DexKeeper = *dexmodulekeeper.NewKeeper(
-		appCodec,
-		keys[dexmoduletypes.StoreKey],
-		keys[dexmoduletypes.MemStoreKey],
-		app.GetSubspace(dexmoduletypes.ModuleName),
-		app.BankKeeper,
-	)
-	dexModule := dexmodule.NewAppModule(appCodec, app.DexKeeper, app.BankKeeper)
 
 	// Create swap middleware keeper
 	app.SwapKeeper = swapkeeper.NewKeeper(
@@ -852,6 +873,7 @@ func NewQuadrateApp(
 		ica.NewAppModule(&app.ICAControllerKeeper, &app.ICAHostKeeper),
 		liquidstakeibc.NewAppModule(app.LiquidStakeIBCKeeper),
 		interchainquery.NewAppModule(appCodec, app.InterchainQueryKeeper),
+		perpetualmodule.NewAppModule(appCodec, app.PerpetualKeeper, app.AccountKeeper, app.BankKeeper),
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
@@ -892,6 +914,7 @@ func NewQuadrateApp(
 		liquidstakeibctypes.ModuleName,
 		interchainquerytypes.ModuleName,
 		ibchookertypes.ModuleName,
+		perpetualmoduletypes.ModuleName,
 	)
 
 	app.mm.SetOrderEndBlockers(
@@ -926,6 +949,7 @@ func NewQuadrateApp(
 		liquidstakeibctypes.ModuleName,
 		interchainquerytypes.ModuleName,
 		ibchookertypes.ModuleName,
+		perpetualmoduletypes.ModuleName,
 	)
 
 	app.mm.SetOrderInitGenesis(
@@ -960,6 +984,7 @@ func NewQuadrateApp(
 		liquidstakeibctypes.ModuleName,
 		interchainquerytypes.ModuleName,
 		ibchookertypes.ModuleName,
+		perpetualmoduletypes.ModuleName,
 	)
 
 	app.mm.RegisterInvariants(&app.CrisisKeeper)
@@ -1172,6 +1197,7 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(growmoduletypes.ModuleName)
 	paramsKeeper.Subspace(dexmoduletypes.ModuleName)
 	paramsKeeper.Subspace(icacontrollertypes.SubModuleName)
+	paramsKeeper.Subspace(perpetualmoduletypes.ModuleName)
 	return paramsKeeper
 }
 
