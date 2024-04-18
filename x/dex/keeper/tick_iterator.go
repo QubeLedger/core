@@ -17,7 +17,6 @@ func (k Keeper) NewTickIterator(
 	tradePairID *types.TradePairID,
 ) TickIterator {
 	prefixStore := prefix.NewStore(ctx.KVStore(k.storeKey), types.TickLiquidityPrefix(tradePairID))
-
 	return TickIterator{
 		iter: prefixStore.Iterator(nil, nil),
 		cdc:  k.cdc,

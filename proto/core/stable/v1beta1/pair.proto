@@ -23,7 +23,8 @@ message Pair {
         ];
         string oracleAssetId = 9;
         string perpetualOracleAssetId = 10;
-        string minAmountIn = 11;
-        string minAmountOut = 12;
-        string model = 13;
+        string stakePriceOracleId = 11;
+        string minAmountIn = 12;
+        string minAmountOut = 13;
+        string model = 14;
 }

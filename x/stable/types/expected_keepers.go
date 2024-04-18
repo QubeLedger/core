@@ -5,6 +5,7 @@ import (
 	"time"
 
 	dextypes "github.com/QuadrateOrg/core/x/dex/types"
+	math_utils "github.com/QuadrateOrg/core/x/dex/utils/math"
 	perptypes "github.com/QuadrateOrg/core/x/perpetual/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/auth/types"
@@ -51,6 +52,16 @@ type DexKeeper interface {
 		callerAddr sdk.AccAddress,
 		receiverAddr sdk.AccAddress,
 	) (trancheKey string, totalInCoin sdk.Coin, swapInCoin sdk.Coin, swapOutCoin sdk.Coin, err error)
+
+	MultiHopSwapCore(
+		ctx sdk.Context,
+		amountIn sdk.Int,
+		routes []*dextypes.MultiHopRoute,
+		exitLimitPrice math_utils.PrecDec,
+		pickBestRoute bool,
+		callerAddr sdk.AccAddress,
+		receiverAddr sdk.AccAddress,
+	) (coinOut sdk.Coin, err error)
 }
 
 type PerpetualKeeper interface {

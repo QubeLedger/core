@@ -310,11 +310,13 @@ var (
 		liquidstakeibctypes.DepositModuleAccount:      nil,
 		liquidstakeibctypes.UndelegationModuleAccount: {authtypes.Burner},
 		perpetualmoduletypes.ModuleName:               {authtypes.Minter, authtypes.Burner},
+		stablemoduletypes.SystemModuleAccount:         {authtypes.Minter, authtypes.Burner},
 	}
 
 	receiveAllowedMAcc = map[string]bool{
 		liquidstakeibctypes.DepositModuleAccount:      true,
 		liquidstakeibctypes.UndelegationModuleAccount: true,
+		stablemoduletypes.SystemModuleAccount:         true,
 	}
 )
 
@@ -593,6 +595,24 @@ func NewQuadrateApp(
 	)
 	oracleModule := oraclemodule.NewAppModule(appCodec, app.OracleKeeper, app.AccountKeeper, app.BankKeeper)
 
+	app.DexKeeper = *dexmodulekeeper.NewKeeper(
+		appCodec,
+		keys[dexmoduletypes.StoreKey],
+		keys[dexmoduletypes.MemStoreKey],
+		app.GetSubspace(dexmoduletypes.ModuleName),
+		app.BankKeeper,
+	)
+	dexModule := dexmodule.NewAppModule(appCodec, app.DexKeeper, app.BankKeeper)
+
+	app.PerpetualKeeper = *perpetualmodulekeeper.NewKeeper(
+		appCodec,
+		keys[perpetualmoduletypes.StoreKey],
+		keys[perpetualmoduletypes.MemStoreKey],
+		app.GetSubspace(perpetualmoduletypes.ModuleName),
+		app.BankKeeper,
+		app.OracleKeeper,
+	)
+
 	app.StableKeeper = *stablemodulekeeper.NewKeeper(
 		appCodec,
 		keys[stablemoduletypes.StoreKey],
@@ -605,6 +625,7 @@ func NewQuadrateApp(
 		app.OracleKeeper,
 		app.DexKeeper,
 		app.PerpetualKeeper,
+		app.AccountKeeper,
 	)
 	stableModule := stablemodule.NewAppModule(appCodec, app.StableKeeper, app.AccountKeeper, app.BankKeeper, app.OracleKeeper)
 	stableIBCModule := stablemodule.NewIBCModule(app.StableKeeper)
@@ -619,15 +640,6 @@ func NewQuadrateApp(
 		app.StableKeeper,
 	)
 
-	app.DexKeeper = *dexmodulekeeper.NewKeeper(
-		appCodec,
-		keys[dexmoduletypes.StoreKey],
-		keys[dexmoduletypes.MemStoreKey],
-		app.GetSubspace(dexmoduletypes.ModuleName),
-		app.BankKeeper,
-	)
-	dexModule := dexmodule.NewAppModule(appCodec, app.DexKeeper, app.BankKeeper)
-
 	// Create swap middleware keeper
 	app.SwapKeeper = swapkeeper.NewKeeper(
 		appCodec,
@@ -636,15 +648,6 @@ func NewQuadrateApp(
 		app.BankKeeper,
 	)
 	swapModule := swapmiddleware.NewAppModule(app.SwapKeeper)
-
-	app.PerpetualKeeper = *perpetualmodulekeeper.NewKeeper(
-		appCodec,
-		keys[perpetualmoduletypes.StoreKey],
-		keys[perpetualmoduletypes.MemStoreKey],
-		app.GetSubspace(perpetualmoduletypes.ModuleName),
-		app.BankKeeper,
-		app.OracleKeeper,
-	)
 
 	// register the proposal types
 	govRouter := govtypes.NewRouter()

@@ -4,7 +4,7 @@ deps:
   - remote: buf.build
     owner: cosmos
     repository: cosmos-proto
-    commit: 1935555c206d4afb9e94615dfd0fad31
+    commit: 04467658e59e44bbb22fe568206e1f70
   - remote: buf.build
     owner: cosmos
     repository: cosmos-sdk

@@ -155,9 +155,10 @@ func (k Keeper) MultiHopSwap(
 ) (*types.MsgMultiHopSwapResponse, error) {
 	callerAddr := sdk.MustAccAddressFromBech32(msg.Creator)
 	receiverAddr := sdk.MustAccAddressFromBech32(msg.Receiver)
+	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	coinOut, err := k.MultiHopSwapCore(
-		goCtx,
+		ctx,
 		msg.AmountIn,
 		msg.Routes,
 		msg.ExitLimitPrice,

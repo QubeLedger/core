@@ -1,9 +1,8 @@
 package keeper
 
 import (
-	"time"
-
 	dextypes "github.com/QuadrateOrg/core/x/dex/types"
+	math_utils "github.com/QuadrateOrg/core/x/dex/utils/math"
 	perptypes "github.com/QuadrateOrg/core/x/perpetual/types"
 	"github.com/QuadrateOrg/core/x/stable/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -37,20 +36,32 @@ func (k Keeper) DeltaMint(ctx sdk.Context, msg *types.MsgMint, pair types.Pair) 
 		return err, sdk.Coin{}
 	}
 
-	maxAmountOut := sdk.NewInt(0)
-	_, _, _, coinOutSwap, err := k.dexKeeper.PlaceLimitOrderCore(
-		ctx.Context(),
-		pair.AmountInMetadata.Base,
-		pair.TokenStakeMetadata.Base,
+	price, err := k.oracleKeeper.GetExchangeRate(ctx, pair.OracleAssetId)
+	if err != nil {
+		return err, sdk.Coin{}
+	}
+
+	stake_price, err := k.oracleKeeper.GetExchangeRate(ctx, pair.StakePriceOracleId)
+	if err != nil {
+		return err, sdk.Coin{}
+	}
+
+	coinOutSwap, err := k.dexKeeper.MultiHopSwapCore(
+		ctx,
 		amountIn,
-		0, // TODO
-		dextypes.LimitOrderType_FILL_OR_KILL,
-		&time.Time{},
-		&maxAmountOut,
+		[]*dextypes.MultiHopRoute{
+			{[]string{
+				pair.AmountInMetadata.Base,
+				pair.TokenStakeMetadata.Base,
+			}},
+		},
+		math_utils.MustNewPrecDecFromStr(
+			stake_price.String(),
+		),
+		true,
 		k.GetSystemModuleAccount(ctx).GetAddress(),
 		k.GetSystemModuleAccount(ctx).GetAddress(),
 	)
-
 	if err != nil {
 		return err, sdk.Coin{}
 	}
@@ -67,11 +78,6 @@ func (k Keeper) DeltaMint(ctx sdk.Context, msg *types.MsgMint, pair types.Pair) 
 			amountOutAfterSwap.QuoRaw(2),
 		)).String(),
 	))
-	if err != nil {
-		return err, sdk.Coin{}
-	}
-
-	price, err := k.oracleKeeper.GetExchangeRate(ctx, pair.OracleAssetId)
 	if err != nil {
 		return err, sdk.Coin{}
 	}

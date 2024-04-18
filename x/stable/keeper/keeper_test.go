@@ -15,6 +15,7 @@ import (
 	"github.com/QuadrateOrg/core/x/oracle"
 	oraclekeeper "github.com/QuadrateOrg/core/x/oracle/keeper"
 	oracletypes "github.com/QuadrateOrg/core/x/oracle/types"
+	perptypes "github.com/QuadrateOrg/core/x/perpetual/types"
 	"github.com/QuadrateOrg/core/x/stable/types"
 	"github.com/buger/jsonparser"
 	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
@@ -32,11 +33,11 @@ import (
 
 type StableKeeperTestSuite struct {
 	suite.Suite
-	ctx        sdk.Context
-	app        *app.QuadrateApp
-	genesis    types.GenesisState
-	Address    sdk.AccAddress
-	ValPubKeys []cryptotypes.PubKey
+	ctx               sdk.Context
+	app               *app.QuadrateApp
+	Address           sdk.AccAddress
+	DexDepositAddress sdk.AccAddress
+	ValPubKeys        []cryptotypes.PubKey
 }
 
 var s *StableKeeperTestSuite
@@ -45,6 +46,7 @@ func (s *StableKeeperTestSuite) Setup() {
 	apptypes.SetConfig()
 	s.app = quadrateapptest.Setup(s.T(), "qube-1", false, 1)
 	s.Address = apptesting.CreateRandomAccounts(1)[0]
+	s.DexDepositAddress = apptesting.CreateRandomAccounts(1)[0]
 	s.ValPubKeys = simapp.CreateTestPubKeys(1)
 	s.Commit()
 	s.app.GrowKeeper.AppendPair(s.ctx, s.GetNormalGTokenPair(0))
@@ -83,7 +85,7 @@ func (suite *StableKeeperTestSuite) MintStable(amount int64, pair types.Pair) er
 func (s *StableKeeperTestSuite) GetNormalGMBPair(id uint64) types.Pair {
 	pair := types.Pair{
 		Id:     id,
-		PairId: fmt.Sprintf("%x", crypto.Sha256(append([]byte("uatom"+"uusd")))),
+		PairId: fmt.Sprintf("%x", crypto.Sha256(([]byte("uatom" + "uusd")))),
 		AmountInMetadata: banktypes.Metadata{
 			Description: "",
 			DenomUnits: []*banktypes.DenomUnit{
@@ -114,11 +116,66 @@ func (s *StableKeeperTestSuite) GetNormalGMBPair(id uint64) types.Pair {
 	return pair
 }
 
+func (s *StableKeeperTestSuite) GetNormalDeltaPair(id uint64) types.Pair {
+	pair := types.Pair{
+		Id:     id,
+		PairId: fmt.Sprintf("%x", crypto.Sha256(([]byte("uatom" + "uusd")))),
+		AmountInMetadata: banktypes.Metadata{
+			Description: "",
+			DenomUnits: []*banktypes.DenomUnit{
+				{Denom: "uatom", Exponent: uint32(0), Aliases: []string{"microatom"}},
+			},
+			Base:    "uatom",
+			Display: "ATOM",
+			Name:    "ATOM",
+			Symbol:  "ATOM",
+		},
+		TokenStakeMetadata: banktypes.Metadata{
+			Description: "",
+			DenomUnits: []*banktypes.DenomUnit{
+				{Denom: "qs/uatom", Exponent: uint32(0), Aliases: []string{}},
+			},
+			Base:    "qs/uatom",
+			Display: "qsATOM",
+			Name:    "qsATOM",
+			Symbol:  "qsATOM",
+		},
+		TokenYMetadata: banktypes.Metadata{
+			Description: "",
+			DenomUnits: []*banktypes.DenomUnit{
+				{Denom: "uusdc", Exponent: uint32(0), Aliases: []string{}},
+			},
+			Base:    "uusdc",
+			Display: "USDC",
+			Name:    "USDC",
+			Symbol:  "USDC",
+		},
+		AmountOutMetadata: banktypes.Metadata{
+			Description: "",
+			DenomUnits: []*banktypes.DenomUnit{
+				{Denom: "uusd", Exponent: uint32(0), Aliases: []string{"microusd"}},
+			},
+			Base:    "uusd",
+			Display: "usd",
+			Name:    "USQ",
+			Symbol:  "USQ",
+		},
+		MinAmountIn:            "20uatom",
+		MinAmountOut:           "20uusd",
+		Model:                  "delta",
+		OracleAssetId:          "ATOM",
+		PerpetualOracleAssetId: "qsATOM/USDC",
+		StakePriceOracleId:     "qsATOM/ATOM",
+	}
+
+	return pair
+}
+
 func (s *StableKeeperTestSuite) GetNormalGTokenPair(id uint64) growtypes.GTokenPair {
 	pair := growtypes.GTokenPair{
 		Id:            id,
-		DenomID:       fmt.Sprintf("%x", crypto.Sha256(append([]byte("ugusd")))),
-		QStablePairId: fmt.Sprintf("%x", crypto.Sha256(append([]byte("uatom"+"uusd")))),
+		DenomID:       fmt.Sprintf("%x", crypto.Sha256(([]byte("ugusd")))),
+		QStablePairId: fmt.Sprintf("%x", crypto.Sha256(([]byte("uatom" + "uusd")))),
 		GTokenMetadata: banktypes.Metadata{
 			Description: "",
 			DenomUnits: []*banktypes.DenomUnit{
@@ -138,6 +195,21 @@ func (s *StableKeeperTestSuite) GetNormalGTokenPair(id uint64) growtypes.GTokenP
 	}
 
 	return pair
+}
+
+func (suite *StableKeeperTestSuite) GetNormalTestVault(tokenX banktypes.Metadata, tokenY banktypes.Metadata, OracleAssetId string, InitLiq int64) *perptypes.Vault {
+	price, _ := s.app.OracleKeeper.GetExchangeRate(s.ctx, OracleAssetId)
+	return &perptypes.Vault{
+		VaultId:         s.app.PerpetualKeeper.GenerateVaultIdHash(tokenX.Base, tokenY.Base),
+		AmountXMetadata: tokenX,
+		AmountYMetadata: tokenY,
+		X:               sdk.NewInt(InitLiq),
+		Y:               (sdk.NewInt(InitLiq).ToDec().Quo(price)).RoundInt(),
+		K:               sdk.NewInt(InitLiq).Mul((sdk.NewInt(InitLiq).ToDec().Quo(price)).RoundInt()),
+		OracleAssetId:   OracleAssetId,
+		LongPositionId:  []string{},
+		ShortPositionId: []string{},
+	}
 }
 
 func (s *StableKeeperTestSuite) AddTestCoins(amount int64, denom string) {
@@ -240,15 +312,21 @@ func (s *StableKeeperTestSuite) OracleAggregateExchangeRateFromNet() {
 	s.Require().NoError(err)
 }
 
-func (s *StableKeeperTestSuite) SetupOracleKeeper() {
+func (s *StableKeeperTestSuite) OracleAggregateExchangeRateFromInput(denom string) {
+	err := s.PrevoteVotePrice(denom)
+	s.Require().NoError(err)
+}
+
+func (s *StableKeeperTestSuite) SetupOracleKeeper(denom string) {
 	params := s.app.OracleKeeper.GetParams(s.ctx)
-	params.Whitelist = oracletypes.DenomList{
-		{
-			Name: "ATOM",
-		},
-	}
+	params.Whitelist = append(params.Whitelist, oracletypes.Denom{Name: denom})
+	s.app.OracleKeeper.SetParams(s.ctx, params)
 	params.VotePeriod = 1
 	params.SlashWindow = 100
 	params.RewardDistributionWindow = 100
 	s.app.OracleKeeper.SetParams(s.ctx, params)
+}
+
+func (s *StableKeeperTestSuite) CalculateTickByPrice(price sdk.Dec) sdk.Dec {
+	return sdk.OneDec().Quo(price)
 }
